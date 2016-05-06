@@ -1,0 +1,33 @@
+<header ng-switch on="$location.path().indexOf('/Laps/new') > -1">
+    <h3 ng-switch-when="true">Create a new Lap</h3>
+    <h3 ng-switch-when="false">View or edit Lap</h3>
+</header>
+<form id="LapForm" name="LapForm" class="form-horizontal" role="form">
+    
+    <div class="form-group" ng-class="{'has-error': LapForm.timelap.$invalid}">
+        <label for="timelap" class="col-sm-2 control-label">Timelap</label>
+        <div id="timelapControls" class="col-sm-10">
+            <input id="timelap" name="timelap" type="number" required class="form-control" ng-model="lap.timelap" placeholder="Enter the Lap Timelap"></input>
+            <span class="help-block error" ng-show="LapForm.timelap.$error.required">required</span> 
+            <span class="help-block error" ng-show="LapForm.timelap.$error.number">not a number</span>
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': LapForm.beacon.$invalid}">
+        <label for="beacon" class="col-sm-2 control-label">Beacon</label>
+        <div id="beaconControls" class="col-sm-10">
+            <input id="beacon" name="beacon" type="number" required class="form-control" ng-model="lap.beacon" placeholder="Enter the Lap Beacon"></input>
+            <span class="help-block error" ng-show="LapForm.beacon.$error.required">required</span> 
+            <span class="help-block error" ng-show="LapForm.beacon.$error.number">not a number</span>
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button id="saveLap" name="saveLap" class="btn btn-primary" ng-disabled="isClean() || LapForm.$invalid" ng-click="save()"><span class="glyphicon glyphicon-ok-sign"></span> Save</button>
+            <button id="cancel" name="cancel" class="btn btn-default" ng-click="cancel()"><span class="glyphicon glyphicon-remove-sign"></span> Cancel</button>
+            <button id="deleteLap" name="deleteLap" class="btn btn-danger" ng-show="lap.id" ng-click="remove()"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+        </div>
+    </div>
+</form>

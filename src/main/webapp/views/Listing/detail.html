@@ -1,0 +1,147 @@
+<header ng-switch on="$location.path().indexOf('/Listings/new') > -1">
+    <h3 ng-switch-when="true">Create a new Listing</h3>
+    <h3 ng-switch-when="false">View or edit Listing</h3>
+</header>
+<form id="ListingForm" name="ListingForm" class="form-horizontal" role="form">
+    
+    <div class="form-group" ng-class="{'has-error': ListingForm.commande.$invalid}">
+        <label for="commande" class="col-sm-2 control-label">Commande</label>
+        <div id="commandeControls" class="col-sm-10">
+            <input id="commande" name="commande" type="number" required class="form-control" ng-model="listing.commande" placeholder="Enter the Listing Commande"></input>
+            <span class="help-block error" ng-show="ListingForm.commande.$error.required">required</span> 
+            <span class="help-block error" ng-show="ListingForm.commande.$error.number">not a number</span>
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': ListingForm.idShop.$invalid}">
+        <label for="idShop" class="col-sm-2 control-label">Id Shop</label>
+        <div id="idShopControls" class="col-sm-10">
+            <input id="idShop" name="idShop" type="number" required class="form-control" ng-model="listing.idShop" placeholder="Enter the Listing Id Shop"></input>
+            <span class="help-block error" ng-show="ListingForm.idShop.$error.required">required</span> 
+            <span class="help-block error" ng-show="ListingForm.idShop.$error.number">not a number</span>
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': ListingForm.nom.$invalid}">
+        <label for="nom" class="col-sm-2 control-label">Nom</label>
+        <div id="nomControls" class="col-sm-10">
+            <input id="nom" name="nom" type="text" required class="form-control" ng-model="listing.nom" placeholder="Enter the Listing Nom"></input>
+            <span class="help-block error" ng-show="ListingForm.nom.$error.required">required</span> 
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': ListingForm.prenom.$invalid}">
+        <label for="prenom" class="col-sm-2 control-label">Prenom</label>
+        <div id="prenomControls" class="col-sm-10">
+            <input id="prenom" name="prenom" type="text" required class="form-control" ng-model="listing.prenom" placeholder="Enter the Listing Prenom"></input>
+            <span class="help-block error" ng-show="ListingForm.prenom.$error.required">required</span> 
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': ListingForm.moto.$invalid}">
+        <label for="moto" class="col-sm-2 control-label">Moto</label>
+        <div id="motoControls" class="col-sm-10">
+            <input id="moto" name="moto" type="text" required class="form-control" ng-model="listing.moto" placeholder="Enter the Listing Moto"></input>
+            <span class="help-block error" ng-show="ListingForm.moto.$error.required">required</span> 
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': ListingForm.cylindree.$invalid}">
+        <label for="cylindree" class="col-sm-2 control-label">Cylindree</label>
+        <div id="cylindreeControls" class="col-sm-10">
+            <input id="cylindree" name="cylindree" type="text" required class="form-control" ng-model="listing.cylindree" placeholder="Enter the Listing Cylindree"></input>
+            <span class="help-block error" ng-show="ListingForm.cylindree.$error.required">required</span> 
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': ListingForm.adresse.$invalid}">
+        <label for="adresse" class="col-sm-2 control-label">Adresse</label>
+        <div id="adresseControls" class="col-sm-10">
+            <input id="adresse" name="adresse" type="text" required class="form-control" ng-model="listing.adresse" placeholder="Enter the Listing Adresse"></input>
+            <span class="help-block error" ng-show="ListingForm.adresse.$error.required">required</span> 
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': ListingForm.telephone.$invalid}">
+        <label for="telephone" class="col-sm-2 control-label">Telephone</label>
+        <div id="telephoneControls" class="col-sm-10">
+            <input id="telephone" name="telephone" type="text" required class="form-control" ng-model="listing.telephone" placeholder="Enter the Listing Telephone"></input>
+            <span class="help-block error" ng-show="ListingForm.telephone.$error.required">required</span> 
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': ListingForm.rc.$invalid}">
+        <label for="rc" class="col-sm-2 control-label">Rc</label>
+        <div id="rcControls" class="col-sm-10">
+            <input id="rc" name="rc" type="text" required class="form-control" ng-model="listing.rc" placeholder="Enter the Listing Rc"></input>
+            <span class="help-block error" ng-show="ListingForm.rc.$error.required">required</span> 
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': ListingForm.indiv.$invalid}">
+        <label for="indiv" class="col-sm-2 control-label">Indiv</label>
+        <div id="indivControls" class="col-sm-10">
+            <input id="indiv" name="indiv" type="text" required class="form-control" ng-model="listing.indiv" placeholder="Enter the Listing Indiv"></input>
+            <span class="help-block error" ng-show="ListingForm.indiv.$error.required">required</span> 
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': ListingForm.licence.$invalid}">
+        <label for="licence" class="col-sm-2 control-label">Licence</label>
+        <div id="licenceControls" class="col-sm-10">
+            <input id="licence" name="licence" type="text" required class="form-control" ng-model="listing.licence" placeholder="Enter the Listing Licence"></input>
+            <span class="help-block error" ng-show="ListingForm.licence.$error.required">required</span> 
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': ListingForm.emplacement.$invalid}">
+        <label for="emplacement" class="col-sm-2 control-label">Emplacement</label>
+        <div id="emplacementControls" class="col-sm-10">
+            <input id="emplacement" name="emplacement" type="text" required class="form-control" ng-model="listing.emplacement" placeholder="Enter the Listing Emplacement"></input>
+            <span class="help-block error" ng-show="ListingForm.emplacement.$error.required">required</span> 
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': ListingForm.beacon.$invalid}">
+        <label for="beacon" class="col-sm-2 control-label">Beacon</label>
+        <div id="beaconControls" class="col-sm-10">
+            <input id="beacon" name="beacon" type="number" required class="form-control" ng-model="listing.beacon" placeholder="Enter the Listing Beacon"></input>
+            <span class="help-block error" ng-show="ListingForm.beacon.$error.required">required</span> 
+            <span class="help-block error" ng-show="ListingForm.beacon.$error.number">not a number</span>
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': ListingForm.groupe.$invalid}">
+        <label for="groupe" class="col-sm-2 control-label">Groupe</label>
+        <div id="groupeControls" class="col-sm-10">
+            <input id="groupe" name="groupe" type="number" required class="form-control" ng-model="listing.groupe" placeholder="Enter the Listing Groupe"></input>
+            <span class="help-block error" ng-show="ListingForm.groupe.$error.required">required</span> 
+            <span class="help-block error" ng-show="ListingForm.groupe.$error.number">not a number</span>
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': ListingForm.paiement.$invalid}">
+        <label for="paiement" class="col-sm-2 control-label">Paiement</label>
+        <div id="paiementControls" class="col-sm-10">
+            <input id="paiement" name="paiement" type="text" required class="form-control" ng-model="listing.paiement" placeholder="Enter the Listing Paiement"></input>
+            <span class="help-block error" ng-show="ListingForm.paiement.$error.required">required</span> 
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': ListingForm.valid.$invalid}">
+        <label for="valid" class="col-sm-2 control-label">Valid</label>
+        <div id="validControls" class="col-sm-10">
+            <input id="valid" name="valid" type="text" required class="form-control" ng-model="listing.valid" placeholder="Enter the Listing Valid"></input>
+            <span class="help-block error" ng-show="ListingForm.valid.$error.required">required</span> 
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button id="saveListing" name="saveListing" class="btn btn-primary" ng-disabled="isClean() || ListingForm.$invalid" ng-click="save()"><span class="glyphicon glyphicon-ok-sign"></span> Save</button>
+            <button id="cancel" name="cancel" class="btn btn-default" ng-click="cancel()"><span class="glyphicon glyphicon-remove-sign"></span> Cancel</button>
+            <button id="deleteListing" name="deleteListing" class="btn btn-danger" ng-show="listing.id" ng-click="remove()"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+        </div>
+    </div>
+</form>

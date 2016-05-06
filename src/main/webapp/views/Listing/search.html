@@ -1,0 +1,192 @@
+<div class="form-horizontal">
+    <h3>Create a new Listing</h3>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-sm-2">
+            <a id="Create" name="Create" class="btn btn-primary" href="#/Listings/new"><span class="glyphicon glyphicon-plus-sign"></span> Create</a>
+        </div>
+    </div>
+</div>
+<hr/>
+<div>
+    <h3>Search for Listings</h3>
+    <form id="ListingSearch" class="form-horizontal">
+        
+    <div class="form-group">
+        <label for="commande" class="col-sm-2 control-label">Commande</label>
+        <div class="col-sm-10">
+            <input id="commande" name="commande" class="form-control" type="text" ng-model="search.commande" placeholder="Enter the Listing Commande"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="idShop" class="col-sm-2 control-label">Id Shop</label>
+        <div class="col-sm-10">
+            <input id="idShop" name="idShop" class="form-control" type="text" ng-model="search.idShop" placeholder="Enter the Listing Id Shop"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="nom" class="col-sm-2 control-label">Nom</label>
+        <div class="col-sm-10">
+            <input id="nom" name="nom" class="form-control" type="text" ng-model="search.nom" placeholder="Enter the Listing Nom"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="prenom" class="col-sm-2 control-label">Prenom</label>
+        <div class="col-sm-10">
+            <input id="prenom" name="prenom" class="form-control" type="text" ng-model="search.prenom" placeholder="Enter the Listing Prenom"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="moto" class="col-sm-2 control-label">Moto</label>
+        <div class="col-sm-10">
+            <input id="moto" name="moto" class="form-control" type="text" ng-model="search.moto" placeholder="Enter the Listing Moto"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="cylindree" class="col-sm-2 control-label">Cylindree</label>
+        <div class="col-sm-10">
+            <input id="cylindree" name="cylindree" class="form-control" type="text" ng-model="search.cylindree" placeholder="Enter the Listing Cylindree"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="adresse" class="col-sm-2 control-label">Adresse</label>
+        <div class="col-sm-10">
+            <input id="adresse" name="adresse" class="form-control" type="text" ng-model="search.adresse" placeholder="Enter the Listing Adresse"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="telephone" class="col-sm-2 control-label">Telephone</label>
+        <div class="col-sm-10">
+            <input id="telephone" name="telephone" class="form-control" type="text" ng-model="search.telephone" placeholder="Enter the Listing Telephone"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="rc" class="col-sm-2 control-label">Rc</label>
+        <div class="col-sm-10">
+            <input id="rc" name="rc" class="form-control" type="text" ng-model="search.rc" placeholder="Enter the Listing Rc"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="indiv" class="col-sm-2 control-label">Indiv</label>
+        <div class="col-sm-10">
+            <input id="indiv" name="indiv" class="form-control" type="text" ng-model="search.indiv" placeholder="Enter the Listing Indiv"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="licence" class="col-sm-2 control-label">Licence</label>
+        <div class="col-sm-10">
+            <input id="licence" name="licence" class="form-control" type="text" ng-model="search.licence" placeholder="Enter the Listing Licence"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="emplacement" class="col-sm-2 control-label">Emplacement</label>
+        <div class="col-sm-10">
+            <input id="emplacement" name="emplacement" class="form-control" type="text" ng-model="search.emplacement" placeholder="Enter the Listing Emplacement"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="beacon" class="col-sm-2 control-label">Beacon</label>
+        <div class="col-sm-10">
+            <input id="beacon" name="beacon" class="form-control" type="text" ng-model="search.beacon" placeholder="Enter the Listing Beacon"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="groupe" class="col-sm-2 control-label">Groupe</label>
+        <div class="col-sm-10">
+            <input id="groupe" name="groupe" class="form-control" type="text" ng-model="search.groupe" placeholder="Enter the Listing Groupe"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="paiement" class="col-sm-2 control-label">Paiement</label>
+        <div class="col-sm-10">
+            <input id="paiement" name="paiement" class="form-control" type="text" ng-model="search.paiement" placeholder="Enter the Listing Paiement"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="valid" class="col-sm-2 control-label">Valid</label>
+        <div class="col-sm-10">
+            <input id="valid" name="valid" class="form-control" type="text" ng-model="search.valid" placeholder="Enter the Listing Valid"></input>
+        </div>
+    </div>
+
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-sm-10">
+                <a id="Search" name="Search" class="btn btn-primary" ng-click="performSearch()"><span class="glyphicon glyphicon-search"></span> Search</a>
+            </div>
+        </div>
+    </form>
+</div>
+<div id="search-results">
+        <div class="table-responsive">
+        <table class="table table-responsive table-bordered table-striped clearfix">
+            <thead>
+                <tr>
+                    <th>Commande</th>
+                    <th>Id Shop</th>
+                    <th>Nom</th>
+                    <th>Prenom</th>
+                    <th>Moto</th>
+                    <th>Cylindree</th>
+                    <th>Adresse</th>
+                    <th>Telephone</th>
+                    <th>Rc</th>
+                    <th>Indiv</th>
+                    <th>Licence</th>
+                    <th>Emplacement</th>
+                    <th>Beacon</th>
+                    <th>Groupe</th>
+                    <th>Paiement</th>
+                    <th>Valid</th>
+                </tr>
+            </thead>
+            <tbody id="search-results-body">
+                <tr ng-repeat="result in filteredResults | startFrom:currentPage*pageSize | limitTo:pageSize">
+                    <td><a href="#/Listings/edit/{{result.id}}">{{result.commande}}</a></td>
+                    <td><a href="#/Listings/edit/{{result.id}}">{{result.idShop}}</a></td>
+                    <td><a href="#/Listings/edit/{{result.id}}">{{result.nom}}</a></td>
+                    <td><a href="#/Listings/edit/{{result.id}}">{{result.prenom}}</a></td>
+                    <td><a href="#/Listings/edit/{{result.id}}">{{result.moto}}</a></td>
+                    <td><a href="#/Listings/edit/{{result.id}}">{{result.cylindree}}</a></td>
+                    <td><a href="#/Listings/edit/{{result.id}}">{{result.adresse}}</a></td>
+                    <td><a href="#/Listings/edit/{{result.id}}">{{result.telephone}}</a></td>
+                    <td><a href="#/Listings/edit/{{result.id}}">{{result.rc}}</a></td>
+                    <td><a href="#/Listings/edit/{{result.id}}">{{result.indiv}}</a></td>
+                    <td><a href="#/Listings/edit/{{result.id}}">{{result.licence}}</a></td>
+                    <td><a href="#/Listings/edit/{{result.id}}">{{result.emplacement}}</a></td>
+                    <td><a href="#/Listings/edit/{{result.id}}">{{result.beacon}}</a></td>
+                    <td><a href="#/Listings/edit/{{result.id}}">{{result.groupe}}</a></td>
+                    <td><a href="#/Listings/edit/{{result.id}}">{{result.paiement}}</a></td>
+                    <td><a href="#/Listings/edit/{{result.id}}">{{result.valid}}</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+        <ul class="pagination pagination-centered">
+        <li ng-class="{disabled:currentPage == 0}">
+            <a id="prev" href ng-click="previous()">«</a>
+        </li>
+        <li ng-repeat="n in pageRange" ng-class="{active:currentPage == n}" ng-click="setPage(n)">
+            <a href ng-bind="n + 1">1</a>
+        </li>
+        <li ng-class="{disabled: currentPage == (numberOfPages() - 1)}">
+            <a id="next" href ng-click="next()">»</a>
+        </li>
+    </ul>
+
+</div>

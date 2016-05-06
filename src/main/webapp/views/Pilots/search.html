@@ -1,0 +1,111 @@
+<div class="form-horizontal">
+    <h3>Create a new Pilots</h3>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-sm-2">
+            <a id="Create" name="Create" class="btn btn-primary" href="#/Pilots/new"><span class="glyphicon glyphicon-plus-sign"></span> Create</a>
+        </div>
+    </div>
+</div>
+<hr/>
+<div>
+    <h3>Search for Pilots</h3>
+    <form id="PilotsSearch" class="form-horizontal">
+        
+    <div class="form-group">
+        <label for="idShop" class="col-sm-2 control-label">Id Shop</label>
+        <div class="col-sm-10">
+            <input id="idShop" name="idShop" class="form-control" type="text" ng-model="search.idShop" placeholder="Enter the Pilots Id Shop"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="nom" class="col-sm-2 control-label">Nom</label>
+        <div class="col-sm-10">
+            <input id="nom" name="nom" class="form-control" type="text" ng-model="search.nom" placeholder="Enter the Pilots Nom"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="prenom" class="col-sm-2 control-label">Prenom</label>
+        <div class="col-sm-10">
+            <input id="prenom" name="prenom" class="form-control" type="text" ng-model="search.prenom" placeholder="Enter the Pilots Prenom"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="moto" class="col-sm-2 control-label">Moto</label>
+        <div class="col-sm-10">
+            <input id="moto" name="moto" class="form-control" type="text" ng-model="search.moto" placeholder="Enter the Pilots Moto"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="cylindree" class="col-sm-2 control-label">Cylindree</label>
+        <div class="col-sm-10">
+            <input id="cylindree" name="cylindree" class="form-control" type="text" ng-model="search.cylindree" placeholder="Enter the Pilots Cylindree"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="groupe" class="col-sm-2 control-label">Groupe</label>
+        <div class="col-sm-10">
+            <input id="groupe" name="groupe" class="form-control" type="text" ng-model="search.groupe" placeholder="Enter the Pilots Groupe"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="beacon" class="col-sm-2 control-label">Beacon</label>
+        <div class="col-sm-10">
+            <input id="beacon" name="beacon" class="form-control" type="text" ng-model="search.beacon" placeholder="Enter the Pilots Beacon"></input>
+        </div>
+    </div>
+
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-sm-10">
+                <a id="Search" name="Search" class="btn btn-primary" ng-click="performSearch()"><span class="glyphicon glyphicon-search"></span> Search</a>
+            </div>
+        </div>
+    </form>
+</div>
+<div id="search-results">
+        <div class="table-responsive">
+        <table class="table table-responsive table-bordered table-striped clearfix">
+            <thead>
+                <tr>
+                    <th>Id Shop</th>
+                    <th>Nom</th>
+                    <th>Prenom</th>
+                    <th>Moto</th>
+                    <th>Cylindree</th>
+                    <th>Groupe</th>
+                    <th>Beacon</th>
+                </tr>
+            </thead>
+            <tbody id="search-results-body">
+                <tr ng-repeat="result in filteredResults | startFrom:currentPage*pageSize | limitTo:pageSize">
+                    <td><a href="#/Pilots/edit/{{result.id}}">{{result.idShop}}</a></td>
+                    <td><a href="#/Pilots/edit/{{result.id}}">{{result.nom}}</a></td>
+                    <td><a href="#/Pilots/edit/{{result.id}}">{{result.prenom}}</a></td>
+                    <td><a href="#/Pilots/edit/{{result.id}}">{{result.moto}}</a></td>
+                    <td><a href="#/Pilots/edit/{{result.id}}">{{result.cylindree}}</a></td>
+                    <td><a href="#/Pilots/edit/{{result.id}}">{{result.groupe}}</a></td>
+                    <td><a href="#/Pilots/edit/{{result.id}}">{{result.beacon}}</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+        <ul class="pagination pagination-centered">
+        <li ng-class="{disabled:currentPage == 0}">
+            <a id="prev" href ng-click="previous()">«</a>
+        </li>
+        <li ng-repeat="n in pageRange" ng-class="{active:currentPage == n}" ng-click="setPage(n)">
+            <a href ng-bind="n + 1">1</a>
+        </li>
+        <li ng-class="{disabled: currentPage == (numberOfPages() - 1)}">
+            <a id="next" href ng-click="next()">»</a>
+        </li>
+    </ul>
+
+</div>
