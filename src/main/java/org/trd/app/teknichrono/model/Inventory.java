@@ -1,4 +1,4 @@
-package org.jboss.tools.example.forge.model;
+package org.trd.app.teknichrono.model;
 // Generated 5 mai 2016 11:08:49 by Hibernate Tools 4.3.1.Final
 
 import javax.persistence.Column;

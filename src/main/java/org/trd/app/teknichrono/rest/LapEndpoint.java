@@ -1,4 +1,4 @@
-package org.jboss.tools.example.forge.rest;
+package org.trd.app.teknichrono.rest;
 
 import java.util.List;
 
@@ -19,32 +19,33 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
 
-import org.jboss.tools.example.forge.model.Listing;
+import org.trd.app.teknichrono.model.Lap;
+
+import javax.ws.rs.core.UriBuilder;
 
 /**
  * 
  */
 @Stateless
-@Path("/listings")
-public class ListingEndpoint {
-	@PersistenceContext(unitName = "jboss-forge-html5-persistence-unit")
+@Path("/laps")
+public class LapEndpoint {
+	@PersistenceContext(unitName = "teknichrono-persistence-unit")
 	private EntityManager em;
 
 	@POST
 	@Consumes("application/json")
-	public Response create(Listing entity) {
+	public Response create(Lap entity) {
 		em.persist(entity);
 		return Response.created(
-				UriBuilder.fromResource(ListingEndpoint.class)
+				UriBuilder.fromResource(LapEndpoint.class)
 						.path(String.valueOf(entity.getId())).build()).build();
 	}
 
 	@DELETE
 	@Path("/{id:[0-9][0-9]*}")
 	public Response deleteById(@PathParam("id") int id) {
-		Listing entity = em.find(Listing.class, id);
+		Lap entity = em.find(Lap.class, id);
 		if (entity == null) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
@@ -56,12 +57,12 @@ public class ListingEndpoint {
 	@Path("/{id:[0-9][0-9]*}")
 	@Produces("application/json")
 	public Response findById(@PathParam("id") int id) {
-		TypedQuery<Listing> findByIdQuery = em
+		TypedQuery<Lap> findByIdQuery = em
 				.createQuery(
-						"SELECT DISTINCT l FROM Listing l WHERE l.id = :entityId ORDER BY l.id",
-						Listing.class);
+						"SELECT DISTINCT l FROM Lap l WHERE l.id = :entityId ORDER BY l.id",
+						Lap.class);
 		findByIdQuery.setParameter("entityId", id);
-		Listing entity;
+		Lap entity;
 		try {
 			entity = findByIdQuery.getSingleResult();
 		} catch (NoResultException nre) {
@@ -75,32 +76,31 @@ public class ListingEndpoint {
 
 	@GET
 	@Produces("application/json")
-	public List<Listing> listAll(@QueryParam("start") Integer startPosition,
+	public List<Lap> listAll(@QueryParam("start") Integer startPosition,
 			@QueryParam("max") Integer maxResult) {
-		TypedQuery<Listing> findAllQuery = em
-				.createQuery("SELECT DISTINCT l FROM Listing l ORDER BY l.id",
-						Listing.class);
+		TypedQuery<Lap> findAllQuery = em.createQuery(
+				"SELECT DISTINCT l FROM Lap l ORDER BY l.id", Lap.class);
 		if (startPosition != null) {
 			findAllQuery.setFirstResult(startPosition);
 		}
 		if (maxResult != null) {
 			findAllQuery.setMaxResults(maxResult);
 		}
-		final List<Listing> results = findAllQuery.getResultList();
+		final List<Lap> results = findAllQuery.getResultList();
 		return results;
 	}
 
 	@PUT
 	@Path("/{id:[0-9][0-9]*}")
 	@Consumes("application/json")
-	public Response update(@PathParam("id") int id, Listing entity) {
+	public Response update(@PathParam("id") int id, Lap entity) {
 		if (entity == null) {
 			return Response.status(Status.BAD_REQUEST).build();
 		}
 		if (id != entity.getId()) {
 			return Response.status(Status.CONFLICT).entity(entity).build();
 		}
-		if (em.find(Listing.class, id) == null) {
+		if (em.find(Lap.class, id) == null) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
 		try {

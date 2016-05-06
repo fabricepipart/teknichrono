@@ -1,4 +1,4 @@
-package org.jboss.tools.example.forge.rest;
+package org.trd.app.teknichrono.rest;
 
 import java.util.List;
 
@@ -19,9 +19,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
 
-import org.jboss.tools.example.forge.model.Inventory;
+import org.trd.app.teknichrono.model.Inventory;
+
+import javax.ws.rs.core.UriBuilder;
 
 /**
  * 
@@ -29,7 +30,7 @@ import org.jboss.tools.example.forge.model.Inventory;
 @Stateless
 @Path("/inventories")
 public class InventoryEndpoint {
-	@PersistenceContext(unitName = "jboss-forge-html5-persistence-unit")
+	@PersistenceContext(unitName = "teknichrono-persistence-unit")
 	private EntityManager em;
 
 	@POST

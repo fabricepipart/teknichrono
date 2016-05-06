@@ -1,4 +1,4 @@
-package org.jboss.tools.example.forge.rest;
+package org.trd.app.teknichrono.rest;
 
 import java.util.List;
 
@@ -19,32 +19,33 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
 
-import org.jboss.tools.example.forge.model.Member;
+import org.trd.app.teknichrono.model.Listing;
+
+import javax.ws.rs.core.UriBuilder;
 
 /**
  * 
  */
 @Stateless
-@Path("/members")
-public class MemberEndpoint {
-	@PersistenceContext(unitName = "jboss-forge-html5-persistence-unit")
+@Path("/listings")
+public class ListingEndpoint {
+	@PersistenceContext(unitName = "teknichrono-persistence-unit")
 	private EntityManager em;
 
 	@POST
 	@Consumes("application/json")
-	public Response create(Member entity) {
+	public Response create(Listing entity) {
 		em.persist(entity);
 		return Response.created(
-				UriBuilder.fromResource(MemberEndpoint.class)
+				UriBuilder.fromResource(ListingEndpoint.class)
 						.path(String.valueOf(entity.getId())).build()).build();
 	}
 
 	@DELETE
 	@Path("/{id:[0-9][0-9]*}")
-	public Response deleteById(@PathParam("id") Long id) {
-		Member entity = em.find(Member.class, id);
+	public Response deleteById(@PathParam("id") int id) {
+		Listing entity = em.find(Listing.class, id);
 		if (entity == null) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
@@ -55,13 +56,13 @@ public class MemberEndpoint {
 	@GET
 	@Path("/{id:[0-9][0-9]*}")
 	@Produces("application/json")
-	public Response findById(@PathParam("id") Long id) {
-		TypedQuery<Member> findByIdQuery = em
+	public Response findById(@PathParam("id") int id) {
+		TypedQuery<Listing> findByIdQuery = em
 				.createQuery(
-						"SELECT DISTINCT m FROM Member m WHERE m.id = :entityId ORDER BY m.id",
-						Member.class);
+						"SELECT DISTINCT l FROM Listing l WHERE l.id = :entityId ORDER BY l.id",
+						Listing.class);
 		findByIdQuery.setParameter("entityId", id);
-		Member entity;
+		Listing entity;
 		try {
 			entity = findByIdQuery.getSingleResult();
 		} catch (NoResultException nre) {
@@ -75,34 +76,32 @@ public class MemberEndpoint {
 
 	@GET
 	@Produces("application/json")
-	public List<Member> listAll(@QueryParam("start") Integer startPosition,
+	public List<Listing> listAll(@QueryParam("start") Integer startPosition,
 			@QueryParam("max") Integer maxResult) {
-		TypedQuery<Member> findAllQuery = em.createQuery(
-				"SELECT DISTINCT m FROM Member m ORDER BY m.id", Member.class);
+		TypedQuery<Listing> findAllQuery = em
+				.createQuery("SELECT DISTINCT l FROM Listing l ORDER BY l.id",
+						Listing.class);
 		if (startPosition != null) {
 			findAllQuery.setFirstResult(startPosition);
 		}
 		if (maxResult != null) {
 			findAllQuery.setMaxResults(maxResult);
 		}
-		final List<Member> results = findAllQuery.getResultList();
+		final List<Listing> results = findAllQuery.getResultList();
 		return results;
 	}
 
 	@PUT
 	@Path("/{id:[0-9][0-9]*}")
 	@Consumes("application/json")
-	public Response update(@PathParam("id") Long id, Member entity) {
+	public Response update(@PathParam("id") int id, Listing entity) {
 		if (entity == null) {
 			return Response.status(Status.BAD_REQUEST).build();
 		}
-		if (id == null) {
-			return Response.status(Status.BAD_REQUEST).build();
-		}
-		if (!id.equals(entity.getId())) {
+		if (id != entity.getId()) {
 			return Response.status(Status.CONFLICT).entity(entity).build();
 		}
-		if (em.find(Member.class, id) == null) {
+		if (em.find(Listing.class, id) == null) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
 		try {

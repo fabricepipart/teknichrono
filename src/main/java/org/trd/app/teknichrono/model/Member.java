@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.tools.example.forge.model;
+package org.trd.app.teknichrono.model;
 
 import java.io.Serializable;
 

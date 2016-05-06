@@ -1,4 +1,4 @@
-package org.jboss.tools.example.forge.rest;
+package org.trd.app.teknichrono.rest;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
