@@ -2,11 +2,8 @@ package org.trd.app.teknichrono.model;
 
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -39,9 +36,6 @@ public class Event implements java.io.Serializable {
 
 	@Column(nullable = false)
 	private String name;
-
-	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
-	private Set<LapTime> laptimes = new HashSet<LapTime>();
 
 	public int getId() {
 		return this.id;
@@ -89,14 +83,6 @@ public class Event implements java.io.Serializable {
 		if (name != null && !name.trim().isEmpty())
 			result += "name: " + name;
 		return result;
-	}
-
-	public Set<LapTime> getLaptimes() {
-		return this.laptimes;
-	}
-
-	public void setLaptimes(final Set<LapTime> laptimes) {
-		this.laptimes = laptimes;
 	}
 
 }
