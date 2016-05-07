@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
+import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
@@ -21,8 +22,12 @@ public class Event implements java.io.Serializable {
 	private static final long serialVersionUID = 929783339304030614L;
 
 	@Id
-	@Column(name = "ID", unique = true, nullable = false)
+	@Column(name = "id", unique = true, nullable = false)
 	private int id;
+
+	@Version
+	@Column(name = "version")
+	private int version;
 
 	@Column(nullable = false)
 	private Date beginning;
@@ -43,6 +48,14 @@ public class Event implements java.io.Serializable {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public int getVersion() {
+		return this.version;
+	}
+
+	public void setVersion(final int version) {
+		this.version = version;
 	}
 
 	public Date getBeginning() {

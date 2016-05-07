@@ -3,7 +3,10 @@ package org.trd.app.teknichrono.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
@@ -15,7 +18,16 @@ public class Beacon implements java.io.Serializable {
 	 */
 	private static final long serialVersionUID = -2438563507266191424L;
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "id", updatable = false, nullable = false)
 	private int id;
+
+	@Version
+	@Column(name = "version")
+	private int version;
+
+	@Column(nullable = false)
 	private int number;
 
 	public Beacon() {
@@ -26,8 +38,6 @@ public class Beacon implements java.io.Serializable {
 		this.number = number;
 	}
 
-	@Id
-	@Column(name = "ID", unique = true, nullable = false)
 	public int getId() {
 		return this.id;
 	}
@@ -36,7 +46,14 @@ public class Beacon implements java.io.Serializable {
 		this.id = id;
 	}
 
-	@Column(name = "NUMBER", nullable = false)
+	public int getVersion() {
+		return this.version;
+	}
+
+	public void setVersion(final int version) {
+		this.version = version;
+	}
+
 	public int getNumber() {
 		return this.number;
 	}

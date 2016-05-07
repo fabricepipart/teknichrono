@@ -1,16 +1,15 @@
 package org.trd.app.teknichrono.model;
 
 import java.io.Serializable;
+import java.sql.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Version;
-import org.trd.app.teknichrono.model.Pilot;
 import javax.persistence.ManyToOne;
-import java.sql.Date;
+import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
@@ -25,6 +24,7 @@ public class Intermediate implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id", updatable = false, nullable = false)
 	private Long id;
+
 	@Version
 	@Column(name = "version")
 	private int version;
