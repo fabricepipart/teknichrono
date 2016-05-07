@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('jbossforgehtml5').controller('FlashController', ['$scope','flash', function ($scope, flash) {
+angular.module('frontend').controller('FlashController', ['$scope','flash', function ($scope, flash) {
     $scope.flash = flash;
     $scope.showAlert = false;
 

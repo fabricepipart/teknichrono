@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('jbossforgehtml5').filter('startFrom', function() {
+angular.module('frontend').filter('startFrom', function() {
     return function(input, start) {
         start = +start; //parse to int
         return input.slice(start);

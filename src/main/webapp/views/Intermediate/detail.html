@@ -1,0 +1,41 @@
+<header ng-switch on="$location.path().indexOf('/Intermediates/new') > -1">
+    <h3 ng-switch-when="true">Create a new Intermediate</h3>
+    <h3 ng-switch-when="false">View or edit Intermediate</h3>
+</header>
+<form id="IntermediateForm" name="IntermediateForm" class="form-horizontal" role="form">
+    
+
+    <div class="form-group" ng-class="{'has-error': IntermediateForm.timeFromLast.$invalid}">
+        <label for="timeFromLast" class="col-sm-2 control-label">Time From Last</label>
+        <div id="timeFromLastControls" class="col-sm-10">
+            <input id="timeFromLast" name="timeFromLast" type="number" class="form-control" ng-model="intermediate.timeFromLast" placeholder="Enter the Intermediate Time From Last"></input>
+            <span class="help-block error" ng-show="IntermediateForm.timeFromLast.$error.number">not a number</span>
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': IntermediateForm.pilot.$invalid}">
+        <label for="pilot" class="col-sm-2 control-label">Pilot</label>
+        <div id="pilotControls" class="col-sm-10">
+        <select id="pilot" name="pilot" class="form-control" ng-model="pilotSelection" ng-options="p.text for p in pilotSelectionList"  >
+            <option value="">Choose a Pilot</option>
+        </select>
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': IntermediateForm.captureDate.$invalid}">
+        <label for="captureDate" class="col-sm-2 control-label">Capture Date</label>
+        <div id="captureDateControls" class="col-sm-10">
+            <input id="captureDate" name="captureDate" type="text" required class="form-control" ng-model="intermediate.captureDate" placeholder="Enter the Intermediate Capture Date"></input>
+            <span class="help-block error" ng-show="IntermediateForm.captureDate.$error.required">required</span> 
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button id="saveIntermediate" name="saveIntermediate" class="btn btn-primary" ng-disabled="isClean() || IntermediateForm.$invalid" ng-click="save()"><span class="glyphicon glyphicon-ok-sign"></span> Save</button>
+            <button id="cancel" name="cancel" class="btn btn-default" ng-click="cancel()"><span class="glyphicon glyphicon-remove-sign"></span> Cancel</button>
+            <button id="deleteIntermediate" name="deleteIntermediate" class="btn btn-danger" ng-show="intermediate.id" ng-click="remove()"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+        </div>
+    </div>
+</form>

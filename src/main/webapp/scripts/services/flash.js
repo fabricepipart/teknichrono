@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('jbossforgehtml5').factory('flash', ['$rootScope', function ($rootScope) {
+angular.module('frontend').factory('flash', ['$rootScope', function ($rootScope) {
     var messages = [];
     var currentMessage = {};
 

@@ -1,0 +1,88 @@
+<div class="form-horizontal">
+    <h3>Create a new LapTime</h3>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-sm-2">
+            <a id="Create" name="Create" class="btn btn-primary" href="#/LapTimes/new"><span class="glyphicon glyphicon-plus-sign"></span> Create</a>
+        </div>
+    </div>
+</div>
+<hr/>
+<div>
+    <h3>Search for LapTimes</h3>
+    <form id="LapTimeSearch" class="form-horizontal">
+        
+    <div class="form-group">
+        <label for="timelap" class="col-sm-2 control-label">Timelap</label>
+        <div class="col-sm-10">
+            <input id="timelap" name="timelap" class="form-control" type="text" ng-model="search.timelap" placeholder="Enter the LapTime Timelap"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="pilot" class="col-sm-2 control-label">Pilot</label>
+        <div class="col-sm-10">
+            <select id="pilot" name="pilot" class="form-control" ng-model="search.pilot" ng-options="p as p.id for p in pilotList">
+                <option value="">Choose a Pilot</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="captureDate" class="col-sm-2 control-label">Capture Date</label>
+        <div class="col-sm-10">
+            <input id="captureDate" name="captureDate" class="form-control" type="text" ng-model="search.captureDate" placeholder="Enter the LapTime Capture Date"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="event" class="col-sm-2 control-label">Event</label>
+        <div class="col-sm-10">
+            <select id="event" name="event" class="form-control" ng-model="search.event" ng-options="e as e.id for e in eventList">
+                <option value="">Choose a Event</option>
+            </select>
+        </div>
+    </div>
+
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-sm-10">
+                <a id="Search" name="Search" class="btn btn-primary" ng-click="performSearch()"><span class="glyphicon glyphicon-search"></span> Search</a>
+            </div>
+        </div>
+    </form>
+</div>
+<div id="search-results">
+        <div class="table-responsive">
+        <table class="table table-responsive table-bordered table-striped clearfix">
+            <thead>
+                <tr>
+                    <th>Timelap</th>
+                    <th>Pilot</th>
+                    <th>Capture Date</th>
+                    <th>Event</th>
+                </tr>
+            </thead>
+            <tbody id="search-results-body">
+                <tr ng-repeat="result in filteredResults | startFrom:currentPage*pageSize | limitTo:pageSize">
+                    <td><a href="#/LapTimes/edit/{{result.id}}">{{result.timelap}}</a></td>
+                        <td><a href="#/LapTimes/edit/{{result.id}}">{{result.pilot.id}}</a></td>
+                    <td><a href="#/LapTimes/edit/{{result.id}}">{{result.captureDate}}</a></td>
+                        <td><a href="#/LapTimes/edit/{{result.id}}">{{result.event.id}}</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+        <ul class="pagination pagination-centered">
+        <li ng-class="{disabled:currentPage == 0}">
+            <a id="prev" href ng-click="previous()">«</a>
+        </li>
+        <li ng-repeat="n in pageRange" ng-class="{active:currentPage == n}" ng-click="setPage(n)">
+            <a href ng-bind="n + 1">1</a>
+        </li>
+        <li ng-class="{disabled: currentPage == (numberOfPages() - 1)}">
+            <a id="next" href ng-click="next()">»</a>
+        </li>
+    </ul>
+
+</div>

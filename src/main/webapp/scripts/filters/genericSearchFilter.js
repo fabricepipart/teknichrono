@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('jbossforgehtml5').filter('searchFilter', function() {
+angular.module('frontend').filter('searchFilter', function() {
 
     function matchObjectProperties(expectedObject, actualObject) {
         var flag = true;

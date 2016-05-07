@@ -1,24 +1,27 @@
 'use strict';
 
-angular.module('jbossforgehtml5',['ngRoute','ngResource'])
+angular.module('frontend',['ngRoute','ngResource'])
   .config(['$routeProvider', function($routeProvider) {
     $routeProvider
       .when('/',{templateUrl:'views/landing.html',controller:'LandingPageController'})
-      .when('/Inventories',{templateUrl:'views/Inventory/search.html',controller:'SearchInventoryController'})
-      .when('/Inventories/new',{templateUrl:'views/Inventory/detail.html',controller:'NewInventoryController'})
-      .when('/Inventories/edit/:InventoryId',{templateUrl:'views/Inventory/detail.html',controller:'EditInventoryController'})
-      .when('/Laps',{templateUrl:'views/Lap/search.html',controller:'SearchLapController'})
-      .when('/Laps/new',{templateUrl:'views/Lap/detail.html',controller:'NewLapController'})
-      .when('/Laps/edit/:LapId',{templateUrl:'views/Lap/detail.html',controller:'EditLapController'})
-      .when('/Listings',{templateUrl:'views/Listing/search.html',controller:'SearchListingController'})
-      .when('/Listings/new',{templateUrl:'views/Listing/detail.html',controller:'NewListingController'})
-      .when('/Listings/edit/:ListingId',{templateUrl:'views/Listing/detail.html',controller:'EditListingController'})
-      .when('/Members',{templateUrl:'views/Member/search.html',controller:'SearchMemberController'})
-      .when('/Members/new',{templateUrl:'views/Member/detail.html',controller:'NewMemberController'})
-      .when('/Members/edit/:MemberId',{templateUrl:'views/Member/detail.html',controller:'EditMemberController'})
-      .when('/Pilots',{templateUrl:'views/Pilots/search.html',controller:'SearchPilotsController'})
-      .when('/Pilots/new',{templateUrl:'views/Pilots/detail.html',controller:'NewPilotsController'})
-      .when('/Pilots/edit/:PilotsId',{templateUrl:'views/Pilots/detail.html',controller:'EditPilotsController'})
+      .when('/Beacons',{templateUrl:'views/Beacon/search.html',controller:'SearchBeaconController'})
+      .when('/Beacons/new',{templateUrl:'views/Beacon/detail.html',controller:'NewBeaconController'})
+      .when('/Beacons/edit/:BeaconId',{templateUrl:'views/Beacon/detail.html',controller:'EditBeaconController'})
+      .when('/ChronoPoints',{templateUrl:'views/ChronoPoint/search.html',controller:'SearchChronoPointController'})
+      .when('/ChronoPoints/new',{templateUrl:'views/ChronoPoint/detail.html',controller:'NewChronoPointController'})
+      .when('/ChronoPoints/edit/:ChronoPointId',{templateUrl:'views/ChronoPoint/detail.html',controller:'EditChronoPointController'})
+      .when('/Events',{templateUrl:'views/Event/search.html',controller:'SearchEventController'})
+      .when('/Events/new',{templateUrl:'views/Event/detail.html',controller:'NewEventController'})
+      .when('/Events/edit/:EventId',{templateUrl:'views/Event/detail.html',controller:'EditEventController'})
+      .when('/Intermediates',{templateUrl:'views/Intermediate/search.html',controller:'SearchIntermediateController'})
+      .when('/Intermediates/new',{templateUrl:'views/Intermediate/detail.html',controller:'NewIntermediateController'})
+      .when('/Intermediates/edit/:IntermediateId',{templateUrl:'views/Intermediate/detail.html',controller:'EditIntermediateController'})
+      .when('/LapTimes',{templateUrl:'views/LapTime/search.html',controller:'SearchLapTimeController'})
+      .when('/LapTimes/new',{templateUrl:'views/LapTime/detail.html',controller:'NewLapTimeController'})
+      .when('/LapTimes/edit/:LapTimeId',{templateUrl:'views/LapTime/detail.html',controller:'EditLapTimeController'})
+      .when('/Pilots',{templateUrl:'views/Pilot/search.html',controller:'SearchPilotController'})
+      .when('/Pilots/new',{templateUrl:'views/Pilot/detail.html',controller:'NewPilotController'})
+      .when('/Pilots/edit/:PilotId',{templateUrl:'views/Pilot/detail.html',controller:'EditPilotController'})
       .otherwise({
         redirectTo: '/'
       });

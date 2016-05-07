@@ -1,0 +1,57 @@
+<header ng-switch on="$location.path().indexOf('/Events/new') > -1">
+    <h3 ng-switch-when="true">Create a new Event</h3>
+    <h3 ng-switch-when="false">View or edit Event</h3>
+</header>
+<form id="EventForm" name="EventForm" class="form-horizontal" role="form">
+    
+    <div class="form-group" ng-class="{'has-error': EventForm.beginning.$invalid}">
+        <label for="beginning" class="col-sm-2 control-label">Beginning</label>
+        <div id="beginningControls" class="col-sm-10">
+            <input id="beginning" name="beginning" type="text" required class="form-control" ng-model="event.beginning" placeholder="Enter the Event Beginning"></input>
+            <span class="help-block error" ng-show="EventForm.beginning.$error.required">required</span> 
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': EventForm.end.$invalid}">
+        <label for="end" class="col-sm-2 control-label">End</label>
+        <div id="endControls" class="col-sm-10">
+            <input id="end" name="end" type="text" required class="form-control" ng-model="event.end" placeholder="Enter the Event End"></input>
+            <span class="help-block error" ng-show="EventForm.end.$error.required">required</span> 
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': EventForm.chronopoints.$invalid}">
+        <label for="chronopoints" class="col-sm-2 control-label">Chronopoints</label>
+        <div id="chronopointsControls" class="col-sm-10">
+            <select id="chronopoints" name="chronopoints" multiple class="form-control" ng-model="chronopointsSelection" ng-options="c.text for c in chronopointsSelectionList">
+                <option value="">Choose a Chronopoints</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': EventForm.name.$invalid}">
+        <label for="name" class="col-sm-2 control-label">Name</label>
+        <div id="nameControls" class="col-sm-10">
+            <input id="name" name="name" type="text" required class="form-control" ng-model="event.name" placeholder="Enter the Event Name"></input>
+            <span class="help-block error" ng-show="EventForm.name.$error.required">required</span> 
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': EventForm.laptimes.$invalid}">
+        <label for="laptimes" class="col-sm-2 control-label">Laptimes</label>
+        <div id="laptimesControls" class="col-sm-10">
+            <select id="laptimes" name="laptimes" multiple class="form-control" ng-model="laptimesSelection" ng-options="l.text for l in laptimesSelectionList">
+                <option value="">Choose a Laptimes</option>
+            </select>
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button id="saveEvent" name="saveEvent" class="btn btn-primary" ng-disabled="isClean() || EventForm.$invalid" ng-click="save()"><span class="glyphicon glyphicon-ok-sign"></span> Save</button>
+            <button id="cancel" name="cancel" class="btn btn-default" ng-click="cancel()"><span class="glyphicon glyphicon-remove-sign"></span> Cancel</button>
+            <button id="deleteEvent" name="deleteEvent" class="btn btn-danger" ng-show="event.id" ng-click="remove()"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,77 @@
+<div class="form-horizontal">
+    <h3>Create a new Event</h3>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-sm-2">
+            <a id="Create" name="Create" class="btn btn-primary" href="#/Events/new"><span class="glyphicon glyphicon-plus-sign"></span> Create</a>
+        </div>
+    </div>
+</div>
+<hr/>
+<div>
+    <h3>Search for Events</h3>
+    <form id="EventSearch" class="form-horizontal">
+        
+    <div class="form-group">
+        <label for="beginning" class="col-sm-2 control-label">Beginning</label>
+        <div class="col-sm-10">
+            <input id="beginning" name="beginning" class="form-control" type="text" ng-model="search.beginning" placeholder="Enter the Event Beginning"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="end" class="col-sm-2 control-label">End</label>
+        <div class="col-sm-10">
+            <input id="end" name="end" class="form-control" type="text" ng-model="search.end" placeholder="Enter the Event End"></input>
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <label for="name" class="col-sm-2 control-label">Name</label>
+        <div class="col-sm-10">
+            <input id="name" name="name" class="form-control" type="text" ng-model="search.name" placeholder="Enter the Event Name"></input>
+        </div>
+    </div>
+
+
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-sm-10">
+                <a id="Search" name="Search" class="btn btn-primary" ng-click="performSearch()"><span class="glyphicon glyphicon-search"></span> Search</a>
+            </div>
+        </div>
+    </form>
+</div>
+<div id="search-results">
+        <div class="table-responsive">
+        <table class="table table-responsive table-bordered table-striped clearfix">
+            <thead>
+                <tr>
+                    <th>Beginning</th>
+                    <th>End</th>
+                    <th>Name</th>
+                </tr>
+            </thead>
+            <tbody id="search-results-body">
+                <tr ng-repeat="result in filteredResults | startFrom:currentPage*pageSize | limitTo:pageSize">
+                    <td><a href="#/Events/edit/{{result.id}}">{{result.beginning}}</a></td>
+                    <td><a href="#/Events/edit/{{result.id}}">{{result.end}}</a></td>
+                    <td><a href="#/Events/edit/{{result.id}}">{{result.name}}</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+        <ul class="pagination pagination-centered">
+        <li ng-class="{disabled:currentPage == 0}">
+            <a id="prev" href ng-click="previous()">«</a>
+        </li>
+        <li ng-repeat="n in pageRange" ng-class="{active:currentPage == n}" ng-click="setPage(n)">
+            <a href ng-bind="n + 1">1</a>
+        </li>
+        <li ng-class="{disabled: currentPage == (numberOfPages() - 1)}">
+            <a id="next" href ng-click="next()">»</a>
+        </li>
+    </ul>
+
+</div>

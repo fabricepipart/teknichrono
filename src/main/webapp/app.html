@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="jbossforgehtml5">
+<html lang="en" ng-app="frontend">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Jboss-forge-html 5</title>
+	<title>Frontend</title>
     <link href="styles/bootstrap.css" rel="stylesheet" media="screen">
     <link href="styles/bootstrap-theme.css" rel="stylesheet" media="screen">
     <link href="styles/main.css" rel="stylesheet" media="screen">
@@ -20,7 +20,7 @@
                       <span class="icon-bar"></span>
                       <span class="icon-bar"></span>
                     </button>
-				    <a class="navbar-brand" href="#">Jboss-forge-html 5</a>
+				    <a class="navbar-brand" href="#">Frontend</a>
 			    </div>
 			</div>
     	</div>
@@ -34,10 +34,11 @@
                     </a>
                     <nav class="sidebar-nav" ng-controller="NavController" role="navigation">
                         <div id="sidebar-entries" class="list-group">
-                        	<a class="list-group-item" ng-class="{active: matchesRoute('Inventories')}" href="#/Inventories" data-toggle="offcanvas">Inventories</a>
-                        	<a class="list-group-item" ng-class="{active: matchesRoute('Laps')}" href="#/Laps" data-toggle="offcanvas">Laps</a>
-                        	<a class="list-group-item" ng-class="{active: matchesRoute('Listings')}" href="#/Listings" data-toggle="offcanvas">Listings</a>
-                        	<a class="list-group-item" ng-class="{active: matchesRoute('Members')}" href="#/Members" data-toggle="offcanvas">Members</a>
+                        	<a class="list-group-item" ng-class="{active: matchesRoute('Beacons')}" href="#/Beacons" data-toggle="offcanvas">Beacons</a>
+                        	<a class="list-group-item" ng-class="{active: matchesRoute('ChronoPoints')}" href="#/ChronoPoints" data-toggle="offcanvas">ChronoPoints</a>
+                        	<a class="list-group-item" ng-class="{active: matchesRoute('Events')}" href="#/Events" data-toggle="offcanvas">Events</a>
+                        	<a class="list-group-item" ng-class="{active: matchesRoute('Intermediates')}" href="#/Intermediates" data-toggle="offcanvas">Intermediates</a>
+                        	<a class="list-group-item" ng-class="{active: matchesRoute('LapTimes')}" href="#/LapTimes" data-toggle="offcanvas">LapTimes</a>
                         	<a class="list-group-item" ng-class="{active: matchesRoute('Pilots')}" href="#/Pilots" data-toggle="offcanvas">Pilots</a>
                         </div>
                     </nav>
@@ -78,25 +79,29 @@
     <script src="scripts/services/flash.js"></script>
     <script src="scripts/services/locationParser.js"></script>
     <script src="scripts/controllers/flashController.js"></script>
-    <script src="scripts/services/InventoryFactory.js"></script>
-    <script src="scripts/controllers/newInventoryController.js"></script>
-    <script src="scripts/controllers/searchInventoryController.js"></script>
-    <script src="scripts/controllers/editInventoryController.js"></script>
-    <script src="scripts/services/LapFactory.js"></script>
-    <script src="scripts/controllers/newLapController.js"></script>
-    <script src="scripts/controllers/searchLapController.js"></script>
-    <script src="scripts/controllers/editLapController.js"></script>
-    <script src="scripts/services/ListingFactory.js"></script>
-    <script src="scripts/controllers/newListingController.js"></script>
-    <script src="scripts/controllers/searchListingController.js"></script>
-    <script src="scripts/controllers/editListingController.js"></script>
-    <script src="scripts/services/MemberFactory.js"></script>
-    <script src="scripts/controllers/newMemberController.js"></script>
-    <script src="scripts/controllers/searchMemberController.js"></script>
-    <script src="scripts/controllers/editMemberController.js"></script>
-    <script src="scripts/services/PilotsFactory.js"></script>
-    <script src="scripts/controllers/newPilotsController.js"></script>
-    <script src="scripts/controllers/searchPilotsController.js"></script>
-    <script src="scripts/controllers/editPilotsController.js"></script>
+    <script src="scripts/services/BeaconFactory.js"></script>
+    <script src="scripts/controllers/newBeaconController.js"></script>
+    <script src="scripts/controllers/searchBeaconController.js"></script>
+    <script src="scripts/controllers/editBeaconController.js"></script>
+    <script src="scripts/services/ChronoPointFactory.js"></script>
+    <script src="scripts/controllers/newChronoPointController.js"></script>
+    <script src="scripts/controllers/searchChronoPointController.js"></script>
+    <script src="scripts/controllers/editChronoPointController.js"></script>
+    <script src="scripts/services/EventFactory.js"></script>
+    <script src="scripts/controllers/newEventController.js"></script>
+    <script src="scripts/controllers/searchEventController.js"></script>
+    <script src="scripts/controllers/editEventController.js"></script>
+    <script src="scripts/services/IntermediateFactory.js"></script>
+    <script src="scripts/controllers/newIntermediateController.js"></script>
+    <script src="scripts/controllers/searchIntermediateController.js"></script>
+    <script src="scripts/controllers/editIntermediateController.js"></script>
+    <script src="scripts/services/LapTimeFactory.js"></script>
+    <script src="scripts/controllers/newLapTimeController.js"></script>
+    <script src="scripts/controllers/searchLapTimeController.js"></script>
+    <script src="scripts/controllers/editLapTimeController.js"></script>
+    <script src="scripts/services/PilotFactory.js"></script>
+    <script src="scripts/controllers/newPilotController.js"></script>
+    <script src="scripts/controllers/searchPilotController.js"></script>
+    <script src="scripts/controllers/editPilotController.js"></script>
 </body>
 </html>

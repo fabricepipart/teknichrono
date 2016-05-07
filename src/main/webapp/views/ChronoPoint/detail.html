@@ -1,0 +1,33 @@
+<header ng-switch on="$location.path().indexOf('/ChronoPoints/new') > -1">
+    <h3 ng-switch-when="true">Create a new ChronoPoint</h3>
+    <h3 ng-switch-when="false">View or edit ChronoPoint</h3>
+</header>
+<form id="ChronoPointForm" name="ChronoPointForm" class="form-horizontal" role="form">
+    
+
+    <div class="form-group" ng-class="{'has-error': ChronoPointForm.index.$invalid}">
+        <label for="index" class="col-sm-2 control-label">Index</label>
+        <div id="indexControls" class="col-sm-10">
+            <input id="index" name="index" type="number" required class="form-control" ng-model="chronoPoint.index" placeholder="Enter the ChronoPoint Index"></input>
+            <span class="help-block error" ng-show="ChronoPointForm.index.$error.required">required</span> 
+            <span class="help-block error" ng-show="ChronoPointForm.index.$error.number">not a number</span>
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': ChronoPointForm.name.$invalid}">
+        <label for="name" class="col-sm-2 control-label">Name</label>
+        <div id="nameControls" class="col-sm-10">
+            <input id="name" name="name" type="text" required class="form-control" ng-model="chronoPoint.name" placeholder="Enter the ChronoPoint Name"></input>
+            <span class="help-block error" ng-show="ChronoPointForm.name.$error.required">required</span> 
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button id="saveChronoPoint" name="saveChronoPoint" class="btn btn-primary" ng-disabled="isClean() || ChronoPointForm.$invalid" ng-click="save()"><span class="glyphicon glyphicon-ok-sign"></span> Save</button>
+            <button id="cancel" name="cancel" class="btn btn-default" ng-click="cancel()"><span class="glyphicon glyphicon-remove-sign"></span> Cancel</button>
+            <button id="deleteChronoPoint" name="deleteChronoPoint" class="btn btn-danger" ng-show="chronoPoint.id" ng-click="remove()"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+        </div>
+    </div>
+</form>
