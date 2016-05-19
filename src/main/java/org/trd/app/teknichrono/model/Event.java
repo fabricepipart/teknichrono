@@ -35,6 +35,18 @@ public class Event implements java.io.Serializable {
 	@Column(nullable = false)
 	private Date end;
 
+	/**
+	 * <pre>
+	 * List of chrono points used for the event. From start to finish line.
+	 * 
+	 * For a rally. The Raspberry number are as follows
+	 *     _________________
+	 *     | 0 | 1 | 2 | 3 |
+	 * For a track
+	 *     _________________
+	 *     | 0 | 1 | 2 | 0 |
+	 * </pre>
+	 */
 	@OneToMany
 	@OrderColumn(name = "index")
 	private List<ChronoPoint> chronopoints = new ArrayList<ChronoPoint>();

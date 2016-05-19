@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.trd.app.teknichrono.model.ChronoPoint;
 
 @Entity
 @XmlRootElement
@@ -29,14 +30,14 @@ public class Intermediate implements Serializable {
 	@Column(name = "version")
 	private int version;
 
-	@Column
-	private double timeFromLast;
-
 	@ManyToOne
 	private Pilot pilot;
 
 	@Column(nullable = false)
 	private Date captureDate;
+
+	@ManyToOne
+	private ChronoPoint chronopoint;
 
 	public Long getId() {
 		return this.id;
@@ -79,14 +80,6 @@ public class Intermediate implements Serializable {
 		return result;
 	}
 
-	public double getTimeFromLast() {
-		return timeFromLast;
-	}
-
-	public void setTimeFromLast(double timeFromLast) {
-		this.timeFromLast = timeFromLast;
-	}
-
 	public Pilot getPilot() {
 		return this.pilot;
 	}
@@ -106,7 +99,15 @@ public class Intermediate implements Serializable {
 	@Override
 	public String toString() {
 		String result = getClass().getSimpleName() + " ";
-		result += "timeFromLast: " + timeFromLast;
+		result += "id: " + id;
 		return result;
+	}
+
+	public ChronoPoint getChronopoint() {
+		return this.chronopoint;
+	}
+
+	public void setChronopoint(final ChronoPoint chronopoint) {
+		this.chronopoint = chronopoint;
 	}
 }

@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.trd.app.teknichrono.model.Raspberry;
+import javax.persistence.ManyToOne;
 
 @Entity
 @Table(name = "CHRONOPOINT")
@@ -35,6 +37,9 @@ public class ChronoPoint implements Serializable {
 
 	@Column(nullable = false)
 	private String name;
+
+	@ManyToOne
+	private Raspberry raspberry;
 
 	public Long getId() {
 		return this.id;
@@ -100,5 +105,13 @@ public class ChronoPoint implements Serializable {
 		if (name != null && !name.trim().isEmpty())
 			result += ", name: " + name;
 		return result;
+	}
+
+	public Raspberry getRaspberry() {
+		return this.raspberry;
+	}
+
+	public void setRaspberry(final Raspberry raspberry) {
+		this.raspberry = raspberry;
 	}
 }
