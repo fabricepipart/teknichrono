@@ -22,6 +22,15 @@
         </div>
     </div>
 
+    <div class="form-group" ng-class="{'has-error': ChronoPointForm.raspberry.$invalid}">
+        <label for="raspberry" class="col-sm-2 control-label">Raspberry</label>
+        <div id="raspberryControls" class="col-sm-10">
+        <select id="raspberry" name="raspberry" class="form-control" ng-model="raspberrySelection" ng-options="r.text for r in raspberrySelectionList"  >
+            <option value="">Choose a Raspberry</option>
+        </select>
+        </div>
+    </div>
+
 
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">

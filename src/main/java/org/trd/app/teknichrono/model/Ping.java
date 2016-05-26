@@ -4,22 +4,20 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
 @XmlRootElement
-public class Pilot implements Serializable {
+public class Ping implements Serializable {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 5594553167060540038L;
+	private static final long serialVersionUID = -7022575222961829989L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -31,13 +29,16 @@ public class Pilot implements Serializable {
 	private int version;
 
 	@Column(nullable = false)
-	private String firstName;
+	private double time;
 
 	@Column(nullable = false)
-	private String lastName;
+	private String uuid;
 
-	@OneToOne(fetch = FetchType.LAZY)
-	private Beacon currentBeacon;
+	@Column(nullable = false)
+	private int power;
+
+	@Column(nullable = false)
+	private int chronoPointIndex;
 
 	public Long getId() {
 		return this.id;
@@ -60,10 +61,10 @@ public class Pilot implements Serializable {
 		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof Pilot)) {
+		if (!(obj instanceof Ping)) {
 			return false;
 		}
-		Pilot other = (Pilot) obj;
+		Ping other = (Ping) obj;
 		if (id != null) {
 			if (!id.equals(other.id)) {
 				return false;
@@ -80,37 +81,46 @@ public class Pilot implements Serializable {
 		return result;
 	}
 
-	public String getFirstName() {
-		return firstName;
+	public double getTime() {
+		return time;
 	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
+	public void setTime(double time) {
+		this.time = time;
 	}
 
-	public String getLastName() {
-		return lastName;
+	public String getUuid() {
+		return uuid;
 	}
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 
-	public Beacon getCurrentBeacon() {
-		return currentBeacon;
+	public int getPower() {
+		return power;
 	}
 
-	public void setCurrentBeacon(Beacon currentBeacon) {
-		this.currentBeacon = currentBeacon;
+	public void setPower(int power) {
+		this.power = power;
+	}
+
+	public int getChronoPointIndex() {
+		return chronoPointIndex;
+	}
+
+	public void setChronoPointIndex(int chronoPointIndex) {
+		this.chronoPointIndex = chronoPointIndex;
 	}
 
 	@Override
 	public String toString() {
 		String result = getClass().getSimpleName() + " ";
-		if (firstName != null && !firstName.trim().isEmpty())
-			result += "firstName: " + firstName;
-		if (lastName != null && !lastName.trim().isEmpty())
-			result += ", lastName: " + lastName;
+		result += "time: " + time;
+		if (uuid != null && !uuid.trim().isEmpty())
+			result += ", uuid: " + uuid;
+		result += ", power: " + power;
+		result += ", chronoPointIndex: " + chronoPointIndex;
 		return result;
 	}
 }

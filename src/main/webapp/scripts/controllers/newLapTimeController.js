@@ -1,5 +1,5 @@
 
-angular.module('frontend').controller('NewLapTimeController', function ($scope, $location, locationParser, flash, LapTimeResource , PilotResource, EventResource) {
+angular.module('frontend').controller('NewLapTimeController', function ($scope, $location, locationParser, flash, LapTimeResource , PilotResource, EventResource, IntermediateResource) {
     $scope.disabled = false;
     $scope.$location = $location;
     $scope.lapTime = $scope.lapTime || {};
@@ -34,6 +34,25 @@ angular.module('frontend').controller('NewLapTimeController', function ($scope, 
         }
     });
     
+    $scope.intermediatesList = IntermediateResource.queryAll(function(items){
+        $scope.intermediatesSelectionList = $.map(items, function(item) {
+            return ( {
+                value : item.id,
+                text : item.id
+            });
+        });
+    });
+    $scope.$watch("intermediatesSelection", function(selection) {
+        if (typeof selection != 'undefined') {
+            $scope.lapTime.intermediates = [];
+            $.each(selection, function(idx,selectedItem) {
+                var collectionItem = {};
+                collectionItem.id = selectedItem.value;
+                $scope.lapTime.intermediates.push(collectionItem);
+            });
+        }
+    });
+
 
     $scope.save = function() {
         var successCallback = function(data,responseHeaders){

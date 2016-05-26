@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('SearchLapTimeController', function($scope, $http, $filter, LapTimeResource , PilotResource, EventResource) {
+angular.module('frontend').controller('SearchLapTimeController', function($scope, $http, $filter, LapTimeResource , PilotResource, EventResource, IntermediateResource) {
 
     $scope.search={};
     $scope.currentPage = 0;

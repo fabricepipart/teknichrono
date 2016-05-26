@@ -13,13 +13,6 @@
         
 
     <div class="form-group">
-        <label for="timeFromLast" class="col-sm-2 control-label">Time From Last</label>
-        <div class="col-sm-10">
-            <input id="timeFromLast" name="timeFromLast" class="form-control" type="text" ng-model="search.timeFromLast" placeholder="Enter the Intermediate Time From Last"></input>
-        </div>
-    </div>
-
-    <div class="form-group">
         <label for="pilot" class="col-sm-2 control-label">Pilot</label>
         <div class="col-sm-10">
             <select id="pilot" name="pilot" class="form-control" ng-model="search.pilot" ng-options="p as p.id for p in pilotList">
@@ -32,6 +25,15 @@
         <label for="captureDate" class="col-sm-2 control-label">Capture Date</label>
         <div class="col-sm-10">
             <input id="captureDate" name="captureDate" class="form-control" type="text" ng-model="search.captureDate" placeholder="Enter the Intermediate Capture Date"></input>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="chronopoint" class="col-sm-2 control-label">Chronopoint</label>
+        <div class="col-sm-10">
+            <select id="chronopoint" name="chronopoint" class="form-control" ng-model="search.chronopoint" ng-options="c as c.id for c in chronopointList">
+                <option value="">Choose a Chronopoint</option>
+            </select>
         </div>
     </div>
 
@@ -48,16 +50,16 @@
         <table class="table table-responsive table-bordered table-striped clearfix">
             <thead>
                 <tr>
-                    <th>Time From Last</th>
                     <th>Pilot</th>
                     <th>Capture Date</th>
+                    <th>Chronopoint</th>
                 </tr>
             </thead>
             <tbody id="search-results-body">
                 <tr ng-repeat="result in filteredResults | startFrom:currentPage*pageSize | limitTo:pageSize">
-                    <td><a href="#/Intermediates/edit/{{result.id}}">{{result.timeFromLast}}</a></td>
                         <td><a href="#/Intermediates/edit/{{result.id}}">{{result.pilot.id}}</a></td>
                     <td><a href="#/Intermediates/edit/{{result.id}}">{{result.captureDate}}</a></td>
+                        <td><a href="#/Intermediates/edit/{{result.id}}">{{result.chronopoint.id}}</a></td>
                 </tr>
             </tbody>
         </table>

@@ -26,6 +26,15 @@
         </div>
     </div>
 
+    <div class="form-group">
+        <label for="raspberry" class="col-sm-2 control-label">Raspberry</label>
+        <div class="col-sm-10">
+            <select id="raspberry" name="raspberry" class="form-control" ng-model="search.raspberry" ng-options="r as r.id for r in raspberryList">
+                <option value="">Choose a Raspberry</option>
+            </select>
+        </div>
+    </div>
+
 
         <div class="form-group">
             <div class="col-md-offset-2 col-sm-10">
@@ -41,12 +50,14 @@
                 <tr>
                     <th>Index</th>
                     <th>Name</th>
+                    <th>Raspberry</th>
                 </tr>
             </thead>
             <tbody id="search-results-body">
                 <tr ng-repeat="result in filteredResults | startFrom:currentPage*pageSize | limitTo:pageSize">
                     <td><a href="#/ChronoPoints/edit/{{result.id}}">{{result.index}}</a></td>
                     <td><a href="#/ChronoPoints/edit/{{result.id}}">{{result.name}}</a></td>
+                        <td><a href="#/ChronoPoints/edit/{{result.id}}">{{result.raspberry.id}}</a></td>
                 </tr>
             </tbody>
         </table>

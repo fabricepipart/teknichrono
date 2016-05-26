@@ -20,13 +20,14 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
+
 import org.trd.app.teknichrono.model.Pilot;
 
 /**
  * 
  */
 @Stateless
-@Path("forge/pilots")
+@Path("/pilots")
 public class PilotEndpoint {
 	@PersistenceContext(unitName = "teknichrono-persistence-unit")
 	private EntityManager em;
@@ -35,9 +36,9 @@ public class PilotEndpoint {
 	@Consumes("application/json")
 	public Response create(Pilot entity) {
 		em.persist(entity);
-		return Response.created(
-				UriBuilder.fromResource(PilotEndpoint.class)
-						.path(String.valueOf(entity.getId())).build()).build();
+		return Response
+				.created(UriBuilder.fromResource(PilotEndpoint.class).path(String.valueOf(entity.getId())).build())
+				.build();
 	}
 
 	@DELETE
@@ -55,10 +56,9 @@ public class PilotEndpoint {
 	@Path("/{id:[0-9][0-9]*}")
 	@Produces("application/json")
 	public Response findById(@PathParam("id") Long id) {
-		TypedQuery<Pilot> findByIdQuery = em
-				.createQuery(
-						"SELECT DISTINCT p FROM Pilot p LEFT JOIN FETCH p.currentBeacon WHERE p.id = :entityId ORDER BY p.id",
-						Pilot.class);
+		TypedQuery<Pilot> findByIdQuery = em.createQuery(
+				"SELECT DISTINCT p FROM Pilot p LEFT JOIN FETCH p.currentBeacon WHERE p.id = :entityId ORDER BY p.id",
+				Pilot.class);
 		findByIdQuery.setParameter("entityId", id);
 		Pilot entity;
 		try {
@@ -73,13 +73,31 @@ public class PilotEndpoint {
 	}
 
 	@GET
+	@Path("/name")
 	@Produces("application/json")
-	public List<Pilot> listAll(@QueryParam("start") Integer startPosition,
-			@QueryParam("max") Integer maxResult) {
-		TypedQuery<Pilot> findAllQuery = em
-				.createQuery(
-						"SELECT DISTINCT p FROM Pilot p LEFT JOIN FETCH p.currentBeacon ORDER BY p.id",
-						Pilot.class);
+	public Response findByName(@QueryParam("firstname") String firstname, @QueryParam("lastname") String lastname) {
+		TypedQuery<Pilot> findByIdQuery = em
+				.createQuery("SELECT DISTINCT p FROM Pilot p LEFT JOIN FETCH p.currentBeacon WHERE"
+						+ " p.firstName = :firstname AND p.lastName = :lastname ORDER BY p.id", Pilot.class);
+		findByIdQuery.setParameter("firstname", firstname);
+		findByIdQuery.setParameter("lastname", lastname);
+		Pilot entity;
+		try {
+			entity = findByIdQuery.getSingleResult();
+		} catch (NoResultException nre) {
+			entity = null;
+		}
+		if (entity == null) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+		return Response.ok(entity).build();
+	}
+
+	@GET
+	@Produces("application/json")
+	public List<Pilot> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
+		TypedQuery<Pilot> findAllQuery = em.createQuery(
+				"SELECT DISTINCT p FROM Pilot p LEFT JOIN FETCH p.currentBeacon ORDER BY p.id", Pilot.class);
 		if (startPosition != null) {
 			findAllQuery.setFirstResult(startPosition);
 		}
@@ -109,8 +127,7 @@ public class PilotEndpoint {
 		try {
 			entity = em.merge(entity);
 		} catch (OptimisticLockException e) {
-			return Response.status(Response.Status.CONFLICT)
-					.entity(e.getEntity()).build();
+			return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
 		}
 
 		return Response.noContent().build();

@@ -9,9 +9,13 @@ import javax.persistence.Id;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 @Entity
 @XmlRootElement
 public class Beacon implements java.io.Serializable {
+
+	/* =========================== Entity stuff =========================== */
 
 	/**
 	 * 
@@ -27,8 +31,12 @@ public class Beacon implements java.io.Serializable {
 	@Column(name = "version")
 	private int version;
 
-	@Column(nullable = false)
+	/* =============================== Fields =============================== */
+
+	@Column(nullable = false, unique = true)
 	private int number;
+
+	/* ============================ Factory ============================ */
 
 	public Beacon() {
 	}
@@ -37,6 +45,15 @@ public class Beacon implements java.io.Serializable {
 		this.id = id;
 		this.number = number;
 	}
+
+	@JsonCreator
+	public static Beacon create(int id) {
+		Beacon b = new Beacon();
+		b.setId(id);
+		return b;
+	}
+
+	/* ===================== Getters and setters ======================== */
 
 	public int getId() {
 		return this.id;

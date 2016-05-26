@@ -1,4 +1,4 @@
-package org.trd.app.teknichrono.pi.rest;
+package org.trd.app.teknichrono.rest;
 
 import java.util.List;
 
@@ -19,33 +19,31 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
-import org.trd.app.teknichrono.pi.model.PiPilots;
-
 import javax.ws.rs.core.UriBuilder;
+import org.trd.app.teknichrono.model.Ping;
 
 /**
  * 
  */
 @Stateless
-@Path("/pilots")
-public class PilotsEndpoint {
+@Path("/pings")
+public class PingEndpoint {
 	@PersistenceContext(unitName = "teknichrono-persistence-unit")
 	private EntityManager em;
 
 	@POST
 	@Consumes("application/json")
-	public Response create(PiPilots entity) {
+	public Response create(Ping entity) {
 		em.persist(entity);
-		return Response
-				.created(UriBuilder.fromResource(PilotsEndpoint.class).path(String.valueOf(entity.getId())).build())
-				.build();
+		return Response.created(
+				UriBuilder.fromResource(PingEndpoint.class)
+						.path(String.valueOf(entity.getId())).build()).build();
 	}
 
 	@DELETE
 	@Path("/{id:[0-9][0-9]*}")
-	public Response deleteById(@PathParam("id") int id) {
-		PiPilots entity = em.find(PiPilots.class, id);
+	public Response deleteById(@PathParam("id") Long id) {
+		Ping entity = em.find(Ping.class, id);
 		if (entity == null) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
@@ -56,11 +54,13 @@ public class PilotsEndpoint {
 	@GET
 	@Path("/{id:[0-9][0-9]*}")
 	@Produces("application/json")
-	public Response findById(@PathParam("id") int id) {
-		TypedQuery<PiPilots> findByIdQuery = em
-				.createQuery("SELECT DISTINCT p FROM Pilots p WHERE p.id = :entityId ORDER BY p.id", PiPilots.class);
+	public Response findById(@PathParam("id") Long id) {
+		TypedQuery<Ping> findByIdQuery = em
+				.createQuery(
+						"SELECT DISTINCT p FROM Ping p WHERE p.id = :entityId ORDER BY p.id",
+						Ping.class);
 		findByIdQuery.setParameter("entityId", id);
-		PiPilots entity;
+		Ping entity;
 		try {
 			entity = findByIdQuery.getSingleResult();
 		} catch (NoResultException nre) {
@@ -74,35 +74,41 @@ public class PilotsEndpoint {
 
 	@GET
 	@Produces("application/json")
-	public List<PiPilots> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
-		TypedQuery<PiPilots> findAllQuery = em.createQuery("SELECT DISTINCT p FROM Pilots p ORDER BY p.id", PiPilots.class);
+	public List<Ping> listAll(@QueryParam("start") Integer startPosition,
+			@QueryParam("max") Integer maxResult) {
+		TypedQuery<Ping> findAllQuery = em.createQuery(
+				"SELECT DISTINCT p FROM Ping p ORDER BY p.id", Ping.class);
 		if (startPosition != null) {
 			findAllQuery.setFirstResult(startPosition);
 		}
 		if (maxResult != null) {
 			findAllQuery.setMaxResults(maxResult);
 		}
-		final List<PiPilots> results = findAllQuery.getResultList();
+		final List<Ping> results = findAllQuery.getResultList();
 		return results;
 	}
 
 	@PUT
 	@Path("/{id:[0-9][0-9]*}")
 	@Consumes("application/json")
-	public Response update(@PathParam("id") int id, PiPilots entity) {
+	public Response update(@PathParam("id") Long id, Ping entity) {
 		if (entity == null) {
 			return Response.status(Status.BAD_REQUEST).build();
 		}
-		if (id != entity.getId()) {
+		if (id == null) {
+			return Response.status(Status.BAD_REQUEST).build();
+		}
+		if (!id.equals(entity.getId())) {
 			return Response.status(Status.CONFLICT).entity(entity).build();
 		}
-		if (em.find(PiPilots.class, id) == null) {
+		if (em.find(Ping.class, id) == null) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
 		try {
 			entity = em.merge(entity);
 		} catch (OptimisticLockException e) {
-			return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
+			return Response.status(Response.Status.CONFLICT)
+					.entity(e.getEntity()).build();
 		}
 
 		return Response.noContent().build();

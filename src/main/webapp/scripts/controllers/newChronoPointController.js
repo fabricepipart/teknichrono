@@ -1,8 +1,23 @@
 
-angular.module('frontend').controller('NewChronoPointController', function ($scope, $location, locationParser, flash, ChronoPointResource ) {
+angular.module('frontend').controller('NewChronoPointController', function ($scope, $location, locationParser, flash, ChronoPointResource , RaspberryResource) {
     $scope.disabled = false;
     $scope.$location = $location;
     $scope.chronoPoint = $scope.chronoPoint || {};
+    
+    $scope.raspberryList = RaspberryResource.queryAll(function(items){
+        $scope.raspberrySelectionList = $.map(items, function(item) {
+            return ( {
+                value : item.id,
+                text : item.id
+            });
+        });
+    });
+    $scope.$watch("raspberrySelection", function(selection) {
+        if ( typeof selection != 'undefined') {
+            $scope.chronoPoint.raspberry = {};
+            $scope.chronoPoint.raspberry.id = selection.value;
+        }
+    });
     
 
     $scope.save = function() {

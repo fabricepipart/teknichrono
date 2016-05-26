@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('EditIntermediateController', function($scope, $routeParams, $location, flash, IntermediateResource , PilotResource) {
+angular.module('frontend').controller('EditIntermediateController', function($scope, $routeParams, $location, flash, IntermediateResource , PilotResource, ChronoPointResource) {
     var self = this;
     $scope.disabled = false;
     $scope.$location = $location;
@@ -22,6 +22,23 @@ angular.module('frontend').controller('EditIntermediateController', function($sc
                         $scope.pilotSelection = labelObject;
                         $scope.intermediate.pilot = wrappedObject;
                         self.original.pilot = $scope.intermediate.pilot;
+                    }
+                    return labelObject;
+                });
+            });
+            ChronoPointResource.queryAll(function(items) {
+                $scope.chronopointSelectionList = $.map(items, function(item) {
+                    var wrappedObject = {
+                        id : item.id
+                    };
+                    var labelObject = {
+                        value : item.id,
+                        text : item.id
+                    };
+                    if($scope.intermediate.chronopoint && item.id == $scope.intermediate.chronopoint.id) {
+                        $scope.chronopointSelection = labelObject;
+                        $scope.intermediate.chronopoint = wrappedObject;
+                        self.original.chronopoint = $scope.intermediate.chronopoint;
                     }
                     return labelObject;
                 });
@@ -76,6 +93,12 @@ angular.module('frontend').controller('EditIntermediateController', function($sc
         if (typeof selection != 'undefined') {
             $scope.intermediate.pilot = {};
             $scope.intermediate.pilot.id = selection.value;
+        }
+    });
+    $scope.$watch("chronopointSelection", function(selection) {
+        if (typeof selection != 'undefined') {
+            $scope.intermediate.chronopoint = {};
+            $scope.intermediate.chronopoint.id = selection.value;
         }
     });
     

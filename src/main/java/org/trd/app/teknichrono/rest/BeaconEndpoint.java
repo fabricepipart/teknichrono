@@ -20,12 +20,13 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
+
 import org.trd.app.teknichrono.model.Beacon;
 
 /**
  * 
  */
-@Stateless
+@Stateless(name = "beacons")
 @Path("/beacons")
 public class BeaconEndpoint {
 	@PersistenceContext(unitName = "teknichrono-persistence-unit")
@@ -35,9 +36,9 @@ public class BeaconEndpoint {
 	@Consumes("application/json")
 	public Response create(Beacon entity) {
 		em.persist(entity);
-		return Response.created(
-				UriBuilder.fromResource(BeaconEndpoint.class)
-						.path(String.valueOf(entity.getId())).build()).build();
+		return Response
+				.created(UriBuilder.fromResource(BeaconEndpoint.class).path(String.valueOf(entity.getId())).build())
+				.build();
 	}
 
 	@DELETE
@@ -55,10 +56,16 @@ public class BeaconEndpoint {
 	@Path("/{id:[0-9][0-9]*}")
 	@Produces("application/json")
 	public Response findById(@PathParam("id") int id) {
+		Beacon entity = findBeacon(id);
+		if (entity == null) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+		return Response.ok(entity).build();
+	}
+
+	public Beacon findBeacon(int id) {
 		TypedQuery<Beacon> findByIdQuery = em
-				.createQuery(
-						"SELECT DISTINCT b FROM Beacon b WHERE b.id = :entityId ORDER BY b.id",
-						Beacon.class);
+				.createQuery("SELECT DISTINCT b FROM Beacon b WHERE b.id = :entityId ORDER BY b.id", Beacon.class);
 		findByIdQuery.setParameter("entityId", id);
 		Beacon entity;
 		try {
@@ -66,18 +73,29 @@ public class BeaconEndpoint {
 		} catch (NoResultException nre) {
 			entity = null;
 		}
-		if (entity == null) {
-			return Response.status(Status.NOT_FOUND).build();
+		return entity;
+	}
+
+	@GET
+	@Path("/number/{number:[0-9][0-9]*}")
+	@Produces("application/json")
+	public Beacon findBeaconNumber(@PathParam("number") int number) {
+		TypedQuery<Beacon> findByIdQuery = em.createQuery(
+				"SELECT DISTINCT b FROM Beacon b WHERE b.number = :entityId ORDER BY b.number", Beacon.class);
+		findByIdQuery.setParameter("entityId", number);
+		Beacon entity;
+		try {
+			entity = findByIdQuery.getSingleResult();
+		} catch (NoResultException nre) {
+			entity = null;
 		}
-		return Response.ok(entity).build();
+		return entity;
 	}
 
 	@GET
 	@Produces("application/json")
-	public List<Beacon> listAll(@QueryParam("start") Integer startPosition,
-			@QueryParam("max") Integer maxResult) {
-		TypedQuery<Beacon> findAllQuery = em.createQuery(
-				"SELECT DISTINCT b FROM Beacon b ORDER BY b.id", Beacon.class);
+	public List<Beacon> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
+		TypedQuery<Beacon> findAllQuery = em.createQuery("SELECT DISTINCT b FROM Beacon b ORDER BY b.id", Beacon.class);
 		if (startPosition != null) {
 			findAllQuery.setFirstResult(startPosition);
 		}
@@ -104,8 +122,7 @@ public class BeaconEndpoint {
 		try {
 			entity = em.merge(entity);
 		} catch (OptimisticLockException e) {
-			return Response.status(Response.Status.CONFLICT)
-					.entity(e.getEntity()).build();
+			return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
 		}
 
 		return Response.noContent().build();

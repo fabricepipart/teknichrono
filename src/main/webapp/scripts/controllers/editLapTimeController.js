@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('EditLapTimeController', function($scope, $routeParams, $location, flash, LapTimeResource , PilotResource, EventResource) {
+angular.module('frontend').controller('EditLapTimeController', function($scope, $routeParams, $location, flash, LapTimeResource , PilotResource, EventResource, IntermediateResource) {
     var self = this;
     $scope.disabled = false;
     $scope.$location = $location;
@@ -39,6 +39,27 @@ angular.module('frontend').controller('EditLapTimeController', function($scope, 
                         $scope.eventSelection = labelObject;
                         $scope.lapTime.event = wrappedObject;
                         self.original.event = $scope.lapTime.event;
+                    }
+                    return labelObject;
+                });
+            });
+            IntermediateResource.queryAll(function(items) {
+                $scope.intermediatesSelectionList = $.map(items, function(item) {
+                    var wrappedObject = {
+                        id : item.id
+                    };
+                    var labelObject = {
+                        value : item.id,
+                        text : item.id
+                    };
+                    if($scope.lapTime.intermediates){
+                        $.each($scope.lapTime.intermediates, function(idx, element) {
+                            if(item.id == element.id) {
+                                $scope.intermediatesSelection.push(labelObject);
+                                $scope.lapTime.intermediates.push(wrappedObject);
+                            }
+                        });
+                        self.original.intermediates = $scope.lapTime.intermediates;
                     }
                     return labelObject;
                 });
@@ -99,6 +120,17 @@ angular.module('frontend').controller('EditLapTimeController', function($scope, 
         if (typeof selection != 'undefined') {
             $scope.lapTime.event = {};
             $scope.lapTime.event.id = selection.value;
+        }
+    });
+    $scope.intermediatesSelection = $scope.intermediatesSelection || [];
+    $scope.$watch("intermediatesSelection", function(selection) {
+        if (typeof selection != 'undefined' && $scope.lapTime) {
+            $scope.lapTime.intermediates = [];
+            $.each(selection, function(idx,selectedItem) {
+                var collectionItem = {};
+                collectionItem.id = selectedItem.value;
+                $scope.lapTime.intermediates.push(collectionItem);
+            });
         }
     });
     

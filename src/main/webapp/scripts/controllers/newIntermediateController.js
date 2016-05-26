@@ -1,5 +1,5 @@
 
-angular.module('frontend').controller('NewIntermediateController', function ($scope, $location, locationParser, flash, IntermediateResource , PilotResource) {
+angular.module('frontend').controller('NewIntermediateController', function ($scope, $location, locationParser, flash, IntermediateResource , PilotResource, ChronoPointResource) {
     $scope.disabled = false;
     $scope.$location = $location;
     $scope.intermediate = $scope.intermediate || {};
@@ -16,6 +16,21 @@ angular.module('frontend').controller('NewIntermediateController', function ($sc
         if ( typeof selection != 'undefined') {
             $scope.intermediate.pilot = {};
             $scope.intermediate.pilot.id = selection.value;
+        }
+    });
+    
+    $scope.chronopointList = ChronoPointResource.queryAll(function(items){
+        $scope.chronopointSelectionList = $.map(items, function(item) {
+            return ( {
+                value : item.id,
+                text : item.id
+            });
+        });
+    });
+    $scope.$watch("chronopointSelection", function(selection) {
+        if ( typeof selection != 'undefined') {
+            $scope.intermediate.chronopoint = {};
+            $scope.intermediate.chronopoint.id = selection.value;
         }
     });
     

@@ -22,6 +22,12 @@ angular.module('frontend',['ngRoute','ngResource'])
       .when('/Pilots',{templateUrl:'views/Pilot/search.html',controller:'SearchPilotController'})
       .when('/Pilots/new',{templateUrl:'views/Pilot/detail.html',controller:'NewPilotController'})
       .when('/Pilots/edit/:PilotId',{templateUrl:'views/Pilot/detail.html',controller:'EditPilotController'})
+      .when('/Pings',{templateUrl:'views/Ping/search.html',controller:'SearchPingController'})
+      .when('/Pings/new',{templateUrl:'views/Ping/detail.html',controller:'NewPingController'})
+      .when('/Pings/edit/:PingId',{templateUrl:'views/Ping/detail.html',controller:'EditPingController'})
+      .when('/Raspberries',{templateUrl:'views/Raspberry/search.html',controller:'SearchRaspberryController'})
+      .when('/Raspberries/new',{templateUrl:'views/Raspberry/detail.html',controller:'NewRaspberryController'})
+      .when('/Raspberries/edit/:RaspberryId',{templateUrl:'views/Raspberry/detail.html',controller:'EditRaspberryController'})
       .otherwise({
         redirectTo: '/'
       });

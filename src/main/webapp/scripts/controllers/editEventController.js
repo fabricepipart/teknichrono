@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('EditEventController', function($scope, $routeParams, $location, flash, EventResource , ChronoPointResource, LapTimeResource) {
+angular.module('frontend').controller('EditEventController', function($scope, $routeParams, $location, flash, EventResource , ChronoPointResource) {
     var self = this;
     $scope.disabled = false;
     $scope.$location = $location;
@@ -26,27 +26,6 @@ angular.module('frontend').controller('EditEventController', function($scope, $r
                             }
                         });
                         self.original.chronopoints = $scope.event.chronopoints;
-                    }
-                    return labelObject;
-                });
-            });
-            LapTimeResource.queryAll(function(items) {
-                $scope.laptimesSelectionList = $.map(items, function(item) {
-                    var wrappedObject = {
-                        id : item.id
-                    };
-                    var labelObject = {
-                        value : item.id,
-                        text : item.id
-                    };
-                    if($scope.event.laptimes){
-                        $.each($scope.event.laptimes, function(idx, element) {
-                            if(item.id == element.id) {
-                                $scope.laptimesSelection.push(labelObject);
-                                $scope.event.laptimes.push(wrappedObject);
-                            }
-                        });
-                        self.original.laptimes = $scope.event.laptimes;
                     }
                     return labelObject;
                 });
@@ -105,17 +84,6 @@ angular.module('frontend').controller('EditEventController', function($scope, $r
                 var collectionItem = {};
                 collectionItem.id = selectedItem.value;
                 $scope.event.chronopoints.push(collectionItem);
-            });
-        }
-    });
-    $scope.laptimesSelection = $scope.laptimesSelection || [];
-    $scope.$watch("laptimesSelection", function(selection) {
-        if (typeof selection != 'undefined' && $scope.event) {
-            $scope.event.laptimes = [];
-            $.each(selection, function(idx,selectedItem) {
-                var collectionItem = {};
-                collectionItem.id = selectedItem.value;
-                $scope.event.laptimes.push(collectionItem);
             });
         }
     });

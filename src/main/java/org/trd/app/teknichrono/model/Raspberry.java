@@ -4,40 +4,28 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
 import javax.persistence.Version;
-import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
-@XmlRootElement
-public class Pilot implements Serializable {
+public class Raspberry implements Serializable {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 5594553167060540038L;
-
+	private static final long serialVersionUID = 5820548872316869699L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id", updatable = false, nullable = false)
 	private Long id;
-
 	@Version
 	@Column(name = "version")
 	private int version;
 
 	@Column(nullable = false)
-	private String firstName;
-
-	@Column(nullable = false)
-	private String lastName;
-
-	@OneToOne(fetch = FetchType.LAZY)
-	private Beacon currentBeacon;
+	private int number;
 
 	public Long getId() {
 		return this.id;
@@ -60,10 +48,10 @@ public class Pilot implements Serializable {
 		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof Pilot)) {
+		if (!(obj instanceof Raspberry)) {
 			return false;
 		}
-		Pilot other = (Pilot) obj;
+		Raspberry other = (Raspberry) obj;
 		if (id != null) {
 			if (!id.equals(other.id)) {
 				return false;
@@ -80,37 +68,18 @@ public class Pilot implements Serializable {
 		return result;
 	}
 
-	public String getFirstName() {
-		return firstName;
+	public int getNumber() {
+		return number;
 	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
-	public Beacon getCurrentBeacon() {
-		return currentBeacon;
-	}
-
-	public void setCurrentBeacon(Beacon currentBeacon) {
-		this.currentBeacon = currentBeacon;
+	public void setNumber(int number) {
+		this.number = number;
 	}
 
 	@Override
 	public String toString() {
 		String result = getClass().getSimpleName() + " ";
-		if (firstName != null && !firstName.trim().isEmpty())
-			result += "firstName: " + firstName;
-		if (lastName != null && !lastName.trim().isEmpty())
-			result += ", lastName: " + lastName;
+		result += "number: " + number;
 		return result;
 	}
 }

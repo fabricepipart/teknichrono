@@ -1,5 +1,5 @@
 
-angular.module('frontend').controller('NewEventController', function ($scope, $location, locationParser, flash, EventResource , ChronoPointResource, LapTimeResource) {
+angular.module('frontend').controller('NewEventController', function ($scope, $location, locationParser, flash, EventResource , ChronoPointResource) {
     $scope.disabled = false;
     $scope.$location = $location;
     $scope.event = $scope.event || {};
@@ -19,25 +19,6 @@ angular.module('frontend').controller('NewEventController', function ($scope, $l
                 var collectionItem = {};
                 collectionItem.id = selectedItem.value;
                 $scope.event.chronopoints.push(collectionItem);
-            });
-        }
-    });
-
-    $scope.laptimesList = LapTimeResource.queryAll(function(items){
-        $scope.laptimesSelectionList = $.map(items, function(item) {
-            return ( {
-                value : item.id,
-                text : item.id
-            });
-        });
-    });
-    $scope.$watch("laptimesSelection", function(selection) {
-        if (typeof selection != 'undefined') {
-            $scope.event.laptimes = [];
-            $.each(selection, function(idx,selectedItem) {
-                var collectionItem = {};
-                collectionItem.id = selectedItem.value;
-                $scope.event.laptimes.push(collectionItem);
             });
         }
     });

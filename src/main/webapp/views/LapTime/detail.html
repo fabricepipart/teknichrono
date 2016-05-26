@@ -4,15 +4,6 @@
 </header>
 <form id="LapTimeForm" name="LapTimeForm" class="form-horizontal" role="form">
     
-    <div class="form-group" ng-class="{'has-error': LapTimeForm.timelap.$invalid}">
-        <label for="timelap" class="col-sm-2 control-label">Timelap</label>
-        <div id="timelapControls" class="col-sm-10">
-            <input id="timelap" name="timelap" type="number" required class="form-control" ng-model="lapTime.timelap" placeholder="Enter the LapTime Timelap"></input>
-            <span class="help-block error" ng-show="LapTimeForm.timelap.$error.required">required</span> 
-            <span class="help-block error" ng-show="LapTimeForm.timelap.$error.number">not a number</span>
-        </div>
-    </div>
-
     <div class="form-group" ng-class="{'has-error': LapTimeForm.pilot.$invalid}">
         <label for="pilot" class="col-sm-2 control-label">Pilot</label>
         <div id="pilotControls" class="col-sm-10">
@@ -22,10 +13,10 @@
         </div>
     </div>
 
-    <div class="form-group" ng-class="{'has-error': LapTimeForm.captureDate.$invalid}">
-        <label for="captureDate" class="col-sm-2 control-label">Capture Date</label>
-        <div id="captureDateControls" class="col-sm-10">
-            <input id="captureDate" name="captureDate" type="text" class="form-control" ng-model="lapTime.captureDate" placeholder="Enter the LapTime Capture Date"></input>
+    <div class="form-group" ng-class="{'has-error': LapTimeForm.startDate.$invalid}">
+        <label for="startDate" class="col-sm-2 control-label">Start Date</label>
+        <div id="startDateControls" class="col-sm-10">
+            <input id="startDate" name="startDate" type="text" class="form-control" ng-model="lapTime.startDate" placeholder="Enter the LapTime Start Date"></input>
         </div>
     </div>
 
@@ -35,6 +26,22 @@
         <select id="event" name="event" class="form-control" ng-model="eventSelection" ng-options="e.text for e in eventSelectionList"  >
             <option value="">Choose a Event</option>
         </select>
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': LapTimeForm.endDate.$invalid}">
+        <label for="endDate" class="col-sm-2 control-label">End Date</label>
+        <div id="endDateControls" class="col-sm-10">
+            <input id="endDate" name="endDate" type="text" class="form-control" ng-model="lapTime.endDate" placeholder="Enter the LapTime End Date"></input>
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': LapTimeForm.intermediates.$invalid}">
+        <label for="intermediates" class="col-sm-2 control-label">Intermediates</label>
+        <div id="intermediatesControls" class="col-sm-10">
+            <select id="intermediates" name="intermediates" multiple class="form-control" ng-model="intermediatesSelection" ng-options="i.text for i in intermediatesSelectionList">
+                <option value="">Choose a Intermediates</option>
+            </select>
         </div>
     </div>
 

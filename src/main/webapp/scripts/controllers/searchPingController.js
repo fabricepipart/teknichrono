@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('SearchChronoPointController', function($scope, $http, $filter, ChronoPointResource , RaspberryResource) {
+angular.module('frontend').controller('SearchPingController', function($scope, $http, $filter, PingResource ) {
 
     $scope.search={};
     $scope.currentPage = 0;
@@ -17,10 +17,9 @@ angular.module('frontend').controller('SearchChronoPointController', function($s
         }
         return max;
     };
-    $scope.raspberryList = RaspberryResource.queryAll();
 
     $scope.performSearch = function() {
-        $scope.searchResults = ChronoPointResource.queryAll(function(){
+        $scope.searchResults = PingResource.queryAll(function(){
             $scope.filteredResults = $filter('searchFilter')($scope.searchResults, $scope);
             $scope.currentPage = 0;
         });
