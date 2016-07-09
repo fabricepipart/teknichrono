@@ -1,14 +1,18 @@
 package org.trd.app.teknichrono.model;
 // Generated 5 mai 2016 11:08:49 by Hibernate Tools 4.3.1.Final
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 @Entity
@@ -36,6 +40,12 @@ public class Beacon implements java.io.Serializable {
 	@Column(nullable = false, unique = true)
 	private int number;
 
+	// Mapped by denotes that Pilot is the owner of the relationship
+	// http://meri-stuff.blogspot.fr/2012/03/jpa-tutorial.html#RelationshipsBidirectionalOneToManyManyToOneConsistency
+	@OneToOne(fetch = FetchType.EAGER, optional = true, mappedBy = "currentBeacon", cascade = CascadeType.MERGE)
+	@JsonBackReference
+	private Pilot pilot;
+
 	/* ============================ Factory ============================ */
 
 	public Beacon() {
@@ -54,6 +64,32 @@ public class Beacon implements java.io.Serializable {
 	}
 
 	/* ===================== Getters and setters ======================== */
+
+	public Pilot getPilot() {
+		return pilot;
+	}
+
+	public void setPilot(Pilot pilot) {
+		// prevent endless loop
+		if (sameAsFormer(pilot)) {
+			return;
+		}
+		Pilot oldPilot = this.pilot;
+		// Set new pilot
+		this.pilot = pilot;
+		// This beacon is not associated to the previous Pilot
+		if (oldPilot != null) {
+			oldPilot.setCurrentBeacon(null);
+		}
+		// Set reverse relationship
+		if (pilot != null) {
+			pilot.setCurrentBeacon(this);
+		}
+	}
+
+	private boolean sameAsFormer(Pilot newPilot) {
+		return pilot == null ? newPilot == null : pilot.equals(newPilot);
+	}
 
 	public int getId() {
 		return this.id;

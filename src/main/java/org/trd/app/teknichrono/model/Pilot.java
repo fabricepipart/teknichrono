@@ -2,19 +2,25 @@ package org.trd.app.teknichrono.model;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Entity
 @XmlRootElement
 public class Pilot implements Serializable {
+
+	/* =========================== Entity stuff =========================== */
 
 	/**
 	 * 
@@ -24,26 +30,31 @@ public class Pilot implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id", updatable = false, nullable = false)
-	private Long id;
+	private int id;
 
 	@Version
 	@Column(name = "version")
 	private int version;
 
+	/* =============================== Fields =============================== */
 	@Column(nullable = false)
 	private String firstName;
 
 	@Column(nullable = false)
 	private String lastName;
 
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne(fetch = FetchType.EAGER, optional = true, cascade = CascadeType.MERGE)
+	@JoinColumn(name = "currentBeaconId")
+	@JsonManagedReference
 	private Beacon currentBeacon;
 
-	public Long getId() {
+	/* ===================== Getters and setters ======================== */
+
+	public int getId() {
 		return this.id;
 	}
 
-	public void setId(final Long id) {
+	public void setId(final int id) {
 		this.id = id;
 	}
 
@@ -53,31 +64,6 @@ public class Pilot implements Serializable {
 
 	public void setVersion(final int version) {
 		this.version = version;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (!(obj instanceof Pilot)) {
-			return false;
-		}
-		Pilot other = (Pilot) obj;
-		if (id != null) {
-			if (!id.equals(other.id)) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
 	}
 
 	public String getFirstName() {
@@ -101,7 +87,25 @@ public class Pilot implements Serializable {
 	}
 
 	public void setCurrentBeacon(Beacon currentBeacon) {
+		// prevent endless loop
+		if (sameAsFormer(currentBeacon)) {
+			return;
+		}
+		Beacon oldBeacon = this.currentBeacon;
+		// Set new pilot
 		this.currentBeacon = currentBeacon;
+		// This beacon is not associated to the previous Pilot
+		if (oldBeacon != null) {
+			oldBeacon.setPilot(null);
+		}
+		// Set reverse relationship
+		if (currentBeacon != null) {
+			currentBeacon.setPilot(this);
+		}
+	}
+
+	private boolean sameAsFormer(Beacon newBeacon) {
+		return currentBeacon == null ? newBeacon == null : currentBeacon.equals(newBeacon);
 	}
 
 	@Override

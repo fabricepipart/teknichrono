@@ -22,6 +22,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import org.trd.app.teknichrono.model.Beacon;
+import org.trd.app.teknichrono.model.Pilot;
 
 /**
  * 
@@ -48,6 +49,12 @@ public class BeaconEndpoint {
 		if (entity == null) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
+		Pilot associatedPilot = entity.getPilot();
+		if (associatedPilot != null) {
+			associatedPilot.setCurrentBeacon(null);
+			em.persist(associatedPilot);
+		}
+
 		em.remove(entity);
 		return Response.noContent().build();
 	}

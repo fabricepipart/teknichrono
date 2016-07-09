@@ -21,6 +21,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import org.trd.app.teknichrono.model.Beacon;
 import org.trd.app.teknichrono.model.Pilot;
 
 /**
@@ -43,7 +44,7 @@ public class PilotEndpoint {
 
 	@DELETE
 	@Path("/{id:[0-9][0-9]*}")
-	public Response deleteById(@PathParam("id") Long id) {
+	public Response deleteById(@PathParam("id") int id) {
 		Pilot entity = em.find(Pilot.class, id);
 		if (entity == null) {
 			return Response.status(Status.NOT_FOUND).build();
@@ -55,7 +56,7 @@ public class PilotEndpoint {
 	@GET
 	@Path("/{id:[0-9][0-9]*}")
 	@Produces("application/json")
-	public Response findById(@PathParam("id") Long id) {
+	public Response findById(@PathParam("id") int id) {
 		TypedQuery<Pilot> findByIdQuery = em.createQuery(
 				"SELECT DISTINCT p FROM Pilot p LEFT JOIN FETCH p.currentBeacon WHERE p.id = :entityId ORDER BY p.id",
 				Pilot.class);
@@ -108,17 +109,32 @@ public class PilotEndpoint {
 		return results;
 	}
 
+	@POST
+	@Path("{pilotId:[0-9][0-9]*}/setBeacon")
+	@Produces("application/json")
+	public Response associateBeacon(@PathParam("pilotId") int pilotId, @QueryParam("beaconId") int beaconId) {
+		Pilot pilot = em.find(Pilot.class, pilotId);
+		if (pilot == null) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+		Beacon beacon = em.find(Beacon.class, beaconId);
+		if (beacon == null) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+		pilot.setCurrentBeacon(beacon);
+		em.persist(pilot);
+		em.persist(beacon);
+		return Response.ok(pilot).build();
+	}
+
 	@PUT
 	@Path("/{id:[0-9][0-9]*}")
 	@Consumes("application/json")
-	public Response update(@PathParam("id") Long id, Pilot entity) {
+	public Response update(@PathParam("id") int id, Pilot entity) {
 		if (entity == null) {
 			return Response.status(Status.BAD_REQUEST).build();
 		}
-		if (id == null) {
-			return Response.status(Status.BAD_REQUEST).build();
-		}
-		if (!id.equals(entity.getId())) {
+		if (id != entity.getId()) {
 			return Response.status(Status.CONFLICT).entity(entity).build();
 		}
 		if (em.find(Pilot.class, id) == null) {
