@@ -1,7 +1,7 @@
 package org.trd.app.teknichrono.business;
 
 import org.trd.app.teknichrono.model.Beacon;
-import org.trd.app.teknichrono.model.ChronoPoint;
+import org.trd.app.teknichrono.model.Chronometer;
 import org.trd.app.teknichrono.model.Event;
 import org.trd.app.teknichrono.model.Pilot;
 import org.trd.app.teknichrono.model.Ping;
@@ -14,7 +14,7 @@ public class ChronoManager {
 	public void addPing(Ping ping) {
 		Beacon beacon = getBeacon(ping);
 		Pilot pilot = getPilot(ping);
-		ChronoPoint chronoPoint = getChronoPoint(ping);
+		Chronometer chronometer = getChronometer(ping);
 		Event event = getEvent(ping);
 
 		// Missing intermediate of previous existing Laptime
@@ -32,7 +32,7 @@ public class ChronoManager {
 		return null;
 	}
 
-	private ChronoPoint getChronoPoint(Ping ping) {
+	private Chronometer getChronometer(Ping ping) {
 		// TODO Auto-generated method stub
 		return null;
 	}

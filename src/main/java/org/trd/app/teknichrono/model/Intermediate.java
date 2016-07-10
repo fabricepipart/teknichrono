@@ -11,7 +11,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.trd.app.teknichrono.model.ChronoPoint;
 
 @Entity
 @XmlRootElement
@@ -37,7 +36,7 @@ public class Intermediate implements Serializable {
 	private Date captureDate;
 
 	@ManyToOne
-	private ChronoPoint chronopoint;
+	private Chronometer chronometer;
 
 	public Long getId() {
 		return this.id;
@@ -103,11 +102,11 @@ public class Intermediate implements Serializable {
 		return result;
 	}
 
-	public ChronoPoint getChronopoint() {
-		return this.chronopoint;
+	public Chronometer getChronometer() {
+		return this.chronometer;
 	}
 
-	public void setChronopoint(final ChronoPoint chronopoint) {
-		this.chronopoint = chronopoint;
+	public void setChronometer(final Chronometer chronometer) {
+		this.chronometer = chronometer;
 	}
 }

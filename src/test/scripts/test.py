@@ -5,23 +5,25 @@ import json
 from base import *
 from pilots import *
 from beacons import *
+from chronometer import *
 
 # ----------------------------------------------------------------------
 
 # Cleanup
-print getBeacons()
 deleteBeacons()
-print getBeacons()
-
-print getPilots()
 deletePilots()
-print getPilots()
+deleteChronometers()
 
 
 
+# ----------------------------------------------------------------------
 # Add Beacons
 for i in range(1, 20):
     addBeacon(i);
+
+
+# ----------------------------------------------------------------------
+# Add Pilots
 
 addPilot('Jerome', 'Rousseau')
 addPilot('Fabrice', 'Pipart')
@@ -31,8 +33,9 @@ addPilot('Marc', 'Marquez')
 addPilot('Dani', 'Pedrosa')
 addPilot('Jorge', 'Lorenzo')
 
-print getPilots()
-print getBeacons()
+
+# ----------------------------------------------------------------------
+# Play with associations
 
 associatePilotBeacon(getPilot('Jerome', 'Rousseau')['id'],getBeacon(12)['id'])
 
@@ -44,5 +47,15 @@ associatePilotBeacon(getPilot('Jorge', 'Lorenzo')['id'],getBeacon(8)['id'])
 
 deleteBeacon(getBeacon(2)['id'])
 
-print getPilots()
-print getBeacons()
+
+# ----------------------------------------------------------------------
+# Add Chronometers
+for i in range(0, 5):
+    addChronometer('Raspberry #' + str(i+1), i);
+
+# ----------------------------------------------------------------------
+# Add Events
+
+
+# ----------------------------------------------------------------------
+# Associate chronometers to event in right order

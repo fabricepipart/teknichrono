@@ -7,21 +7,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.trd.app.teknichrono.model.Raspberry;
-import javax.persistence.ManyToOne;
 
 @Entity
-@Table(name = "CHRONOPOINT")
 @XmlRootElement
-public class ChronoPoint implements Serializable {
+public class Chronometer implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2292679012493456922L;
+	/* =========================== Entity stuff =========================== */
+
+	private static final long serialVersionUID = 108231410607139227L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -32,15 +27,15 @@ public class ChronoPoint implements Serializable {
 	@Column(name = "version")
 	private int version;
 
-	@Column(name = "index", nullable = false)
-	private int index;
+	/* =============================== Fields =============================== */
 
-	@Column(nullable = false)
+	@Column
 	private String name;
 
-	@ManyToOne
-	private Raspberry raspberry;
+	@Column(nullable = false, unique = true)
+	private int index;
 
+	/* ===================== Getters and setters ======================== */
 	public Long getId() {
 		return this.id;
 	}
@@ -57,15 +52,32 @@ public class ChronoPoint implements Serializable {
 		this.version = version;
 	}
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public void setIndex(int index) {
+		this.index = index;
+	}
+
+	/* ===================== Other ======================== */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof ChronoPoint)) {
+		if (!(obj instanceof Chronometer)) {
 			return false;
 		}
-		ChronoPoint other = (ChronoPoint) obj;
+		Chronometer other = (Chronometer) obj;
 		if (id != null) {
 			if (!id.equals(other.id)) {
 				return false;
@@ -82,36 +94,12 @@ public class ChronoPoint implements Serializable {
 		return result;
 	}
 
-	public int getIndex() {
-		return index;
-	}
-
-	public void setIndex(int index) {
-		this.index = index;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	@Override
 	public String toString() {
 		String result = getClass().getSimpleName() + " ";
-		result += "index: " + index;
+		result += "(" + index + ") ";
 		if (name != null && !name.trim().isEmpty())
-			result += ", name: " + name;
+			result += name;
 		return result;
-	}
-
-	public Raspberry getRaspberry() {
-		return this.raspberry;
-	}
-
-	public void setRaspberry(final Raspberry raspberry) {
-		this.raspberry = raspberry;
 	}
 }

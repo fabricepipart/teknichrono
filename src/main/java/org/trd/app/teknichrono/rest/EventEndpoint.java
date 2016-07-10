@@ -57,7 +57,7 @@ public class EventEndpoint {
 	public Response findById(@PathParam("id") int id) {
 		TypedQuery<Event> findByIdQuery = em
 				.createQuery(
-						"SELECT DISTINCT e FROM Event e LEFT JOIN FETCH e.chronopoints WHERE e.id = :entityId ORDER BY e.id",
+						"SELECT DISTINCT e FROM Event e LEFT JOIN FETCH e.chronometers WHERE e.id = :entityId ORDER BY e.id",
 						Event.class);
 		findByIdQuery.setParameter("entityId", id);
 		Event entity;
@@ -78,7 +78,7 @@ public class EventEndpoint {
 			@QueryParam("max") Integer maxResult) {
 		TypedQuery<Event> findAllQuery = em
 				.createQuery(
-						"SELECT DISTINCT e FROM Event e LEFT JOIN FETCH e.chronopoints ORDER BY e.id",
+						"SELECT DISTINCT e FROM Event e LEFT JOIN FETCH e.chronometers ORDER BY e.id",
 						Event.class);
 		if (startPosition != null) {
 			findAllQuery.setFirstResult(startPosition);

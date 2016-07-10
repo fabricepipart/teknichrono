@@ -49,10 +49,16 @@ public class Event implements java.io.Serializable {
 	 */
 	@OneToMany
 	@OrderColumn(name = "index")
-	private List<ChronoPoint> chronopoints = new ArrayList<ChronoPoint>();
+	private List<Chronometer> chronometers = new ArrayList<Chronometer>();
 
 	@Column(nullable = false)
 	private String name;
+
+	/**
+	 * True for a racetrack, false for a rally stage
+	 */
+	@Column
+	private boolean loop;
 
 	public int getId() {
 		return this.id;
@@ -86,12 +92,12 @@ public class Event implements java.io.Serializable {
 		this.end = end;
 	}
 
-	public List<ChronoPoint> getChronopoints() {
-		return this.chronopoints;
+	public List<Chronometer> getChronopoints() {
+		return this.chronometers;
 	}
 
-	public void setChronopoints(final List<ChronoPoint> chronopoints) {
-		this.chronopoints = chronopoints;
+	public void setChronopoints(final List<Chronometer> chronometers) {
+		this.chronometers = chronometers;
 	}
 
 	public String getName() {
@@ -102,11 +108,20 @@ public class Event implements java.io.Serializable {
 		this.name = name;
 	}
 
+	public boolean isLoop() {
+		return loop;
+	}
+
+	public void setLoop(boolean loop) {
+		this.loop = loop;
+	}
+
 	@Override
 	public String toString() {
 		String result = getClass().getSimpleName() + " ";
 		if (name != null && !name.trim().isEmpty())
 			result += "name: " + name;
+		result += ", loop: " + loop;
 		return result;
 	}
 

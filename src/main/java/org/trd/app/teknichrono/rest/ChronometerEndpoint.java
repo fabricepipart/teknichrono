@@ -20,30 +20,32 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
-import org.trd.app.teknichrono.model.ChronoPoint;
+
+import org.trd.app.teknichrono.model.Chronometer;
 
 /**
  * 
  */
 @Stateless
-@Path("/chronopoints")
-public class ChronoPointEndpoint {
+@Path("/chronometers")
+public class ChronometerEndpoint {
 	@PersistenceContext(unitName = "teknichrono-persistence-unit")
 	private EntityManager em;
 
 	@POST
 	@Consumes("application/json")
-	public Response create(ChronoPoint entity) {
+	public Response create(Chronometer entity) {
 		em.persist(entity);
-		return Response.created(
-				UriBuilder.fromResource(ChronoPointEndpoint.class)
-						.path(String.valueOf(entity.getId())).build()).build();
+		return Response
+				.created(
+						UriBuilder.fromResource(ChronometerEndpoint.class).path(String.valueOf(entity.getId())).build())
+				.build();
 	}
 
 	@DELETE
 	@Path("/{id:[0-9][0-9]*}")
 	public Response deleteById(@PathParam("id") Long id) {
-		ChronoPoint entity = em.find(ChronoPoint.class, id);
+		Chronometer entity = em.find(Chronometer.class, id);
 		if (entity == null) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
@@ -55,12 +57,10 @@ public class ChronoPointEndpoint {
 	@Path("/{id:[0-9][0-9]*}")
 	@Produces("application/json")
 	public Response findById(@PathParam("id") Long id) {
-		TypedQuery<ChronoPoint> findByIdQuery = em
-				.createQuery(
-						"SELECT DISTINCT c FROM ChronoPoint c WHERE c.id = :entityId ORDER BY c.id",
-						ChronoPoint.class);
+		TypedQuery<Chronometer> findByIdQuery = em.createQuery(
+				"SELECT DISTINCT c FROM Chronometer c WHERE c.id = :entityId ORDER BY c.id", Chronometer.class);
 		findByIdQuery.setParameter("entityId", id);
-		ChronoPoint entity;
+		Chronometer entity;
 		try {
 			entity = findByIdQuery.getSingleResult();
 		} catch (NoResultException nre) {
@@ -74,26 +74,23 @@ public class ChronoPointEndpoint {
 
 	@GET
 	@Produces("application/json")
-	public List<ChronoPoint> listAll(
-			@QueryParam("start") Integer startPosition,
-			@QueryParam("max") Integer maxResult) {
-		TypedQuery<ChronoPoint> findAllQuery = em.createQuery(
-				"SELECT DISTINCT c FROM ChronoPoint c ORDER BY c.id",
-				ChronoPoint.class);
+	public List<Chronometer> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
+		TypedQuery<Chronometer> findAllQuery = em.createQuery("SELECT DISTINCT c FROM Chronometer c ORDER BY c.id",
+				Chronometer.class);
 		if (startPosition != null) {
 			findAllQuery.setFirstResult(startPosition);
 		}
 		if (maxResult != null) {
 			findAllQuery.setMaxResults(maxResult);
 		}
-		final List<ChronoPoint> results = findAllQuery.getResultList();
+		final List<Chronometer> results = findAllQuery.getResultList();
 		return results;
 	}
 
 	@PUT
 	@Path("/{id:[0-9][0-9]*}")
 	@Consumes("application/json")
-	public Response update(@PathParam("id") Long id, ChronoPoint entity) {
+	public Response update(@PathParam("id") Long id, Chronometer entity) {
 		if (entity == null) {
 			return Response.status(Status.BAD_REQUEST).build();
 		}
@@ -103,14 +100,13 @@ public class ChronoPointEndpoint {
 		if (!id.equals(entity.getId())) {
 			return Response.status(Status.CONFLICT).entity(entity).build();
 		}
-		if (em.find(ChronoPoint.class, id) == null) {
+		if (em.find(Chronometer.class, id) == null) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
 		try {
 			entity = em.merge(entity);
 		} catch (OptimisticLockException e) {
-			return Response.status(Response.Status.CONFLICT)
-					.entity(e.getEntity()).build();
+			return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
 		}
 
 		return Response.noContent().build();
