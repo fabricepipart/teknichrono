@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
@@ -22,6 +24,7 @@ public class Event implements java.io.Serializable {
 	private static final long serialVersionUID = 929783339304030614L;
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id", unique = true, nullable = false)
 	private int id;
 
@@ -30,7 +33,7 @@ public class Event implements java.io.Serializable {
 	private int version;
 
 	@Column(nullable = false)
-	private Date beginning;
+	private Date start;
 
 	@Column(nullable = false)
 	private Date end;
@@ -76,12 +79,12 @@ public class Event implements java.io.Serializable {
 		this.version = version;
 	}
 
-	public Date getBeginning() {
-		return beginning;
+	public Date getStart() {
+		return start;
 	}
 
-	public void setBeginning(Date beginning) {
-		this.beginning = beginning;
+	public void setStart(Date beginning) {
+		this.start = beginning;
 	}
 
 	public Date getEnd() {

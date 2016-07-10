@@ -2,10 +2,12 @@
 
 import requests
 import json
+from datetime import date
 from base import *
 from pilots import *
 from beacons import *
 from chronometer import *
+from event import *
 
 # ----------------------------------------------------------------------
 
@@ -13,6 +15,7 @@ from chronometer import *
 deleteBeacons()
 deletePilots()
 deleteChronometers()
+deleteEvents()
 
 
 
@@ -55,7 +58,11 @@ for i in range(0, 5):
 
 # ----------------------------------------------------------------------
 # Add Events
-
+addEvent('TRD Le Luc 2016-08-22', date(2016,8,22), date(2016,8,22));
+addEvent('TRD Ledenon 2016-09-12+13', date(2016,9,12), date(2016,9,13));
+addEvent('TRD Aragon 2016-10-22+23', date(2016,10,22), date(2016,10,23));
+addEvent('TRD Le Luc 2016-11-01', date(2016,11,01), date(2016,11,01));
+addEvent('Rally #1', date(2017,3,1), date(2017,3,1), False);
 
 # ----------------------------------------------------------------------
 # Associate chronometers to event in right order
