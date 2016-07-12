@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.Version;
@@ -50,8 +51,9 @@ public class Event implements java.io.Serializable {
 	 *     | 0 | 1 | 2 | 0 |
 	 * </pre>
 	 */
-	@OneToMany
+	@OneToMany(orphanRemoval = true)
 	@OrderColumn(name = "index")
+	@JoinColumn(name = "event_id")
 	private List<Chronometer> chronometers = new ArrayList<Chronometer>();
 
 	@Column(nullable = false)
