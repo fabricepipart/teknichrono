@@ -95,12 +95,37 @@ public class Event implements java.io.Serializable {
 		this.end = end;
 	}
 
-	public List<Chronometer> getChronopoints() {
+	public List<Chronometer> getChronometers() {
 		return this.chronometers;
 	}
 
-	public void setChronopoints(final List<Chronometer> chronometers) {
+	public void setChronometers(final List<Chronometer> chronometers) {
 		this.chronometers = chronometers;
+	}
+
+	public void addChronometer(Chronometer chronometer) {
+		int insertAtIndex = 0;
+		Integer expectedIndex = chronometer.getIndex();
+		if (expectedIndex == null) {
+			this.chronometers.add(chronometer);
+		} else {
+			int index = 0;
+			for (Chronometer c : this.chronometers) {
+				if (c.getIndex() == null || c.getIndex() >= expectedIndex) {
+					insertAtIndex = index;
+					break;
+				}
+				index++;
+			}
+			this.chronometers.add(insertAtIndex, chronometer);
+		}
+
+		// Reset indexes
+		int index = 0;
+		for (Chronometer c : this.chronometers) {
+			c.setIndex(index);
+			index++;
+		}
 	}
 
 	public String getName() {

@@ -21,7 +21,7 @@ deleteEvents()
 
 # ----------------------------------------------------------------------
 # Add Beacons
-for i in range(1, 20):
+for i in range(0, 20):
     addBeacon(i);
 
 
@@ -54,7 +54,7 @@ deleteBeacon(getBeacon(2)['id'])
 # ----------------------------------------------------------------------
 # Add Chronometers
 for i in range(0, 5):
-    addChronometer('Raspberry #' + str(i+1), i);
+    addChronometer('Raspberry-' + str(i));
 
 # ----------------------------------------------------------------------
 # Add Events
@@ -66,3 +66,17 @@ addEvent('Rally #1', date(2017,3,1), date(2017,3,1), False);
 
 # ----------------------------------------------------------------------
 # Associate chronometers to event in right order
+event = getEventByName('TRD Le Luc 2016-08-22')
+print event
+addChronometerToEvent(event['id'], getChronometerByName('Raspberry-0')['id'])
+event = getEventByName('TRD Le Luc 2016-08-22')
+print event
+
+addChronometerToEvent(event['id'], getChronometerByName('Raspberry-2')['id'])
+event = getEventByName('TRD Le Luc 2016-08-22')
+print event
+
+addChronometerToEvent(event['id'], getChronometerByName('Raspberry-1')['id'], 1)
+
+event = getEventByName('TRD Le Luc 2016-08-22')
+print event

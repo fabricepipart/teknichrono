@@ -21,7 +21,7 @@ public class Chronometer implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id", updatable = false, nullable = false)
-	private Long id;
+	private int id;
 
 	@Version
 	@Column(name = "version")
@@ -32,15 +32,16 @@ public class Chronometer implements Serializable {
 	@Column
 	private String name;
 
-	@Column(nullable = false, unique = true)
-	private int index;
+	// I dont make it unique because I am unsure of the save order
+	@Column(nullable = true)
+	private Integer index;
 
 	/* ===================== Getters and setters ======================== */
-	public Long getId() {
+	public int getId() {
 		return this.id;
 	}
 
-	public void setId(final Long id) {
+	public void setId(final int id) {
 		this.id = id;
 	}
 
@@ -60,11 +61,11 @@ public class Chronometer implements Serializable {
 		this.name = name;
 	}
 
-	public int getIndex() {
+	public Integer getIndex() {
 		return index;
 	}
 
-	public void setIndex(int index) {
+	public void setIndex(Integer index) {
 		this.index = index;
 	}
 
@@ -78,20 +79,10 @@ public class Chronometer implements Serializable {
 			return false;
 		}
 		Chronometer other = (Chronometer) obj;
-		if (id != null) {
-			if (!id.equals(other.id)) {
-				return false;
-			}
+		if (id != other.id) {
+			return false;
 		}
 		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
 	}
 
 	@Override

@@ -6,12 +6,18 @@ ChronometersUrl = 'http://localhost:8080/teknichrono/rest/chronometers'
 
 # ----------------------------------------------------------------------
 
-def addChronometer( name, index ):
+def addChronometer( name ):
   "This adds a Chronometer"
-  data = '{"name":"' + name + '", "index":' + str(index) + '}'
+  data = '{"name":"' + name + '" }'
   ChronometerResponse = post(data, ChronometersUrl);
-  print "Chronometer " + str(index) + " added"
+  print "Chronometer " + name + " added"
   return;
+
+def getChronometerByName( name ):
+  "This gets a Chronometer by name and returns a json"
+  url = ChronometersUrl + '/name?name=' + name
+  ChronometerResponse = get(url);
+  return ChronometerResponse;
 
 def deleteChronometer( id ):
   "This deletes a Chronometer by id"

@@ -44,7 +44,7 @@ public class ChronometerEndpoint {
 
 	@DELETE
 	@Path("/{id:[0-9][0-9]*}")
-	public Response deleteById(@PathParam("id") Long id) {
+	public Response deleteById(@PathParam("id") int id) {
 		Chronometer entity = em.find(Chronometer.class, id);
 		if (entity == null) {
 			return Response.status(Status.NOT_FOUND).build();
@@ -56,13 +56,32 @@ public class ChronometerEndpoint {
 	@GET
 	@Path("/{id:[0-9][0-9]*}")
 	@Produces("application/json")
-	public Response findById(@PathParam("id") Long id) {
+	public Response findById(@PathParam("id") int id) {
 		TypedQuery<Chronometer> findByIdQuery = em.createQuery(
 				"SELECT DISTINCT c FROM Chronometer c WHERE c.id = :entityId ORDER BY c.id", Chronometer.class);
 		findByIdQuery.setParameter("entityId", id);
 		Chronometer entity;
 		try {
 			entity = findByIdQuery.getSingleResult();
+		} catch (NoResultException nre) {
+			entity = null;
+		}
+		if (entity == null) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+		return Response.ok(entity).build();
+	}
+
+	@GET
+	@Path("/name")
+	@Produces("application/json")
+	public Response findChronometerByName(@QueryParam("name") String name) {
+		TypedQuery<Chronometer> findByNameQuery = em.createQuery(
+				"SELECT DISTINCT c FROM Chronometer c WHERE c.name = :name ORDER BY c.id", Chronometer.class);
+		findByNameQuery.setParameter("name", name);
+		Chronometer entity;
+		try {
+			entity = findByNameQuery.getSingleResult();
 		} catch (NoResultException nre) {
 			entity = null;
 		}
@@ -90,14 +109,11 @@ public class ChronometerEndpoint {
 	@PUT
 	@Path("/{id:[0-9][0-9]*}")
 	@Consumes("application/json")
-	public Response update(@PathParam("id") Long id, Chronometer entity) {
+	public Response update(@PathParam("id") int id, Chronometer entity) {
 		if (entity == null) {
 			return Response.status(Status.BAD_REQUEST).build();
 		}
-		if (id == null) {
-			return Response.status(Status.BAD_REQUEST).build();
-		}
-		if (!id.equals(entity.getId())) {
+		if (id != entity.getId()) {
 			return Response.status(Status.CONFLICT).entity(entity).build();
 		}
 		if (em.find(Chronometer.class, id) == null) {

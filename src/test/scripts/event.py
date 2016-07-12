@@ -13,6 +13,12 @@ def addEvent( name, start, end, loop=True ):
   print "Event " + name + " added"
   return;
 
+def getEventByName( name ):
+  "This gets a Event by name and returns a json"
+  url = EventsUrl + '/name?name=' + name
+  eventResponse = get(url);
+  return eventResponse;
+
 def deleteEvent( id ):
   "This deletes a Event by id"
   url = EventsUrl + '/' + str(id)
@@ -31,5 +37,15 @@ def deleteEvents():
   for Event in Events:
     deleteEvent(Event['id'])
   return;
+
+
+def addChronometerToEvent(eventId, chronoId, index=-1):
+    "Associate Event and Chrono"
+    url = EventsUrl + '/' + str(eventId) + '/addChronometer?chronoId=' + str(chronoId)
+    if index >= 0:
+        url = url + '&index=' + str(index)
+    post('', url);
+    print "Associate Event id " + str(eventId) + " and chrono id " + str(chronoId)
+    return;
 
 # ----------------------------------------------------------------------

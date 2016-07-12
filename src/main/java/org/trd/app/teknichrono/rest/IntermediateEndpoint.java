@@ -20,6 +20,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
+
 import org.trd.app.teknichrono.model.Intermediate;
 
 /**
@@ -36,13 +37,13 @@ public class IntermediateEndpoint {
 	public Response create(Intermediate entity) {
 		em.persist(entity);
 		return Response.created(
-				UriBuilder.fromResource(IntermediateEndpoint.class)
-						.path(String.valueOf(entity.getId())).build()).build();
+				UriBuilder.fromResource(IntermediateEndpoint.class).path(String.valueOf(entity.getId())).build())
+				.build();
 	}
 
 	@DELETE
 	@Path("/{id:[0-9][0-9]*}")
-	public Response deleteById(@PathParam("id") Long id) {
+	public Response deleteById(@PathParam("id") int id) {
 		Intermediate entity = em.find(Intermediate.class, id);
 		if (entity == null) {
 			return Response.status(Status.NOT_FOUND).build();
@@ -54,11 +55,10 @@ public class IntermediateEndpoint {
 	@GET
 	@Path("/{id:[0-9][0-9]*}")
 	@Produces("application/json")
-	public Response findById(@PathParam("id") Long id) {
-		TypedQuery<Intermediate> findByIdQuery = em
-				.createQuery(
-						"SELECT DISTINCT i FROM Intermediate i LEFT JOIN FETCH i.pilot WHERE i.id = :entityId ORDER BY i.id",
-						Intermediate.class);
+	public Response findById(@PathParam("id") int id) {
+		TypedQuery<Intermediate> findByIdQuery = em.createQuery(
+				"SELECT DISTINCT i FROM Intermediate i LEFT JOIN FETCH i.pilot WHERE i.id = :entityId ORDER BY i.id",
+				Intermediate.class);
 		findByIdQuery.setParameter("entityId", id);
 		Intermediate entity;
 		try {
@@ -74,13 +74,10 @@ public class IntermediateEndpoint {
 
 	@GET
 	@Produces("application/json")
-	public List<Intermediate> listAll(
-			@QueryParam("start") Integer startPosition,
+	public List<Intermediate> listAll(@QueryParam("start") Integer startPosition,
 			@QueryParam("max") Integer maxResult) {
-		TypedQuery<Intermediate> findAllQuery = em
-				.createQuery(
-						"SELECT DISTINCT i FROM Intermediate i LEFT JOIN FETCH i.pilot ORDER BY i.id",
-						Intermediate.class);
+		TypedQuery<Intermediate> findAllQuery = em.createQuery(
+				"SELECT DISTINCT i FROM Intermediate i LEFT JOIN FETCH i.pilot ORDER BY i.id", Intermediate.class);
 		if (startPosition != null) {
 			findAllQuery.setFirstResult(startPosition);
 		}
@@ -94,14 +91,11 @@ public class IntermediateEndpoint {
 	@PUT
 	@Path("/{id:[0-9][0-9]*}")
 	@Consumes("application/json")
-	public Response update(@PathParam("id") Long id, Intermediate entity) {
+	public Response update(@PathParam("id") int id, Intermediate entity) {
 		if (entity == null) {
 			return Response.status(Status.BAD_REQUEST).build();
 		}
-		if (id == null) {
-			return Response.status(Status.BAD_REQUEST).build();
-		}
-		if (!id.equals(entity.getId())) {
+		if (id != entity.getId()) {
 			return Response.status(Status.CONFLICT).entity(entity).build();
 		}
 		if (em.find(Intermediate.class, id) == null) {
@@ -110,8 +104,7 @@ public class IntermediateEndpoint {
 		try {
 			entity = em.merge(entity);
 		} catch (OptimisticLockException e) {
-			return Response.status(Response.Status.CONFLICT)
-					.entity(e.getEntity()).build();
+			return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
 		}
 
 		return Response.noContent().build();

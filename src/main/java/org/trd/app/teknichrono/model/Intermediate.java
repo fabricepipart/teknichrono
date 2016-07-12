@@ -23,7 +23,7 @@ public class Intermediate implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id", updatable = false, nullable = false)
-	private Long id;
+	private int id;
 
 	@Version
 	@Column(name = "version")
@@ -38,11 +38,11 @@ public class Intermediate implements Serializable {
 	@ManyToOne
 	private Chronometer chronometer;
 
-	public Long getId() {
+	public int getId() {
 		return this.id;
 	}
 
-	public void setId(final Long id) {
+	public void setId(final int id) {
 		this.id = id;
 	}
 
@@ -63,20 +63,10 @@ public class Intermediate implements Serializable {
 			return false;
 		}
 		Intermediate other = (Intermediate) obj;
-		if (id != null) {
-			if (!id.equals(other.id)) {
-				return false;
-			}
+		if (id != other.id) {
+			return false;
 		}
 		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
 	}
 
 	public Pilot getPilot() {
