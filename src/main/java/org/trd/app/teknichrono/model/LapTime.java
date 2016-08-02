@@ -15,12 +15,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderColumn;
+import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
 @XmlRootElement
 public class LapTime implements java.io.Serializable {
 
+	/* =========================== Entity stuff =========================== */
 	/**
 	 * 
 	 */
@@ -30,6 +32,12 @@ public class LapTime implements java.io.Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id", updatable = false, nullable = false)
 	private int id;
+
+	@Version
+	@Column(name = "version")
+	private int version;
+
+	/* =============================== Fields =============================== */
 
 	@OneToOne(fetch = FetchType.LAZY)
 	private Pilot pilot;
@@ -44,8 +52,10 @@ public class LapTime implements java.io.Serializable {
 	private Date endDate;
 
 	@OneToMany
-	@OrderColumn(name = "captureDate")
-	private List<Intermediate> intermediates = new ArrayList<Intermediate>();
+	@OrderColumn(name = "dateTime")
+	private List<Ping> intermediates = new ArrayList<Ping>();
+
+	/* ===================== Getters and setters ======================== */
 
 	public int getId() {
 		return this.id;
@@ -53,6 +63,14 @@ public class LapTime implements java.io.Serializable {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public int getVersion() {
+		return this.version;
+	}
+
+	public void setVersion(final int version) {
+		this.version = version;
 	}
 
 	public Pilot getPilot() {
@@ -94,11 +112,11 @@ public class LapTime implements java.io.Serializable {
 		return result;
 	}
 
-	public List<Intermediate> getIntermediates() {
+	public List<Ping> getIntermediates() {
 		return this.intermediates;
 	}
 
-	public void setIntermediates(final List<Intermediate> intermediates) {
+	public void setIntermediates(final List<Ping> intermediates) {
 		this.intermediates = intermediates;
 	}
 

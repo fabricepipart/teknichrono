@@ -1,12 +1,15 @@
 package org.trd.app.teknichrono.model;
 
 import java.io.Serializable;
+import java.sql.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -14,6 +17,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Ping implements Serializable {
 
+	/* =========================== Entity stuff =========================== */
 	/**
 	 * 
 	 */
@@ -28,17 +32,25 @@ public class Ping implements Serializable {
 	@Column(name = "version")
 	private int version;
 
-	@Column(nullable = false)
-	private double time;
+	/* =============================== Fields =============================== */
 
 	@Column(nullable = false)
-	private String uuid;
+	private Date dateTime;
 
-	@Column(nullable = false)
+	// Can be null if after event, items are reassociated
+	@ManyToOne(optional = true)
+	@JoinColumn(name = "beaconId")
+	private Beacon beacon;
+
+	@Column
 	private int power;
 
-	@Column(nullable = false)
-	private int chronoPointIndex;
+	// Can be null if after event, items are reassociated
+	@ManyToOne(optional = true)
+	@JoinColumn(name = "chronoId")
+	private Chronometer chrono;
+
+	/* ===================== Getters and setters ======================== */
 
 	public int getId() {
 		return this.id;
@@ -56,6 +68,48 @@ public class Ping implements Serializable {
 		this.version = version;
 	}
 
+	public Date getDateTime() {
+		return dateTime;
+	}
+
+	public void setDateTime(Date dateTime) {
+		this.dateTime = dateTime;
+	}
+
+	public int getPower() {
+		return power;
+	}
+
+	public void setPower(int power) {
+		this.power = power;
+	}
+
+	public Beacon getBeacon() {
+		return beacon;
+	}
+
+	public void setBeacon(Beacon beacon) {
+		this.beacon = beacon;
+	}
+
+	public Chronometer getChrono() {
+		return chrono;
+	}
+
+	public void setChrono(Chronometer chrono) {
+		this.chrono = chrono;
+	}
+
+	@Override
+	public String toString() {
+		String result = getClass().getSimpleName() + " ";
+		result += "time: " + dateTime;
+		result += ", beaconId: " + beacon;
+		result += ", power: " + power;
+		result += ", chronoId: " + chrono;
+		return result;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -70,48 +124,5 @@ public class Ping implements Serializable {
 			return false;
 		}
 		return true;
-	}
-
-	public double getTime() {
-		return time;
-	}
-
-	public void setTime(double time) {
-		this.time = time;
-	}
-
-	public String getUuid() {
-		return uuid;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-
-	public int getPower() {
-		return power;
-	}
-
-	public void setPower(int power) {
-		this.power = power;
-	}
-
-	public int getChronoPointIndex() {
-		return chronoPointIndex;
-	}
-
-	public void setChronoPointIndex(int chronoPointIndex) {
-		this.chronoPointIndex = chronoPointIndex;
-	}
-
-	@Override
-	public String toString() {
-		String result = getClass().getSimpleName() + " ";
-		result += "time: " + time;
-		if (uuid != null && !uuid.trim().isEmpty())
-			result += ", uuid: " + uuid;
-		result += ", power: " + power;
-		result += ", chronoPointIndex: " + chronoPointIndex;
-		return result;
 	}
 }

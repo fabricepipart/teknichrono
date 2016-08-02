@@ -1,14 +1,20 @@
 package org.trd.app.teknichrono.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @XmlRootElement
@@ -35,6 +41,11 @@ public class Chronometer implements Serializable {
 	// I dont make it unique because I am unsure of the save order
 	@Column(nullable = true)
 	private Integer index;
+
+	// Can be null if after event, items are reassociated
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "chrono")
+	@JsonIgnore
+	private List<Ping> pings = new ArrayList<Ping>();
 
 	/* ===================== Getters and setters ======================== */
 	public int getId() {
@@ -67,6 +78,14 @@ public class Chronometer implements Serializable {
 
 	public void setIndex(Integer index) {
 		this.index = index;
+	}
+
+	public List<Ping> getPings() {
+		return pings;
+	}
+
+	public void setPings(List<Ping> pings) {
+		this.pings = pings;
 	}
 
 	/* ===================== Other ======================== */

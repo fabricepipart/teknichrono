@@ -23,6 +23,7 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.trd.app.teknichrono.model.Beacon;
 import org.trd.app.teknichrono.model.Pilot;
+import org.trd.app.teknichrono.model.Ping;
 
 /**
  * 
@@ -54,7 +55,13 @@ public class BeaconEndpoint {
 			associatedPilot.setCurrentBeacon(null);
 			em.persist(associatedPilot);
 		}
-
+		List<Ping> pings = entity.getPings();
+		if (pings != null) {
+			for (Ping ping : pings) {
+				ping.setBeacon(null);
+				em.persist(ping);
+			}
+		}
 		em.remove(entity);
 		return Response.noContent().build();
 	}

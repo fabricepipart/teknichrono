@@ -1,6 +1,9 @@
 package org.trd.app.teknichrono.model;
 // Generated 5 mai 2016 11:08:49 by Hibernate Tools 4.3.1.Final
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,12 +11,14 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @XmlRootElement
@@ -43,8 +48,13 @@ public class Beacon implements java.io.Serializable {
 	// Mapped by denotes that Pilot is the owner of the relationship
 	// http://meri-stuff.blogspot.fr/2012/03/jpa-tutorial.html#RelationshipsBidirectionalOneToManyManyToOneConsistency
 	@OneToOne(fetch = FetchType.EAGER, optional = true, mappedBy = "currentBeacon", cascade = CascadeType.MERGE)
-	@JsonBackReference
+	@JsonBackReference(value = "pilot-beacon")
 	private Pilot pilot;
+
+	// Can be null if after event, items are reassociated
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "beacon")
+	@JsonIgnore
+	private List<Ping> pings = new ArrayList<Ping>();
 
 	/* ============================ Factory ============================ */
 
@@ -89,6 +99,14 @@ public class Beacon implements java.io.Serializable {
 
 	private boolean sameAsFormer(Pilot newPilot) {
 		return pilot == null ? newPilot == null : pilot.equals(newPilot);
+	}
+
+	public List<Ping> getPings() {
+		return pings;
+	}
+
+	public void setPings(List<Ping> pings) {
+		this.pings = pings;
 	}
 
 	public int getId() {

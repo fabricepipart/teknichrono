@@ -2,12 +2,13 @@
 
 import requests
 import json
-from datetime import date
+
 from base import *
 from pilots import *
 from beacons import *
 from chronometer import *
 from event import *
+from ping import *
 
 # ----------------------------------------------------------------------
 
@@ -49,6 +50,7 @@ associatePilotBeacon(getPilot('Valentino', 'Rossi')['id'],getBeacon(4)['id'])
 associatePilotBeacon(getPilot('Jorge', 'Lorenzo')['id'],getBeacon(8)['id'])
 
 deleteBeacon(getBeacon(2)['id'])
+associatePilotBeacon(getPilot('Fabrice', 'Pipart')['id'],getBeacon(3)['id'])
 
 
 # ----------------------------------------------------------------------
@@ -71,3 +73,76 @@ event = getEventByName('TRD Le Luc 2016-08-22')
 addChronometerToEvent(event['id'], getChronometerByName('Raspberry-0')['id'])
 addChronometerToEvent(event['id'], getChronometerByName('Raspberry-2')['id'])
 addChronometerToEvent(event['id'], getChronometerByName('Raspberry-1')['id'], 1)
+addChronometerToEvent(event['id'], getChronometerByName('Raspberry-3')['id'])
+
+# ----------------------------------------------------------------------
+# Send pings
+fabriceBeaconId = getBeacon(3)['id'];
+jeremyBeaconId = getBeacon(12)['id'];
+valentinoBeaconId = getBeacon(4)['id'];
+jorgeBeaconId = getBeacon(8)['id'];
+
+chrono0 = getChronometerByName('Raspberry-0')['id'];
+chrono1 = getChronometerByName('Raspberry-1')['id'];
+chrono2 = getChronometerByName('Raspberry-2')['id'];
+chrono3 = getChronometerByName('Raspberry-3')['id'];
+
+
+# import random
+# random.shuffle(array)
+baseDate = datetime.datetime(2016,8,22,11,0,0,1*1000);
+
+baseDate = pingsForLap( baseDate, 21, fabriceBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 20, fabriceBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 19, fabriceBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 21, fabriceBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 20, fabriceBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 19, fabriceBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 21, fabriceBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 20, fabriceBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 19, fabriceBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 21, fabriceBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 20, fabriceBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 19, fabriceBeaconId, chrono0, chrono1, chrono2, chrono3 );
+
+baseDate = datetime.datetime(2016,8,22,11,0,1,2*1000)
+baseDate = pingsForLap( baseDate, 19, jeremyBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 18, jeremyBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 17, jeremyBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 19, jeremyBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 18, jeremyBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 17, jeremyBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 19, jeremyBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 18, jeremyBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 17, jeremyBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 19, jeremyBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 18, jeremyBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 17, jeremyBeaconId, chrono0, chrono1, chrono2, chrono3 );
+
+baseDate = datetime.datetime(2016,8,22,11,0,2,3*1000)
+baseDate = pingsForLap( baseDate, 16, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 15, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 14, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 16, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 15, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 14, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 16, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 15, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 14, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 16, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 15, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 14, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
+
+baseDate = datetime.datetime(2016,8,22,11,0,3,4*1000)
+baseDate = pingsForLap( baseDate, 14, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 15, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 16, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 14, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 15, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 16, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 14, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 15, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 16, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 14, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 15, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 16, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );

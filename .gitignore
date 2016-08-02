@@ -10,3 +10,5 @@ MANIFEST.MF
 *.iml
 *.idea
 local-stage
+*.pyc
+

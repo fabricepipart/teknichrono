@@ -14,8 +14,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 @Entity
 @XmlRootElement
 public class Pilot implements Serializable {
@@ -45,7 +43,6 @@ public class Pilot implements Serializable {
 
 	@OneToOne(fetch = FetchType.EAGER, optional = true, cascade = CascadeType.MERGE)
 	@JoinColumn(name = "currentBeaconId")
-	@JsonManagedReference
 	private Beacon currentBeacon;
 
 	/* ===================== Getters and setters ======================== */

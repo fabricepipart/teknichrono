@@ -21,6 +21,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import org.trd.app.teknichrono.model.Beacon;
+import org.trd.app.teknichrono.model.Chronometer;
 import org.trd.app.teknichrono.model.Ping;
 
 /**
@@ -33,8 +35,19 @@ public class PingEndpoint {
 	private EntityManager em;
 
 	@POST
+	@Path("/{chronoId:[0-9][0-9]*}/{beaconId:[0-9][0-9]*}")
 	@Consumes("application/json")
-	public Response create(Ping entity) {
+	public Response create(Ping entity, @PathParam("chronoId") int chronoId, @PathParam("beaconId") int beaconId) {
+		Chronometer chrono = em.find(Chronometer.class, chronoId);
+		if (chrono == null) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+		entity.setChrono(chrono);
+		Beacon beacon = em.find(Beacon.class, beaconId);
+		if (beacon == null) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+		entity.setBeacon(beacon);
 		em.persist(entity);
 		return Response
 				.created(UriBuilder.fromResource(PingEndpoint.class).path(String.valueOf(entity.getId())).build())

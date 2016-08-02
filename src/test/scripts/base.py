@@ -2,6 +2,8 @@
 
 import requests
 import json
+import datetime
+from datetime import date
 
 headers = {'Content-type': 'application/json'}
 
@@ -33,3 +35,8 @@ def get(url ):
     response.raise_for_status();
   jData = json.loads(response.content)
   return jData;
+
+def formatDatetime(d):
+  "This formats a datetime in a format that can be understood on JAX RS side"
+  string = d.strftime("%Y-%m-%dT%H:%M:%S")
+  return "%s.%03dZ" % (string, d.microsecond / 1000.0);

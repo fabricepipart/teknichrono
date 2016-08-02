@@ -22,6 +22,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import org.trd.app.teknichrono.model.Chronometer;
+import org.trd.app.teknichrono.model.Ping;
 
 /**
  * 
@@ -48,6 +49,13 @@ public class ChronometerEndpoint {
 		Chronometer entity = em.find(Chronometer.class, id);
 		if (entity == null) {
 			return Response.status(Status.NOT_FOUND).build();
+		}
+		List<Ping> pings = entity.getPings();
+		if (pings != null) {
+			for (Ping ping : pings) {
+				ping.setChrono(null);
+				em.persist(ping);
+			}
 		}
 		em.remove(entity);
 		return Response.noContent().build();
