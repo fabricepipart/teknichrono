@@ -2,7 +2,7 @@
 
 from base import *
 
-beaconsUrl = 'http://localhost:8080/teknichrono/rest/beacons'
+beaconsUrl = host + '/teknichrono/rest/beacons'
 
 # ----------------------------------------------------------------------
 

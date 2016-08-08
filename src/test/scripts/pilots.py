@@ -2,7 +2,7 @@
 
 from base import *
 
-pilotsUrl = 'http://localhost:8080/teknichrono/rest/pilots'
+pilotsUrl = host + '/teknichrono/rest/pilots'
 
 def addPilot( firstName, lastName ):
   "This adds a Pilot"

@@ -3,7 +3,7 @@
 from base import *
 
 headers = {'Content-type': 'application/json'}
-pingsUrl = 'http://localhost:8080/teknichrono/rest/pings'
+pingsUrl = host + '/teknichrono/rest/pings'
 
 # ----------------------------------------------------------------------
 def ping( dateTime, pilotBeaconId, power, chronoId  ):

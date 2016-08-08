@@ -2,7 +2,7 @@
 
 from base import *
 
-ChronometersUrl = 'http://localhost:8080/teknichrono/rest/chronometers'
+ChronometersUrl = host + '/teknichrono/rest/chronometers'
 
 # ----------------------------------------------------------------------
 

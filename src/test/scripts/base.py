@@ -5,10 +5,13 @@ import json
 import datetime
 from datetime import date
 
+
+host = 'http://localhost:8080'
 headers = {'Content-type': 'application/json'}
 
 def post( dataString, url ):
   "This posts a json to a URL and returns a json"
+  print 'POST to ' + url
   response = requests.post(url, data=dataString, headers=headers)
   if(not response.ok):
     response.raise_for_status();
@@ -16,6 +19,7 @@ def post( dataString, url ):
 
 def put( dataString, url ):
     "This send in a PUT a json to a URL"
+    print 'PUT to ' + url
     response = requests.put(url, data=dataString, headers=headers)
     if(not response.ok):
       response.raise_for_status();
@@ -23,6 +27,7 @@ def put( dataString, url ):
 
 def delete(url ):
   "This sends a DELETE to a URL"
+  print 'DELETE to ' + url
   response = requests.delete(url, headers=headers)
   if(not response.ok):
     response.raise_for_status();
@@ -30,6 +35,7 @@ def delete(url ):
 
 def get(url ):
   "This sends a get to a URL and returns a json"
+  print 'GET to ' + url
   response = requests.get(url, headers=headers)
   if(not response.ok):
     response.raise_for_status();

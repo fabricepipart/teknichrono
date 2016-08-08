@@ -2,7 +2,7 @@
 
 from base import *
 
-EventsUrl = 'http://localhost:8080/teknichrono/rest/events'
+EventsUrl = host + '/teknichrono/rest/events'
 
 # ----------------------------------------------------------------------
 

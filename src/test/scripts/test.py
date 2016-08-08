@@ -2,6 +2,7 @@
 
 import requests
 import json
+import sys
 
 from base import *
 from pilots import *
@@ -11,13 +12,18 @@ from event import *
 from ping import *
 
 # ----------------------------------------------------------------------
+# Command line parameters
+
+if len(sys.argv) >= 2:
+    host = sys.argv[1]
+
+# ----------------------------------------------------------------------
 
 # Cleanup
 deleteBeacons()
 deletePilots()
 deleteChronometers()
 deleteEvents()
-
 
 
 # ----------------------------------------------------------------------
