@@ -52,7 +52,7 @@ public class Event implements java.io.Serializable {
 	 * </pre>
 	 */
 	@OneToMany(orphanRemoval = true)
-	@OrderColumn(name = "index")
+	@OrderColumn(name = "chronoIndex")
 	@JoinColumn(name = "event_id")
 	private List<Chronometer> chronometers = new ArrayList<Chronometer>();
 
@@ -63,7 +63,7 @@ public class Event implements java.io.Serializable {
 	 * True for a racetrack, false for a rally stage
 	 */
 	@Column
-	private boolean loop;
+	private boolean loopTrack;
 
 	public int getId() {
 		return this.id;
@@ -107,13 +107,13 @@ public class Event implements java.io.Serializable {
 
 	public void addChronometer(Chronometer chronometer) {
 		int insertAtIndex = 0;
-		Integer expectedIndex = chronometer.getIndex();
+		Integer expectedIndex = chronometer.getChronoIndex();
 		if (expectedIndex == null) {
 			this.chronometers.add(chronometer);
 		} else {
 			int index = 0;
 			for (Chronometer c : this.chronometers) {
-				if (c.getIndex() == null || c.getIndex() >= expectedIndex) {
+				if (c.getChronoIndex() == null || c.getChronoIndex() >= expectedIndex) {
 					insertAtIndex = index;
 					break;
 				}
@@ -125,7 +125,7 @@ public class Event implements java.io.Serializable {
 		// Reset indexes
 		int index = 0;
 		for (Chronometer c : this.chronometers) {
-			c.setIndex(index);
+			c.setChronoIndex(index);
 			index++;
 		}
 	}
@@ -138,12 +138,12 @@ public class Event implements java.io.Serializable {
 		this.name = name;
 	}
 
-	public boolean isLoop() {
-		return loop;
+	public boolean isLoopTrack() {
+		return loopTrack;
 	}
 
-	public void setLoop(boolean loop) {
-		this.loop = loop;
+	public void setLoopTrack(boolean loop) {
+		this.loopTrack = loop;
 	}
 
 	@Override
@@ -151,7 +151,7 @@ public class Event implements java.io.Serializable {
 		String result = getClass().getSimpleName() + " ";
 		if (name != null && !name.trim().isEmpty())
 			result += "name: " + name;
-		result += ", loop: " + loop;
+		result += ", loop: " + loopTrack;
 		return result;
 	}
 

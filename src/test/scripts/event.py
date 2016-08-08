@@ -9,7 +9,7 @@ EventsUrl = '/teknichrono/rest/events'
 
 def addEvent( name, start, end, loop=True ):
   "This adds a Event"
-  data = '{"name":"' + name + '", "start":"' + str(start) + '", "end":"' + str(end) + '", "loop":"' + str(loop) + '"}'
+  data = '{"name":"' + name + '", "start":"' + str(start) + '", "end":"' + str(end) + '", "loopTrack":"' + str(loop) + '"}'
   eventResponse = post(data, EventsUrl);
   print "Event " + name + " added"
   return;

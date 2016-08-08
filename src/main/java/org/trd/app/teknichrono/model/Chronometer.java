@@ -40,7 +40,7 @@ public class Chronometer implements Serializable {
 
 	// I dont make it unique because I am unsure of the save order
 	@Column(nullable = true)
-	private Integer index;
+	private Integer chronoIndex;
 
 	// Can be null if after event, items are reassociated
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "chrono")
@@ -72,12 +72,12 @@ public class Chronometer implements Serializable {
 		this.name = name;
 	}
 
-	public Integer getIndex() {
-		return index;
+	public Integer getChronoIndex() {
+		return chronoIndex;
 	}
 
-	public void setIndex(Integer index) {
-		this.index = index;
+	public void setChronoIndex(Integer index) {
+		this.chronoIndex = index;
 	}
 
 	public List<Ping> getPings() {
@@ -107,7 +107,7 @@ public class Chronometer implements Serializable {
 	@Override
 	public String toString() {
 		String result = getClass().getSimpleName() + " ";
-		result += "(" + index + ") ";
+		result += "(" + chronoIndex + ") ";
 		if (name != null && !name.trim().isEmpty())
 			result += name;
 		return result;

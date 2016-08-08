@@ -119,7 +119,7 @@ public class EventEndpoint {
 			return Response.status(Status.NOT_FOUND).build();
 		}
 		if (index != null) {
-			chronometer.setIndex(index);
+			chronometer.setChronoIndex(index);
 		}
 		event.addChronometer(chronometer);
 		em.persist(event);
