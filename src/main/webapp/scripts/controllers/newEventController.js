@@ -1,27 +1,32 @@
 
-angular.module('frontend').controller('NewEventController', function ($scope, $location, locationParser, flash, EventResource , ChronoPointResource) {
+angular.module('frontend').controller('NewEventController', function ($scope, $location, locationParser, flash, EventResource , ChronometerResource) {
     $scope.disabled = false;
     $scope.$location = $location;
     $scope.event = $scope.event || {};
     
-    $scope.chronopointsList = ChronoPointResource.queryAll(function(items){
-        $scope.chronopointsSelectionList = $.map(items, function(item) {
+    $scope.chronometersList = ChronometerResource.queryAll(function(items){
+        $scope.chronometersSelectionList = $.map(items, function(item) {
             return ( {
                 value : item.id,
                 text : item.id
             });
         });
     });
-    $scope.$watch("chronopointsSelection", function(selection) {
+    $scope.$watch("chronometersSelection", function(selection) {
         if (typeof selection != 'undefined') {
-            $scope.event.chronopoints = [];
+            $scope.event.chronometers = [];
             $.each(selection, function(idx,selectedItem) {
                 var collectionItem = {};
                 collectionItem.id = selectedItem.value;
-                $scope.event.chronopoints.push(collectionItem);
+                $scope.event.chronometers.push(collectionItem);
             });
         }
     });
+
+    $scope.loopList = [
+        "true",
+        "false"
+    ];
 
 
     $scope.save = function() {

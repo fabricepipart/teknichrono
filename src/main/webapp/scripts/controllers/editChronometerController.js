@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('EditBeaconController', function($scope, $routeParams, $location, flash, BeaconResource , PilotResource, PingResource) {
+angular.module('frontend').controller('EditChronometerController', function($scope, $routeParams, $location, flash, ChronometerResource , PingResource) {
     var self = this;
     $scope.disabled = false;
     $scope.$location = $location;
@@ -8,24 +8,7 @@ angular.module('frontend').controller('EditBeaconController', function($scope, $
     $scope.get = function() {
         var successCallback = function(data){
             self.original = data;
-            $scope.beacon = new BeaconResource(self.original);
-            PilotResource.queryAll(function(items) {
-                $scope.pilotSelectionList = $.map(items, function(item) {
-                    var wrappedObject = {
-                        id : item.id
-                    };
-                    var labelObject = {
-                        value : item.id,
-                        text : item.id
-                    };
-                    if($scope.beacon.pilot && item.id == $scope.beacon.pilot.id) {
-                        $scope.pilotSelection = labelObject;
-                        $scope.beacon.pilot = wrappedObject;
-                        self.original.pilot = $scope.beacon.pilot;
-                    }
-                    return labelObject;
-                });
-            });
+            $scope.chronometer = new ChronometerResource(self.original);
             PingResource.queryAll(function(items) {
                 $scope.pingsSelectionList = $.map(items, function(item) {
                     var wrappedObject = {
@@ -35,33 +18,33 @@ angular.module('frontend').controller('EditBeaconController', function($scope, $
                         value : item.id,
                         text : item.id
                     };
-                    if($scope.beacon.pings){
-                        $.each($scope.beacon.pings, function(idx, element) {
+                    if($scope.chronometer.pings){
+                        $.each($scope.chronometer.pings, function(idx, element) {
                             if(item.id == element.id) {
                                 $scope.pingsSelection.push(labelObject);
-                                $scope.beacon.pings.push(wrappedObject);
+                                $scope.chronometer.pings.push(wrappedObject);
                             }
                         });
-                        self.original.pings = $scope.beacon.pings;
+                        self.original.pings = $scope.chronometer.pings;
                     }
                     return labelObject;
                 });
             });
         };
         var errorCallback = function() {
-            flash.setMessage({'type': 'error', 'text': 'The beacon could not be found.'});
-            $location.path("/Beacons");
+            flash.setMessage({'type': 'error', 'text': 'The chronometer could not be found.'});
+            $location.path("/Chronometers");
         };
-        BeaconResource.get({BeaconId:$routeParams.BeaconId}, successCallback, errorCallback);
+        ChronometerResource.get({ChronometerId:$routeParams.ChronometerId}, successCallback, errorCallback);
     };
 
     $scope.isClean = function() {
-        return angular.equals(self.original, $scope.beacon);
+        return angular.equals(self.original, $scope.chronometer);
     };
 
     $scope.save = function() {
         var successCallback = function(){
-            flash.setMessage({'type':'success','text':'The beacon was updated successfully.'}, true);
+            flash.setMessage({'type':'success','text':'The chronometer was updated successfully.'}, true);
             $scope.get();
         };
         var errorCallback = function(response) {
@@ -71,17 +54,17 @@ angular.module('frontend').controller('EditBeaconController', function($scope, $
                 flash.setMessage({'type': 'error', 'text': 'Something broke. Retry, or cancel and start afresh.'}, true);
             }
         };
-        $scope.beacon.$update(successCallback, errorCallback);
+        $scope.chronometer.$update(successCallback, errorCallback);
     };
 
     $scope.cancel = function() {
-        $location.path("/Beacons");
+        $location.path("/Chronometers");
     };
 
     $scope.remove = function() {
         var successCallback = function() {
-            flash.setMessage({'type': 'error', 'text': 'The beacon was deleted.'});
-            $location.path("/Beacons");
+            flash.setMessage({'type': 'error', 'text': 'The chronometer was deleted.'});
+            $location.path("/Chronometers");
         };
         var errorCallback = function(response) {
             if(response && response.data && response.data.message) {
@@ -90,23 +73,17 @@ angular.module('frontend').controller('EditBeaconController', function($scope, $
                 flash.setMessage({'type': 'error', 'text': 'Something broke. Retry, or cancel and start afresh.'}, true);
             }
         }; 
-        $scope.beacon.$remove(successCallback, errorCallback);
+        $scope.chronometer.$remove(successCallback, errorCallback);
     };
     
-    $scope.$watch("pilotSelection", function(selection) {
-        if (typeof selection != 'undefined') {
-            $scope.beacon.pilot = {};
-            $scope.beacon.pilot.id = selection.value;
-        }
-    });
     $scope.pingsSelection = $scope.pingsSelection || [];
     $scope.$watch("pingsSelection", function(selection) {
-        if (typeof selection != 'undefined' && $scope.beacon) {
-            $scope.beacon.pings = [];
+        if (typeof selection != 'undefined' && $scope.chronometer) {
+            $scope.chronometer.pings = [];
             $.each(selection, function(idx,selectedItem) {
                 var collectionItem = {};
                 collectionItem.id = selectedItem.value;
-                $scope.beacon.pings.push(collectionItem);
+                $scope.chronometer.pings.push(collectionItem);
             });
         }
     });

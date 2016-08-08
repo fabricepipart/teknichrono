@@ -1,39 +1,31 @@
 <div class="form-horizontal">
-    <h3>Create a new ChronoPoint</h3>
+    <h3>Create a new Chronometer</h3>
     <div class="form-group">
         <div class="col-md-offset-2 col-sm-2">
-            <a id="Create" name="Create" class="btn btn-primary" href="#/ChronoPoints/new"><span class="glyphicon glyphicon-plus-sign"></span> Create</a>
+            <a id="Create" name="Create" class="btn btn-primary" href="#/Chronometers/new"><span class="glyphicon glyphicon-plus-sign"></span> Create</a>
         </div>
     </div>
 </div>
 <hr/>
 <div>
-    <h3>Search for ChronoPoints</h3>
-    <form id="ChronoPointSearch" class="form-horizontal">
+    <h3>Search for Chronometers</h3>
+    <form id="ChronometerSearch" class="form-horizontal">
         
-
-    <div class="form-group">
-        <label for="index" class="col-sm-2 control-label">Index</label>
-        <div class="col-sm-10">
-            <input id="index" name="index" class="form-control" type="text" ng-model="search.index" placeholder="Enter the ChronoPoint Index"></input>
-        </div>
-    </div>
 
     <div class="form-group">
         <label for="name" class="col-sm-2 control-label">Name</label>
         <div class="col-sm-10">
-            <input id="name" name="name" class="form-control" type="text" ng-model="search.name" placeholder="Enter the ChronoPoint Name"></input>
+            <input id="name" name="name" class="form-control" type="text" ng-model="search.name" placeholder="Enter the Chronometer Name"></input>
         </div>
     </div>
 
     <div class="form-group">
-        <label for="raspberry" class="col-sm-2 control-label">Raspberry</label>
+        <label for="index" class="col-sm-2 control-label">Index</label>
         <div class="col-sm-10">
-            <select id="raspberry" name="raspberry" class="form-control" ng-model="search.raspberry" ng-options="r as r.id for r in raspberryList">
-                <option value="">Choose a Raspberry</option>
-            </select>
+            <input id="index" name="index" class="form-control" type="text" ng-model="search.index" placeholder="Enter the Chronometer Index"></input>
         </div>
     </div>
+
 
 
         <div class="form-group">
@@ -48,16 +40,14 @@
         <table class="table table-responsive table-bordered table-striped clearfix">
             <thead>
                 <tr>
-                    <th>Index</th>
                     <th>Name</th>
-                    <th>Raspberry</th>
+                    <th>Index</th>
                 </tr>
             </thead>
             <tbody id="search-results-body">
                 <tr ng-repeat="result in filteredResults | startFrom:currentPage*pageSize | limitTo:pageSize">
-                    <td><a href="#/ChronoPoints/edit/{{result.id}}">{{result.index}}</a></td>
-                    <td><a href="#/ChronoPoints/edit/{{result.id}}">{{result.name}}</a></td>
-                        <td><a href="#/ChronoPoints/edit/{{result.id}}">{{result.raspberry.id}}</a></td>
+                    <td><a href="#/Chronometers/edit/{{result.id}}">{{result.name}}</a></td>
+                    <td><a href="#/Chronometers/edit/{{result.id}}">{{result.index}}</a></td>
                 </tr>
             </tbody>
         </table>

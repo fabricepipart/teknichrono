@@ -10,7 +10,17 @@
 <div>
     <h3>Search for Beacons</h3>
     <form id="BeaconSearch" class="form-horizontal">
-        
+            <div class="form-group">
+        <label for="pilot" class="col-sm-2 control-label">Pilot</label>
+        <div class="col-sm-10">
+            <select id="pilot" name="pilot" class="form-control" ng-model="search.pilot" ng-options="p as p.id for p in pilotList">
+                <option value="">Choose a Pilot</option>
+            </select>
+        </div>
+    </div>
+
+
+
 
     <div class="form-group">
         <label for="number" class="col-sm-2 control-label">Number</label>
@@ -32,11 +42,13 @@
         <table class="table table-responsive table-bordered table-striped clearfix">
             <thead>
                 <tr>
+                    <th>Pilot</th>
                     <th>Number</th>
                 </tr>
             </thead>
             <tbody id="search-results-body">
                 <tr ng-repeat="result in filteredResults | startFrom:currentPage*pageSize | limitTo:pageSize">
+                        <td><a href="#/Beacons/edit/{{result.id}}">{{result.pilot.id}}</a></td>
                     <td><a href="#/Beacons/edit/{{result.id}}">{{result.number}}</a></td>
                 </tr>
             </tbody>

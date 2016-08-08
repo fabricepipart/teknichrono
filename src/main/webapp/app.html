@@ -35,13 +35,12 @@
                     <nav class="sidebar-nav" ng-controller="NavController" role="navigation">
                         <div id="sidebar-entries" class="list-group">
                         	<a class="list-group-item" ng-class="{active: matchesRoute('Beacons')}" href="#/Beacons" data-toggle="offcanvas">Beacons</a>
-                        	<a class="list-group-item" ng-class="{active: matchesRoute('ChronoPoints')}" href="#/ChronoPoints" data-toggle="offcanvas">ChronoPoints</a>
+                        	<a class="list-group-item" ng-class="{active: matchesRoute('Chronometers')}" href="#/Chronometers" data-toggle="offcanvas">Chronometers</a>
                         	<a class="list-group-item" ng-class="{active: matchesRoute('Events')}" href="#/Events" data-toggle="offcanvas">Events</a>
                         	<a class="list-group-item" ng-class="{active: matchesRoute('Intermediates')}" href="#/Intermediates" data-toggle="offcanvas">Intermediates</a>
                         	<a class="list-group-item" ng-class="{active: matchesRoute('LapTimes')}" href="#/LapTimes" data-toggle="offcanvas">LapTimes</a>
                         	<a class="list-group-item" ng-class="{active: matchesRoute('Pilots')}" href="#/Pilots" data-toggle="offcanvas">Pilots</a>
                         	<a class="list-group-item" ng-class="{active: matchesRoute('Pings')}" href="#/Pings" data-toggle="offcanvas">Pings</a>
-                        	<a class="list-group-item" ng-class="{active: matchesRoute('Raspberries')}" href="#/Raspberries" data-toggle="offcanvas">Raspberries</a>
                         </div>
                     </nav>
                 </div>
@@ -85,10 +84,10 @@
     <script src="scripts/controllers/newBeaconController.js"></script>
     <script src="scripts/controllers/searchBeaconController.js"></script>
     <script src="scripts/controllers/editBeaconController.js"></script>
-    <script src="scripts/services/ChronoPointFactory.js"></script>
-    <script src="scripts/controllers/newChronoPointController.js"></script>
-    <script src="scripts/controllers/searchChronoPointController.js"></script>
-    <script src="scripts/controllers/editChronoPointController.js"></script>
+    <script src="scripts/services/ChronometerFactory.js"></script>
+    <script src="scripts/controllers/newChronometerController.js"></script>
+    <script src="scripts/controllers/searchChronometerController.js"></script>
+    <script src="scripts/controllers/editChronometerController.js"></script>
     <script src="scripts/services/EventFactory.js"></script>
     <script src="scripts/controllers/newEventController.js"></script>
     <script src="scripts/controllers/searchEventController.js"></script>
@@ -109,9 +108,5 @@
     <script src="scripts/controllers/newPingController.js"></script>
     <script src="scripts/controllers/searchPingController.js"></script>
     <script src="scripts/controllers/editPingController.js"></script>
-    <script src="scripts/services/RaspberryFactory.js"></script>
-    <script src="scripts/controllers/newRaspberryController.js"></script>
-    <script src="scripts/controllers/searchRaspberryController.js"></script>
-    <script src="scripts/controllers/editRaspberryController.js"></script>
 </body>
 </html>

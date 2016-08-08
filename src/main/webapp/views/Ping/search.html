@@ -13,16 +13,9 @@
         
 
     <div class="form-group">
-        <label for="time" class="col-sm-2 control-label">Time</label>
+        <label for="dateTime" class="col-sm-2 control-label">Date Time</label>
         <div class="col-sm-10">
-            <input id="time" name="time" class="form-control" type="text" ng-model="search.time" placeholder="Enter the Ping Time"></input>
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label for="uuid" class="col-sm-2 control-label">Uuid</label>
-        <div class="col-sm-10">
-            <input id="uuid" name="uuid" class="form-control" type="text" ng-model="search.uuid" placeholder="Enter the Ping Uuid"></input>
+            <input id="dateTime" name="dateTime" class="form-control" type="text" ng-model="search.dateTime" placeholder="Enter the Ping Date Time"></input>
         </div>
     </div>
 
@@ -34,9 +27,20 @@
     </div>
 
     <div class="form-group">
-        <label for="chronoPointIndex" class="col-sm-2 control-label">Chrono Point Index</label>
+        <label for="beacon" class="col-sm-2 control-label">Beacon</label>
         <div class="col-sm-10">
-            <input id="chronoPointIndex" name="chronoPointIndex" class="form-control" type="text" ng-model="search.chronoPointIndex" placeholder="Enter the Ping Chrono Point Index"></input>
+            <select id="beacon" name="beacon" class="form-control" ng-model="search.beacon" ng-options="b as b.id for b in beaconList">
+                <option value="">Choose a Beacon</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="chrono" class="col-sm-2 control-label">Chrono</label>
+        <div class="col-sm-10">
+            <select id="chrono" name="chrono" class="form-control" ng-model="search.chrono" ng-options="c as c.id for c in chronoList">
+                <option value="">Choose a Chrono</option>
+            </select>
         </div>
     </div>
 
@@ -53,18 +57,18 @@
         <table class="table table-responsive table-bordered table-striped clearfix">
             <thead>
                 <tr>
-                    <th>Time</th>
-                    <th>Uuid</th>
+                    <th>Date Time</th>
                     <th>Power</th>
-                    <th>Chrono Point Index</th>
+                    <th>Beacon</th>
+                    <th>Chrono</th>
                 </tr>
             </thead>
             <tbody id="search-results-body">
                 <tr ng-repeat="result in filteredResults | startFrom:currentPage*pageSize | limitTo:pageSize">
-                    <td><a href="#/Pings/edit/{{result.id}}">{{result.time}}</a></td>
-                    <td><a href="#/Pings/edit/{{result.id}}">{{result.uuid}}</a></td>
+                    <td><a href="#/Pings/edit/{{result.id}}">{{result.dateTime}}</a></td>
                     <td><a href="#/Pings/edit/{{result.id}}">{{result.power}}</a></td>
-                    <td><a href="#/Pings/edit/{{result.id}}">{{result.chronoPointIndex}}</a></td>
+                        <td><a href="#/Pings/edit/{{result.id}}">{{result.beacon.id}}</a></td>
+                        <td><a href="#/Pings/edit/{{result.id}}">{{result.chrono.id}}</a></td>
                 </tr>
             </tbody>
         </table>

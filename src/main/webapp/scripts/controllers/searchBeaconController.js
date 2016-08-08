@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('SearchBeaconController', function($scope, $http, $filter, BeaconResource ) {
+angular.module('frontend').controller('SearchBeaconController', function($scope, $http, $filter, BeaconResource , PilotResource, PingResource) {
 
     $scope.search={};
     $scope.currentPage = 0;
@@ -17,6 +17,7 @@ angular.module('frontend').controller('SearchBeaconController', function($scope,
         }
         return max;
     };
+    $scope.pilotList = PilotResource.queryAll();
 
     $scope.performSearch = function() {
         $scope.searchResults = BeaconResource.queryAll(function(){

@@ -5,11 +5,11 @@
 <form id="EventForm" name="EventForm" class="form-horizontal" role="form">
     
 
-    <div class="form-group" ng-class="{'has-error': EventForm.beginning.$invalid}">
-        <label for="beginning" class="col-sm-2 control-label">Beginning</label>
-        <div id="beginningControls" class="col-sm-10">
-            <input id="beginning" name="beginning" type="text" required class="form-control" ng-model="event.beginning" placeholder="Enter the Event Beginning"></input>
-            <span class="help-block error" ng-show="EventForm.beginning.$error.required">required</span> 
+    <div class="form-group" ng-class="{'has-error': EventForm.start.$invalid}">
+        <label for="start" class="col-sm-2 control-label">Start</label>
+        <div id="startControls" class="col-sm-10">
+            <input id="start" name="start" type="text" required class="form-control" ng-model="event.start" placeholder="Enter the Event Start"></input>
+            <span class="help-block error" ng-show="EventForm.start.$error.required">required</span> 
         </div>
     </div>
 
@@ -21,11 +21,11 @@
         </div>
     </div>
 
-    <div class="form-group" ng-class="{'has-error': EventForm.chronopoints.$invalid}">
-        <label for="chronopoints" class="col-sm-2 control-label">Chronopoints</label>
-        <div id="chronopointsControls" class="col-sm-10">
-            <select id="chronopoints" name="chronopoints" multiple class="form-control" ng-model="chronopointsSelection" ng-options="c.text for c in chronopointsSelectionList">
-                <option value="">Choose a Chronopoints</option>
+    <div class="form-group" ng-class="{'has-error': EventForm.chronometers.$invalid}">
+        <label for="chronometers" class="col-sm-2 control-label">Chronometers</label>
+        <div id="chronometersControls" class="col-sm-10">
+            <select id="chronometers" name="chronometers" multiple class="form-control" ng-model="chronometersSelection" ng-options="c.text for c in chronometersSelectionList">
+                <option value="">Choose a Chronometers</option>
             </select>
         </div>
     </div>
@@ -35,6 +35,13 @@
         <div id="nameControls" class="col-sm-10">
             <input id="name" name="name" type="text" required class="form-control" ng-model="event.name" placeholder="Enter the Event Name"></input>
             <span class="help-block error" ng-show="EventForm.name.$error.required">required</span> 
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': EventForm.loop.$invalid}">
+        <label for="loop" class="col-sm-2 control-label">Loop</label>
+        <div id="loopControls" class="col-sm-10">
+            <input id="loop" name="loop" type="checkbox" class="checkbox" ng-model="event.loop" placeholder="Enter the Event Loop"></input>
         </div>
     </div>
 

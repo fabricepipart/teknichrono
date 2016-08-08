@@ -1,5 +1,5 @@
 
-angular.module('frontend').controller('NewLapTimeController', function ($scope, $location, locationParser, flash, LapTimeResource , PilotResource, EventResource, IntermediateResource) {
+angular.module('frontend').controller('NewLapTimeController', function ($scope, $location, locationParser, flash, LapTimeResource , PilotResource, EventResource, PingResource) {
     $scope.disabled = false;
     $scope.$location = $location;
     $scope.lapTime = $scope.lapTime || {};
@@ -34,7 +34,7 @@ angular.module('frontend').controller('NewLapTimeController', function ($scope, 
         }
     });
     
-    $scope.intermediatesList = IntermediateResource.queryAll(function(items){
+    $scope.intermediatesList = PingResource.queryAll(function(items){
         $scope.intermediatesSelectionList = $.map(items, function(item) {
             return ( {
                 value : item.id,

@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('EditLapTimeController', function($scope, $routeParams, $location, flash, LapTimeResource , PilotResource, EventResource, IntermediateResource) {
+angular.module('frontend').controller('EditLapTimeController', function($scope, $routeParams, $location, flash, LapTimeResource , PilotResource, EventResource, PingResource) {
     var self = this;
     $scope.disabled = false;
     $scope.$location = $location;
@@ -43,7 +43,7 @@ angular.module('frontend').controller('EditLapTimeController', function($scope, 
                     return labelObject;
                 });
             });
-            IntermediateResource.queryAll(function(items) {
+            PingResource.queryAll(function(items) {
                 $scope.intermediatesSelectionList = $.map(items, function(item) {
                     var wrappedObject = {
                         id : item.id

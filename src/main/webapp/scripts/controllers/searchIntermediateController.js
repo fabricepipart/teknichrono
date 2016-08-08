@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('SearchIntermediateController', function($scope, $http, $filter, IntermediateResource , PilotResource, ChronoPointResource) {
+angular.module('frontend').controller('SearchIntermediateController', function($scope, $http, $filter, IntermediateResource , PilotResource, ChronometerResource) {
 
     $scope.search={};
     $scope.currentPage = 0;
@@ -18,7 +18,7 @@ angular.module('frontend').controller('SearchIntermediateController', function($
         return max;
     };
     $scope.pilotList = PilotResource.queryAll();
-    $scope.chronopointList = ChronoPointResource.queryAll();
+    $scope.chronometerList = ChronometerResource.queryAll();
 
     $scope.performSearch = function() {
         $scope.searchResults = IntermediateResource.queryAll(function(){

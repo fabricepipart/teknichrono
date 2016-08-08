@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('EditIntermediateController', function($scope, $routeParams, $location, flash, IntermediateResource , PilotResource, ChronoPointResource) {
+angular.module('frontend').controller('EditIntermediateController', function($scope, $routeParams, $location, flash, IntermediateResource , PilotResource, ChronometerResource) {
     var self = this;
     $scope.disabled = false;
     $scope.$location = $location;
@@ -26,8 +26,8 @@ angular.module('frontend').controller('EditIntermediateController', function($sc
                     return labelObject;
                 });
             });
-            ChronoPointResource.queryAll(function(items) {
-                $scope.chronopointSelectionList = $.map(items, function(item) {
+            ChronometerResource.queryAll(function(items) {
+                $scope.chronometerSelectionList = $.map(items, function(item) {
                     var wrappedObject = {
                         id : item.id
                     };
@@ -35,10 +35,10 @@ angular.module('frontend').controller('EditIntermediateController', function($sc
                         value : item.id,
                         text : item.id
                     };
-                    if($scope.intermediate.chronopoint && item.id == $scope.intermediate.chronopoint.id) {
-                        $scope.chronopointSelection = labelObject;
-                        $scope.intermediate.chronopoint = wrappedObject;
-                        self.original.chronopoint = $scope.intermediate.chronopoint;
+                    if($scope.intermediate.chronometer && item.id == $scope.intermediate.chronometer.id) {
+                        $scope.chronometerSelection = labelObject;
+                        $scope.intermediate.chronometer = wrappedObject;
+                        self.original.chronometer = $scope.intermediate.chronometer;
                     }
                     return labelObject;
                 });
@@ -95,10 +95,10 @@ angular.module('frontend').controller('EditIntermediateController', function($sc
             $scope.intermediate.pilot.id = selection.value;
         }
     });
-    $scope.$watch("chronopointSelection", function(selection) {
+    $scope.$watch("chronometerSelection", function(selection) {
         if (typeof selection != 'undefined') {
-            $scope.intermediate.chronopoint = {};
-            $scope.intermediate.chronopoint.id = selection.value;
+            $scope.intermediate.chronometer = {};
+            $scope.intermediate.chronometer.id = selection.value;
         }
     });
     

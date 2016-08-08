@@ -13,9 +13,9 @@
         
 
     <div class="form-group">
-        <label for="beginning" class="col-sm-2 control-label">Beginning</label>
+        <label for="start" class="col-sm-2 control-label">Start</label>
         <div class="col-sm-10">
-            <input id="beginning" name="beginning" class="form-control" type="text" ng-model="search.beginning" placeholder="Enter the Event Beginning"></input>
+            <input id="start" name="start" class="form-control" type="text" ng-model="search.start" placeholder="Enter the Event Start"></input>
         </div>
     </div>
 
@@ -34,6 +34,15 @@
         </div>
     </div>
 
+    <div class="form-group">
+        <label for="loop" class="col-sm-2 control-label">Loop</label>
+        <div class="col-sm-10">
+            <select id="loop" name="loop" class="form-control" ng-model="search.loop" ng-options="l as l for l in loopList">
+                <option value="">Choose a Loop</option>
+            </select>
+        </div>
+    </div>
+
 
         <div class="form-group">
             <div class="col-md-offset-2 col-sm-10">
@@ -47,16 +56,18 @@
         <table class="table table-responsive table-bordered table-striped clearfix">
             <thead>
                 <tr>
-                    <th>Beginning</th>
+                    <th>Start</th>
                     <th>End</th>
                     <th>Name</th>
+                    <th>Loop</th>
                 </tr>
             </thead>
             <tbody id="search-results-body">
                 <tr ng-repeat="result in filteredResults | startFrom:currentPage*pageSize | limitTo:pageSize">
-                    <td><a href="#/Events/edit/{{result.id}}">{{result.beginning}}</a></td>
+                    <td><a href="#/Events/edit/{{result.id}}">{{result.start}}</a></td>
                     <td><a href="#/Events/edit/{{result.id}}">{{result.end}}</a></td>
                     <td><a href="#/Events/edit/{{result.id}}">{{result.name}}</a></td>
+                    <td><a href="#/Events/edit/{{result.id}}">{{result.loop}}</a></td>
                 </tr>
             </tbody>
         </table>

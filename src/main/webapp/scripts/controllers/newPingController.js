@@ -1,8 +1,38 @@
 
-angular.module('frontend').controller('NewPingController', function ($scope, $location, locationParser, flash, PingResource ) {
+angular.module('frontend').controller('NewPingController', function ($scope, $location, locationParser, flash, PingResource , BeaconResource, ChronometerResource) {
     $scope.disabled = false;
     $scope.$location = $location;
     $scope.ping = $scope.ping || {};
+    
+    $scope.beaconList = BeaconResource.queryAll(function(items){
+        $scope.beaconSelectionList = $.map(items, function(item) {
+            return ( {
+                value : item.id,
+                text : item.id
+            });
+        });
+    });
+    $scope.$watch("beaconSelection", function(selection) {
+        if ( typeof selection != 'undefined') {
+            $scope.ping.beacon = {};
+            $scope.ping.beacon.id = selection.value;
+        }
+    });
+    
+    $scope.chronoList = ChronometerResource.queryAll(function(items){
+        $scope.chronoSelectionList = $.map(items, function(item) {
+            return ( {
+                value : item.id,
+                text : item.id
+            });
+        });
+    });
+    $scope.$watch("chronoSelection", function(selection) {
+        if ( typeof selection != 'undefined') {
+            $scope.ping.chrono = {};
+            $scope.ping.chrono.id = selection.value;
+        }
+    });
     
 
     $scope.save = function() {

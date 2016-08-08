@@ -5,38 +5,37 @@
 <form id="PingForm" name="PingForm" class="form-horizontal" role="form">
     
 
-    <div class="form-group" ng-class="{'has-error': PingForm.time.$invalid}">
-        <label for="time" class="col-sm-2 control-label">Time</label>
-        <div id="timeControls" class="col-sm-10">
-            <input id="time" name="time" type="number" required class="form-control" ng-model="ping.time" placeholder="Enter the Ping Time"></input>
-            <span class="help-block error" ng-show="PingForm.time.$error.required">required</span> 
-            <span class="help-block error" ng-show="PingForm.time.$error.number">not a number</span>
-        </div>
-    </div>
-
-    <div class="form-group" ng-class="{'has-error': PingForm.uuid.$invalid}">
-        <label for="uuid" class="col-sm-2 control-label">Uuid</label>
-        <div id="uuidControls" class="col-sm-10">
-            <input id="uuid" name="uuid" type="text" required class="form-control" ng-model="ping.uuid" placeholder="Enter the Ping Uuid"></input>
-            <span class="help-block error" ng-show="PingForm.uuid.$error.required">required</span> 
+    <div class="form-group" ng-class="{'has-error': PingForm.dateTime.$invalid}">
+        <label for="dateTime" class="col-sm-2 control-label">Date Time</label>
+        <div id="dateTimeControls" class="col-sm-10">
+            <input id="dateTime" name="dateTime" type="text" required class="form-control" ng-model="ping.dateTime" placeholder="Enter the Ping Date Time"></input>
+            <span class="help-block error" ng-show="PingForm.dateTime.$error.required">required</span> 
         </div>
     </div>
 
     <div class="form-group" ng-class="{'has-error': PingForm.power.$invalid}">
         <label for="power" class="col-sm-2 control-label">Power</label>
         <div id="powerControls" class="col-sm-10">
-            <input id="power" name="power" type="number" required class="form-control" ng-model="ping.power" placeholder="Enter the Ping Power"></input>
-            <span class="help-block error" ng-show="PingForm.power.$error.required">required</span> 
+            <input id="power" name="power" type="number" class="form-control" ng-model="ping.power" placeholder="Enter the Ping Power"></input>
             <span class="help-block error" ng-show="PingForm.power.$error.number">not a number</span>
         </div>
     </div>
 
-    <div class="form-group" ng-class="{'has-error': PingForm.chronoPointIndex.$invalid}">
-        <label for="chronoPointIndex" class="col-sm-2 control-label">Chrono Point Index</label>
-        <div id="chronoPointIndexControls" class="col-sm-10">
-            <input id="chronoPointIndex" name="chronoPointIndex" type="number" required class="form-control" ng-model="ping.chronoPointIndex" placeholder="Enter the Ping Chrono Point Index"></input>
-            <span class="help-block error" ng-show="PingForm.chronoPointIndex.$error.required">required</span> 
-            <span class="help-block error" ng-show="PingForm.chronoPointIndex.$error.number">not a number</span>
+    <div class="form-group" ng-class="{'has-error': PingForm.beacon.$invalid}">
+        <label for="beacon" class="col-sm-2 control-label">Beacon</label>
+        <div id="beaconControls" class="col-sm-10">
+        <select id="beacon" name="beacon" class="form-control" ng-model="beaconSelection" ng-options="b.text for b in beaconSelectionList"  >
+            <option value="">Choose a Beacon</option>
+        </select>
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': PingForm.chrono.$invalid}">
+        <label for="chrono" class="col-sm-2 control-label">Chrono</label>
+        <div id="chronoControls" class="col-sm-10">
+        <select id="chrono" name="chrono" class="form-control" ng-model="chronoSelection" ng-options="c.text for c in chronoSelectionList"  >
+            <option value="">Choose a Chrono</option>
+        </select>
         </div>
     </div>
 

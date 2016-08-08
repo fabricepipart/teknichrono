@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('EditEventController', function($scope, $routeParams, $location, flash, EventResource , ChronoPointResource) {
+angular.module('frontend').controller('EditEventController', function($scope, $routeParams, $location, flash, EventResource , ChronometerResource) {
     var self = this;
     $scope.disabled = false;
     $scope.$location = $location;
@@ -9,8 +9,8 @@ angular.module('frontend').controller('EditEventController', function($scope, $r
         var successCallback = function(data){
             self.original = data;
             $scope.event = new EventResource(self.original);
-            ChronoPointResource.queryAll(function(items) {
-                $scope.chronopointsSelectionList = $.map(items, function(item) {
+            ChronometerResource.queryAll(function(items) {
+                $scope.chronometersSelectionList = $.map(items, function(item) {
                     var wrappedObject = {
                         id : item.id
                     };
@@ -18,14 +18,14 @@ angular.module('frontend').controller('EditEventController', function($scope, $r
                         value : item.id,
                         text : item.id
                     };
-                    if($scope.event.chronopoints){
-                        $.each($scope.event.chronopoints, function(idx, element) {
+                    if($scope.event.chronometers){
+                        $.each($scope.event.chronometers, function(idx, element) {
                             if(item.id == element.id) {
-                                $scope.chronopointsSelection.push(labelObject);
-                                $scope.event.chronopoints.push(wrappedObject);
+                                $scope.chronometersSelection.push(labelObject);
+                                $scope.event.chronometers.push(wrappedObject);
                             }
                         });
-                        self.original.chronopoints = $scope.event.chronopoints;
+                        self.original.chronometers = $scope.event.chronometers;
                     }
                     return labelObject;
                 });
@@ -76,17 +76,21 @@ angular.module('frontend').controller('EditEventController', function($scope, $r
         $scope.event.$remove(successCallback, errorCallback);
     };
     
-    $scope.chronopointsSelection = $scope.chronopointsSelection || [];
-    $scope.$watch("chronopointsSelection", function(selection) {
+    $scope.chronometersSelection = $scope.chronometersSelection || [];
+    $scope.$watch("chronometersSelection", function(selection) {
         if (typeof selection != 'undefined' && $scope.event) {
-            $scope.event.chronopoints = [];
+            $scope.event.chronometers = [];
             $.each(selection, function(idx,selectedItem) {
                 var collectionItem = {};
                 collectionItem.id = selectedItem.value;
-                $scope.event.chronopoints.push(collectionItem);
+                $scope.event.chronometers.push(collectionItem);
             });
         }
     });
+    $scope.loopList = [
+        "true",
+        "false"
+    ];
     
     $scope.get();
 });

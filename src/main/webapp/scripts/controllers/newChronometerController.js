@@ -1,23 +1,8 @@
 
-angular.module('frontend').controller('NewBeaconController', function ($scope, $location, locationParser, flash, BeaconResource , PilotResource, PingResource) {
+angular.module('frontend').controller('NewChronometerController', function ($scope, $location, locationParser, flash, ChronometerResource , PingResource) {
     $scope.disabled = false;
     $scope.$location = $location;
-    $scope.beacon = $scope.beacon || {};
-    
-    $scope.pilotList = PilotResource.queryAll(function(items){
-        $scope.pilotSelectionList = $.map(items, function(item) {
-            return ( {
-                value : item.id,
-                text : item.id
-            });
-        });
-    });
-    $scope.$watch("pilotSelection", function(selection) {
-        if ( typeof selection != 'undefined') {
-            $scope.beacon.pilot = {};
-            $scope.beacon.pilot.id = selection.value;
-        }
-    });
+    $scope.chronometer = $scope.chronometer || {};
     
     $scope.pingsList = PingResource.queryAll(function(items){
         $scope.pingsSelectionList = $.map(items, function(item) {
@@ -29,11 +14,11 @@ angular.module('frontend').controller('NewBeaconController', function ($scope, $
     });
     $scope.$watch("pingsSelection", function(selection) {
         if (typeof selection != 'undefined') {
-            $scope.beacon.pings = [];
+            $scope.chronometer.pings = [];
             $.each(selection, function(idx,selectedItem) {
                 var collectionItem = {};
                 collectionItem.id = selectedItem.value;
-                $scope.beacon.pings.push(collectionItem);
+                $scope.chronometer.pings.push(collectionItem);
             });
         }
     });
@@ -42,8 +27,8 @@ angular.module('frontend').controller('NewBeaconController', function ($scope, $
     $scope.save = function() {
         var successCallback = function(data,responseHeaders){
             var id = locationParser(responseHeaders);
-            flash.setMessage({'type':'success','text':'The beacon was created successfully.'});
-            $location.path('/Beacons');
+            flash.setMessage({'type':'success','text':'The chronometer was created successfully.'});
+            $location.path('/Chronometers');
         };
         var errorCallback = function(response) {
             if(response && response.data && response.data.message) {
@@ -52,10 +37,10 @@ angular.module('frontend').controller('NewBeaconController', function ($scope, $
                 flash.setMessage({'type': 'error', 'text': 'Something broke. Retry, or cancel and start afresh.'}, true);
             }
         };
-        BeaconResource.save($scope.beacon, successCallback, errorCallback);
+        ChronometerResource.save($scope.chronometer, successCallback, errorCallback);
     };
     
     $scope.cancel = function() {
-        $location.path("/Beacons");
+        $location.path("/Chronometers");
     };
 });

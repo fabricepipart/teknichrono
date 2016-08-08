@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('SearchPingController', function($scope, $http, $filter, PingResource ) {
+angular.module('frontend').controller('SearchPingController', function($scope, $http, $filter, PingResource , BeaconResource, ChronometerResource) {
 
     $scope.search={};
     $scope.currentPage = 0;
@@ -17,6 +17,8 @@ angular.module('frontend').controller('SearchPingController', function($scope, $
         }
         return max;
     };
+    $scope.beaconList = BeaconResource.queryAll();
+    $scope.chronoList = ChronometerResource.queryAll();
 
     $scope.performSearch = function() {
         $scope.searchResults = PingResource.queryAll(function(){
