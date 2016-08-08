@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 from base import *
-import variables
 
 headers = {'Content-type': 'application/json'}
 pingsUrl = '/teknichrono/rest/pings'

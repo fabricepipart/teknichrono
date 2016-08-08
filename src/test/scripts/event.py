@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 from base import *
-import variables
 
 EventsUrl = '/teknichrono/rest/events'
 

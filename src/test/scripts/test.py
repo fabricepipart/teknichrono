@@ -3,7 +3,6 @@
 import requests
 import json
 import sys
-import variables
 
 from base import *
 from pilots import *

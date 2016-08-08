@@ -16,7 +16,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -48,7 +47,7 @@ public class Beacon implements java.io.Serializable {
 	// Mapped by denotes that Pilot is the owner of the relationship
 	// http://meri-stuff.blogspot.fr/2012/03/jpa-tutorial.html#RelationshipsBidirectionalOneToManyManyToOneConsistency
 	@OneToOne(fetch = FetchType.EAGER, optional = true, mappedBy = "currentBeacon", cascade = CascadeType.MERGE)
-	@JsonBackReference(value = "pilot-beacon")
+	@JsonIgnore
 	private Pilot pilot;
 
 	// Can be null if after event, items are reassociated
