@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
 from base import *
+import variables
 
-beaconsUrl = host + '/teknichrono/rest/beacons'
+beaconsUrl = '/teknichrono/rest/beacons'
 
 # ----------------------------------------------------------------------
 

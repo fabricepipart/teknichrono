@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
 from base import *
+import variables
 
-EventsUrl = host + '/teknichrono/rest/events'
+EventsUrl = '/teknichrono/rest/events'
 
 # ----------------------------------------------------------------------
 

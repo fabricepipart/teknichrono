@@ -3,6 +3,7 @@
 import requests
 import json
 import sys
+import variables
 
 from base import *
 from pilots import *
@@ -13,9 +14,9 @@ from ping import *
 
 # ----------------------------------------------------------------------
 # Command line parameters
-
+print len(sys.argv)
 if len(sys.argv) >= 2:
-    host = sys.argv[1]
+    setHost(sys.argv[1])
 
 # ----------------------------------------------------------------------
 

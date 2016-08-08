@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
 from base import *
+import variables
 
-pilotsUrl = host + '/teknichrono/rest/pilots'
+pilotsUrl = '/teknichrono/rest/pilots'
 
 def addPilot( firstName, lastName ):
   "This adds a Pilot"

@@ -1,9 +1,10 @@
 #!/usr/bin/python
 
 from base import *
+import variables
 
 headers = {'Content-type': 'application/json'}
-pingsUrl = host + '/teknichrono/rest/pings'
+pingsUrl = '/teknichrono/rest/pings'
 
 # ----------------------------------------------------------------------
 def ping( dateTime, pilotBeaconId, power, chronoId  ):

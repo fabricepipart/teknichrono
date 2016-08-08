@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
 from base import *
+import variables
 
-ChronometersUrl = host + '/teknichrono/rest/chronometers'
+ChronometersUrl = '/teknichrono/rest/chronometers'
 
 # ----------------------------------------------------------------------
 
