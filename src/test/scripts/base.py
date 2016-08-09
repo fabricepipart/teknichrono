@@ -7,6 +7,7 @@ from datetime import date
 
 headers = {'Content-type': 'application/json'}
 host = 'http://localhost:8080'
+debug = True
 
 def setHost( url ):
     global host
@@ -14,7 +15,8 @@ def setHost( url ):
 
 def post( dataString, url ):
   "This posts a json to a URL and returns a json"
-  print 'POST to ' + host + url
+  if debug:
+    print 'POST to ' + host + url
   response = requests.post(host + url, data=dataString, headers=headers)
   if(not response.ok):
     response.raise_for_status();
@@ -22,7 +24,8 @@ def post( dataString, url ):
 
 def put( dataString, url ):
     "This send in a PUT a json to a URL"
-    print 'PUT to ' + host + url
+    if debug:
+      print 'PUT to ' + host + url
     response = requests.put(host + url, data=dataString, headers=headers)
     if(not response.ok):
       response.raise_for_status();
@@ -30,7 +33,8 @@ def put( dataString, url ):
 
 def delete(url ):
   "This sends a DELETE to a URL"
-  print 'DELETE to ' + host + url
+  if debug:
+    print 'DELETE to ' + host + url
   response = requests.delete(host + url, headers=headers)
   if(not response.ok):
     response.raise_for_status();
@@ -38,7 +42,8 @@ def delete(url ):
 
 def get(url ):
   "This sends a get to a URL and returns a json"
-  print 'GET to ' + host + url
+  if debug:
+    print 'GET to ' + host + url
   response = requests.get(host + url, headers=headers)
   if(not response.ok):
     response.raise_for_status();
