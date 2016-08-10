@@ -20,12 +20,21 @@
     </div>
 
     <div class="form-group">
-        <label for="index" class="col-sm-2 control-label">Index</label>
+        <label for="chronoIndex" class="col-sm-2 control-label">Chrono Index</label>
         <div class="col-sm-10">
-            <input id="index" name="index" class="form-control" type="text" ng-model="search.index" placeholder="Enter the Chronometer Index"></input>
+            <input id="chronoIndex" name="chronoIndex" class="form-control" type="text" ng-model="search.chronoIndex" placeholder="Enter the Chronometer Chrono Index"></input>
         </div>
     </div>
 
+
+    <div class="form-group">
+        <label for="event" class="col-sm-2 control-label">Event</label>
+        <div class="col-sm-10">
+            <select id="event" name="event" class="form-control" ng-model="search.event" ng-options="e as e.id for e in eventList">
+                <option value="">Choose a Event</option>
+            </select>
+        </div>
+    </div>
 
 
         <div class="form-group">
@@ -41,13 +50,15 @@
             <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Index</th>
+                    <th>Chrono Index</th>
+                    <th>Event</th>
                 </tr>
             </thead>
             <tbody id="search-results-body">
                 <tr ng-repeat="result in filteredResults | startFrom:currentPage*pageSize | limitTo:pageSize">
                     <td><a href="#/Chronometers/edit/{{result.id}}">{{result.name}}</a></td>
-                    <td><a href="#/Chronometers/edit/{{result.id}}">{{result.index}}</a></td>
+                    <td><a href="#/Chronometers/edit/{{result.id}}">{{result.chronoIndex}}</a></td>
+                        <td><a href="#/Chronometers/edit/{{result.id}}">{{result.event.id}}</a></td>
                 </tr>
             </tbody>
         </table>

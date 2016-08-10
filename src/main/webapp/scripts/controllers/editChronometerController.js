@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('EditChronometerController', function($scope, $routeParams, $location, flash, ChronometerResource , PingResource) {
+angular.module('frontend').controller('EditChronometerController', function($scope, $routeParams, $location, flash, ChronometerResource , PingResource, EventResource) {
     var self = this;
     $scope.disabled = false;
     $scope.$location = $location;
@@ -26,6 +26,23 @@ angular.module('frontend').controller('EditChronometerController', function($sco
                             }
                         });
                         self.original.pings = $scope.chronometer.pings;
+                    }
+                    return labelObject;
+                });
+            });
+            EventResource.queryAll(function(items) {
+                $scope.eventSelectionList = $.map(items, function(item) {
+                    var wrappedObject = {
+                        id : item.id
+                    };
+                    var labelObject = {
+                        value : item.id,
+                        text : item.id
+                    };
+                    if($scope.chronometer.event && item.id == $scope.chronometer.event.id) {
+                        $scope.eventSelection = labelObject;
+                        $scope.chronometer.event = wrappedObject;
+                        self.original.event = $scope.chronometer.event;
                     }
                     return labelObject;
                 });
@@ -85,6 +102,12 @@ angular.module('frontend').controller('EditChronometerController', function($sco
                 collectionItem.id = selectedItem.value;
                 $scope.chronometer.pings.push(collectionItem);
             });
+        }
+    });
+    $scope.$watch("eventSelection", function(selection) {
+        if (typeof selection != 'undefined') {
+            $scope.chronometer.event = {};
+            $scope.chronometer.event.id = selection.value;
         }
     });
     

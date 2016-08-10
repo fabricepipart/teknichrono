@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('SearchPilotController', function($scope, $http, $filter, PilotResource , BeaconResource) {
+angular.module('frontend').controller('SearchPilotController', function($scope, $http, $filter, PilotResource , BeaconResource, LapTimeResource) {
 
     $scope.search={};
     $scope.currentPage = 0;

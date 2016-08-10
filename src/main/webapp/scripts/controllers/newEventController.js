@@ -23,7 +23,7 @@ angular.module('frontend').controller('NewEventController', function ($scope, $l
         }
     });
 
-    $scope.loopList = [
+    $scope.loopTrackList = [
         "true",
         "false"
     ];

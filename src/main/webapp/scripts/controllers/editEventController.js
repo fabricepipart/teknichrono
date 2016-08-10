@@ -87,7 +87,7 @@ angular.module('frontend').controller('EditEventController', function($scope, $r
             });
         }
     });
-    $scope.loopList = [
+    $scope.loopTrackList = [
         "true",
         "false"
     ];

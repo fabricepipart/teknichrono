@@ -1,5 +1,5 @@
 
-angular.module('frontend').controller('NewPilotController', function ($scope, $location, locationParser, flash, PilotResource , BeaconResource) {
+angular.module('frontend').controller('NewPilotController', function ($scope, $location, locationParser, flash, PilotResource , BeaconResource, LapTimeResource) {
     $scope.disabled = false;
     $scope.$location = $location;
     $scope.pilot = $scope.pilot || {};
@@ -19,6 +19,25 @@ angular.module('frontend').controller('NewPilotController', function ($scope, $l
         }
     });
     
+    $scope.lapsList = LapTimeResource.queryAll(function(items){
+        $scope.lapsSelectionList = $.map(items, function(item) {
+            return ( {
+                value : item.id,
+                text : item.id
+            });
+        });
+    });
+    $scope.$watch("lapsSelection", function(selection) {
+        if (typeof selection != 'undefined') {
+            $scope.pilot.laps = [];
+            $.each(selection, function(idx,selectedItem) {
+                var collectionItem = {};
+                collectionItem.id = selectedItem.value;
+                $scope.pilot.laps.push(collectionItem);
+            });
+        }
+    });
+
 
     $scope.save = function() {
         var successCallback = function(data,responseHeaders){

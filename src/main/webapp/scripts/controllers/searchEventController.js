@@ -17,7 +17,7 @@ angular.module('frontend').controller('SearchEventController', function($scope, 
         }
         return max;
     };
-    $scope.loopList = [
+    $scope.loopTrackList = [
         "true",
         "false"
     ];

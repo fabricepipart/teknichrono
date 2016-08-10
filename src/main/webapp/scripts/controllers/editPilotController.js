@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('EditPilotController', function($scope, $routeParams, $location, flash, PilotResource , BeaconResource) {
+angular.module('frontend').controller('EditPilotController', function($scope, $routeParams, $location, flash, PilotResource , BeaconResource, LapTimeResource) {
     var self = this;
     $scope.disabled = false;
     $scope.$location = $location;
@@ -22,6 +22,27 @@ angular.module('frontend').controller('EditPilotController', function($scope, $r
                         $scope.currentBeaconSelection = labelObject;
                         $scope.pilot.currentBeacon = wrappedObject;
                         self.original.currentBeacon = $scope.pilot.currentBeacon;
+                    }
+                    return labelObject;
+                });
+            });
+            LapTimeResource.queryAll(function(items) {
+                $scope.lapsSelectionList = $.map(items, function(item) {
+                    var wrappedObject = {
+                        id : item.id
+                    };
+                    var labelObject = {
+                        value : item.id,
+                        text : item.id
+                    };
+                    if($scope.pilot.laps){
+                        $.each($scope.pilot.laps, function(idx, element) {
+                            if(item.id == element.id) {
+                                $scope.lapsSelection.push(labelObject);
+                                $scope.pilot.laps.push(wrappedObject);
+                            }
+                        });
+                        self.original.laps = $scope.pilot.laps;
                     }
                     return labelObject;
                 });
@@ -76,6 +97,17 @@ angular.module('frontend').controller('EditPilotController', function($scope, $r
         if (typeof selection != 'undefined') {
             $scope.pilot.currentBeacon = {};
             $scope.pilot.currentBeacon.id = selection.value;
+        }
+    });
+    $scope.lapsSelection = $scope.lapsSelection || [];
+    $scope.$watch("lapsSelection", function(selection) {
+        if (typeof selection != 'undefined' && $scope.pilot) {
+            $scope.pilot.laps = [];
+            $.each(selection, function(idx,selectedItem) {
+                var collectionItem = {};
+                collectionItem.id = selectedItem.value;
+                $scope.pilot.laps.push(collectionItem);
+            });
         }
     });
     

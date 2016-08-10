@@ -1,5 +1,5 @@
 
-angular.module('frontend').controller('NewChronometerController', function ($scope, $location, locationParser, flash, ChronometerResource , PingResource) {
+angular.module('frontend').controller('NewChronometerController', function ($scope, $location, locationParser, flash, ChronometerResource , PingResource, EventResource) {
     $scope.disabled = false;
     $scope.$location = $location;
     $scope.chronometer = $scope.chronometer || {};
@@ -23,6 +23,21 @@ angular.module('frontend').controller('NewChronometerController', function ($sco
         }
     });
 
+    $scope.eventList = EventResource.queryAll(function(items){
+        $scope.eventSelectionList = $.map(items, function(item) {
+            return ( {
+                value : item.id,
+                text : item.id
+            });
+        });
+    });
+    $scope.$watch("eventSelection", function(selection) {
+        if ( typeof selection != 'undefined') {
+            $scope.chronometer.event = {};
+            $scope.chronometer.event.id = selection.value;
+        }
+    });
+    
 
     $scope.save = function() {
         var successCallback = function(data,responseHeaders){

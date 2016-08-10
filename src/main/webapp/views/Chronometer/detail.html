@@ -12,11 +12,11 @@
         </div>
     </div>
 
-    <div class="form-group" ng-class="{'has-error': ChronometerForm.index.$invalid}">
-        <label for="index" class="col-sm-2 control-label">Index</label>
-        <div id="indexControls" class="col-sm-10">
-            <input id="index" name="index" type="number" class="form-control" ng-model="chronometer.index" placeholder="Enter the Chronometer Index"></input>
-            <span class="help-block error" ng-show="ChronometerForm.index.$error.number">not a number</span>
+    <div class="form-group" ng-class="{'has-error': ChronometerForm.chronoIndex.$invalid}">
+        <label for="chronoIndex" class="col-sm-2 control-label">Chrono Index</label>
+        <div id="chronoIndexControls" class="col-sm-10">
+            <input id="chronoIndex" name="chronoIndex" type="number" class="form-control" ng-model="chronometer.chronoIndex" placeholder="Enter the Chronometer Chrono Index"></input>
+            <span class="help-block error" ng-show="ChronometerForm.chronoIndex.$error.number">not a number</span>
         </div>
     </div>
 
@@ -26,6 +26,15 @@
             <select id="pings" name="pings" multiple class="form-control" ng-model="pingsSelection" ng-options="p.text for p in pingsSelectionList">
                 <option value="">Choose a Pings</option>
             </select>
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': ChronometerForm.event.$invalid}">
+        <label for="event" class="col-sm-2 control-label">Event</label>
+        <div id="eventControls" class="col-sm-10">
+        <select id="event" name="event" class="form-control" ng-model="eventSelection" ng-options="e.text for e in eventSelectionList"  >
+            <option value="">Choose a Event</option>
+        </select>
         </div>
     </div>
 

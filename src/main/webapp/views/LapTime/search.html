@@ -37,13 +37,6 @@
         </div>
     </div>
 
-    <div class="form-group">
-        <label for="endDate" class="col-sm-2 control-label">End Date</label>
-        <div class="col-sm-10">
-            <input id="endDate" name="endDate" class="form-control" type="text" ng-model="search.endDate" placeholder="Enter the LapTime End Date"></input>
-        </div>
-    </div>
-
 
 
         <div class="form-group">
@@ -61,7 +54,6 @@
                     <th>Pilot</th>
                     <th>Start Date</th>
                     <th>Event</th>
-                    <th>End Date</th>
                 </tr>
             </thead>
             <tbody id="search-results-body">
@@ -69,7 +61,6 @@
                         <td><a href="#/LapTimes/edit/{{result.id}}">{{result.pilot.id}}</a></td>
                     <td><a href="#/LapTimes/edit/{{result.id}}">{{result.startDate}}</a></td>
                         <td><a href="#/LapTimes/edit/{{result.id}}">{{result.event.id}}</a></td>
-                    <td><a href="#/LapTimes/edit/{{result.id}}">{{result.endDate}}</a></td>
                 </tr>
             </tbody>
         </table>

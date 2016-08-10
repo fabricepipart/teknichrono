@@ -30,6 +30,15 @@
         </div>
     </div>
 
+    <div class="form-group" ng-class="{'has-error': PilotForm.laps.$invalid}">
+        <label for="laps" class="col-sm-2 control-label">Laps</label>
+        <div id="lapsControls" class="col-sm-10">
+            <select id="laps" name="laps" multiple class="form-control" ng-model="lapsSelection" ng-options="l.text for l in lapsSelectionList">
+                <option value="">Choose a Laps</option>
+            </select>
+        </div>
+    </div>
+
 
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">

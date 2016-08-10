@@ -35,10 +35,10 @@
     </div>
 
     <div class="form-group">
-        <label for="loop" class="col-sm-2 control-label">Loop</label>
+        <label for="loopTrack" class="col-sm-2 control-label">Loop Track</label>
         <div class="col-sm-10">
-            <select id="loop" name="loop" class="form-control" ng-model="search.loop" ng-options="l as l for l in loopList">
-                <option value="">Choose a Loop</option>
+            <select id="loopTrack" name="loopTrack" class="form-control" ng-model="search.loopTrack" ng-options="l as l for l in loopTrackList">
+                <option value="">Choose a Loop Track</option>
             </select>
         </div>
     </div>
@@ -59,7 +59,7 @@
                     <th>Start</th>
                     <th>End</th>
                     <th>Name</th>
-                    <th>Loop</th>
+                    <th>Loop Track</th>
                 </tr>
             </thead>
             <tbody id="search-results-body">
@@ -67,7 +67,7 @@
                     <td><a href="#/Events/edit/{{result.id}}">{{result.start}}</a></td>
                     <td><a href="#/Events/edit/{{result.id}}">{{result.end}}</a></td>
                     <td><a href="#/Events/edit/{{result.id}}">{{result.name}}</a></td>
-                    <td><a href="#/Events/edit/{{result.id}}">{{result.loop}}</a></td>
+                    <td><a href="#/Events/edit/{{result.id}}">{{result.loopTrack}}</a></td>
                 </tr>
             </tbody>
         </table>
