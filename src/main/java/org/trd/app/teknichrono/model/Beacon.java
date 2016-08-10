@@ -24,122 +24,122 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @XmlRootElement
 public class Beacon implements java.io.Serializable {
 
-	/* =========================== Entity stuff =========================== */
+  /* =========================== Entity stuff =========================== */
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2438563507266191424L;
+  /**
+   * 
+   */
+  private static final long serialVersionUID = -2438563507266191424L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "id", updatable = false, nullable = false)
-	private int id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  @Column(name = "id", updatable = false, nullable = false)
+  private int id;
 
-	@Version
-	@Column(name = "version")
-	private int version;
+  @Version
+  @Column(name = "version")
+  private int version;
 
-	/* =============================== Fields =============================== */
+  /* =============================== Fields =============================== */
 
-	@Column(nullable = false, unique = true)
-	private int number;
+  @Column(nullable = false, unique = true)
+  private int number;
 
-	// Mapped by denotes that Pilot is the owner of the relationship
-	// http://meri-stuff.blogspot.fr/2012/03/jpa-tutorial.html#RelationshipsBidirectionalOneToManyManyToOneConsistency
-	@OneToOne(fetch = FetchType.EAGER, optional = true, mappedBy = "currentBeacon", cascade = CascadeType.MERGE)
-	@JsonIgnore
-	@JsonBackReference
-	private Pilot pilot;
+  // Mapped by denotes that Pilot is the owner of the relationship
+  // http://meri-stuff.blogspot.fr/2012/03/jpa-tutorial.html#RelationshipsBidirectionalOneToManyManyToOneConsistency
+  @OneToOne(fetch = FetchType.EAGER, optional = true, mappedBy = "currentBeacon", cascade = CascadeType.MERGE)
+  @JsonIgnore
+  @JsonBackReference
+  private Pilot pilot;
 
-	// Can be null if after event, items are reassociated
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "beacon")
-	@JsonIgnore
-	@JsonBackReference
-	private List<Ping> pings = new ArrayList<Ping>();
+  // Can be null if after event, items are reassociated
+  @OneToMany(fetch = FetchType.EAGER, mappedBy = "beacon")
+  @JsonIgnore
+  @JsonBackReference
+  private List<Ping> pings = new ArrayList<Ping>();
 
-	/* ============================ Factory ============================ */
+  /* ============================ Factory ============================ */
 
-	public Beacon() {
-	}
+  public Beacon() {
+  }
 
-	public Beacon(int id, int number) {
-		this.id = id;
-		this.number = number;
-	}
+  public Beacon(int id, int number) {
+    this.id = id;
+    this.number = number;
+  }
 
-	@JsonCreator
-	public static Beacon create(int id) {
-		Beacon b = new Beacon();
-		b.setId(id);
-		return b;
-	}
+  @JsonCreator
+  public static Beacon create(int id) {
+    Beacon b = new Beacon();
+    b.setId(id);
+    return b;
+  }
 
-	/* ===================== Getters and setters ======================== */
+  /* ===================== Getters and setters ======================== */
 
-	public Pilot getPilot() {
-		return pilot;
-	}
+  public Pilot getPilot() {
+    return pilot;
+  }
 
-	public void setPilot(Pilot pilot) {
-		// prevent endless loop
-		if (sameAsFormer(pilot)) {
-			return;
-		}
-		Pilot oldPilot = this.pilot;
-		// Set new pilot
-		this.pilot = pilot;
-		// This beacon is not associated to the previous Pilot
-		if (oldPilot != null) {
-			oldPilot.setCurrentBeacon(null);
-		}
-		// Set reverse relationship
-		if (pilot != null) {
-			pilot.setCurrentBeacon(this);
-		}
-	}
+  public void setPilot(Pilot pilot) {
+    // prevent endless loop
+    if (sameAsFormer(pilot)) {
+      return;
+    }
+    Pilot oldPilot = this.pilot;
+    // Set new pilot
+    this.pilot = pilot;
+    // This beacon is not associated to the previous Pilot
+    if (oldPilot != null) {
+      oldPilot.setCurrentBeacon(null);
+    }
+    // Set reverse relationship
+    if (pilot != null) {
+      pilot.setCurrentBeacon(this);
+    }
+  }
 
-	private boolean sameAsFormer(Pilot newPilot) {
-		return pilot == null ? newPilot == null : pilot.equals(newPilot);
-	}
+  private boolean sameAsFormer(Pilot newPilot) {
+    return pilot == null ? newPilot == null : pilot.equals(newPilot);
+  }
 
-	public List<Ping> getPings() {
-		return pings;
-	}
+  public List<Ping> getPings() {
+    return pings;
+  }
 
-	public void setPings(List<Ping> pings) {
-		this.pings = pings;
-	}
+  public void setPings(List<Ping> pings) {
+    this.pings = pings;
+  }
 
-	public int getId() {
-		return this.id;
-	}
+  public int getId() {
+    return this.id;
+  }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+  public void setId(int id) {
+    this.id = id;
+  }
 
-	public int getVersion() {
-		return this.version;
-	}
+  public int getVersion() {
+    return this.version;
+  }
 
-	public void setVersion(final int version) {
-		this.version = version;
-	}
+  public void setVersion(final int version) {
+    this.version = version;
+  }
 
-	public int getNumber() {
-		return this.number;
-	}
+  public int getNumber() {
+    return this.number;
+  }
 
-	public void setNumber(int number) {
-		this.number = number;
-	}
+  public void setNumber(int number) {
+    this.number = number;
+  }
 
-	@Override
-	public String toString() {
-		String result = getClass().getSimpleName() + " ";
-		result += "number: " + number;
-		return result;
-	}
+  @Override
+  public String toString() {
+    String result = getClass().getSimpleName() + " ";
+    result += "number: " + number;
+    return result;
+  }
 
 }

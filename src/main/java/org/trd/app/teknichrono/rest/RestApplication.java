@@ -11,24 +11,24 @@ import javax.ws.rs.core.Application;
 @ApplicationPath("/rest")
 public class RestApplication extends Application {
 
-	public RestApplication() {
-		overrideToLocalDB();
-	}
+  public RestApplication() {
+    overrideToLocalDB();
+  }
 
-	private void overrideToLocalDB() {
-		Map<String, String> env = System.getenv();
-		Map<String, Object> configOverrides = new HashMap<String, Object>();
-		boolean remoteDB = false;
-		for (String envName : env.keySet()) {
-			if (envName.contains("DB_USERNAME")) {
-				remoteDB = true;
-			}
-			// You can put more code in here to populate configOverrides...
-		}
-		if (remoteDB) {
-			configOverrides.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
-			EntityManagerFactory emf = Persistence.createEntityManagerFactory("teknichrono-persistence-unit",
-					configOverrides);
-		}
-	}
+  private void overrideToLocalDB() {
+    Map<String, String> env = System.getenv();
+    Map<String, Object> configOverrides = new HashMap<String, Object>();
+    boolean remoteDB = false;
+    for (String envName : env.keySet()) {
+      if (envName.contains("DB_USERNAME")) {
+        remoteDB = true;
+      }
+      // You can put more code in here to populate configOverrides...
+    }
+    if (remoteDB) {
+      configOverrides.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+      EntityManagerFactory emf = Persistence.createEntityManagerFactory("teknichrono-persistence-unit",
+          configOverrides);
+    }
+  }
 }

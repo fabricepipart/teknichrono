@@ -10,6 +10,13 @@ from beacons import *
 from chronometer import *
 from event import *
 from ping import *
+from laps import *
+
+
+# ----------------------------------------------------------------------
+# Test dqte primitives
+print "Date = " + formatDatetime(timestampToDate(1471863621321))
+# 2016-08-22T11:00:21.321Z
 
 # ----------------------------------------------------------------------
 # Command line parameters
@@ -24,7 +31,6 @@ deleteBeacons()
 deletePilots()
 deleteChronometers()
 deleteEvents()
-
 
 # ----------------------------------------------------------------------
 # Add Beacons
@@ -98,6 +104,7 @@ chrono3 = getChronometerByName('Raspberry-3')['id'];
 # random.shuffle(array)
 baseDate = datetime.datetime(2016,8,22,11,0,0,1*1000);
 
+# Chronos passed in order  0 1 2 3
 baseDate = pingsForLap( baseDate, 21, fabriceBeaconId, chrono0, chrono1, chrono2, chrono3 );
 baseDate = pingsForLap( baseDate, 20, fabriceBeaconId, chrono0, chrono1, chrono2, chrono3 );
 baseDate = pingsForLap( baseDate, 19, fabriceBeaconId, chrono0, chrono1, chrono2, chrono3 );
@@ -111,19 +118,20 @@ baseDate = pingsForLap( baseDate, 21, fabriceBeaconId, chrono0, chrono1, chrono2
 baseDate = pingsForLap( baseDate, 20, fabriceBeaconId, chrono0, chrono1, chrono2, chrono3 );
 baseDate = pingsForLap( baseDate, 19, fabriceBeaconId, chrono0, chrono1, chrono2, chrono3 );
 
+# Chronos passed in order  1 2 3 0
 baseDate = datetime.datetime(2016,8,22,11,0,1,2*1000)
-baseDate = pingsForLap( baseDate, 19, jeremyBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 18, jeremyBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 17, jeremyBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 19, jeremyBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 18, jeremyBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 17, jeremyBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 19, jeremyBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 18, jeremyBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 17, jeremyBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 19, jeremyBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 18, jeremyBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 17, jeremyBeaconId, chrono0, chrono1, chrono2, chrono3 );
+baseDate = pingsForLap( baseDate, 19, jeremyBeaconId, chrono1, chrono2, chrono3, chrono0 );
+baseDate = pingsForLap( baseDate, 18, jeremyBeaconId, chrono1, chrono2, chrono3, chrono0 );
+baseDate = pingsForLap( baseDate, 17, jeremyBeaconId, chrono1, chrono2, chrono3, chrono0 );
+baseDate = pingsForLap( baseDate, 19, jeremyBeaconId, chrono1, chrono2, chrono3, chrono0 );
+baseDate = pingsForLap( baseDate, 18, jeremyBeaconId, chrono1, chrono2, chrono3, chrono0 );
+baseDate = pingsForLap( baseDate, 17, jeremyBeaconId, chrono1, chrono2, chrono3, chrono0 );
+baseDate = pingsForLap( baseDate, 19, jeremyBeaconId, chrono1, chrono2, chrono3, chrono0 );
+baseDate = pingsForLap( baseDate, 18, jeremyBeaconId, chrono1, chrono2, chrono3, chrono0 );
+baseDate = pingsForLap( baseDate, 17, jeremyBeaconId, chrono1, chrono2, chrono3, chrono0 );
+baseDate = pingsForLap( baseDate, 19, jeremyBeaconId, chrono1, chrono2, chrono3, chrono0 );
+baseDate = pingsForLap( baseDate, 18, jeremyBeaconId, chrono1, chrono2, chrono3, chrono0 );
+baseDate = pingsForLap( baseDate, 17, jeremyBeaconId, chrono1, chrono2, chrono3, chrono0 );
 
 baseDate = datetime.datetime(2016,8,22,11,0,2,3*1000)
 baseDate = pingsForLap( baseDate, 16, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
@@ -152,3 +160,31 @@ baseDate = pingsForLap( baseDate, 16, jorgeBeaconId, chrono0, chrono1, chrono2, 
 baseDate = pingsForLap( baseDate, 14, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
 baseDate = pingsForLap( baseDate, 15, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
 baseDate = pingsForLap( baseDate, 16, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
+
+
+# ----------------------------------------------------------------------
+# Get laptimes
+#
+# We should have per pilot all laps (12) in order with 4 intermediates in each (for 4 chronos)
+
+lapsFabrice = getLapsOfPilot(getPilot('Fabrice', 'Pipart')['id'])
+lapsJeremy = getLapsOfPilot(getPilot('Jeremy', 'Ponchel')['id'])
+lapsValentino = getLapsOfPilot(getPilot('Valentino', 'Rossi')['id'])
+lapsJorge = getLapsOfPilot(getPilot('Jorge', 'Lorenzo')['id'])
+
+print "---- Laps Fabrice ----"
+printLaps(lapsFabrice)
+
+print "---- Laps Jeremy ----"
+printLaps(lapsJeremy)
+
+print "---- Laps Valentino ----"
+printLaps(lapsValentino)
+
+print "---- Laps Jorge ----"
+printLaps(lapsJorge)
+
+
+# --------- TODO -------------
+# Shuffle the pings in a crazy order and check they are still reordered correctly
+# --------- TODO -------------

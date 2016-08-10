@@ -2,6 +2,7 @@ package org.trd.app.teknichrono.model;
 // Generated 5 mai 2016 11:08:49 by Hibernate Tools 4.3.1.Final
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +14,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -22,102 +22,103 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class LapTime implements java.io.Serializable {
 
-	/* =========================== Entity stuff =========================== */
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2438563507266191424L;
+  /* =========================== Entity stuff =========================== */
+  /**
+   * 
+   */
+  private static final long serialVersionUID = -2438563507266191424L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "id", updatable = false, nullable = false)
-	private int id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  @Column(name = "id", updatable = false, nullable = false)
+  private int id;
 
-	@Version
-	@Column(name = "version")
-	private int version;
+  @Version
+  @Column(name = "version")
+  private int version;
 
-	/* =============================== Fields =============================== */
+  /* =============================== Fields =============================== */
 
-	@OneToOne(fetch = FetchType.LAZY)
-	private Pilot pilot;
+  @ManyToOne
+  private Pilot pilot;
 
-	@Column
-	private Date startDate;
+  // Used to order the laps for the pilot relationship
+  @Column
+  private Timestamp startDate;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Event event;
+  @ManyToOne(fetch = FetchType.LAZY)
+  private Event event;
 
-	@Column
-	private Date endDate;
+  @OneToMany
+  @OrderColumn(name = "dateTime")
+  private List<Ping> intermediates = new ArrayList<Ping>();
 
-	@OneToMany
-	@OrderColumn(name = "dateTime")
-	private List<Ping> intermediates = new ArrayList<Ping>();
+  /* ===================== Getters and setters ======================== */
 
-	/* ===================== Getters and setters ======================== */
+  public int getId() {
+    return this.id;
+  }
 
-	public int getId() {
-		return this.id;
-	}
+  public void setId(int id) {
+    this.id = id;
+  }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+  public int getVersion() {
+    return this.version;
+  }
 
-	public int getVersion() {
-		return this.version;
-	}
+  public void setVersion(final int version) {
+    this.version = version;
+  }
 
-	public void setVersion(final int version) {
-		this.version = version;
-	}
+  public Pilot getPilot() {
+    return pilot;
+  }
 
-	public Pilot getPilot() {
-		return pilot;
-	}
+  public void setPilot(Pilot pilot) {
+    this.pilot = pilot;
+  }
 
-	public void setPilot(Pilot pilot) {
-		this.pilot = pilot;
-	}
+  public Timestamp getStartDate() {
+    return startDate;
+  }
 
-	public Date getStartDate() {
-		return startDate;
-	}
+  public void setStartDate(Timestamp captureDate) {
+    this.startDate = captureDate;
+  }
 
-	public void setStartDate(Date captureDate) {
-		this.startDate = captureDate;
-	}
+  public Event getEvent() {
+    return this.event;
+  }
 
-	public Event getEvent() {
-		return this.event;
-	}
+  public void setEvent(final Event event) {
+    this.event = event;
+  }
 
-	public void setEvent(final Event event) {
-		this.event = event;
-	}
+  @Override
+  public String toString() {
+    String result = getClass().getSimpleName() + " ";
+    result += "id: " + id;
+    return result;
+  }
 
-	public Date getEndDate() {
-		return endDate;
-	}
+  public List<Ping> getIntermediates() {
+    return this.intermediates;
+  }
 
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
+  public void setIntermediates(final List<Ping> intermediates) {
+    this.intermediates = intermediates;
+  }
 
-	@Override
-	public String toString() {
-		String result = getClass().getSimpleName() + " ";
-		result += "id: " + id;
-		return result;
-	}
+  public void addIntermediates(Ping p) {
+    addIntermediates(this.intermediates.size(), p);
+  }
 
-	public List<Ping> getIntermediates() {
-		return this.intermediates;
-	}
-
-	public void setIntermediates(final List<Ping> intermediates) {
-		this.intermediates = intermediates;
-	}
+  public void addIntermediates(int index, Ping p) {
+    if (startDate == null || startDate.getTime() > p.getDateTime().getTime()) {
+      startDate = p.getDateTime();
+    }
+    this.intermediates.add(index, p);
+  }
 
 }

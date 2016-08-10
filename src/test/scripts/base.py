@@ -54,3 +54,9 @@ def formatDatetime(d):
   "This formats a datetime in a format that can be understood on JAX RS side"
   string = d.strftime("%Y-%m-%dT%H:%M:%S")
   return "%s.%03dZ" % (string, d.microsecond / 1000.0);
+
+def timestampToDate(t):
+  "This creates a date from a timestamp in secs from 1970"
+  secs = t / 1000
+  millisecs = t - (secs * 1000)
+  return (datetime.datetime.utcfromtimestamp(secs)+datetime.timedelta(microseconds=(millisecs*1000)))

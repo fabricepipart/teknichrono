@@ -21,6 +21,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import org.trd.app.teknichrono.business.ChronoManager;
 import org.trd.app.teknichrono.model.Beacon;
 import org.trd.app.teknichrono.model.Chronometer;
 import org.trd.app.teknichrono.model.Ping;
@@ -31,92 +32,93 @@ import org.trd.app.teknichrono.model.Ping;
 @Stateless
 @Path("/pings")
 public class PingEndpoint {
-	@PersistenceContext(unitName = "teknichrono-persistence-unit")
-	private EntityManager em;
+  @PersistenceContext(unitName = "teknichrono-persistence-unit")
+  private EntityManager em;
 
-	@POST
-	@Path("/{chronoId:[0-9][0-9]*}/{beaconId:[0-9][0-9]*}")
-	@Consumes("application/json")
-	public Response create(Ping entity, @PathParam("chronoId") int chronoId, @PathParam("beaconId") int beaconId) {
-		Chronometer chrono = em.find(Chronometer.class, chronoId);
-		if (chrono == null) {
-			return Response.status(Status.NOT_FOUND).build();
-		}
-		entity.setChrono(chrono);
-		Beacon beacon = em.find(Beacon.class, beaconId);
-		if (beacon == null) {
-			return Response.status(Status.NOT_FOUND).build();
-		}
-		entity.setBeacon(beacon);
-		em.persist(entity);
-		return Response
-				.created(UriBuilder.fromResource(PingEndpoint.class).path(String.valueOf(entity.getId())).build())
-				.build();
-	}
+  @POST
+  @Path("/create")
+  @Consumes("application/json")
+  public Response create(Ping entity, @QueryParam("chronoId") int chronoId, @QueryParam("beaconId") int beaconId) {
+    Chronometer chrono = em.find(Chronometer.class, chronoId);
+    if (chrono == null) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+    entity.setChrono(chrono);
+    Beacon beacon = em.find(Beacon.class, beaconId);
+    if (beacon == null) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+    entity.setBeacon(beacon);
+    em.persist(entity);
+    ChronoManager manager = new ChronoManager(em);
+    manager.addPing(entity);
+    return Response.created(UriBuilder.fromResource(PingEndpoint.class).path(String.valueOf(entity.getId())).build())
+        .build();
+  }
 
-	@DELETE
-	@Path("/{id:[0-9][0-9]*}")
-	public Response deleteById(@PathParam("id") int id) {
-		Ping entity = em.find(Ping.class, id);
-		if (entity == null) {
-			return Response.status(Status.NOT_FOUND).build();
-		}
-		em.remove(entity);
-		return Response.noContent().build();
-	}
+  @DELETE
+  @Path("/{id:[0-9][0-9]*}")
+  public Response deleteById(@PathParam("id") int id) {
+    Ping entity = em.find(Ping.class, id);
+    if (entity == null) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+    em.remove(entity);
+    return Response.noContent().build();
+  }
 
-	@GET
-	@Path("/{id:[0-9][0-9]*}")
-	@Produces("application/json")
-	public Response findById(@PathParam("id") int id) {
-		TypedQuery<Ping> findByIdQuery = em
-				.createQuery("SELECT DISTINCT p FROM Ping p WHERE p.id = :entityId ORDER BY p.id", Ping.class);
-		findByIdQuery.setParameter("entityId", id);
-		Ping entity;
-		try {
-			entity = findByIdQuery.getSingleResult();
-		} catch (NoResultException nre) {
-			entity = null;
-		}
-		if (entity == null) {
-			return Response.status(Status.NOT_FOUND).build();
-		}
-		return Response.ok(entity).build();
-	}
+  @GET
+  @Path("/{id:[0-9][0-9]*}")
+  @Produces("application/json")
+  public Response findById(@PathParam("id") int id) {
+    TypedQuery<Ping> findByIdQuery = em
+        .createQuery("SELECT DISTINCT p FROM Ping p WHERE p.id = :entityId ORDER BY p.id", Ping.class);
+    findByIdQuery.setParameter("entityId", id);
+    Ping entity;
+    try {
+      entity = findByIdQuery.getSingleResult();
+    } catch (NoResultException nre) {
+      entity = null;
+    }
+    if (entity == null) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+    return Response.ok(entity).build();
+  }
 
-	@GET
-	@Produces("application/json")
-	public List<Ping> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
-		TypedQuery<Ping> findAllQuery = em.createQuery("SELECT DISTINCT p FROM Ping p ORDER BY p.id", Ping.class);
-		if (startPosition != null) {
-			findAllQuery.setFirstResult(startPosition);
-		}
-		if (maxResult != null) {
-			findAllQuery.setMaxResults(maxResult);
-		}
-		final List<Ping> results = findAllQuery.getResultList();
-		return results;
-	}
+  @GET
+  @Produces("application/json")
+  public List<Ping> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
+    TypedQuery<Ping> findAllQuery = em.createQuery("SELECT DISTINCT p FROM Ping p ORDER BY p.id", Ping.class);
+    if (startPosition != null) {
+      findAllQuery.setFirstResult(startPosition);
+    }
+    if (maxResult != null) {
+      findAllQuery.setMaxResults(maxResult);
+    }
+    final List<Ping> results = findAllQuery.getResultList();
+    return results;
+  }
 
-	@PUT
-	@Path("/{id:[0-9][0-9]*}")
-	@Consumes("application/json")
-	public Response update(@PathParam("id") int id, Ping entity) {
-		if (entity == null) {
-			return Response.status(Status.BAD_REQUEST).build();
-		}
-		if (id != entity.getId()) {
-			return Response.status(Status.CONFLICT).entity(entity).build();
-		}
-		if (em.find(Ping.class, id) == null) {
-			return Response.status(Status.NOT_FOUND).build();
-		}
-		try {
-			entity = em.merge(entity);
-		} catch (OptimisticLockException e) {
-			return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
-		}
+  @PUT
+  @Path("/{id:[0-9][0-9]*}")
+  @Consumes("application/json")
+  public Response update(@PathParam("id") int id, Ping entity) {
+    if (entity == null) {
+      return Response.status(Status.BAD_REQUEST).build();
+    }
+    if (id != entity.getId()) {
+      return Response.status(Status.CONFLICT).entity(entity).build();
+    }
+    if (em.find(Ping.class, id) == null) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+    try {
+      entity = em.merge(entity);
+    } catch (OptimisticLockException e) {
+      return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
+    }
 
-		return Response.noContent().build();
-	}
+    return Response.noContent().build();
+  }
 }

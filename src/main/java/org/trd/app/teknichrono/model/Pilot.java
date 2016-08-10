@@ -1,6 +1,8 @@
 package org.trd.app.teknichrono.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -10,108 +12,125 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @XmlRootElement
 public class Pilot implements Serializable {
 
-	/* =========================== Entity stuff =========================== */
+  /* =========================== Entity stuff =========================== */
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 5594553167060540038L;
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 5594553167060540038L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "id", updatable = false, nullable = false)
-	private int id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  @Column(name = "id", updatable = false, nullable = false)
+  private int id;
 
-	@Version
-	@Column(name = "version")
-	private int version;
+  @Version
+  @Column(name = "version")
+  private int version;
 
-	/* =============================== Fields =============================== */
-	@Column(nullable = false)
-	private String firstName;
+  /* =============================== Fields =============================== */
+  @Column(nullable = false)
+  private String firstName;
 
-	@Column(nullable = false)
-	private String lastName;
+  @Column(nullable = false)
+  private String lastName;
 
-	@OneToOne(fetch = FetchType.EAGER, optional = true, cascade = CascadeType.MERGE)
-	@JoinColumn(name = "currentBeaconId")
-	private Beacon currentBeacon;
+  @OneToOne(fetch = FetchType.EAGER, optional = true, cascade = CascadeType.MERGE)
+  @JoinColumn(name = "currentBeaconId")
+  private Beacon currentBeacon;
 
-	/* ===================== Getters and setters ======================== */
+  @OneToMany(mappedBy = "pilot", cascade = CascadeType.REMOVE)
+  @OrderBy(value = "startDate")
+  @JsonIgnore
+  private List<LapTime> laps = new ArrayList<LapTime>();
 
-	public int getId() {
-		return this.id;
-	}
+  /* ===================== Getters and setters ======================== */
 
-	public void setId(final int id) {
-		this.id = id;
-	}
+  public int getId() {
+    return this.id;
+  }
 
-	public int getVersion() {
-		return this.version;
-	}
+  public void setId(final int id) {
+    this.id = id;
+  }
 
-	public void setVersion(final int version) {
-		this.version = version;
-	}
+  public int getVersion() {
+    return this.version;
+  }
 
-	public String getFirstName() {
-		return firstName;
-	}
+  public void setVersion(final int version) {
+    this.version = version;
+  }
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+  public String getFirstName() {
+    return firstName;
+  }
 
-	public String getLastName() {
-		return lastName;
-	}
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+  public String getLastName() {
+    return lastName;
+  }
 
-	public Beacon getCurrentBeacon() {
-		return currentBeacon;
-	}
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
+  }
 
-	public void setCurrentBeacon(Beacon currentBeacon) {
-		// prevent endless loop
-		if (sameAsFormer(currentBeacon)) {
-			return;
-		}
-		Beacon oldBeacon = this.currentBeacon;
-		// Set new pilot
-		this.currentBeacon = currentBeacon;
-		// This beacon is not associated to the previous Pilot
-		if (oldBeacon != null) {
-			oldBeacon.setPilot(null);
-		}
-		// Set reverse relationship
-		if (currentBeacon != null) {
-			currentBeacon.setPilot(this);
-		}
-	}
+  public Beacon getCurrentBeacon() {
+    return currentBeacon;
+  }
 
-	private boolean sameAsFormer(Beacon newBeacon) {
-		return currentBeacon == null ? newBeacon == null : currentBeacon.equals(newBeacon);
-	}
+  public void setCurrentBeacon(Beacon currentBeacon) {
+    // prevent endless loop
+    if (sameAsFormer(currentBeacon)) {
+      return;
+    }
+    Beacon oldBeacon = this.currentBeacon;
+    // Set new pilot
+    this.currentBeacon = currentBeacon;
+    // This beacon is not associated to the previous Pilot
+    if (oldBeacon != null) {
+      oldBeacon.setPilot(null);
+    }
+    // Set reverse relationship
+    if (currentBeacon != null) {
+      currentBeacon.setPilot(this);
+    }
+  }
 
-	@Override
-	public String toString() {
-		String result = getClass().getSimpleName() + " ";
-		if (firstName != null && !firstName.trim().isEmpty())
-			result += "firstName: " + firstName;
-		if (lastName != null && !lastName.trim().isEmpty())
-			result += ", lastName: " + lastName;
-		return result;
-	}
+  public List<LapTime> getLaps() {
+    return laps;
+  }
+
+  public void setLaps(List<LapTime> laps) {
+    this.laps = laps;
+  }
+
+  private boolean sameAsFormer(Beacon newBeacon) {
+    return currentBeacon == null ? newBeacon == null : currentBeacon.equals(newBeacon);
+  }
+
+  @Override
+  public String toString() {
+    String result = getClass().getSimpleName() + " ";
+    if (firstName != null && !firstName.trim().isEmpty())
+      result += "firstName: " + firstName;
+    if (lastName != null && !lastName.trim().isEmpty())
+      result += ", lastName: " + lastName;
+    return result;
+  }
 }

@@ -10,6 +10,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -20,96 +21,108 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @XmlRootElement
 public class Chronometer implements Serializable {
 
-	/* =========================== Entity stuff =========================== */
+  /* =========================== Entity stuff =========================== */
 
-	private static final long serialVersionUID = 108231410607139227L;
+  private static final long serialVersionUID = 108231410607139227L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "id", updatable = false, nullable = false)
-	private int id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  @Column(name = "id", updatable = false, nullable = false)
+  private int id;
 
-	@Version
-	@Column(name = "version")
-	private int version;
+  @Version
+  @Column(name = "version")
+  private int version;
 
-	/* =============================== Fields =============================== */
+  /* =============================== Fields =============================== */
 
-	@Column
-	private String name;
+  @Column
+  private String name;
 
-	// I dont make it unique because I am unsure of the save order
-	@Column(nullable = true)
-	private Integer chronoIndex;
+  // I dont make it unique because I am unsure of the save order
+  @Column(nullable = true)
+  private Integer chronoIndex;
 
-	// Can be null if after event, items are reassociated
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "chrono")
-	@JsonIgnore
-	private List<Ping> pings = new ArrayList<Ping>();
+  // Can be null if after event, items are reassociated
+  @OneToMany(fetch = FetchType.EAGER, mappedBy = "chrono")
+  @JsonIgnore
+  private List<Ping> pings = new ArrayList<Ping>();
 
-	/* ===================== Getters and setters ======================== */
-	public int getId() {
-		return this.id;
-	}
+  @ManyToOne
+  @JsonIgnore
+  private Event event = null;
 
-	public void setId(final int id) {
-		this.id = id;
-	}
+  /* ===================== Getters and setters ======================== */
+  public int getId() {
+    return this.id;
+  }
 
-	public int getVersion() {
-		return this.version;
-	}
+  public void setId(final int id) {
+    this.id = id;
+  }
 
-	public void setVersion(final int version) {
-		this.version = version;
-	}
+  public int getVersion() {
+    return this.version;
+  }
 
-	public String getName() {
-		return name;
-	}
+  public void setVersion(final int version) {
+    this.version = version;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public Integer getChronoIndex() {
-		return chronoIndex;
-	}
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	public void setChronoIndex(Integer index) {
-		this.chronoIndex = index;
-	}
+  public Integer getChronoIndex() {
+    return chronoIndex;
+  }
 
-	public List<Ping> getPings() {
-		return pings;
-	}
+  public void setChronoIndex(Integer index) {
+    this.chronoIndex = index;
+  }
 
-	public void setPings(List<Ping> pings) {
-		this.pings = pings;
-	}
+  public List<Ping> getPings() {
+    return pings;
+  }
 
-	/* ===================== Other ======================== */
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (!(obj instanceof Chronometer)) {
-			return false;
-		}
-		Chronometer other = (Chronometer) obj;
-		if (id != other.id) {
-			return false;
-		}
-		return true;
-	}
+  public void setPings(List<Ping> pings) {
+    this.pings = pings;
+  }
 
-	@Override
-	public String toString() {
-		String result = getClass().getSimpleName() + " ";
-		result += "(" + chronoIndex + ") ";
-		if (name != null && !name.trim().isEmpty())
-			result += name;
-		return result;
-	}
+  public Event getEvent() {
+    return event;
+  }
+
+  public void setEvent(Event event) {
+    this.event = event;
+  }
+
+  /* ===================== Other ======================== */
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof Chronometer)) {
+      return false;
+    }
+    Chronometer other = (Chronometer) obj;
+    if (id != other.id) {
+      return false;
+    }
+    return true;
+  }
+
+  @Override
+  public String toString() {
+    String result = getClass().getSimpleName() + " ";
+    result += "(" + chronoIndex + ") ";
+    if (name != null && !name.trim().isEmpty())
+      result += name;
+    return result;
+  }
 }

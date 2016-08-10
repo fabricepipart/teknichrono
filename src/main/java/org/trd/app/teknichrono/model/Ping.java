@@ -1,7 +1,7 @@
 package org.trd.app.teknichrono.model;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,112 +17,112 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Ping implements Serializable {
 
-	/* =========================== Entity stuff =========================== */
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -7022575222961829989L;
+  /* =========================== Entity stuff =========================== */
+  /**
+   * 
+   */
+  private static final long serialVersionUID = -7022575222961829989L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "id", updatable = false, nullable = false)
-	private int id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  @Column(name = "id", updatable = false, nullable = false)
+  private int id;
 
-	@Version
-	@Column(name = "version")
-	private int version;
+  @Version
+  @Column(name = "version")
+  private int version;
 
-	/* =============================== Fields =============================== */
+  /* =============================== Fields =============================== */
 
-	@Column(nullable = false)
-	private Date dateTime;
+  @Column(nullable = false)
+  private Timestamp dateTime;
 
-	// Can be null if after event, items are reassociated
-	@ManyToOne(optional = true)
-	@JoinColumn(name = "beaconId")
-	private Beacon beacon;
+  // Can be null if after event, items are reassociated
+  @ManyToOne(optional = true)
+  @JoinColumn(name = "beaconId")
+  private Beacon beacon;
 
-	@Column
-	private int power;
+  @Column
+  private int power;
 
-	// Can be null if after event, items are reassociated
-	@ManyToOne(optional = true)
-	@JoinColumn(name = "chronoId")
-	private Chronometer chrono;
+  // Can be null if after event, items are reassociated
+  @ManyToOne(optional = true)
+  @JoinColumn(name = "chronoId")
+  private Chronometer chrono;
 
-	/* ===================== Getters and setters ======================== */
+  /* ===================== Getters and setters ======================== */
 
-	public int getId() {
-		return this.id;
-	}
+  public int getId() {
+    return this.id;
+  }
 
-	public void setId(final int id) {
-		this.id = id;
-	}
+  public void setId(final int id) {
+    this.id = id;
+  }
 
-	public int getVersion() {
-		return this.version;
-	}
+  public int getVersion() {
+    return this.version;
+  }
 
-	public void setVersion(final int version) {
-		this.version = version;
-	}
+  public void setVersion(final int version) {
+    this.version = version;
+  }
 
-	public Date getDateTime() {
-		return dateTime;
-	}
+  public Timestamp getDateTime() {
+    return dateTime;
+  }
 
-	public void setDateTime(Date dateTime) {
-		this.dateTime = dateTime;
-	}
+  public void setDateTime(Timestamp dateTime) {
+    this.dateTime = dateTime;
+  }
 
-	public int getPower() {
-		return power;
-	}
+  public int getPower() {
+    return power;
+  }
 
-	public void setPower(int power) {
-		this.power = power;
-	}
+  public void setPower(int power) {
+    this.power = power;
+  }
 
-	public Beacon getBeacon() {
-		return beacon;
-	}
+  public Beacon getBeacon() {
+    return beacon;
+  }
 
-	public void setBeacon(Beacon beacon) {
-		this.beacon = beacon;
-	}
+  public void setBeacon(Beacon beacon) {
+    this.beacon = beacon;
+  }
 
-	public Chronometer getChrono() {
-		return chrono;
-	}
+  public Chronometer getChrono() {
+    return chrono;
+  }
 
-	public void setChrono(Chronometer chrono) {
-		this.chrono = chrono;
-	}
+  public void setChrono(Chronometer chrono) {
+    this.chrono = chrono;
+  }
 
-	@Override
-	public String toString() {
-		String result = getClass().getSimpleName() + " ";
-		result += "time: " + dateTime;
-		result += ", beaconId: " + beacon;
-		result += ", power: " + power;
-		result += ", chronoId: " + chrono;
-		return result;
-	}
+  @Override
+  public String toString() {
+    String result = getClass().getSimpleName() + " ";
+    result += "time: " + dateTime;
+    result += ", beaconId: " + beacon;
+    result += ", power: " + power;
+    result += ", chronoId: " + chrono;
+    return result;
+  }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (!(obj instanceof Ping)) {
-			return false;
-		}
-		Ping other = (Ping) obj;
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof Ping)) {
+      return false;
+    }
+    Ping other = (Ping) obj;
 
-		if (id != other.id) {
-			return false;
-		}
-		return true;
-	}
+    if (id != other.id) {
+      return false;
+    }
+    return true;
+  }
 }
