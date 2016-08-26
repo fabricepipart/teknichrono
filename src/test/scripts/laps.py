@@ -19,9 +19,12 @@ def getLaps():
 
 def printLaps(laps):
   print "#Laps : " + str(len(laps))
+  lastIntermediate = 0
   for lap in laps:
     print "Laps #" + str(lap['id']) + " with intermediates #" + str(len(lap['intermediates']))
     for intermediate in lap['intermediates']:
+      #assert lastIntermediate < intermediate['dateTime']
+      lastIntermediate = intermediate['dateTime']
       print "    Intermediate #" + str(intermediate['id']) + " @ " + formatDatetime(timestampToDate(intermediate['dateTime']))
 
 # ----------------------------------------------------------------------

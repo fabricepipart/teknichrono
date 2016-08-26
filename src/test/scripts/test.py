@@ -104,7 +104,9 @@ chrono3 = getChronometerByName('Raspberry-3')['id'];
 # random.shuffle(array)
 baseDate = datetime.datetime(2016,8,22,11,0,0,1*1000);
 
+# ----------------------------------------------------------
 # Chronos passed in order  0 1 2 3
+# ----------------------------------------------------------
 baseDate = pingsForLap( baseDate, 21, fabriceBeaconId, chrono0, chrono1, chrono2, chrono3 );
 baseDate = pingsForLap( baseDate, 20, fabriceBeaconId, chrono0, chrono1, chrono2, chrono3 );
 baseDate = pingsForLap( baseDate, 19, fabriceBeaconId, chrono0, chrono1, chrono2, chrono3 );
@@ -118,7 +120,9 @@ baseDate = pingsForLap( baseDate, 21, fabriceBeaconId, chrono0, chrono1, chrono2
 baseDate = pingsForLap( baseDate, 20, fabriceBeaconId, chrono0, chrono1, chrono2, chrono3 );
 baseDate = pingsForLap( baseDate, 19, fabriceBeaconId, chrono0, chrono1, chrono2, chrono3 );
 
+# ----------------------------------------------------------
 # Chronos passed in order  1 2 3 0
+# ----------------------------------------------------------
 baseDate = datetime.datetime(2016,8,22,11,0,1,2*1000)
 baseDate = pingsForLap( baseDate, 19, jeremyBeaconId, chrono1, chrono2, chrono3, chrono0 );
 baseDate = pingsForLap( baseDate, 18, jeremyBeaconId, chrono1, chrono2, chrono3, chrono0 );
@@ -147,20 +151,74 @@ baseDate = pingsForLap( baseDate, 16, valentinoBeaconId, chrono0, chrono1, chron
 baseDate = pingsForLap( baseDate, 15, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
 baseDate = pingsForLap( baseDate, 14, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
 
-baseDate = datetime.datetime(2016,8,22,11,0,3,4*1000)
-baseDate = pingsForLap( baseDate, 14, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 15, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 16, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 14, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 15, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 16, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 14, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 15, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 16, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 14, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 15, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 16, jorgeBeaconId, chrono0, chrono1, chrono2, chrono3 );
+# ----------------------------------------------------------
+# Chronos passed in order  1 2 3 0
+# Pings in random order
+# ----------------------------------------------------------
+ping(datetime.datetime(2016,8,22,11,0,45,4*1000), jorgeBeaconId, -83, chrono2)
+ping(datetime.datetime(2016,8,22,11,1,44,4*1000), jorgeBeaconId, -83, chrono2)
+ping(datetime.datetime(2016,8,22,11,2,47,4*1000), jorgeBeaconId, -83, chrono2)
 
+ping(datetime.datetime(2016,8,22,11,0,17,4*1000), jorgeBeaconId, -83, chrono0)
+ping(datetime.datetime(2016,8,22,11,0,31,4*1000), jorgeBeaconId, -83, chrono1)
+ping(datetime.datetime(2016,8,22,11,0,59,4*1000), jorgeBeaconId, -83, chrono3)
+
+ping(datetime.datetime(2016,8,22,11,2,17,4*1000), jorgeBeaconId, -83, chrono0)
+ping(datetime.datetime(2016,8,22,11,3,3,4*1000), jorgeBeaconId, -83, chrono3)
+ping(datetime.datetime(2016,8,22,11,2,31,4*1000), jorgeBeaconId, -83, chrono1)
+
+ping(datetime.datetime(2016,8,22,11,1,59,4*1000), jorgeBeaconId, -83, chrono3)
+ping(datetime.datetime(2016,8,22,11,1,29,4*1000), jorgeBeaconId, -83, chrono1)
+ping(datetime.datetime(2016,8,22,11,1,14,4*1000), jorgeBeaconId, -83, chrono0)
+
+ping(datetime.datetime(2016,8,22,11,3,17,4*1000), jorgeBeaconId, -83, chrono0)
+
+ping(datetime.datetime(2016,8,22,11,4,59,4*1000), jorgeBeaconId, -83, chrono3)
+ping(datetime.datetime(2016,8,22,11,4,44,4*1000), jorgeBeaconId, -83, chrono2)
+ping(datetime.datetime(2016,8,22,11,4,29,4*1000), jorgeBeaconId, -83, chrono1)
+ping(datetime.datetime(2016,8,22,11,4,14,4*1000), jorgeBeaconId, -83, chrono0)
+
+ping(datetime.datetime(2016,8,22,11,3,31,4*1000), jorgeBeaconId, -83, chrono1)
+
+ping(datetime.datetime(2016,8,22,11,5,15,4*1000), jorgeBeaconId, -83, chrono0)
+ping(datetime.datetime(2016,8,22,11,6,3,4*1000), jorgeBeaconId, -83, chrono3)
+ping(datetime.datetime(2016,8,22,11,5,31,4*1000), jorgeBeaconId, -83, chrono1)
+ping(datetime.datetime(2016,8,22,11,5,47,4*1000), jorgeBeaconId, -83, chrono2)
+
+ping(datetime.datetime(2016,8,22,11,6,17,4*1000), jorgeBeaconId, -83, chrono0)
+ping(datetime.datetime(2016,8,22,11,6,31,4*1000), jorgeBeaconId, -83, chrono1)
+ping(datetime.datetime(2016,8,22,11,6,45,4*1000), jorgeBeaconId, -83, chrono2)
+ping(datetime.datetime(2016,8,22,11,6,59,4*1000), jorgeBeaconId, -83, chrono3)
+
+ping(datetime.datetime(2016,8,22,11,3,59,4*1000), jorgeBeaconId, -83, chrono3)
+ping(datetime.datetime(2016,8,22,11,10,29,4*1000), jorgeBeaconId, -83, chrono1)
+
+ping(datetime.datetime(2016,8,22,11,7,14,4*1000), jorgeBeaconId, -83, chrono0)
+ping(datetime.datetime(2016,8,22,11,7,29,4*1000), jorgeBeaconId, -83, chrono1)
+ping(datetime.datetime(2016,8,22,11,7,44,4*1000), jorgeBeaconId, -83, chrono2)
+ping(datetime.datetime(2016,8,22,11,7,59,4*1000), jorgeBeaconId, -83, chrono3)
+
+ping(datetime.datetime(2016,8,22,11,8,15,4*1000), jorgeBeaconId, -83, chrono0)
+ping(datetime.datetime(2016,8,22,11,8,31,4*1000), jorgeBeaconId, -83, chrono1)
+ping(datetime.datetime(2016,8,22,11,8,47,4*1000), jorgeBeaconId, -83, chrono2)
+ping(datetime.datetime(2016,8,22,11,9,3,4*1000), jorgeBeaconId, -83, chrono3)
+
+ping(datetime.datetime(2016,8,22,11,3,45,4*1000), jorgeBeaconId, -83, chrono2)
+ping(datetime.datetime(2016,8,22,11,10,44,4*1000), jorgeBeaconId, -83, chrono2)
+
+ping(datetime.datetime(2016,8,22,11,9,17,4*1000), jorgeBeaconId, -83, chrono0)
+ping(datetime.datetime(2016,8,22,11,9,31,4*1000), jorgeBeaconId, -83, chrono1)
+ping(datetime.datetime(2016,8,22,11,9,45,4*1000), jorgeBeaconId, -83, chrono2)
+ping(datetime.datetime(2016,8,22,11,9,59,4*1000), jorgeBeaconId, -83, chrono3)
+
+ping(datetime.datetime(2016,8,22,11,10,14,4*1000), jorgeBeaconId, -83, chrono0)
+
+ping(datetime.datetime(2016,8,22,11,11,15,4*1000), jorgeBeaconId, -83, chrono0)
+ping(datetime.datetime(2016,8,22,11,11,31,4*1000), jorgeBeaconId, -83, chrono1)
+ping(datetime.datetime(2016,8,22,11,11,47,4*1000), jorgeBeaconId, -83, chrono2)
+ping(datetime.datetime(2016,8,22,11,12,3,4*1000), jorgeBeaconId, -83, chrono3)
+
+ping(datetime.datetime(2016,8,22,11,10,59,4*1000), jorgeBeaconId, -83, chrono3)
 
 # ----------------------------------------------------------------------
 # Get laptimes
@@ -174,15 +232,19 @@ lapsJorge = getLapsOfPilot(getPilot('Jorge', 'Lorenzo')['id'])
 
 print "---- Laps Fabrice ----"
 printLaps(lapsFabrice)
+assert len(lapsFabrice) == 12
 
 print "---- Laps Jeremy ----"
 printLaps(lapsJeremy)
+assert len(lapsJeremy) == 13
 
 print "---- Laps Valentino ----"
 printLaps(lapsValentino)
+assert len(lapsValentino) == 12
 
 print "---- Laps Jorge ----"
 printLaps(lapsJorge)
+assert len(lapsJorge) == 12
 
 
 # --------- TODO -------------

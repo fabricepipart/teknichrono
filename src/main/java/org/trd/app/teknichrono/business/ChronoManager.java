@@ -51,24 +51,39 @@ public class ChronoManager {
 
     List<LapTime> previousLaptimes = pilot.getLaps();
 
+    // System.out.println("\n\n");
+    // System.out.println("----------------------------");
+    // System.out.println("Trying to insert : " + ping);
+    // System.out.println("----------------------------");
     if (previousLaptimes != null && !previousLaptimes.isEmpty()) {
       LapTime lapTimeOfPingBefore = null;
       Ping pingBefore = null;
       LapTime lapTimeOfPingAfter = null;
       Ping pingAfter = null;
       for (LapTime lapTime : previousLaptimes) {
+        // System.out.println("Lap #" + lapTime.getId());
         for (Ping lapTimePing : lapTime.getIntermediates()) {
+          // System.out.println("\t\tIntermediate #" + lapTimePing.getId() + " @
+          // " + lapTimePing.getDateTime() + " ("
+          // + lapTimePing.getChrono().getChronoIndex() + ") ");
           if (lapTimePing.getDateTime().getTime() < ping.getDateTime().getTime()) {
             lapTimeOfPingBefore = lapTime;
             pingBefore = lapTimePing;
           } else if (lapTimePing.getDateTime().getTime() == ping.getDateTime().getTime()) {
             System.err.println("Trying to store a ping that was already in DB " + ping.getDateTime());
-          } else if (lapTimePing.getDateTime().getTime() > ping.getDateTime().getTime()) {
+          } else if (lapTimePing.getDateTime().getTime() > ping.getDateTime().getTime()
+              && (pingAfter == null || lapTimePing.getDateTime().getTime() < pingAfter.getDateTime().getTime())) {
             lapTimeOfPingAfter = lapTime;
             pingAfter = lapTimePing;
           }
         }
       }
+      // System.out.println("----------------------------");
+      // System.out.println("lapTimeOfPingBefore " + lapTimeOfPingBefore);
+      // System.out.println("pingBefore " + pingBefore);
+      // System.out.println("lapTimeOfPingAfter " + lapTimeOfPingAfter);
+      // System.out.println("pingAfter " + pingAfter);
+
       if (pingBefore == null) {
         if (pingAfter == null) {
           System.err.println("We had previous laptimes but none before and none after ???");
@@ -101,7 +116,8 @@ public class ChronoManager {
           // We ll insert it in the lap of the ping before
           int insertAtIndex = lapTimeOfPingBefore.getIntermediates().indexOf(pingBefore) + 1;
           // Is this index taken by pingAfter ?
-          if (lapTimeOfPingBefore.getIntermediates().size() >= insertAtIndex) {
+          if (lapTimeOfPingBefore.getId() == lapTimeOfPingAfter.getId()
+              && chronoIndex >= pingAfter.getChrono().getChronoIndex().intValue()) {
             // Split
             List<Ping> toInsertInNewLap = lapTimeOfPingBefore.getIntermediates().subList(insertAtIndex,
                 lapTimeOfPingBefore.getIntermediates().size());
@@ -109,8 +125,8 @@ public class ChronoManager {
             em.persist(lap);
             toInsertInNewLap.clear();
             // since toInsertInNewLap is backed by original list,
-            // this removes all sub-list items from the original
-            // list
+            // this removes all sub-list items from the original list
+            lapTimeOfPingBefore.addIntermediates(insertAtIndex, ping);
             em.persist(lapTimeOfPingBefore);
           } else {
             // Insert
@@ -121,8 +137,22 @@ public class ChronoManager {
           // We ll insert it in the lap of the ping after
           if (chronoIndex < pingAfter.getChrono().getChronoIndex().intValue()) {
             int insertAtIdex = lapTimeOfPingAfter.getIntermediates().indexOf(pingAfter);
-            lapTimeOfPingAfter.addIntermediates(insertAtIdex, ping);
-            em.persist(lapTimeOfPingAfter);
+            // Is this index taken by pingBefore ?
+            if (lapTimeOfPingBefore.getId() == lapTimeOfPingAfter.getId()
+                && chronoIndex <= pingBefore.getChrono().getChronoIndex().intValue()) {
+              // Split
+              List<Ping> toInsertInNewLap = lapTimeOfPingAfter.getIntermediates().subList(0, insertAtIdex);
+              LapTime lap = createLaptime(event, pilot, toInsertInNewLap, chronometer);
+              em.persist(lap);
+              toInsertInNewLap.clear();
+              // since toInsertInNewLap is backed by original list, this removes
+              // all sub-list items from the original list
+              lapTimeOfPingAfter.addIntermediates(0, ping);
+              em.persist(lapTimeOfPingAfter);
+            } else {
+              lapTimeOfPingAfter.addIntermediates(insertAtIdex, ping);
+              em.persist(lapTimeOfPingAfter);
+            }
           } else {
             LapTime lap = createLaptime(event, pilot, ping, chronometer);
             em.persist(lap);
