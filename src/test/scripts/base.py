@@ -60,3 +60,13 @@ def timestampToDate(t):
   secs = t / 1000
   millisecs = t - (secs * 1000)
   return (datetime.datetime.utcfromtimestamp(secs)+datetime.timedelta(microseconds=(millisecs*1000)))
+
+def pretty_time_delta(milliseconds):
+    minutes, milliseconds = divmod(milliseconds, 60000)
+    seconds, milliseconds = divmod(milliseconds, 1000)
+    if minutes > 0:
+        return '%d:%02d.%03d' % (minutes, seconds, milliseconds)
+    elif seconds > 0 or milliseconds > 0:
+        return '%d.%03d' % (seconds,milliseconds)
+    else:
+        return ''

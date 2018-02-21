@@ -1,7 +1,10 @@
 package org.trd.app.teknichrono.rest;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -24,6 +27,8 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.trd.app.teknichrono.model.LapTime;
 import org.trd.app.teknichrono.rest.dto.LapTimeDTO;
+import org.trd.app.teknichrono.rest.dto.NestedEventDTO;
+import org.trd.app.teknichrono.rest.dto.NestedPilotDTO;
 
 /**
  * 
@@ -88,7 +93,7 @@ public class LapTimeEndpoint {
 
     TypedQuery<LapTime> findAllQuery = em.createQuery("SELECT DISTINCT l FROM LapTime l"
         + " LEFT JOIN FETCH l.pilot LEFT JOIN FETCH l.event LEFT JOIN FETCH l.intermediates" + whereClause
-        + " ORDER BY l.id", LapTime.class);
+        + " ORDER BY l.startDate", LapTime.class);
     if (startPosition != null) {
       findAllQuery.setFirstResult(startPosition);
     }
@@ -98,10 +103,23 @@ public class LapTimeEndpoint {
     if (!whereClause.isEmpty()) {
       findAllQuery.setParameter("entityId", pilotId);
     }
+    // Check if we are in a loop event
+    // Keep a map of last pilot laps to set new laptime when next lap is reached
+    Map<Integer, LapTimeDTO> lastLapPerPilot = new HashMap<Integer, LapTimeDTO>();
     final List<LapTime> searchResults = findAllQuery.getResultList();
     final List<LapTimeDTO> results = new ArrayList<LapTimeDTO>();
     for (LapTime searchResult : searchResults) {
       LapTimeDTO dto = new LapTimeDTO(searchResult);
+      NestedEventDTO event = dto.getEvent();
+      NestedPilotDTO pilot = dto.getPilot();
+      LapTimeDTO lastPilotLap = lastLapPerPilot.get(pilot.getId());
+      if (event.isLoopTrack() && lastPilotLap != null && lastPilotLap.getEvent().getId() == event.getId()) {
+        Timestamp startDate = dto.getStartDate();
+        if (startDate.getTime() > 0) {
+          lastPilotLap.addLastSector(startDate);
+        }
+      }
+      lastLapPerPilot.put(dto.getPilot().getId(), dto);
       results.add(dto);
     }
     return results;

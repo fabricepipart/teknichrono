@@ -1,10 +1,12 @@
 package org.trd.app.teknichrono.rest.dto;
 
 import java.io.Serializable;
-import org.trd.app.teknichrono.model.Event;
+import java.sql.Date;
+
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import java.sql.Date;
+
+import org.trd.app.teknichrono.model.Event;
 
 public class NestedEventDTO implements Serializable {
 
@@ -14,6 +16,7 @@ public class NestedEventDTO implements Serializable {
   private Date end;
   private String name;
   private boolean loopTrack;
+  private int chronometersCount;
 
   public NestedEventDTO() {
   }
@@ -26,6 +29,7 @@ public class NestedEventDTO implements Serializable {
       this.end = entity.getEnd();
       this.name = entity.getName();
       this.loopTrack = entity.isLoopTrack();
+      this.chronometersCount = entity.getChronometers().size();
     }
   }
 
@@ -45,10 +49,10 @@ public class NestedEventDTO implements Serializable {
       return entity;
     }
     entity.setVersion(this.version);
-    entity.setStart(this.start);
-    entity.setEnd(this.end);
-    entity.setName(this.name);
-    entity.setLoopTrack(this.loopTrack);
+    entity.setEnd(end);
+    entity.setStart(start);
+    entity.setName(name);
+    entity.setLoopTrack(loopTrack);
     entity = em.merge(entity);
     return entity;
   }
@@ -93,11 +97,19 @@ public class NestedEventDTO implements Serializable {
     this.name = name;
   }
 
-  public boolean getLoopTrack() {
+  public boolean isLoopTrack() {
     return this.loopTrack;
   }
 
   public void setLoopTrack(final boolean loopTrack) {
     this.loopTrack = loopTrack;
+  }
+
+  public int getChronometersCount() {
+    return chronometersCount;
+  }
+
+  public void setChronometersCount(int chronometersCount) {
+    this.chronometersCount = chronometersCount;
   }
 }

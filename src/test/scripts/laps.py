@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
+import datetime
 from base import *
+from prettytable import PrettyTable
 
 lapsUrl = '/teknichrono/rest/laptimes'
 
@@ -18,13 +20,35 @@ def getLaps():
   return lapsResponse;
 
 def printLaps(laps):
-  print "#Laps : " + str(len(laps))
-  lastIntermediate = 0
+  maxSectors = 0
   for lap in laps:
-    print "Laps #" + str(lap['id']) + " with intermediates #" + str(len(lap['intermediates']))
-    for intermediate in lap['intermediates']:
-      #assert lastIntermediate < intermediate['dateTime']
-      lastIntermediate = intermediate['dateTime']
-      print "    Intermediate #" + str(intermediate['id']) + " @ " + formatDatetime(timestampToDate(intermediate['dateTime']))
+    maxSectors = max(maxSectors, len(lap['intermediates']))
+  #print "Max Sectors = "+ str(maxSectors)
+  headers = ['Lap', 'Pilot', 'Lap time']
+  for i in range(1, maxSectors+1):
+    headers.append("Sector "+ str(i))
+  #print str(headers)
+  #print "#Laps : " + str(len(laps))
+  table = PrettyTable(headers)
+  for lap in laps:
+    #print "Raw Lap : " + str(lap)
+    lapId = str(lap['id'])
+    pilot = str(lap['pilot']['firstName']) + ' ' + str(lap['pilot']['lastName'])
+    lapTime = pretty_time_delta(lap['duration'])
+    lapRow = [lapId, pilot, lapTime]
+    intermediateIndex = 0
+    intermediates = lap['intermediates']
+    for i in range(0, maxSectors):
+      if i >= len(intermediates):
+        lapRow.append('')
+      else:
+        intermediate = intermediates[intermediateIndex]
+        if intermediate['fromChronoId'] != i:
+          lapRow.append('')
+        else:
+          lapRow.append(pretty_time_delta(intermediate['duration']))
+          intermediateIndex += 1
+    table.add_row(lapRow)
+  print table
 
 # ----------------------------------------------------------------------
