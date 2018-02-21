@@ -10,7 +10,7 @@ def addEvent( name, start, end, loop=True ):
   "This adds a Event"
   data = '{"name":"' + name + '", "start":"' + str(start) + '", "end":"' + str(end) + '", "loopTrack":"' + str(loop) + '"}'
   eventResponse = post(data, EventsUrl);
-  print "Event " + name + " added"
+  print("Event " + name + " added")
   return;
 
 def getEventByName( name ):
@@ -23,7 +23,7 @@ def deleteEvent( id ):
   "This deletes a Event by id"
   url = EventsUrl + '/' + str(id)
   delete(url);
-  print "Deleted Event id " + str(id)
+  print("Deleted Event id " + str(id))
   return;
 
 def getEvents():
@@ -45,7 +45,7 @@ def addChronometerToEvent(eventId, chronoId, index=-1):
     if index >= 0:
         url = url + '&index=' + str(index)
     post('', url);
-    print "Associate Event id " + str(eventId) + " and chrono id " + str(chronoId)
+    print("Associate Event id " + str(eventId) + " and chrono id " + str(chronoId))
     return;
 
 # ----------------------------------------------------------------------

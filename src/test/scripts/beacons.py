@@ -10,7 +10,7 @@ def addBeacon( number ):
   "This adds a Beacon"
   data = '{"number":' + str(number) + '}'
   beaconResponse = post(data, beaconsUrl);
-  print "Beacon " + str(number) + " added"
+  print("Beacon " + str(number) + " added")
   return;
 
 def getBeacon( number ):
@@ -23,7 +23,7 @@ def deleteBeacon( id ):
   "This deletes a Beacon by id"
   url = beaconsUrl + '/' + str(id)
   delete(url);
-  print "Deleted beacon id " + str(id)
+  print("Deleted beacon id " + str(id))
   return;
 
 def getBeacons():

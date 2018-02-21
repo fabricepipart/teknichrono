@@ -10,7 +10,7 @@ def addChronometer( name ):
   "This adds a Chronometer"
   data = '{"name":"' + name + '" }'
   ChronometerResponse = post(data, ChronometersUrl);
-  print "Chronometer " + name + " added"
+  print("Chronometer " + name + " added")
   return;
 
 def getChronometerByName( name ):
@@ -23,7 +23,7 @@ def deleteChronometer( id ):
   "This deletes a Chronometer by id"
   url = ChronometersUrl + '/' + str(id)
   delete(url);
-  print "Deleted Chronometer id " + str(id)
+  print("Deleted Chronometer id " + str(id))
   return;
 
 def getChronometers():

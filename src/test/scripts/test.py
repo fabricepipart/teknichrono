@@ -15,12 +15,12 @@ from laps import *
 
 # ----------------------------------------------------------------------
 # Test dqte primitives
-print "Date = " + formatDatetime(timestampToDate(1471863621321))
+print("Date = " + formatDatetime(timestampToDate(1471863621321)))
 # 2016-08-22T11:00:21.321Z
 
 # ----------------------------------------------------------------------
 # Command line parameters
-print len(sys.argv)
+print(len(sys.argv))
 if len(sys.argv) >= 2:
     setHost(sys.argv[1])
 
@@ -75,7 +75,7 @@ for i in range(0, 5):
 addEvent('TRD Le Luc 2016-08-22', date(2016,8,22), date(2016,8,22));
 addEvent('TRD Ledenon 2016-09-12+13', date(2016,9,12), date(2016,9,13));
 addEvent('TRD Aragon 2016-10-22+23', date(2016,10,22), date(2016,10,23));
-addEvent('TRD Le Luc 2016-11-01', date(2016,11,01), date(2016,11,01));
+addEvent('TRD Le Luc 2016-11-01', date(2016,11,1), date(2016,11,1));
 addEvent('Rally #1', date(2017,3,1), date(2017,3,1), False);
 
 # ----------------------------------------------------------------------
@@ -137,20 +137,23 @@ baseDate = pingsForLap( baseDate, 19, jeremyBeaconId, chrono1, chrono2, chrono3,
 baseDate = pingsForLap( baseDate, 18, jeremyBeaconId, chrono1, chrono2, chrono3, chrono0 );
 baseDate = pingsForLap( baseDate, 17, jeremyBeaconId, chrono1, chrono2, chrono3, chrono0 );
 
-baseDate = datetime.datetime(2016,8,22,11,0,2,3*1000)
-baseDate = pingsForLap( baseDate, 16, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 15, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 14, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 16, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 15, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 14, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 16, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 15, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 14, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 16, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 15, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
-baseDate = pingsForLap( baseDate, 14, valentinoBeaconId, chrono0, chrono1, chrono2, chrono3 );
+# ----------------------------------------------------------
+# Chronos passed in order  2 3 0 1
+# ----------------------------------------------------------
 
+baseDate = datetime.datetime(2016,8,22,11,0,2,3*1000)
+baseDate = pingsForLap( baseDate, 16, valentinoBeaconId, chrono2, chrono3, chrono0, chrono1 );
+baseDate = pingsForLap( baseDate, 15, valentinoBeaconId, chrono2, chrono3, chrono0, chrono1 );
+baseDate = pingsForLap( baseDate, 14, valentinoBeaconId, chrono2, chrono3, chrono0, chrono1 );
+baseDate = pingsForLap( baseDate, 16, valentinoBeaconId, chrono2, chrono3, chrono0, chrono1 );
+baseDate = pingsForLap( baseDate, 15, valentinoBeaconId, chrono2, chrono3, chrono0, chrono1 );
+baseDate = pingsForLap( baseDate, 14, valentinoBeaconId, chrono2, chrono3, chrono0, chrono1 );
+baseDate = pingsForLap( baseDate, 16, valentinoBeaconId, chrono2, chrono3, chrono0, chrono1 );
+baseDate = pingsForLap( baseDate, 15, valentinoBeaconId, chrono2, chrono3, chrono0, chrono1 );
+baseDate = pingsForLap( baseDate, 14, valentinoBeaconId, chrono2, chrono3, chrono0, chrono1 );
+baseDate = pingsForLap( baseDate, 16, valentinoBeaconId, chrono2, chrono3, chrono0, chrono1 );
+baseDate = pingsForLap( baseDate, 15, valentinoBeaconId, chrono2, chrono3, chrono0, chrono1 );
+baseDate = pingsForLap( baseDate, 14, valentinoBeaconId, chrono2, chrono3, chrono0, chrono1 );
 # ----------------------------------------------------------
 # Chronos passed in order  1 2 3 0
 # Pings in random order
@@ -230,19 +233,19 @@ lapsJeremy = getLapsOfPilot(getPilot('Jeremy', 'Ponchel')['id'])
 lapsValentino = getLapsOfPilot(getPilot('Valentino', 'Rossi')['id'])
 lapsJorge = getLapsOfPilot(getPilot('Jorge', 'Lorenzo')['id'])
 
-print "---- Laps Fabrice ----"
+print("---- Laps Fabrice ----")
 printLaps(lapsFabrice)
 assert len(lapsFabrice) == 12
 
-print "---- Laps Jeremy ----"
+print("---- Laps Jeremy ----")
 printLaps(lapsJeremy)
 assert len(lapsJeremy) == 13
 
-print "---- Laps Valentino ----"
+print("---- Laps Valentino ----")
 printLaps(lapsValentino)
-assert len(lapsValentino) == 12
+assert len(lapsValentino) == 13
 
-print "---- Laps Jorge ----"
+print("---- Laps Jorge ----")
 printLaps(lapsJorge)
 assert len(lapsJorge) == 12
 

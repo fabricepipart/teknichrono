@@ -15,12 +15,12 @@ from laps import *
 
 # ----------------------------------------------------------------------
 # Test dqte primitives
-print "Date = " + formatDatetime(timestampToDate(1471863621321))
+print("Date = " + formatDatetime(timestampToDate(1471863621321)))
 # 2016-08-22T11:00:21.321Z
 
 # ----------------------------------------------------------------------
 # Command line parameters
-print len(sys.argv)
+print(len(sys.argv))
 if len(sys.argv) >= 2:
     setHost(sys.argv[1])
 
@@ -167,23 +167,23 @@ runsOne = getLapsOfPilot(getPilot('Rider', 'One')['id'])
 runsTwo = getLapsOfPilot(getPilot('Rider', 'Two')['id'])
 runsThree = getLapsOfPilot(getPilot('Rider', 'Three')['id'])
 
-print "---- Laps Fabrice ----"
+print("---- Laps Fabrice ----")
 printLaps(runsFabrice)
 assert len(runsFabrice) == 2
 
-print "---- Laps Bruce ----"
+print("---- Laps Brupythonce ----")
 printLaps(runsBruce)
 assert len(runsBruce) == 3
 
-print "---- Laps One ----"
+print("---- Laps One ----")
 printLaps(runsOne)
 assert len(runsOne) == 2
 
-print "---- Laps Two ----"
+print("---- Laps Two ----")
 printLaps(runsTwo)
 assert len(runsTwo) == 2
 
-print "---- Laps Three ----"
+print("---- Laps Three ----")
 printLaps(runsThree)
 assert len(runsThree) == 2
 

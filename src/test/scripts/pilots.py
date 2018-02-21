@@ -8,7 +8,7 @@ def addPilot( firstName, lastName ):
   "This adds a Pilot"
   data = '{"firstName":"'+ firstName+'", "lastName":"'+lastName+'"}'
   pilotResponse = post(data, pilotsUrl);
-  print "Pilot " + firstName + ' / '+lastName+" added"
+  print("Pilot " + firstName + ' / '+lastName+" added")
   return;
 
 
@@ -29,7 +29,7 @@ def deletePilot( id ):
   "This deletes a Pilot by id"
   url = pilotsUrl + '/' + str(id)
   delete(url);
-  print "Deleted pilot id " + str(id)
+  print("Deleted pilot id " + str(id))
   return;
 
 def deletePilots():
@@ -43,5 +43,5 @@ def associatePilotBeacon(pilotId, beaconId):
     "Associate Pilot and Beacon"
     url = pilotsUrl + '/' + str(pilotId) + '/setBeacon?beaconId=' + str(beaconId)
     post('', url);
-    print "Associate pilot id " + str(pilotId) + " and beacon id " + str(beaconId)
+    print("Associate pilot id " + str(pilotId) + " and beacon id " + str(beaconId))
     return;

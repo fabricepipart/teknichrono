@@ -16,7 +16,7 @@ def setHost( url ):
 def post( dataString, url ):
   "This posts a json to a URL and returns a json"
   if debug:
-    print 'POST to ' + host + url
+    print('POST to ' + host + url)
   response = requests.post(host + url, data=dataString, headers=headers)
   if(not response.ok):
     response.raise_for_status();
@@ -25,7 +25,7 @@ def post( dataString, url ):
 def put( dataString, url ):
     "This send in a PUT a json to a URL"
     if debug:
-      print 'PUT to ' + host + url
+      print('PUT to ' + host + url)
     response = requests.put(host + url, data=dataString, headers=headers)
     if(not response.ok):
       response.raise_for_status();
@@ -34,7 +34,7 @@ def put( dataString, url ):
 def delete(url ):
   "This sends a DELETE to a URL"
   if debug:
-    print 'DELETE to ' + host + url
+    print('DELETE to ' + host + url)
   response = requests.delete(host + url, headers=headers)
   if(not response.ok):
     response.raise_for_status();
@@ -43,7 +43,7 @@ def delete(url ):
 def get(url ):
   "This sends a get to a URL and returns a json"
   if debug:
-    print 'GET to ' + host + url
+    print('GET to ' + host + url)
   response = requests.get(host + url, headers=headers)
   if(not response.ok):
     response.raise_for_status();
