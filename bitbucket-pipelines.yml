@@ -16,3 +16,5 @@ pipelines:
     - step:
         name: E2E tests
         image: python:3.5.1
+        script: 
+          - echo "./src/test/scripts/bash/all_tests.sh"
