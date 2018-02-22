@@ -110,6 +110,9 @@ public class LapTimeEndpoint {
     if (pilotId == null) {
       lapTimeManager.orderByDuration(results);
     }
+    if (eventId != null) {
+      lapTimeManager.keepOnlyBest(results);
+    }
 
     return results;
   }

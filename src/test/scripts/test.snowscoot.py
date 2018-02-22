@@ -187,22 +187,64 @@ assert len(runsThree) == 2
 laps = getLaps()
 printLaps(laps, True)
 
+# Session summary
+laps = getLapsForEvent(event['id'])
+printLaps(laps, True)
+
 # --------- TODO -------------
+# -------------------------------
 # Time trial with Just one chrono
+# -------------------------------
 
+# Laps per pilot
+# All Laps
+# Session summary
 # --------- TODO -------------
+# -------------------------------
 # Time trial  with several chronos
+# -------------------------------
 
+# Laps per pilot
+# All Laps
+# Session summary
 # --------- TODO -------------
+# -------------------------------
 # Race (derby) with just one chrono
+# -------------------------------
 
+# Laps per pilot
+# All Laps
+# Session summary
 # --------- TODO -------------
+# -------------------------------
 # Race (derby) with several chronos
+# -------------------------------
 
+# Laps per pilot
+# All Laps
+# Session summary
 # --------- TODO -------------
+# -------------------------------
 # Boarder cross  with just one chrono
-# --------- TODO -------------
-# Boarder cross  with several chronos
+# -------------------------------
+
+# Laps per pilot
+# All Laps
+# Session summary
 
 # --------- TODO -------------
+# -------------------------------
+# Boarder cross  with several chronos
+# -------------------------------
+
+# Laps per pilot
+# All Laps
+# Session summary
+# --------- TODO -------------
+# -------------------------------
 # deux site de descentes differentes qui ont la meme arrivée, mais deux points de départ differents
+# -------------------------------
+
+# Laps per pilot
+# All Laps
+# Session summary

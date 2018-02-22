@@ -48,8 +48,27 @@ public class LapTimeManager {
   }
 
   public void keepOnlyBest(List<LapTimeDTO> results) {
-    // results.removeIf(filter)
-
+    Map<Integer, LapTimeDTO> bests = new HashMap<>();
+    List<LapTimeDTO> toRemove = new ArrayList<>();
+    for (LapTimeDTO lapTimeDTO : results) {
+      if (lapTimeDTO.getDuration() <= 0) {
+        toRemove.add(lapTimeDTO);
+        continue;
+      }
+      int pilotId = lapTimeDTO.getPilot().getId();
+      LapTimeDTO pilotBest = bests.get(pilotId);
+      if (pilotBest == null) {
+        bests.put(pilotId, lapTimeDTO);
+      } else {
+        if (lapTimeDTO.getDuration() < pilotBest.getDuration()) {
+          bests.put(pilotId, lapTimeDTO);
+          toRemove.add(pilotBest);
+        } else {
+          toRemove.add(lapTimeDTO);
+        }
+      }
+    }
+    results.removeAll(toRemove);
   }
 
 }

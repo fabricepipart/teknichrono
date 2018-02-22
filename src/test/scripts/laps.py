@@ -24,7 +24,7 @@ def getLaps():
 
 def getLapsForEvent(eventId):
   "This gets the laps of a given event and returns a json"
-  url = lapsUrl + '?pilotId=' + str(pilotId)
+  url = lapsUrl + '?eventId=' + str(eventId)
   lapsResponse = get(url)
   return lapsResponse
 
