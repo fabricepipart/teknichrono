@@ -1,7 +1,6 @@
 package org.trd.app.teknichrono.model;
 // Generated 5 mai 2016 11:08:49 by Hibernate Tools 4.3.1.Final
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -99,6 +98,7 @@ public class LapTime implements java.io.Serializable {
   public String toString() {
     String result = getClass().getSimpleName() + " ";
     result += "id: " + id;
+    result += "start: " + startDate;
     return result;
   }
 
@@ -115,10 +115,21 @@ public class LapTime implements java.io.Serializable {
   }
 
   public void addIntermediates(int index, Ping p) {
+    updateStartDate(p);
+    this.intermediates.add(index, p);
+  }
+
+  private void updateStartDate(Ping p) {
     if (startDate == null || startDate.getTime() > p.getDateTime().getTime()) {
       startDate = p.getDateTime();
     }
-    this.intermediates.add(index, p);
+  }
+
+  public void setStartDate() {
+    startDate = null;
+    for (Ping ping : intermediates) {
+      updateStartDate(ping);
+    }
   }
 
 }

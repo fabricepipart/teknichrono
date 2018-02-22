@@ -32,6 +32,11 @@ public class SectorDTO implements Serializable {
     this.toChronoId = 0;
   }
 
+  @Override
+  public String toString() {
+    return fromChronoId + "->" + toChronoId + ":" + duration;
+  }
+
   public long getDuration() {
     return this.duration;
   }

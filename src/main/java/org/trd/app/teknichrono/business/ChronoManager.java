@@ -124,6 +124,7 @@ public class ChronoManager {
             LapTime lap = createLaptime(event, pilot, toInsertInNewLap, chronometer);
             em.persist(lap);
             toInsertInNewLap.clear();
+            lapTimeOfPingBefore.setStartDate();
             // since toInsertInNewLap is backed by original list,
             // this removes all sub-list items from the original list
             lapTimeOfPingBefore.addIntermediates(insertAtIndex, ping);
@@ -145,6 +146,7 @@ public class ChronoManager {
               LapTime lap = createLaptime(event, pilot, toInsertInNewLap, chronometer);
               em.persist(lap);
               toInsertInNewLap.clear();
+              lapTimeOfPingAfter.setStartDate();
               // since toInsertInNewLap is backed by original list, this removes
               // all sub-list items from the original list
               lapTimeOfPingAfter.addIntermediates(0, ping);

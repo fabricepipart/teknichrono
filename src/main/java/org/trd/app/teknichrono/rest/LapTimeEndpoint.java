@@ -1,10 +1,6 @@
 package org.trd.app.teknichrono.rest;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -25,10 +21,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import org.trd.app.teknichrono.business.LapTimeManager;
 import org.trd.app.teknichrono.model.LapTime;
 import org.trd.app.teknichrono.rest.dto.LapTimeDTO;
-import org.trd.app.teknichrono.rest.dto.NestedEventDTO;
-import org.trd.app.teknichrono.rest.dto.NestedPilotDTO;
+import org.trd.app.teknichrono.rest.sql.OrderByClauseBuilder;
+import org.trd.app.teknichrono.rest.sql.WhereClauseBuilder;
 
 /**
  * 
@@ -82,46 +79,38 @@ public class LapTimeEndpoint {
 
   @GET
   @Produces("application/json")
-  public List<LapTimeDTO> listAll(@QueryParam("pilotId") Integer pilotId, @QueryParam("start") Integer startPosition,
-      @QueryParam("max") Integer maxResult) {
-    String whereClause;
+  public List<LapTimeDTO> listAll(@QueryParam("pilotId") Integer pilotId, @QueryParam("eventId") Integer eventId,
+      @QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
+    WhereClauseBuilder whereClauseBuilder = new WhereClauseBuilder();
     if (pilotId != null) {
-      whereClause = " WHERE l.pilot.id = :entityId";
-    } else {
-      whereClause = "";
+      whereClauseBuilder.addEqualsClause("l.pilot.id", "pilotId", pilotId);
     }
+    if (eventId != null) {
+      whereClauseBuilder.addEqualsClause("l.event.id", "eventId", eventId);
+    }
+    OrderByClauseBuilder orderByClauseBuilder = new OrderByClauseBuilder();
+    // Necessary to have the lapTimeManager.convert working
+    orderByClauseBuilder.add("l.startDate");
 
     TypedQuery<LapTime> findAllQuery = em.createQuery("SELECT DISTINCT l FROM LapTime l"
-        + " LEFT JOIN FETCH l.pilot LEFT JOIN FETCH l.event LEFT JOIN FETCH l.intermediates" + whereClause
-        + " ORDER BY l.startDate", LapTime.class);
+        + " LEFT JOIN FETCH l.pilot LEFT JOIN FETCH l.event LEFT JOIN FETCH l.intermediates"
+        + whereClauseBuilder.build() + orderByClauseBuilder.build(), LapTime.class);
     if (startPosition != null) {
       findAllQuery.setFirstResult(startPosition);
     }
     if (maxResult != null) {
       findAllQuery.setMaxResults(maxResult);
     }
-    if (!whereClause.isEmpty()) {
-      findAllQuery.setParameter("entityId", pilotId);
-    }
-    // Check if we are in a loop event
-    // Keep a map of last pilot laps to set new laptime when next lap is reached
-    Map<Integer, LapTimeDTO> lastLapPerPilot = new HashMap<Integer, LapTimeDTO>();
+    whereClauseBuilder.applyClauses(findAllQuery);
+
     final List<LapTime> searchResults = findAllQuery.getResultList();
-    final List<LapTimeDTO> results = new ArrayList<LapTimeDTO>();
-    for (LapTime searchResult : searchResults) {
-      LapTimeDTO dto = new LapTimeDTO(searchResult);
-      NestedEventDTO event = dto.getEvent();
-      NestedPilotDTO pilot = dto.getPilot();
-      LapTimeDTO lastPilotLap = lastLapPerPilot.get(pilot.getId());
-      if (event.isLoopTrack() && lastPilotLap != null && lastPilotLap.getEvent().getId() == event.getId()) {
-        Timestamp startDate = dto.getStartDate();
-        if (startDate.getTime() > 0) {
-          lastPilotLap.addLastSector(startDate);
-        }
-      }
-      lastLapPerPilot.put(dto.getPilot().getId(), dto);
-      results.add(dto);
+
+    LapTimeManager lapTimeManager = new LapTimeManager();
+    final List<LapTimeDTO> results = lapTimeManager.convert(searchResults);
+    if (pilotId == null) {
+      lapTimeManager.orderByDuration(results);
     }
+
     return results;
   }
 

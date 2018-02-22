@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.trd.app.teknichrono.model.LapTime;
 import org.trd.app.teknichrono.model.Ping;
+import org.trd.app.teknichrono.util.InvalidArgumentException;
 
 @XmlRootElement
 public class LapTimeDTO implements Serializable {
@@ -53,6 +54,17 @@ public class LapTimeDTO implements Serializable {
         this.setEndDate(previous);
       }
     }
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("[id=" + getId());
+    sb.append(",pilot=" + pilot.getId());
+    sb.append(",event=" + event.getId());
+    sb.append(",startDate=" + startDate);
+    sb.append(",duration=" + duration + "]");
+    return sb.toString();
   }
 
   //
@@ -149,6 +161,10 @@ public class LapTimeDTO implements Serializable {
   }
 
   public void setDuration(long duration) {
+    if (duration < 0) {
+      throw new InvalidArgumentException();
+    }
+    // System.out.println("Setting duration " + duration);
     this.duration = duration;
   }
 
@@ -159,10 +175,18 @@ public class LapTimeDTO implements Serializable {
    * @param endDate
    */
   public void addLastSector(Timestamp endDate) {
-    SectorDTO previousLast = this.sectors.get(sectors.size() - 1);
-    long previousLastStart = previousLast.getStart();
-    long previousLastEnd = previousLastStart + previousLast.getDuration();
-    this.sectors.add(new SectorDTO(previousLastEnd, previousLast.getToChronoId(), endDate.getTime() - previousLastEnd));
+    // If we have a proper sector, we use it
+    if (sectors.size() > 0) {
+      SectorDTO previousLast = this.sectors.get(sectors.size() - 1);
+      long previousLastStart = previousLast.getStart();
+      long previousLastEnd = previousLastStart + previousLast.getDuration();
+      // System.out.println("Last sector : " + previousLastEnd + " during " +
+      // (endDate.getTime() - previousLastEnd));
+      this.sectors
+          .add(new SectorDTO(previousLastEnd, previousLast.getToChronoId(), endDate.getTime() - previousLastEnd));
+    } else {
+      this.sectors.add(new SectorDTO(startDate.getTime(), 0, endDate.getTime() - startDate.getTime()));
+    }
     setEndDate(endDate);
   }
 }
