@@ -3,12 +3,16 @@
 # Only use spaces to indent your .yml configuration.
 # -----
 # You can specify a custom docker image from Docker Hub as your build environment.
-image: maven:3.3.9
 
 pipelines:
   default:
     - step:
+        name: Build and test
+        image: maven:3.3.9
         caches:
           - maven
         script: # Modify the commands below to build your repository.
-          - mvn -B verify # -B batch mode makes Maven less verbose
+          - mvn -B test # -B batch mode makes Maven less verbose
+    - step:
+        name: E2E tests
+        image: python:3.5.1
