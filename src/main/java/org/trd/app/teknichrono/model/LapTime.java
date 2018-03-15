@@ -46,7 +46,7 @@ public class LapTime implements java.io.Serializable {
   private Timestamp startDate;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  private Event event;
+  private Session session;
 
   @OneToMany
   @OrderColumn(name = "dateTime")
@@ -86,12 +86,12 @@ public class LapTime implements java.io.Serializable {
     this.startDate = captureDate;
   }
 
-  public Event getEvent() {
-    return this.event;
+  public Session getSession() {
+    return this.session;
   }
 
-  public void setEvent(final Event event) {
-    this.event = event;
+  public void setSession(final Session session) {
+    this.session = session;
   }
 
   @Override

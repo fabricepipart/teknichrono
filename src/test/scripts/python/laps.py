@@ -22,9 +22,9 @@ def getLaps():
   return lapsResponse
 
 
-def getLapsForEvent(eventId):
-  "This gets the laps of a given event and returns a json"
-  url = lapsUrl + '?eventId=' + str(eventId)
+def getLapsForSession(sessionId):
+  "This gets the laps of a given session and returns a json"
+  url = lapsUrl + '?sessionId=' + str(sessionId)
   lapsResponse = get(url)
   return lapsResponse
 

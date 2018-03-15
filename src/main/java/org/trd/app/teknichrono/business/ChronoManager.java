@@ -7,10 +7,10 @@ import javax.persistence.EntityManager;
 
 import org.trd.app.teknichrono.model.Beacon;
 import org.trd.app.teknichrono.model.Chronometer;
-import org.trd.app.teknichrono.model.Event;
 import org.trd.app.teknichrono.model.LapTime;
 import org.trd.app.teknichrono.model.Pilot;
 import org.trd.app.teknichrono.model.Ping;
+import org.trd.app.teknichrono.model.Session;
 
 public class ChronoManager {
 
@@ -43,9 +43,9 @@ public class ChronoManager {
     }
     int chronoIndex = chronometer.getChronoIndex().intValue();
 
-    Event event = ping.getChrono().getEvent();
-    if (event == null) {
-      System.err.println("No Event associated to Chrono " + chronometer.getId() + ", cannot updates laptimes");
+    Session session = ping.getChrono().getSession();
+    if (session == null) {
+      System.err.println("No Session associated to Chrono " + chronometer.getId() + ", cannot updates laptimes");
       return;
     }
 
@@ -95,7 +95,7 @@ public class ChronoManager {
             lapTimeOfPingAfter.addIntermediates(insertAtIdex, ping);
             em.persist(lapTimeOfPingAfter);
           } else {
-            LapTime lap = createLaptime(event, pilot, ping, chronometer);
+            LapTime lap = createLaptime(session, pilot, ping, chronometer);
             em.persist(lap);
           }
         }
@@ -106,7 +106,7 @@ public class ChronoManager {
           lapTimeOfPingBefore.addIntermediates(insertAtIndex, ping);
           em.persist(lapTimeOfPingBefore);
         } else {
-          LapTime lap = createLaptime(event, pilot, ping, chronometer);
+          LapTime lap = createLaptime(session, pilot, ping, chronometer);
           em.persist(lap);
         }
       } else {
@@ -121,7 +121,7 @@ public class ChronoManager {
             // Split
             List<Ping> toInsertInNewLap = lapTimeOfPingBefore.getIntermediates().subList(insertAtIndex,
                 lapTimeOfPingBefore.getIntermediates().size());
-            LapTime lap = createLaptime(event, pilot, toInsertInNewLap, chronometer);
+            LapTime lap = createLaptime(session, pilot, toInsertInNewLap, chronometer);
             em.persist(lap);
             toInsertInNewLap.clear();
             lapTimeOfPingBefore.setStartDate();
@@ -143,7 +143,7 @@ public class ChronoManager {
                 && chronoIndex <= pingBefore.getChrono().getChronoIndex().intValue()) {
               // Split
               List<Ping> toInsertInNewLap = lapTimeOfPingAfter.getIntermediates().subList(0, insertAtIdex);
-              LapTime lap = createLaptime(event, pilot, toInsertInNewLap, chronometer);
+              LapTime lap = createLaptime(session, pilot, toInsertInNewLap, chronometer);
               em.persist(lap);
               toInsertInNewLap.clear();
               lapTimeOfPingAfter.setStartDate();
@@ -156,13 +156,13 @@ public class ChronoManager {
               em.persist(lapTimeOfPingAfter);
             }
           } else {
-            LapTime lap = createLaptime(event, pilot, ping, chronometer);
+            LapTime lap = createLaptime(session, pilot, ping, chronometer);
             em.persist(lap);
           }
         }
       }
     } else {
-      LapTime lap = createLaptime(event, pilot, ping, chronometer);
+      LapTime lap = createLaptime(session, pilot, ping, chronometer);
       em.persist(lap);
     }
 
@@ -171,14 +171,14 @@ public class ChronoManager {
     // New intermediate of last Laptime
 
     // New Laptime / Finish laptime
-    // The chronopoint is the last one of the event
+    // The chronopoint is the last one of the session
 
     // New Laptime but not first intermediate
   }
 
-  private LapTime createLaptime(Event event, Pilot pilot, List<Ping> toInsertInNewLap, Chronometer chronometer) {
+  private LapTime createLaptime(Session session, Pilot pilot, List<Ping> toInsertInNewLap, Chronometer chronometer) {
     LapTime lap = new LapTime();
-    lap.setEvent(event);
+    lap.setSession(session);
     lap.setPilot(pilot);
     for (Ping p : toInsertInNewLap) {
       lap.addIntermediates(p);
@@ -186,8 +186,8 @@ public class ChronoManager {
     return lap;
   }
 
-  private LapTime createLaptime(Event event, Pilot pilot, Ping ping, Chronometer chronometer) {
-    return createLaptime(event, pilot, Arrays.asList(ping), chronometer);
+  private LapTime createLaptime(Session session, Pilot pilot, Ping ping, Chronometer chronometer) {
+    return createLaptime(session, pilot, Arrays.asList(ping), chronometer);
   }
 
 }

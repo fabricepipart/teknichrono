@@ -21,30 +21,30 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
-import org.trd.app.teknichrono.model.Event;
+import org.trd.app.teknichrono.model.Chronometer;
 import org.trd.app.teknichrono.model.Session;
 
 /**
  * 
  */
 @Stateless
-@Path("/events")
-public class EventEndpoint {
+@Path("/sessions")
+public class SessionEndpoint {
   @PersistenceContext(unitName = "teknichrono-persistence-unit")
   private EntityManager em;
 
   @POST
   @Consumes("application/json")
-  public Response create(Event entity) {
+  public Response create(Session entity) {
     em.persist(entity);
-    return Response.created(UriBuilder.fromResource(EventEndpoint.class).path(String.valueOf(entity.getId())).build())
+    return Response.created(UriBuilder.fromResource(SessionEndpoint.class).path(String.valueOf(entity.getId())).build())
         .build();
   }
 
   @DELETE
   @Path("/{id:[0-9][0-9]*}")
   public Response deleteById(@PathParam("id") int id) {
-    Event entity = em.find(Event.class, id);
+    Session entity = em.find(Session.class, id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -56,10 +56,11 @@ public class EventEndpoint {
   @Path("/{id:[0-9][0-9]*}")
   @Produces("application/json")
   public Response findById(@PathParam("id") int id) {
-    TypedQuery<Event> findByIdQuery = em.createQuery(
-        "SELECT DISTINCT e FROM Event e LEFT JOIN FETCH e.sessions WHERE e.id = :entityId ORDER BY e.id", Event.class);
+    TypedQuery<Session> findByIdQuery = em.createQuery(
+        "SELECT DISTINCT e FROM Session e LEFT JOIN FETCH e.chronometers WHERE e.id = :entityId ORDER BY e.id",
+        Session.class);
     findByIdQuery.setParameter("entityId", id);
-    Event entity;
+    Session entity;
     try {
       entity = findByIdQuery.getSingleResult();
     } catch (NoResultException nre) {
@@ -74,11 +75,12 @@ public class EventEndpoint {
   @GET
   @Path("/name")
   @Produces("application/json")
-  public Event findEventByName(@QueryParam("name") String name) {
-    TypedQuery<Event> findByNameQuery = em.createQuery(
-        "SELECT DISTINCT e FROM Event e LEFT JOIN FETCH e.sessions WHERE e.name = :name ORDER BY e.id", Event.class);
+  public Session findSessionByName(@QueryParam("name") String name) {
+    TypedQuery<Session> findByNameQuery = em.createQuery(
+        "SELECT DISTINCT e FROM Session e LEFT JOIN FETCH e.chronometers WHERE e.name = :name ORDER BY e.id",
+        Session.class);
     findByNameQuery.setParameter("name", name);
-    Event entity;
+    Session entity;
     try {
       entity = findByNameQuery.getSingleResult();
     } catch (NoResultException nre) {
@@ -89,52 +91,56 @@ public class EventEndpoint {
 
   @GET
   @Produces("application/json")
-  public List<Event> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
-    TypedQuery<Event> findAllQuery = em
-        .createQuery("SELECT DISTINCT e FROM Event e LEFT JOIN FETCH e.sessions ORDER BY e.id", Event.class);
+  public List<Session> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
+    TypedQuery<Session> findAllQuery = em
+        .createQuery("SELECT DISTINCT e FROM Session e LEFT JOIN FETCH e.chronometers ORDER BY e.id", Session.class);
     if (startPosition != null) {
       findAllQuery.setFirstResult(startPosition);
     }
     if (maxResult != null) {
       findAllQuery.setMaxResults(maxResult);
     }
-    final List<Event> results = findAllQuery.getResultList();
+    final List<Session> results = findAllQuery.getResultList();
     return results;
   }
 
   @POST
-  @Path("{eventId:[0-9][0-9]*}/addSession")
+  @Path("{sessionId:[0-9][0-9]*}/addChronometer")
   @Produces("application/json")
-  public Response addSession(@PathParam("eventId") int eventId, @QueryParam("sessionId") Integer sessionId) {
-    Event event = em.find(Event.class, eventId);
-    if (event == null) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
+  public Response addChronometer(@PathParam("sessionId") int sessionId, @QueryParam("chronoId") Integer chronoId,
+      @QueryParam("index") Integer index) {
     Session session = em.find(Session.class, sessionId);
     if (session == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    session.setEvent(event);
-    event.getSessions().add(session);
-    em.persist(event);
-    for (Session c : event.getSessions()) {
+    Chronometer chronometer = em.find(Chronometer.class, chronoId);
+    if (chronometer == null) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+    chronometer.setSession(session);
+    if (index != null) {
+      chronometer.setChronoIndex(index);
+    }
+    session.addChronometer(chronometer);
+    em.persist(session);
+    for (Chronometer c : session.getChronometers()) {
       em.persist(c);
     }
 
-    return Response.ok(event).build();
+    return Response.ok(session).build();
   }
 
   @PUT
   @Path("/{id:[0-9][0-9]*}")
   @Consumes("application/json")
-  public Response update(@PathParam("id") int id, Event entity) {
+  public Response update(@PathParam("id") int id, Session entity) {
     if (entity == null) {
       return Response.status(Status.BAD_REQUEST).build();
     }
     if (id != entity.getId()) {
       return Response.status(Status.CONFLICT).entity(entity).build();
     }
-    if (em.find(Event.class, id) == null) {
+    if (em.find(Session.class, id) == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
     try {

@@ -50,7 +50,7 @@ public class Chronometer implements Serializable {
 
   @ManyToOne
   @JsonIgnore
-  private Event event = null;
+  private Session session = null;
 
   /* ===================== Getters and setters ======================== */
   public int getId() {
@@ -93,12 +93,12 @@ public class Chronometer implements Serializable {
     this.pings = pings;
   }
 
-  public Event getEvent() {
-    return event;
+  public Session getSession() {
+    return session;
   }
 
-  public void setEvent(Event event) {
-    this.event = event;
+  public void setSession(Session session) {
+    this.session = session;
   }
 
   /* ===================== Other ======================== */

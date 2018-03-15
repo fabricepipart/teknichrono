@@ -13,14 +13,16 @@ import javax.persistence.OneToMany;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @XmlRootElement
-public class Event implements java.io.Serializable {
+public class Location implements java.io.Serializable {
 
   /**
    * 
    */
-  private static final long serialVersionUID = 929783339304030614L;
+  private static final long serialVersionUID = 7127979330876487660L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -31,12 +33,19 @@ public class Event implements java.io.Serializable {
   @Column(name = "version")
   private int version;
 
-  @OneToMany(orphanRemoval = true)
-  @JoinColumn(name = "eventId")
-  private List<Session> sessions = new ArrayList<Session>();
-
   @Column(nullable = false)
   private String name;
+
+  /**
+   * True for a racetrack, false for a rally stage
+   */
+  @Column
+  private boolean loopTrack;
+
+  @OneToMany(orphanRemoval = true)
+  @JoinColumn(name = "locationId")
+  @JsonIgnore
+  private List<Session> sessions = new ArrayList<Session>();
 
   public int getId() {
     return this.id;
@@ -54,14 +63,6 @@ public class Event implements java.io.Serializable {
     this.version = version;
   }
 
-  public List<Session> getSessions() {
-    return this.sessions;
-  }
-
-  public void setSessions(final List<Session> sessions) {
-    this.sessions = sessions;
-  }
-
   public String getName() {
     return name;
   }
@@ -70,11 +71,28 @@ public class Event implements java.io.Serializable {
     this.name = name;
   }
 
+  public boolean isLoopTrack() {
+    return loopTrack;
+  }
+
+  public void setLoopTrack(boolean loop) {
+    this.loopTrack = loop;
+  }
+
+  public List<Session> getSessions() {
+    return this.sessions;
+  }
+
+  public void setSessions(final List<Session> sessions) {
+    this.sessions = sessions;
+  }
+
   @Override
   public String toString() {
     String result = getClass().getSimpleName() + " ";
     if (name != null && !name.trim().isEmpty())
       result += "name: " + name;
+    result += ", loop: " + loopTrack;
     return result;
   }
 

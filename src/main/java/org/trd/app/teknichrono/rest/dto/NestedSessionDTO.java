@@ -6,9 +6,9 @@ import java.sql.Date;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import org.trd.app.teknichrono.model.Event;
+import org.trd.app.teknichrono.model.Session;
 
-public class NestedEventDTO implements Serializable {
+public class NestedSessionDTO implements Serializable {
 
   private int id;
   private int version;
@@ -18,28 +18,28 @@ public class NestedEventDTO implements Serializable {
   private boolean loopTrack;
   private int chronometersCount;
 
-  public NestedEventDTO() {
+  public NestedSessionDTO() {
   }
 
-  public NestedEventDTO(final Event entity) {
+  public NestedSessionDTO(final Session entity) {
     if (entity != null) {
       this.id = entity.getId();
       this.version = entity.getVersion();
       this.start = entity.getStart();
       this.end = entity.getEnd();
       this.name = entity.getName();
-      this.loopTrack = entity.isLoopTrack();
+      this.loopTrack = entity.getLocation().isLoopTrack();
       this.chronometersCount = entity.getChronometers().size();
     }
   }
 
-  public Event fromDTO(Event entity, EntityManager em) {
+  public Session fromDTO(Session entity, EntityManager em) {
     if (entity == null) {
-      entity = new Event();
+      entity = new Session();
     }
     if (((Integer) this.id) != null) {
-      TypedQuery<Event> findByIdQuery = em.createQuery("SELECT DISTINCT e FROM Event e WHERE e.id = :entityId",
-          Event.class);
+      TypedQuery<Session> findByIdQuery = em.createQuery("SELECT DISTINCT e FROM Session e WHERE e.id = :entityId",
+          Session.class);
       findByIdQuery.setParameter("entityId", this.id);
       try {
         entity = findByIdQuery.getSingleResult();
@@ -52,7 +52,7 @@ public class NestedEventDTO implements Serializable {
     entity.setEnd(end);
     entity.setStart(start);
     entity.setName(name);
-    entity.setLoopTrack(loopTrack);
+    // entity.setLoopTrack(loopTrack);
     entity = em.merge(entity);
     return entity;
   }

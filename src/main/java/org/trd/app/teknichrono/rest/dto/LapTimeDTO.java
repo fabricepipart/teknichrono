@@ -19,7 +19,7 @@ public class LapTimeDTO implements Serializable {
   private int id;
   private int version;
   private NestedPilotDTO pilot;
-  private NestedEventDTO event;
+  private NestedSessionDTO session;
   private Timestamp startDate;
   // Either the last intermediate ping or the first ping of the next lap
   private Timestamp endDate;
@@ -35,7 +35,7 @@ public class LapTimeDTO implements Serializable {
       this.id = entity.getId();
       this.version = entity.getVersion();
       this.pilot = new NestedPilotDTO(entity.getPilot());
-      this.event = new NestedEventDTO(entity.getEvent());
+      this.session = new NestedSessionDTO(entity.getSession());
       Iterator<Ping> iterIntermediates = entity.getIntermediates().iterator();
       Ping previous = null;
       while (iterIntermediates.hasNext()) {
@@ -49,8 +49,8 @@ public class LapTimeDTO implements Serializable {
         }
         previous = element;
       }
-      boolean loop = event.isLoopTrack();
-      if (!loop && previous.getChrono().getChronoIndex() == (event.getChronometersCount() - 1)) {
+      boolean loop = session.isLoopTrack();
+      if (!loop && previous.getChrono().getChronoIndex() == (session.getChronometersCount() - 1)) {
         this.setEndDate(previous);
       }
     }
@@ -61,7 +61,7 @@ public class LapTimeDTO implements Serializable {
     StringBuilder sb = new StringBuilder();
     sb.append("[id=" + getId());
     sb.append(",pilot=" + pilot.getId());
-    sb.append(",event=" + event.getId());
+    sb.append(",session=" + session.getId());
     sb.append(",startDate=" + startDate);
     sb.append(",duration=" + duration + "]");
     return sb.toString();
@@ -76,8 +76,8 @@ public class LapTimeDTO implements Serializable {
     if (this.pilot != null) {
       entity.setPilot(this.pilot.fromDTO(entity.getPilot(), em));
     }
-    if (this.event != null) {
-      entity.setEvent(this.event.fromDTO(entity.getEvent(), em));
+    if (this.session != null) {
+      entity.setSession(this.session.fromDTO(entity.getSession(), em));
     }
     if (!this.getIntermediates().isEmpty()) {
       System.err.println("Sorry I cannot rebuild a LapTime from a LapTimeDTO. Leaving list empty.");
@@ -110,12 +110,12 @@ public class LapTimeDTO implements Serializable {
     this.pilot = pilot;
   }
 
-  public NestedEventDTO getEvent() {
-    return this.event;
+  public NestedSessionDTO getSession() {
+    return this.session;
   }
 
-  public void setEvent(final NestedEventDTO event) {
-    this.event = event;
+  public void setSession(final NestedSessionDTO session) {
+    this.session = session;
   }
 
   public List<SectorDTO> getIntermediates() {

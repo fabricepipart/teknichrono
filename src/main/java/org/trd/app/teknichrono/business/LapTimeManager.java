@@ -8,8 +8,8 @@ import java.util.Map;
 
 import org.trd.app.teknichrono.model.LapTime;
 import org.trd.app.teknichrono.rest.dto.LapTimeDTO;
-import org.trd.app.teknichrono.rest.dto.NestedEventDTO;
 import org.trd.app.teknichrono.rest.dto.NestedPilotDTO;
+import org.trd.app.teknichrono.rest.dto.NestedSessionDTO;
 
 public class LapTimeManager {
 
@@ -20,16 +20,16 @@ public class LapTimeManager {
     lapTimes.sort(new LapTimeStartComparator());
     // System.out.println("After : " + lapTimes);
 
-    // Check if we are in a loop event
+    // Check if we are in a loop session
     // Keep a map of last pilot laps to set new laptime when next lap is reached
     Map<Integer, LapTimeDTO> lastLapPerPilot = new HashMap<Integer, LapTimeDTO>();
     final List<LapTimeDTO> results = new ArrayList<LapTimeDTO>();
     for (LapTime searchResult : lapTimes) {
       LapTimeDTO dto = new LapTimeDTO(searchResult);
-      NestedEventDTO event = dto.getEvent();
+      NestedSessionDTO session = dto.getSession();
       NestedPilotDTO pilot = dto.getPilot();
       LapTimeDTO lastPilotLap = lastLapPerPilot.get(pilot.getId());
-      if (event.isLoopTrack() && lastPilotLap != null && lastPilotLap.getEvent().getId() == event.getId()) {
+      if (session.isLoopTrack() && lastPilotLap != null && lastPilotLap.getSession().getId() == session.getId()) {
         Timestamp startDate = dto.getStartDate();
         if (startDate != null && startDate.getTime() > 0) {
           // System.out.println("Add last sector to lap " + lastPilotLap + "

@@ -6,9 +6,10 @@ import java.util.List;
 
 import org.junit.Test;
 import org.trd.app.teknichrono.model.Chronometer;
-import org.trd.app.teknichrono.model.Event;
 import org.trd.app.teknichrono.model.LapTime;
+import org.trd.app.teknichrono.model.Location;
 import org.trd.app.teknichrono.model.Ping;
+import org.trd.app.teknichrono.model.Session;
 import org.trd.app.teknichrono.rest.dto.LapTimeDTO;
 
 public class LapTimeManagerTest {
@@ -75,9 +76,11 @@ public class LapTimeManagerTest {
     laptime.setId(i);
     Timestamp time = new Timestamp(System.currentTimeMillis() + (i * 60 * 60 * 1000));
     laptime.setStartDate(time);
-    Event event = new Event();
-    event.setLoopTrack(loop);
-    laptime.setEvent(event);
+    Session session = new Session();
+    Location location = new Location();
+    session.setLocation(location);
+    location.setLoopTrack(loop);
+    laptime.setSession(session);
     for (int j = 0; j < 6; j++) {
       Ping ping = new Ping();
       Chronometer chrono = new Chronometer();

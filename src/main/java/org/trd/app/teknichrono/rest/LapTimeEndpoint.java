@@ -61,7 +61,7 @@ public class LapTimeEndpoint {
   @Produces("application/json")
   public Response findById(@PathParam("id") int id) {
     TypedQuery<LapTime> findByIdQuery = em.createQuery("SELECT DISTINCT l FROM LapTime"
-        + " l LEFT JOIN FETCH l.pilot LEFT JOIN FETCH l.event LEFT JOIN FETCH l.intermediates"
+        + " l LEFT JOIN FETCH l.pilot LEFT JOIN FETCH l.session LEFT JOIN FETCH l.intermediates"
         + " WHERE l.id = :entityId ORDER BY l.id", LapTime.class);
     findByIdQuery.setParameter("entityId", id);
     LapTime entity;
@@ -79,21 +79,21 @@ public class LapTimeEndpoint {
 
   @GET
   @Produces("application/json")
-  public List<LapTimeDTO> listAll(@QueryParam("pilotId") Integer pilotId, @QueryParam("eventId") Integer eventId,
+  public List<LapTimeDTO> listAll(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
       @QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
     WhereClauseBuilder whereClauseBuilder = new WhereClauseBuilder();
     if (pilotId != null) {
       whereClauseBuilder.addEqualsClause("l.pilot.id", "pilotId", pilotId);
     }
-    if (eventId != null) {
-      whereClauseBuilder.addEqualsClause("l.event.id", "eventId", eventId);
+    if (sessionId != null) {
+      whereClauseBuilder.addEqualsClause("l.session.id", "sessionId", sessionId);
     }
     OrderByClauseBuilder orderByClauseBuilder = new OrderByClauseBuilder();
     // Necessary to have the lapTimeManager.convert working
     orderByClauseBuilder.add("l.startDate");
 
     TypedQuery<LapTime> findAllQuery = em.createQuery("SELECT DISTINCT l FROM LapTime l"
-        + " LEFT JOIN FETCH l.pilot LEFT JOIN FETCH l.event LEFT JOIN FETCH l.intermediates"
+        + " LEFT JOIN FETCH l.pilot LEFT JOIN FETCH l.session LEFT JOIN FETCH l.intermediates"
         + whereClauseBuilder.build() + orderByClauseBuilder.build(), LapTime.class);
     if (startPosition != null) {
       findAllQuery.setFirstResult(startPosition);
@@ -110,7 +110,7 @@ public class LapTimeEndpoint {
     if (pilotId == null) {
       lapTimeManager.orderByDuration(results);
     }
-    if (eventId != null) {
+    if (sessionId != null) {
       lapTimeManager.keepOnlyBest(results);
     }
 
