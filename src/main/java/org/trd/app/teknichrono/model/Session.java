@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -54,9 +55,9 @@ public class Session implements java.io.Serializable {
    *     | 0 | 1 | 2 | 0 |
    * </pre>
    */
-  @OneToMany(orphanRemoval = true)
+  @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true)
   @OrderColumn(name = "chronoIndex")
-  @JoinColumn(name = "eventId")
+  @JoinColumn(name = "sessionId")
   private List<Chronometer> chronometers = new ArrayList<Chronometer>();
 
   @Column(nullable = false)

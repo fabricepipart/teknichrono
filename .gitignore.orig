@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .classpath
 .project
 target
@@ -12,6 +13,7 @@ MANIFEST.MF
 local-stage
 *.pyc
 
+=======
 # Compiled class file
 *.class
 
@@ -34,3 +36,4 @@ local-stage
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+>>>>>>> a638eb8ee973e2e195ef390c31b6b31ff611943e

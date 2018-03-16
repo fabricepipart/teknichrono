@@ -1,5 +1,7 @@
 package org.trd.app.teknichrono.rest;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.ejb.Stateless;
@@ -22,7 +24,10 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import org.trd.app.teknichrono.business.LapTimeManager;
+import org.trd.app.teknichrono.model.Event;
 import org.trd.app.teknichrono.model.LapTime;
+import org.trd.app.teknichrono.model.Location;
+import org.trd.app.teknichrono.model.Session;
 import org.trd.app.teknichrono.rest.dto.LapTimeDTO;
 import org.trd.app.teknichrono.rest.sql.OrderByClauseBuilder;
 import org.trd.app.teknichrono.rest.sql.WhereClauseBuilder;
@@ -80,13 +85,38 @@ public class LapTimeEndpoint {
   @GET
   @Produces("application/json")
   public List<LapTimeDTO> listAll(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
+      @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
       @QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
+    if (sessionId == null && locationId == null && eventId == null) {
+      return Collections.emptyList();
+    }
     WhereClauseBuilder whereClauseBuilder = new WhereClauseBuilder();
     if (pilotId != null) {
       whereClauseBuilder.addEqualsClause("l.pilot.id", "pilotId", pilotId);
     }
     if (sessionId != null) {
       whereClauseBuilder.addEqualsClause("l.session.id", "sessionId", sessionId);
+    } else {
+      if (eventId != null) {
+        Event event = em.find(Event.class, eventId);
+        if (event != null) {
+          List<Integer> eventSessionIds = new ArrayList<>();
+          for (Session s : event.getSessions()) {
+            eventSessionIds.add(s.getId());
+          }
+          whereClauseBuilder.addInClause("l.session.id", "eventSessionIds", eventSessionIds);
+        }
+      }
+      if (locationId != null) {
+        Location location = em.find(Location.class, locationId);
+        if (location != null) {
+          List<Integer> locationSessionIds = new ArrayList<>();
+          for (Session s : location.getSessions()) {
+            locationSessionIds.add(s.getId());
+          }
+          whereClauseBuilder.addInClause("l.session.id", "locationSessionIds", locationSessionIds);
+        }
+      }
     }
     OrderByClauseBuilder orderByClauseBuilder = new OrderByClauseBuilder();
     // Necessary to have the lapTimeManager.convert working
@@ -108,10 +138,10 @@ public class LapTimeEndpoint {
     LapTimeManager lapTimeManager = new LapTimeManager();
     final List<LapTimeDTO> results = lapTimeManager.convert(searchResults);
     if (pilotId == null) {
-      lapTimeManager.orderByDuration(results);
-    }
-    if (sessionId != null) {
       lapTimeManager.keepOnlyBest(results);
+    }
+    if (sessionId != null || locationId != null || eventId != null) {
+      lapTimeManager.orderByDuration(results);
     }
 
     return results;

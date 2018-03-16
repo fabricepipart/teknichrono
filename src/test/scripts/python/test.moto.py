@@ -44,29 +44,29 @@ for i in range(0, 100):
 # ----------------------------------------------------------------------
 # Add Pilots
 
-addPilot('Jerome', 'Rousseau')
-addPilot('Fabrice', 'Pipart')
-addPilot('Jeremy', 'Ponchel')
-addPilot('Valentino', 'Rossi')
-addPilot('Marc', 'Marquez')
-addPilot('Dani', 'Pedrosa')
-addPilot('Jorge', 'Lorenzo')
-addPilot('Johann', 'Zarco')
-addPilot('Cal', 'Crutchlow')
+jerome = addPilot('Jerome', 'Rousseau')
+fabrice = addPilot('Fabrice', 'Pipart')
+jeremy = addPilot('Jeremy', 'Ponchel')
+valentino = addPilot('Valentino', 'Rossi')
+marc = addPilot('Marc', 'Marquez')
+dani = addPilot('Dani', 'Pedrosa')
+jorge = addPilot('Jorge', 'Lorenzo')
+johann = addPilot('Johann', 'Zarco')
+cal = addPilot('Cal', 'Crutchlow')
 
 # ----------------------------------------------------------------------
 # Play with associations
 
-associatePilotBeacon(getPilot('Jerome', 'Rousseau')['id'], getBeacon(12)['id'])
+associatePilotBeacon(jerome['id'], getBeacon(12)['id'])
 
-associatePilotBeacon(getPilot('Fabrice', 'Pipart')['id'], getBeacon(2)['id'])
-associatePilotBeacon(getPilot('Jeremy', 'Ponchel')['id'], getBeacon(12)['id'])
+associatePilotBeacon(fabrice['id'], getBeacon(2)['id'])
+associatePilotBeacon(jeremy['id'], getBeacon(12)['id'])
 
-associatePilotBeacon(getPilot('Valentino', 'Rossi')['id'], getBeacon(4)['id'])
-associatePilotBeacon(getPilot('Jorge', 'Lorenzo')['id'], getBeacon(8)['id'])
+associatePilotBeacon(valentino['id'], getBeacon(4)['id'])
+associatePilotBeacon(jorge['id'], getBeacon(8)['id'])
 
 deleteBeacon(getBeacon(2)['id'])
-associatePilotBeacon(getPilot('Fabrice', 'Pipart')['id'], getBeacon(3)['id'])
+associatePilotBeacon(fabrice['id'], getBeacon(3)['id'])
 
 # ----------------------------------------------------------------------
 # Add Chronometers
@@ -90,14 +90,14 @@ rally = addEvent('Rally-1-event')
 
 # ----------------------------------------------------------------------
 # Add Sessions
-session = addSession('Morning TRD Le Luc 2016-08-22', date(2016, 8, 22), date(2016, 8, 22))
+session = addSession('Morning TRD Le Luc 2016-08-22', datetime(2016, 8, 22), datetime(2016, 8, 22))
 addSessionToLocation(leLuc['id'], session['id'])
 addSessionToEvent(trd1['id'], session['id'])
 
-addSession('Morning TRD Ledenon 2016-09-12+13', date(2016, 9, 12), date(2016, 9, 13))
-addSession('Morning TRD Aragon 2016-10-22+23', date(2016, 10, 22), date(2016, 10, 23))
-addSession('Morning TRD Le Luc 2016-11-01', date(2016, 11, 1), date(2016, 11, 1))
-addSession('Session of Rally 1', date(2017, 3, 1), date(2017, 3, 1))
+addSession('Morning TRD Ledenon 2016-09-12+13', datetime(2016, 9, 12), datetime(2016, 9, 13))
+addSession('Morning TRD Aragon 2016-10-22+23', datetime(2016, 10, 22), datetime(2016, 10, 23))
+addSession('Morning TRD Le Luc 2016-11-01', datetime(2016, 11, 1), datetime(2016, 11, 1))
+addSession('Session of Rally 1', datetime(2017, 3, 1), datetime(2017, 3, 1))
 
 # ----------------------------------------------------------------------
 # Associate chronometers to session in right order
@@ -247,10 +247,10 @@ ping(datetime(2016, 8, 22, 11, 10, 59, random.randint(0, 100000)), jorgeBeaconId
 #
 # We should have per pilot all laps (12) in order with 4 intermediates in each (for 4 chronos)
 
-lapsFabrice = getLapsOfPilot(getPilot('Fabrice', 'Pipart')['id'])
-lapsJeremy = getLapsOfPilot(getPilot('Jeremy', 'Ponchel')['id'])
-lapsValentino = getLapsOfPilot(getPilot('Valentino', 'Rossi')['id'])
-lapsJorge = getLapsOfPilot(getPilot('Jorge', 'Lorenzo')['id'])
+lapsFabrice = getLapsOfPilot(fabrice['id'], sessionId=session['id'])
+lapsJeremy = getLapsOfPilot(jeremy['id'], eventId=trd1['id'])
+lapsValentino = getLapsOfPilot(valentino['id'], locationId=leLuc['id'])
+lapsJorge = getLapsOfPilot(jorge['id'], sessionId=session['id'])
 
 print("---- Laps Fabrice ----")
 printLaps(lapsFabrice)
@@ -273,10 +273,6 @@ assert len(lapsJorge) == 12
 # --------- TODO -------------
 # Shuffle the pings in a crazy order and check they are still reordered correctly
 
-# All Laps
-laps = getLaps()
-printLaps(laps, True)
-
 # Session summary
 laps = getLapsForSession(session['id'])
 printLaps(laps, True)
@@ -286,21 +282,31 @@ print("-------------------------------")
 print("Time trial with Just one chrono")
 print("-------------------------------")
 
+# TODO Session of same event
+
 eventName = 'Time trial with Just one chrono'
 timeTrial = addEvent(eventName)
-session = addSession(eventName + ' session 1', date(2018, 1, 1), date(2018, 1, 1))
 
+morningSession = addSession(eventName + ' morning session', datetime(2018, 1, 1, 8, 0, 0, 0),
+                            datetime(2018, 1, 1, 12, 0, 0, 0))
+addSessionToLocation(ledenon['id'], morningSession['id'])
+addSessionToEvent(timeTrial['id'], morningSession['id'])
+addChronometerToSession(morningSession['id'], getChronometerByName('Raspberry-1')['id'])
+chrono1 = getChronometerByName('Raspberry-1')['id']
+
+session = addSession(eventName + ' afternoon session', datetime(2018, 1, 1, 14, 0, 0, 0),
+                     datetime(2018, 1, 1, 18, 0, 0, 0))
 addSessionToLocation(ledenon['id'], session['id'])
 addSessionToEvent(timeTrial['id'], session['id'])
 addChronometerToSession(session['id'], getChronometerByName('Raspberry-0')['id'])
 chrono0 = getChronometerByName('Raspberry-0')['id']
 
-associatePilotBeacon(getPilot('Valentino', 'Rossi')['id'], getBeacon(46)['id'])
-associatePilotBeacon(getPilot('Marc', 'Marquez')['id'], getBeacon(93)['id'])
-associatePilotBeacon(getPilot('Dani', 'Pedrosa')['id'], getBeacon(26)['id'])
-associatePilotBeacon(getPilot('Jorge', 'Lorenzo')['id'], getBeacon(99)['id'])
-associatePilotBeacon(getPilot('Johann', 'Zarco')['id'], getBeacon(5)['id'])
-associatePilotBeacon(getPilot('Cal', 'Crutchlow')['id'], getBeacon(35)['id'])
+associatePilotBeacon(valentino['id'], getBeacon(46)['id'])
+associatePilotBeacon(marc['id'], getBeacon(93)['id'])
+associatePilotBeacon(dani['id'], getBeacon(26)['id'])
+associatePilotBeacon(jorge['id'], getBeacon(99)['id'])
+associatePilotBeacon(johann['id'], getBeacon(5)['id'])
+associatePilotBeacon(cal['id'], getBeacon(35)['id'])
 
 valentinoBeaconId = getBeacon(46)['id']
 jorgeBeaconId = getBeacon(99)['id']
@@ -309,7 +315,13 @@ daniBeaconId = getBeacon(26)['id']
 johannBeaconId = getBeacon(5)['id']
 calBeaconId = getBeacon(35)['id']
 
-for i in range(0, 10):
+for i in range(0, 6):
+  ping(datetime(2018, 1, 1, 10, i, random.randint(10, 30), random.randint(0, 100000)), jorgeBeaconId, -99, chrono1)
+  ping(datetime(2018, 1, 1, 10, 40 + i, random.randint(5, 30), random.randint(0, 100000)), marcBeaconId, -93, chrono1)
+  ping(datetime(2018, 1, 1, 10, 20 + i, random.randint(10, 30), random.randint(0, 100000)), calBeaconId, -35, chrono1)
+  ping(datetime(2018, 1, 1, 10, 40 + i, random.randint(12, 32), random.randint(0, 100000)), johannBeaconId, -5, chrono1)
+
+for i in range(0, 5):
   ping(datetime(2018, 1, 1, 14, i, random.randint(10, 30), random.randint(0, 100000)), jorgeBeaconId, -99, chrono0)
   ping(datetime(2018, 1, 1, 15, 10 + i, random.randint(10, 30), random.randint(0, 100000)), jorgeBeaconId, -99, chrono0)
   ping(datetime(2018, 1, 1, 16, 20 + i, random.randint(10, 30), random.randint(0, 100000)), jorgeBeaconId, -99, chrono0)
@@ -342,26 +354,63 @@ for i in range(0, 10):
   ping(datetime(2018, 1, 1, 15, 40 + i, random.randint(12, 32), random.randint(0, 100000)), johannBeaconId, -5, chrono0)
 
 # Laps per pilot
-
-# TODO - [ ] Add getLaps of Pilot of Session
 print("---- Laps Valentino ----")
-laps = getLapsOfPilot(getPilot('Valentino', 'Rossi')['id'])
+laps = getLapsOfPilot(valentino['id'], session['id'])
 printLaps(laps, True)
-print(str(len(laps)))
+#print(str(len(laps)))
 #assert len(laps) == 12
 
 print("---- Laps Marc ----")
-print("---- Laps Dani ----")
-print("---- Laps Jorge ----")
-print("---- Laps Johann ----")
-print("---- Laps Cal ----")
-
-# All Laps
-laps = getLaps()
+morningLaps = getLapsOfPilot(marc['id'], morningSession['id'])
+printLaps(morningLaps, True)
+laps = getLapsOfPilot(marc['id'], session['id'])
 printLaps(laps, True)
+
+print("---- Laps Dani ----")
+laps = getLapsOfPilot(dani['id'], session['id'])
+printLaps(laps, True)
+
+print("---- Laps Jorge ----")
+morningLaps = getLapsOfPilot(jorge['id'], morningSession['id'])
+printLaps(morningLaps, True)
+laps = getLapsOfPilot(jorge['id'], session['id'])
+printLaps(laps, True)
+
+print("---- Laps Johann ----")
+morningLaps = getLapsOfPilot(johann['id'], morningSession['id'])
+printLaps(morningLaps, True)
+laps = getLapsOfPilot(johann['id'], session['id'])
+printLaps(laps, True)
+
+# Laps of location
+laps = getLapsOfPilot(pilotId=johann['id'], locationId=ledenon['id'])
+printLaps(laps, True)
+
+# Laps of Event
+laps = getLapsOfPilot(pilotId=johann['id'], eventId=timeTrial['id'])
+printLaps(laps, True)
+
+print("---- Laps Cal ----")
+morningLaps = getLapsOfPilot(cal['id'], morningSession['id'])
+printLaps(morningLaps, True)
+laps = getLapsOfPilot(cal['id'], session['id'])
+printLaps(laps, True)
+
+# Laps of location
+laps = getLaps(locationId=ledenon['id'])
+printLaps(laps, True)
+
+# Laps of Event
+laps = getLaps(eventId=timeTrial['id'])
+printLaps(laps, True)
+
 # Session summary
 laps = getLapsForSession(session['id'])
 printLaps(laps, True)
+
+# -------------------------------
+# Race with just one chrono
+# -------------------------------
 
 # --------- TODO -------------
 # -------------------------------

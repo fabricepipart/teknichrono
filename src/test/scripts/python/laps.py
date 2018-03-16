@@ -9,16 +9,34 @@ lapsUrl = '/teknichrono/rest/laptimes'
 # ----------------------------------------------------------------------
 
 
-def getLapsOfPilot(pilotId):
+def getLapsOfPilot(pilotId, sessionId=None, locationId=None, eventId=None):
   "This gets the laps of a given pilot and returns a json"
-  url = lapsUrl + '?pilotId=' + str(pilotId)
+  sessionIdOption = ''
+  if sessionId:
+    sessionIdOption = '&sessionId=' + str(sessionId)
+  locationIdOption = ''
+  if locationId:
+    locationIdOption = '&locationId=' + str(locationId)
+  eventIdOption = ''
+  if eventId:
+    eventIdOption = '&eventId=' + str(eventId)
+  url = lapsUrl + '?pilotId=' + str(pilotId) + str(sessionIdOption) + str(locationIdOption) + str(eventIdOption)
   lapsResponse = get(url)
   return lapsResponse
 
 
-def getLaps():
+def getLaps(locationId=None, eventId=None):
   "This gets all Laps"
-  lapsResponse = get(lapsUrl)
+  locationIdOption = ''
+  if locationId:
+    locationIdOption = '&locationId=' + str(locationId)
+  eventIdOption = ''
+  if eventId:
+    eventIdOption = '&eventId=' + str(eventId)
+  url = lapsUrl
+  if locationId or eventIdOption:
+    url = url + '?' + str(locationIdOption) + str(eventIdOption)
+  lapsResponse = get(url)
   return lapsResponse
 
 

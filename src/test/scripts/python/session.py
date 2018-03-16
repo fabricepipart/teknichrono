@@ -9,7 +9,7 @@ SessionsUrl = '/teknichrono/rest/sessions'
 
 def addSession(name, start, end):
   "This adds a Session"
-  data = '{"name":"' + name + '", "start":"' + str(start) + '", "end":"' + str(end) + '"}'
+  data = '{"name":"' + name + '", "start":"' + formatDatetime(start) + '", "end":"' + formatDatetime(end) + '"}'
   post(data, SessionsUrl)
   print("Session " + name + " added")
   sessionResponse = getSessionByName(name)

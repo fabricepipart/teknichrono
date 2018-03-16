@@ -184,9 +184,6 @@ assert len(runsThree) == 2
 # Shuffle the pings in a crazy order and check they are still reordered correctly
 # --------- TODO -------------
 
-laps = getLaps()
-printLaps(laps, True)
-
 # Session summary
 laps = getLapsForEvent(event['id'])
 printLaps(laps, True)
