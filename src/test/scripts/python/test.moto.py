@@ -9,6 +9,7 @@ from pilots import *
 from beacons import *
 from chronometer import *
 from event import *
+from category import *
 from session import *
 from location import *
 from ping import *
@@ -34,6 +35,7 @@ deletePilots()
 deleteChronometers()
 deleteSessions()
 deleteEvents()
+deleteCategories()
 deleteLocations()
 
 # ----------------------------------------------------------------------
@@ -53,6 +55,20 @@ dani = addPilot('Dani', 'Pedrosa')
 jorge = addPilot('Jorge', 'Lorenzo')
 johann = addPilot('Johann', 'Zarco')
 cal = addPilot('Cal', 'Crutchlow')
+
+# ----------------------------------------------------------------------
+# Add Categories
+topPilot = addCategory('Top Pilot')
+bottomPilot = addCategory('Bottom Pilot')
+
+addPilotToCategory(bottomPilot['id'], fabrice['id'])
+addPilotToCategory(bottomPilot['id'], jeremy['id'])
+addPilotToCategory(topPilot['id'], valentino['id'])
+addPilotToCategory(topPilot['id'], marc['id'])
+addPilotToCategory(topPilot['id'], dani['id'])
+addPilotToCategory(topPilot['id'], jorge['id'])
+addPilotToCategory(topPilot['id'], johann['id'])
+addPilotToCategory(topPilot['id'], cal['id'])
 
 # ----------------------------------------------------------------------
 # Play with associations
@@ -276,6 +292,18 @@ assert len(lapsJorge) == 12
 # Session summary
 laps = getLapsForSession(session['id'])
 printLaps(laps, True)
+
+# Laps by category
+printLaps(getLapsForSession(session['id'], topPilot['id']), True)
+printLaps(getLapsForSession(session['id'], bottomPilot['id']), True)
+
+# Laps of location and category
+printLaps(getLaps(locationId=leLuc['id'], categoryId=topPilot['id']), True)
+printLaps(getLaps(locationId=leLuc['id'], categoryId=bottomPilot['id']), True)
+
+# Laps of Event and category
+printLaps(getLaps(eventId=trd1['id'], categoryId=topPilot['id']), True)
+printLaps(getLaps(eventId=trd1['id'], categoryId=bottomPilot['id']), True)
 
 # --------- TODO -------------
 print("-------------------------------")

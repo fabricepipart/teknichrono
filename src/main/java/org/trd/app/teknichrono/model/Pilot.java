@@ -12,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
@@ -56,7 +57,19 @@ public class Pilot implements Serializable {
   @JsonIgnore
   private List<LapTime> laps = new ArrayList<LapTime>();
 
+  @ManyToOne(fetch = FetchType.EAGER, optional = true, cascade = CascadeType.MERGE)
+  @JoinColumn(name = "categoryId")
+  private Category category;
+
   /* ===================== Getters and setters ======================== */
+
+  public Category getCategory() {
+    return category;
+  }
+
+  public void setCategory(Category category) {
+    this.category = category;
+  }
 
   public int getId() {
     return this.id;

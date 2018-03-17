@@ -25,7 +25,7 @@ def getLapsOfPilot(pilotId, sessionId=None, locationId=None, eventId=None):
   return lapsResponse
 
 
-def getLaps(locationId=None, eventId=None):
+def getLaps(locationId=None, eventId=None, categoryId=None):
   "This gets all Laps"
   locationIdOption = ''
   if locationId:
@@ -33,16 +33,22 @@ def getLaps(locationId=None, eventId=None):
   eventIdOption = ''
   if eventId:
     eventIdOption = '&eventId=' + str(eventId)
+  categoryIdOption = ''
+  if categoryId:
+    categoryIdOption = '&categoryId=' + str(categoryId)
   url = lapsUrl
   if locationId or eventIdOption:
-    url = url + '?' + str(locationIdOption) + str(eventIdOption)
+    url = url + '?' + str(locationIdOption) + str(eventIdOption) + str(categoryIdOption)
   lapsResponse = get(url)
   return lapsResponse
 
 
-def getLapsForSession(sessionId):
+def getLapsForSession(sessionId, categoryId=None):
   "This gets the laps of a given session and returns a json"
-  url = lapsUrl + '?sessionId=' + str(sessionId)
+  categoryIdOption = ''
+  if categoryId:
+    categoryIdOption = '&categoryId=' + str(categoryId)
+  url = lapsUrl + '?sessionId=' + str(sessionId) + str(categoryIdOption)
   lapsResponse = get(url)
   return lapsResponse
 
