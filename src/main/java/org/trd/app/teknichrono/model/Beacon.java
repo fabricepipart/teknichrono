@@ -7,7 +7,6 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -17,11 +16,12 @@ import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
 @XmlRootElement
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Beacon implements java.io.Serializable {
 
   /* =========================== Entity stuff =========================== */
@@ -47,33 +47,14 @@ public class Beacon implements java.io.Serializable {
 
   // Mapped by denotes that Pilot is the owner of the relationship
   // http://meri-stuff.blogspot.fr/2012/03/jpa-tutorial.html#RelationshipsBidirectionalOneToManyManyToOneConsistency
-  @OneToOne(fetch = FetchType.EAGER, optional = true, mappedBy = "currentBeacon", cascade = CascadeType.MERGE)
-  @JsonIgnore
-  @JsonBackReference
+  @OneToOne(optional = true, mappedBy = "currentBeacon", cascade = CascadeType.MERGE)
+  @JsonBackReference(value = "pilot-beacon")
   private Pilot pilot;
 
   // Can be null if after event, items are reassociated
-  @OneToMany(fetch = FetchType.EAGER, mappedBy = "beacon")
-  @JsonIgnore
-  @JsonBackReference
+  @OneToMany(mappedBy = "beacon")
+  @JsonBackReference(value = "ping-beacon")
   private List<Ping> pings = new ArrayList<Ping>();
-
-  /* ============================ Factory ============================ */
-
-  public Beacon() {
-  }
-
-  public Beacon(int id, int number) {
-    this.id = id;
-    this.number = number;
-  }
-
-  @JsonCreator
-  public static Beacon create(int id) {
-    Beacon b = new Beacon();
-    b.setId(id);
-    return b;
-  }
 
   /* ===================== Getters and setters ======================== */
 

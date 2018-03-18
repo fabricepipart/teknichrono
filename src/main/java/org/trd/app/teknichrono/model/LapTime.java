@@ -11,14 +11,19 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 @Entity
 @XmlRootElement
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class LapTime implements java.io.Serializable {
 
   /* =========================== Entity stuff =========================== */
@@ -38,7 +43,8 @@ public class LapTime implements java.io.Serializable {
 
   /* =============================== Fields =============================== */
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "pilotId")
   private Pilot pilot;
 
   // Used to order the laps for the pilot relationship

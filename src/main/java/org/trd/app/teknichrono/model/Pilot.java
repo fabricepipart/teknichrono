@@ -19,10 +19,13 @@ import javax.persistence.OrderBy;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
 @XmlRootElement
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Pilot implements Serializable {
 
   /* =========================== Entity stuff =========================== */
@@ -52,9 +55,10 @@ public class Pilot implements Serializable {
   @JoinColumn(name = "currentBeaconId")
   private Beacon currentBeacon;
 
-  @OneToMany(mappedBy = "pilot", cascade = CascadeType.REMOVE)
+  @OneToMany(cascade = CascadeType.REMOVE)
   @OrderBy(value = "startDate")
-  @JsonIgnore
+  @JoinColumn(name = "pilotId")
+  @JsonBackReference(value = "laptime-pilot")
   private List<LapTime> laps = new ArrayList<LapTime>();
 
   @ManyToOne(fetch = FetchType.EAGER, optional = true, cascade = CascadeType.MERGE)

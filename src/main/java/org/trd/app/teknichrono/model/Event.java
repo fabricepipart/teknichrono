@@ -13,8 +13,13 @@ import javax.persistence.OneToMany;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 @Entity
 @XmlRootElement
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Event implements java.io.Serializable {
 
   /**
@@ -33,6 +38,7 @@ public class Event implements java.io.Serializable {
 
   @OneToMany(orphanRemoval = true)
   @JoinColumn(name = "eventId")
+  @JsonBackReference(value = "session-event")
   private List<Session> sessions = new ArrayList<Session>();
 
   @Column(nullable = false)

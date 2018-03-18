@@ -17,10 +17,13 @@ import javax.persistence.OrderColumn;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
 @XmlRootElement
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Session implements java.io.Serializable {
 
   /**
@@ -69,7 +72,7 @@ public class Session implements java.io.Serializable {
   private Location location;
 
   @ManyToOne
-  @JsonIgnore
+  @JsonIgnoreProperties
   private Event event = null;
 
   public Event getEvent() {
