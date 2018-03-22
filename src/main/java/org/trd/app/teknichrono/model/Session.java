@@ -11,8 +11,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -43,24 +43,22 @@ public class Session implements java.io.Serializable {
   @Column(nullable = false)
   private Date start;
 
+  @Column
+  private long inactivity = 60000L;
+
   @Column(nullable = false)
   private Date end;
+
+  @Column(nullable = false)
+  private String type;
 
   /**
    * <pre>
    * List of chrono points used for the event. From start to finish line.
-   * 
-   * For a rally. The Raspberry number are as follows
-   *     _________________
-   *     | 0 | 1 | 2 | 3 |
-   * For a track
-   *     _________________
-   *     | 0 | 1 | 2 | 0 |
    * </pre>
    */
-  @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true)
+  @ManyToMany(fetch = FetchType.EAGER)
   @OrderColumn(name = "chronoIndex")
-  @JoinColumn(name = "sessionId")
   private List<Chronometer> chronometers = new ArrayList<Chronometer>();
 
   @Column(nullable = false)
@@ -74,6 +72,17 @@ public class Session implements java.io.Serializable {
   @ManyToOne
   @JsonIgnoreProperties
   private Event event = null;
+
+  @ManyToMany(fetch = FetchType.EAGER)
+  private List<Pilot> pilots = new ArrayList<Pilot>();
+
+  public List<Pilot> getPilots() {
+    return pilots;
+  }
+
+  public void setPilots(List<Pilot> pilots) {
+    this.pilots = pilots;
+  }
 
   public Event getEvent() {
     return event;
@@ -162,6 +171,35 @@ public class Session implements java.io.Serializable {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public SessionType getSessionType() {
+    for (SessionType sessionType : SessionType.values()) {
+      if (type != null && type.equals(sessionType.getIdentifier())) {
+        return sessionType;
+      }
+    }
+    return SessionType.TIME_TRIAL;
+  }
+
+  public void setSessionType(SessionType type) {
+    this.type = type.getIdentifier();
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public long getInactivity() {
+    return inactivity;
+  }
+
+  public void setInactivity(long inactivity) {
+    this.inactivity = inactivity;
   }
 
   @Override

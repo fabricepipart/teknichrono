@@ -14,34 +14,6 @@ from session import *
 from location import *
 from ping import *
 from laps import *
-from tests import *
-
-# ----------------------------------------------------------------------
-# Test dqte primitives
-print("Date = " + formatDatetime(timestampToDate(1471863621321)))
-# 2016-08-22T11:00:21.321Z
-
-# ----------------------------------------------------------------------
-# Command line parameters
-print(len(sys.argv))
-if len(sys.argv) >= 2:
-  setHost(sys.argv[1])
-
-# ----------------------------------------------------------------------
-
-# Cleanup
-deleteBeacons()
-deletePilots()
-deleteChronometers()
-deleteSessions()
-deleteEvents()
-deleteCategories()
-deleteLocations()
-
-# ----------------------------------------------------------------------
-# Add Beacons
-for i in range(0, 100):
-  addBeacon(i)
 
 # ----------------------------------------------------------------------
 # Add Pilots
@@ -49,26 +21,19 @@ for i in range(0, 100):
 jerome = addPilot('Jerome', 'Rousseau')
 fabrice = addPilot('Fabrice', 'Pipart')
 jeremy = addPilot('Jeremy', 'Ponchel')
-valentino = addPilot('Valentino', 'Rossi')
-marc = addPilot('Marc', 'Marquez')
-dani = addPilot('Dani', 'Pedrosa')
-jorge = addPilot('Jorge', 'Lorenzo')
-johann = addPilot('Johann', 'Zarco')
-cal = addPilot('Cal', 'Crutchlow')
+valentino = addPilot('Valentino', 'TRD')
+jorge = addPilot('Jorge', 'TRD')
 
 # ----------------------------------------------------------------------
 # Add Categories
-topPilot = addCategory('Top Pilot')
-bottomPilot = addCategory('Bottom Pilot')
+cat1 = addCategory('Cat1')
+cat2 = addCategory('Cat2')
+cat3 = addCategory('Cat3')
 
-addPilotToCategory(bottomPilot['id'], fabrice['id'])
-addPilotToCategory(bottomPilot['id'], jeremy['id'])
-addPilotToCategory(topPilot['id'], valentino['id'])
-addPilotToCategory(topPilot['id'], marc['id'])
-addPilotToCategory(topPilot['id'], dani['id'])
-addPilotToCategory(topPilot['id'], jorge['id'])
-addPilotToCategory(topPilot['id'], johann['id'])
-addPilotToCategory(topPilot['id'], cal['id'])
+addPilotToCategory(cat3['id'], fabrice['id'])
+addPilotToCategory(cat2['id'], jeremy['id'])
+addPilotToCategory(cat1['id'], valentino['id'])
+addPilotToCategory(cat1['id'], jorge['id'])
 
 # ----------------------------------------------------------------------
 # Play with associations
@@ -92,28 +57,21 @@ for i in range(0, 5):
 # ----------------------------------------------------------------------
 # Add Locations
 leLuc = addLocation('Le Luc')
-ledenon = addLocation('Ledenon')
-aragon = addLocation('Aragon')
-rally = addLocation('Rally #1', False)
 
 # ----------------------------------------------------------------------
 # Add Events
 trd1 = addEvent('TRD Le Luc 2016-08-22')
-trd2 = addEvent('TRD Ledenon 2016-09-12+13')
-trd3 = addEvent('TRD Aragon 2016-10-22+23')
-trd4 = addEvent('TRD Le Luc 2016-11-01')
-rally = addEvent('Rally-1-event')
 
 # ----------------------------------------------------------------------
 # Add Sessions
-session = addSession('Morning TRD Le Luc 2016-08-22', datetime(2016, 8, 22), datetime(2016, 8, 22))
+session = addSession('Morning TRD Le Luc 2016-08-22', datetime(2016, 8, 22), datetime(2016, 8, 22), 'tt')
 addSessionToLocation(leLuc['id'], session['id'])
 addSessionToEvent(trd1['id'], session['id'])
 
-addSession('Morning TRD Ledenon 2016-09-12+13', datetime(2016, 9, 12), datetime(2016, 9, 13))
-addSession('Morning TRD Aragon 2016-10-22+23', datetime(2016, 10, 22), datetime(2016, 10, 23))
-addSession('Morning TRD Le Luc 2016-11-01', datetime(2016, 11, 1), datetime(2016, 11, 1))
-addSession('Session of Rally 1', datetime(2017, 3, 1), datetime(2017, 3, 1))
+addSession('Morning TRD Ledenon 2016-09-12+13', datetime(2016, 9, 12), datetime(2016, 9, 13), 'tt')
+addSession('Morning TRD Aragon 2016-10-22+23', datetime(2016, 10, 22), datetime(2016, 10, 23), 'tt')
+addSession('Morning TRD Le Luc 2016-11-01', datetime(2016, 11, 1), datetime(2016, 11, 1), 'tt')
+addSession('Session of Rally 1', datetime(2017, 3, 1), datetime(2017, 3, 1), 'tt')
 
 # ----------------------------------------------------------------------
 # Associate chronometers to session in right order
@@ -294,166 +252,10 @@ laps = getLapsForSession(session['id'])
 printLaps(laps, True)
 
 # Laps by category
-printLaps(getLapsForSession(session['id'], topPilot['id']), True)
-printLaps(getLapsForSession(session['id'], bottomPilot['id']), True)
+printLaps(getLapsForSession(session['id'], cat1['id']), True)
 
 # Laps of location and category
-printLaps(getLaps(locationId=leLuc['id'], categoryId=topPilot['id']), True)
-printLaps(getLaps(locationId=leLuc['id'], categoryId=bottomPilot['id']), True)
+printLaps(getLaps(locationId=leLuc['id'], categoryId=cat1['id']), True)
 
 # Laps of Event and category
-printLaps(getLaps(eventId=trd1['id'], categoryId=topPilot['id']), True)
-printLaps(getLaps(eventId=trd1['id'], categoryId=bottomPilot['id']), True)
-
-# --------- TODO -------------
-print("-------------------------------")
-print("Time trial with Just one chrono")
-print("-------------------------------")
-
-# TODO Session of same event
-
-eventName = 'Time trial with Just one chrono'
-timeTrial = addEvent(eventName)
-
-morningSession = addSession(eventName + ' morning session', datetime(2018, 1, 1, 8, 0, 0, 0),
-                            datetime(2018, 1, 1, 12, 0, 0, 0))
-addSessionToLocation(ledenon['id'], morningSession['id'])
-addSessionToEvent(timeTrial['id'], morningSession['id'])
-addChronometerToSession(morningSession['id'], getChronometerByName('Raspberry-1')['id'])
-chrono1 = getChronometerByName('Raspberry-1')['id']
-
-session = addSession(eventName + ' afternoon session', datetime(2018, 1, 1, 14, 0, 0, 0),
-                     datetime(2018, 1, 1, 18, 0, 0, 0))
-addSessionToLocation(ledenon['id'], session['id'])
-addSessionToEvent(timeTrial['id'], session['id'])
-addChronometerToSession(session['id'], getChronometerByName('Raspberry-0')['id'])
-chrono0 = getChronometerByName('Raspberry-0')['id']
-
-associatePilotBeacon(valentino['id'], getBeacon(46)['id'])
-associatePilotBeacon(marc['id'], getBeacon(93)['id'])
-associatePilotBeacon(dani['id'], getBeacon(26)['id'])
-associatePilotBeacon(jorge['id'], getBeacon(99)['id'])
-associatePilotBeacon(johann['id'], getBeacon(5)['id'])
-associatePilotBeacon(cal['id'], getBeacon(35)['id'])
-
-valentinoBeaconId = getBeacon(46)['id']
-jorgeBeaconId = getBeacon(99)['id']
-marcBeaconId = getBeacon(93)['id']
-daniBeaconId = getBeacon(26)['id']
-johannBeaconId = getBeacon(5)['id']
-calBeaconId = getBeacon(35)['id']
-
-for i in range(0, 6):
-  ping(datetime(2018, 1, 1, 10, i, random.randint(10, 30), random.randint(0, 100000)), jorgeBeaconId, -99, chrono1)
-  ping(datetime(2018, 1, 1, 10, 40 + i, random.randint(5, 30), random.randint(0, 100000)), marcBeaconId, -93, chrono1)
-  ping(datetime(2018, 1, 1, 10, 20 + i, random.randint(10, 30), random.randint(0, 100000)), calBeaconId, -35, chrono1)
-  ping(datetime(2018, 1, 1, 10, 40 + i, random.randint(12, 32), random.randint(0, 100000)), johannBeaconId, -5, chrono1)
-
-for i in range(0, 5):
-  ping(datetime(2018, 1, 1, 14, i, random.randint(10, 30), random.randint(0, 100000)), jorgeBeaconId, -99, chrono0)
-  ping(datetime(2018, 1, 1, 15, 10 + i, random.randint(10, 30), random.randint(0, 100000)), jorgeBeaconId, -99, chrono0)
-  ping(datetime(2018, 1, 1, 16, 20 + i, random.randint(10, 30), random.randint(0, 100000)), jorgeBeaconId, -99, chrono0)
-  ping(datetime(2018, 1, 1, 17, 30 + i, random.randint(10, 30), random.randint(0, 100000)), jorgeBeaconId, -99, chrono0)
-  ping(
-      datetime(2018, 1, 1, 14, 10 + i, random.randint(10, 30), random.randint(0, 100000)), valentinoBeaconId, -46,
-      chrono0)
-  ping(
-      datetime(2018, 1, 1, 15, 20 + i, random.randint(10, 30), random.randint(0, 100000)), valentinoBeaconId, -46,
-      chrono0)
-  ping(
-      datetime(2018, 1, 1, 16, 30 + i, random.randint(10, 30), random.randint(0, 100000)), valentinoBeaconId, -46,
-      chrono0)
-  ping(datetime(2018, 1, 1, 14, 20 + i, random.randint(5, 30), random.randint(0, 100000)), marcBeaconId, -93, chrono0)
-  ping(datetime(2018, 1, 1, 15, 30 + i, random.randint(5, 30), random.randint(0, 100000)), marcBeaconId, -93, chrono0)
-  ping(datetime(2018, 1, 1, 17, 40 + i, random.randint(5, 30), random.randint(0, 100000)), marcBeaconId, -93, chrono0)
-  ping(datetime(2018, 1, 1, 15, 10 + i, random.randint(5, 30), random.randint(0, 100000)), daniBeaconId, -26, chrono0)
-  ping(datetime(2018, 1, 1, 16, 20 + i, random.randint(5, 30), random.randint(0, 100000)), daniBeaconId, -26, chrono0)
-  ping(datetime(2018, 1, 1, 17, 30 + i, random.randint(5, 30), random.randint(0, 100000)), daniBeaconId, -26, chrono0)
-  ping(datetime(2018, 1, 1, 14, i, random.randint(10, 30), random.randint(0, 100000)), johannBeaconId, -5, chrono0)
-  ping(datetime(2018, 1, 1, 15, 10 + i, random.randint(10, 30), random.randint(0, 100000)), johannBeaconId, -5, chrono0)
-  ping(datetime(2018, 1, 1, 16, 40 + i, random.randint(10, 30), random.randint(0, 100000)), johannBeaconId, -5, chrono0)
-  ping(datetime(2018, 1, 1, 17, 30 + i, random.randint(10, 30), random.randint(0, 100000)), johannBeaconId, -5, chrono0)
-  ping(datetime(2018, 1, 1, 14, i, random.randint(10, 30), random.randint(0, 100000)), calBeaconId, -35, chrono0)
-  ping(datetime(2018, 1, 1, 15, 10 + i, random.randint(10, 30), random.randint(0, 100000)), calBeaconId, -35, chrono0)
-  ping(datetime(2018, 1, 1, 16, 20 + i, random.randint(10, 30), random.randint(0, 100000)), calBeaconId, -35, chrono0)
-  ping(datetime(2018, 1, 1, 17, 30 + i, random.randint(10, 30), random.randint(0, 100000)), calBeaconId, -35, chrono0)
-
-for i in range(0, 10):
-  ping(datetime(2018, 1, 1, 15, 40 + i, random.randint(12, 32), random.randint(0, 100000)), johannBeaconId, -5, chrono0)
-
-# Laps per pilot
-print("---- Laps Valentino ----")
-laps = getLapsOfPilot(valentino['id'], session['id'])
-printLaps(laps, True)
-#print(str(len(laps)))
-#assert len(laps) == 12
-
-print("---- Laps Marc ----")
-morningLaps = getLapsOfPilot(marc['id'], morningSession['id'])
-printLaps(morningLaps, True)
-laps = getLapsOfPilot(marc['id'], session['id'])
-printLaps(laps, True)
-
-print("---- Laps Dani ----")
-laps = getLapsOfPilot(dani['id'], session['id'])
-printLaps(laps, True)
-
-print("---- Laps Jorge ----")
-morningLaps = getLapsOfPilot(jorge['id'], morningSession['id'])
-printLaps(morningLaps, True)
-laps = getLapsOfPilot(jorge['id'], session['id'])
-printLaps(laps, True)
-
-print("---- Laps Johann ----")
-morningLaps = getLapsOfPilot(johann['id'], morningSession['id'])
-printLaps(morningLaps, True)
-laps = getLapsOfPilot(johann['id'], session['id'])
-printLaps(laps, True)
-
-# Laps of location
-laps = getLapsOfPilot(pilotId=johann['id'], locationId=ledenon['id'])
-printLaps(laps, True)
-
-# Laps of Event
-laps = getLapsOfPilot(pilotId=johann['id'], eventId=timeTrial['id'])
-printLaps(laps, True)
-
-print("---- Laps Cal ----")
-morningLaps = getLapsOfPilot(cal['id'], morningSession['id'])
-printLaps(morningLaps, True)
-laps = getLapsOfPilot(cal['id'], session['id'])
-printLaps(laps, True)
-
-# Laps of location
-laps = getLaps(locationId=ledenon['id'])
-printLaps(laps, True)
-
-# Laps of Event
-laps = getLaps(eventId=timeTrial['id'])
-printLaps(laps, True)
-
-# Session summary
-laps = getLapsForSession(session['id'])
-printLaps(laps, True)
-
-# -------------------------------
-# Race with just one chrono
-# -------------------------------
-
-# --------- TODO -------------
-# -------------------------------
-# Race with just one chrono
-# -------------------------------
-
-# Laps per pilot
-# All Laps
-# Session summary
-
-# --------- TODO -------------
-# -------------------------------
-# Race with several chronos
-# -------------------------------
-
-# Laps per pilot
-# All Laps
-# Session summary
+printLaps(getLaps(eventId=trd1['id'], categoryId=cat1['id']), True)

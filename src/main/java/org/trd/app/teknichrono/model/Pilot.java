@@ -12,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -65,7 +66,19 @@ public class Pilot implements Serializable {
   @JoinColumn(name = "categoryId")
   private Category category;
 
+  @ManyToMany(mappedBy = "pilots")
+  @JsonBackReference(value = "session-pilot")
+  private List<Session> sessions = new ArrayList<Session>();
+
   /* ===================== Getters and setters ======================== */
+
+  public List<Session> getSessions() {
+    return sessions;
+  }
+
+  public void setSessions(List<Session> sessions) {
+    this.sessions = sessions;
+  }
 
   public Category getCategory() {
     return category;

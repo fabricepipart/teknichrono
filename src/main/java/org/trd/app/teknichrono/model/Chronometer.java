@@ -9,7 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -50,9 +50,9 @@ public class Chronometer implements Serializable {
   @JsonBackReference(value = "ping-chronometer")
   private List<Ping> pings = new ArrayList<Ping>();
 
-  @ManyToOne
+  @ManyToMany(mappedBy = "chronometers")
   @JsonBackReference(value = "session-chronometer")
-  private Session session = null;
+  private List<Session> sessions = new ArrayList<Session>();
 
   /* ===================== Getters and setters ======================== */
   public int getId() {
@@ -95,12 +95,12 @@ public class Chronometer implements Serializable {
     this.pings = pings;
   }
 
-  public Session getSession() {
-    return session;
+  public List<Session> getSessions() {
+    return sessions;
   }
 
-  public void setSession(Session session) {
-    this.session = session;
+  public void setSessions(List<Session> sessions) {
+    this.sessions = sessions;
   }
 
   /* ===================== Other ======================== */

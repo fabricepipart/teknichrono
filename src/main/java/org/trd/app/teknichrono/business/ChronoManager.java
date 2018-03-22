@@ -43,10 +43,21 @@ public class ChronoManager {
     }
     int chronoIndex = chronometer.getChronoIndex().intValue();
 
-    Session session = ping.getChrono().getSession();
+    Session session = pickMostRelevant(ping.getChrono().getSessions(), ping);
     if (session == null) {
       System.err.println("No Session associated to Chrono " + chronometer.getId() + ", cannot updates laptimes");
       return;
+    }
+
+    long inactivity = session.getInactivity();
+    if (inactivity > 0) {
+      long pingTime = ping.getDateTime().getTime();
+      long start = session.getStart().getTime();
+      long inactivityEnd = start + inactivity;
+      if (pingTime > start && pingTime < inactivityEnd) {
+        System.out.println("Ping ignored since Session " + session.getId() + " is during its inactivity period.");
+        return;
+      }
     }
 
     List<LapTime> previousLaptimes = pilot.getLaps();
@@ -174,6 +185,34 @@ public class ChronoManager {
     // The chronopoint is the last one of the session
 
     // New Laptime but not first intermediate
+  }
+
+  private Session pickMostRelevant(List<Session> sessions, Ping ping) {
+    Session mostRelevant = null;
+    long mostRelevantDistance = Long.MAX_VALUE;
+    for (Session session : sessions) {
+      long pingTime = ping.getDateTime().getTime();
+      long distance = distanceBetween(session, pingTime);
+      if (distance == 0) {
+        return session;
+      }
+      if (distance < mostRelevantDistance) {
+        mostRelevant = session;
+        mostRelevantDistance = distance;
+      }
+    }
+    return mostRelevant;
+  }
+
+  private long distanceBetween(Session session, long pingTime) {
+    long start = session.getStart().getTime();
+    long end = session.getEnd().getTime();
+    if (pingTime > end) {
+      return (pingTime - end);
+    } else if (pingTime < start) {
+      return (start - pingTime);
+    }
+    return 0;
   }
 
   private LapTime createLaptime(Session session, Pilot pilot, List<Ping> toInsertInNewLap, Chronometer chronometer) {

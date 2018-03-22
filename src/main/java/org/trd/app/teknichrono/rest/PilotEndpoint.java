@@ -23,6 +23,7 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.trd.app.teknichrono.model.Beacon;
 import org.trd.app.teknichrono.model.Pilot;
+import org.trd.app.teknichrono.model.Session;
 
 /**
  * 
@@ -47,6 +48,9 @@ public class PilotEndpoint {
     Pilot entity = em.find(Pilot.class, id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
+    }
+    for (Session s : entity.getSessions()) {
+      s.getPilots().remove(entity);
     }
     em.remove(entity);
     return Response.noContent().build();

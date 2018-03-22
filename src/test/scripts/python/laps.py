@@ -1,6 +1,5 @@
 #!python3
 
-import datetime
 from base import *
 from prettytable import PrettyTable
 

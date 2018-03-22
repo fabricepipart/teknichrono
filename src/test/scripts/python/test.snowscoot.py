@@ -90,64 +90,64 @@ chrono2 = getChronometerByName('Raspberry-2')['id']
 
 # import random
 # random.shuffle(array)
-baseDate = datetime.datetime(2017, 1, 27, 11, 0, 0, 1 * 1000)
+baseDate = datetime(2017, 1, 27, 11, 0, 0, 1 * 1000)
 
 # ----------------------------------------------------------
 # Chronos passed in order  0 1 2
 # ----------------------------------------------------------
 
-ping(datetime.datetime(2017, 1, 27, 11, 0, 1, 1 * 1000), fabriceBeaconId, -83, chrono0)
-ping(datetime.datetime(2017, 1, 27, 11, 2, 2, 1 * 1000), fabriceBeaconId, -83, chrono1)
-ping(datetime.datetime(2017, 1, 27, 11, 4, 3, 1 * 1000), fabriceBeaconId, -83, chrono2)
+ping(datetime(2017, 1, 27, 11, 0, 1, 1 * 1000), fabriceBeaconId, -83, chrono0)
+ping(datetime(2017, 1, 27, 11, 2, 2, 1 * 1000), fabriceBeaconId, -83, chrono1)
+ping(datetime(2017, 1, 27, 11, 4, 3, 1 * 1000), fabriceBeaconId, -83, chrono2)
 
-ping(datetime.datetime(2017, 1, 27, 15, 0, 1, 1 * 1000), fabriceBeaconId, -83, chrono0)
-ping(datetime.datetime(2017, 1, 27, 15, 2, 3, 1 * 1000), fabriceBeaconId, -83, chrono1)
-ping(datetime.datetime(2017, 1, 27, 15, 4, 5, 1 * 1000), fabriceBeaconId, -83, chrono2)
+ping(datetime(2017, 1, 27, 15, 0, 1, 1 * 1000), fabriceBeaconId, -83, chrono0)
+ping(datetime(2017, 1, 27, 15, 2, 3, 1 * 1000), fabriceBeaconId, -83, chrono1)
+ping(datetime(2017, 1, 27, 15, 4, 5, 1 * 1000), fabriceBeaconId, -83, chrono2)
 
 # ----------------------------------------------------------
 # Chronos passed in order  0 1 2
 # Pings in wrong order
 # ----------------------------------------------------------
 
-ping(datetime.datetime(2017, 1, 27, 11, 1, 2, 2 * 1000), bruceBeaconId, -83, chrono1)
-ping(datetime.datetime(2017, 1, 27, 11, 2, 3, 2 * 1000), bruceBeaconId, -83, chrono2)
-ping(datetime.datetime(2017, 1, 27, 11, 0, 1, 2 * 1000), bruceBeaconId, -83, chrono0)
+ping(datetime(2017, 1, 27, 11, 1, 2, 2 * 1000), bruceBeaconId, -83, chrono1)
+ping(datetime(2017, 1, 27, 11, 2, 3, 2 * 1000), bruceBeaconId, -83, chrono2)
+ping(datetime(2017, 1, 27, 11, 0, 1, 2 * 1000), bruceBeaconId, -83, chrono0)
 
-ping(datetime.datetime(2017, 1, 27, 15, 1, 3, 2 * 1000), bruceBeaconId, -83, chrono1)
-ping(datetime.datetime(2017, 1, 27, 15, 2, 5, 2 * 1000), bruceBeaconId, -83, chrono2)
-ping(datetime.datetime(2017, 1, 27, 15, 0, 1, 2 * 1000), bruceBeaconId, -83, chrono0)
+ping(datetime(2017, 1, 27, 15, 1, 3, 2 * 1000), bruceBeaconId, -83, chrono1)
+ping(datetime(2017, 1, 27, 15, 2, 5, 2 * 1000), bruceBeaconId, -83, chrono2)
+ping(datetime(2017, 1, 27, 15, 0, 1, 2 * 1000), bruceBeaconId, -83, chrono0)
 
-ping(datetime.datetime(2017, 1, 27, 17, 1, 3, 2 * 1000), bruceBeaconId, -83, chrono1)
-ping(datetime.datetime(2017, 1, 27, 17, 2, 5, 2 * 1000), bruceBeaconId, -83, chrono2)
-ping(datetime.datetime(2017, 1, 27, 17, 0, 1, 2 * 1000), bruceBeaconId, -83, chrono0)
+ping(datetime(2017, 1, 27, 17, 1, 3, 2 * 1000), bruceBeaconId, -83, chrono1)
+ping(datetime(2017, 1, 27, 17, 2, 5, 2 * 1000), bruceBeaconId, -83, chrono2)
+ping(datetime(2017, 1, 27, 17, 0, 1, 2 * 1000), bruceBeaconId, -83, chrono0)
 
 # ----------------------------------------------------------
 # Chronos passed in order  1 2 3 0
 # Pings in random order
 # ----------------------------------------------------------
-ping(datetime.datetime(2017, 1, 27, 11, 0, 1, 1 * 1000), oneBeaconId, -83, chrono0)
-ping(datetime.datetime(2017, 1, 27, 11, 1, 12, 1 * 1000), oneBeaconId, -83, chrono1)
-ping(datetime.datetime(2017, 1, 27, 11, 2, 23, 1 * 1000), oneBeaconId, -83, chrono2)
+ping(datetime(2017, 1, 27, 11, 0, 1, 1 * 1000), oneBeaconId, -83, chrono0)
+ping(datetime(2017, 1, 27, 11, 1, 12, 1 * 1000), oneBeaconId, -83, chrono1)
+ping(datetime(2017, 1, 27, 11, 2, 23, 1 * 1000), oneBeaconId, -83, chrono2)
 
-ping(datetime.datetime(2017, 1, 27, 15, 0, 1, 1 * 1000), oneBeaconId, -83, chrono0)
-ping(datetime.datetime(2017, 1, 27, 15, 1, 13, 1 * 1000), oneBeaconId, -83, chrono1)
-ping(datetime.datetime(2017, 1, 27, 15, 2, 25, 1 * 1000), oneBeaconId, -83, chrono2)
+ping(datetime(2017, 1, 27, 15, 0, 1, 1 * 1000), oneBeaconId, -83, chrono0)
+ping(datetime(2017, 1, 27, 15, 1, 13, 1 * 1000), oneBeaconId, -83, chrono1)
+ping(datetime(2017, 1, 27, 15, 2, 25, 1 * 1000), oneBeaconId, -83, chrono2)
 
-ping(datetime.datetime(2017, 1, 27, 11, 0, 1, 1 * 1000), twoBeaconId, -83, chrono0)
-ping(datetime.datetime(2017, 1, 27, 11, 1, 22, 1 * 1000), twoBeaconId, -83, chrono1)
-ping(datetime.datetime(2017, 1, 27, 11, 2, 33, 1 * 1000), twoBeaconId, -83, chrono2)
+ping(datetime(2017, 1, 27, 11, 0, 1, 1 * 1000), twoBeaconId, -83, chrono0)
+ping(datetime(2017, 1, 27, 11, 1, 22, 1 * 1000), twoBeaconId, -83, chrono1)
+ping(datetime(2017, 1, 27, 11, 2, 33, 1 * 1000), twoBeaconId, -83, chrono2)
 
-ping(datetime.datetime(2017, 1, 27, 15, 0, 1, 1 * 1000), twoBeaconId, -83, chrono0)
-ping(datetime.datetime(2017, 1, 27, 15, 1, 23, 1 * 1000), twoBeaconId, -83, chrono1)
-ping(datetime.datetime(2017, 1, 27, 15, 2, 35, 1 * 1000), twoBeaconId, -83, chrono2)
+ping(datetime(2017, 1, 27, 15, 0, 1, 1 * 1000), twoBeaconId, -83, chrono0)
+ping(datetime(2017, 1, 27, 15, 1, 23, 1 * 1000), twoBeaconId, -83, chrono1)
+ping(datetime(2017, 1, 27, 15, 2, 35, 1 * 1000), twoBeaconId, -83, chrono2)
 
-ping(datetime.datetime(2017, 1, 27, 11, 0, 1, 1 * 1000), threeBeaconId, -83, chrono0)
-ping(datetime.datetime(2017, 1, 27, 11, 1, 32, 1 * 1000), threeBeaconId, -83, chrono1)
-ping(datetime.datetime(2017, 1, 27, 11, 2, 53, 1 * 1000), threeBeaconId, -83, chrono2)
+ping(datetime(2017, 1, 27, 11, 0, 1, 1 * 1000), threeBeaconId, -83, chrono0)
+ping(datetime(2017, 1, 27, 11, 1, 32, 1 * 1000), threeBeaconId, -83, chrono1)
+ping(datetime(2017, 1, 27, 11, 2, 53, 1 * 1000), threeBeaconId, -83, chrono2)
 
-ping(datetime.datetime(2017, 1, 27, 15, 0, 1, 1 * 1000), threeBeaconId, -83, chrono0)
-ping(datetime.datetime(2017, 1, 27, 15, 1, 33, 1 * 1000), threeBeaconId, -83, chrono1)
-ping(datetime.datetime(2017, 1, 27, 15, 2, 55, 1 * 1000), threeBeaconId, -83, chrono2)
+ping(datetime(2017, 1, 27, 15, 0, 1, 1 * 1000), threeBeaconId, -83, chrono0)
+ping(datetime(2017, 1, 27, 15, 1, 33, 1 * 1000), threeBeaconId, -83, chrono1)
+ping(datetime(2017, 1, 27, 15, 2, 55, 1 * 1000), threeBeaconId, -83, chrono2)
 
 # ----------------------------------------------------------------------
 # Get laptimes

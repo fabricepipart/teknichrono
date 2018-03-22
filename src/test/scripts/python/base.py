@@ -2,8 +2,8 @@
 
 import requests
 import json
-import datetime
-from datetime import date
+from datetime import date, datetime, timedelta
+import datetime as dt
 
 headers = {'Content-type': 'application/json'}
 host = 'http://localhost:8080'
@@ -21,8 +21,14 @@ def post(dataString, url, params=[]):
     print('POST to ' + host + url)
   response = requests.post(host + url, data=dataString, params=params, headers=headers)
   if (not response.ok):
+    print("Request returned an invalid status. Text output : " + response.text)
+    print("To reproduce : curl -X POST " + host + url + " --data '" + dataString +
+          "' --header \"Content-Type:application/json\" with params " + str(params))
     response.raise_for_status()
   return
+
+
+#curl -X POST http://localhost:8080/teknichrono/rest/sessions --data '{"type":"tt", name":"name", "start":"0", "end":"0"}' --header "Content-Type:application/json"
 
 
 def put(dataString, url):
@@ -41,6 +47,8 @@ def delete(url):
     print('DELETE to ' + host + url)
   response = requests.delete(host + url, headers=headers)
   if (not response.ok):
+    print("Request returned an invalid status. Text output : " + response.text)
+    print("To reproduce : curl -X DELETE " + host + url + "' --header \"Content-Type:application/json\"")
     response.raise_for_status()
   return
 
@@ -66,7 +74,7 @@ def timestampToDate(t):
   "This creates a date from a timestamp in secs from 1970"
   secs = t / 1000
   millisecs = t - (secs * 1000)
-  return (datetime.datetime.utcfromtimestamp(secs) + datetime.timedelta(microseconds=(millisecs * 1000)))
+  return (datetime.utcfromtimestamp(secs) + timedelta(microseconds=(millisecs * 1000)))
 
 
 def pretty_time_delta(milliseconds):

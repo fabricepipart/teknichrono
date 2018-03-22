@@ -7,9 +7,10 @@ SessionsUrl = '/teknichrono/rest/sessions'
 # ----------------------------------------------------------------------
 
 
-def addSession(name, start, end):
+def addSession(name, start, end, sessionType):
   "This adds a Session"
-  data = '{"name":"' + name + '", "start":"' + formatDatetime(start) + '", "end":"' + formatDatetime(end) + '"}'
+  data = '{"type":"' + sessionType + '", "name":"' + name + '", "start":"' + formatDatetime(
+      start) + '", "end":"' + formatDatetime(end) + '"}'
   post(data, SessionsUrl)
   print("Session " + name + " added")
   sessionResponse = getSessionByName(name)
@@ -53,6 +54,23 @@ def addChronometerToSession(sessionId, chronoId, index=-1):
     url = url + '&index=' + str(index)
   post('', url)
   print("Associate Session id " + str(sessionId) + " and chrono id " + str(chronoId))
+  return
+
+
+def addPilotToSession(sessionId, pilotId):
+  "Associate Session and Chrono"
+  url = SessionsUrl + '/' + str(sessionId) + '/addPilot?pilotId=' + str(pilotId)
+  post('', url)
+  print("Associate Session id " + str(sessionId) + " and pilot id " + str(pilotId))
+  return
+
+
+def startRace(sessionId, dateTime):
+  "Starts the race"
+  data = '{"dateTime":"' + formatDatetime(dateTime) + '"}'
+  url = SessionsUrl + '/' + str(sessionId) + '/race'
+  post(data, url)
+  print("Start the race " + str(sessionId) + " @ " + formatDatetime(dateTime))
   return
 
 

@@ -50,6 +50,7 @@ public class PingEndpoint {
     }
     entity.setBeacon(beacon);
     em.persist(entity);
+    // TODO Check if relevant to create it each time...
     ChronoManager manager = new ChronoManager(em);
     manager.addPing(entity);
     return Response.created(UriBuilder.fromResource(PingEndpoint.class).path(String.valueOf(entity.getId())).build())

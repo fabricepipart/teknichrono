@@ -1,5 +1,6 @@
 package org.trd.app.teknichrono.rest;
 
+import java.sql.Date;
 import java.util.List;
 
 import javax.ejb.Stateless;
@@ -21,7 +22,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import org.trd.app.teknichrono.business.ChronoManager;
 import org.trd.app.teknichrono.model.Chronometer;
+import org.trd.app.teknichrono.model.Pilot;
+import org.trd.app.teknichrono.model.Ping;
 import org.trd.app.teknichrono.model.Session;
 
 /**
@@ -30,6 +34,7 @@ import org.trd.app.teknichrono.model.Session;
 @Stateless
 @Path("/sessions")
 public class SessionEndpoint {
+
   @PersistenceContext(unitName = "teknichrono-persistence-unit")
   private EntityManager em;
 
@@ -47,6 +52,13 @@ public class SessionEndpoint {
     Session entity = em.find(Session.class, id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
+    }
+    for (Chronometer c : entity.getChronometers()) {
+      c.getSessions().remove(entity);
+    }
+
+    for (Pilot p : entity.getPilots()) {
+      p.getSessions().remove(entity);
     }
     em.remove(entity);
     return Response.noContent().build();
@@ -117,7 +129,7 @@ public class SessionEndpoint {
     if (chronometer == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    chronometer.setSession(session);
+    chronometer.getSessions().add(session);
     if (index != null) {
       chronometer.setChronoIndex(index);
     }
@@ -125,6 +137,50 @@ public class SessionEndpoint {
     em.persist(session);
     for (Chronometer c : session.getChronometers()) {
       em.persist(c);
+    }
+
+    return Response.ok(session).build();
+  }
+
+  @POST
+  @Path("{sessionId:[0-9][0-9]*}/addPilot")
+  @Produces("application/json")
+  public Response addPilot(@PathParam("sessionId") int sessionId, @QueryParam("pilotId") Integer pilotId) {
+    Session session = em.find(Session.class, sessionId);
+    if (session == null) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+    Pilot pilot = em.find(Pilot.class, pilotId);
+    if (pilot == null) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+    session.getPilots().add(pilot);
+    em.persist(session);
+    em.persist(pilot);
+
+    return Response.ok(session).build();
+  }
+
+  @POST
+  @Path("{sessionId:[0-9][0-9]*}/race")
+  @Produces("application/json")
+  public Response race(Ping start, @PathParam("sessionId") int sessionId) {
+    Session session = em.find(Session.class, sessionId);
+    if (session == null) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+    session.setStart(new Date(start.getDateTime().getTime()));
+    em.persist(session);
+    Chronometer chronometer = session.getChronometers().get(0);
+    List<Pilot> pilots = session.getPilots();
+    ChronoManager cm = new ChronoManager(em);
+    for (Pilot pilot : pilots) {
+      Ping ping = new Ping();
+      ping.setDateTime(start.getDateTime());
+      ping.setBeacon(pilot.getCurrentBeacon());
+      ping.setChrono(chronometer);
+      em.persist(ping);
+      cm.addPing(ping);
     }
 
     return Response.ok(session).build();
