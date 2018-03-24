@@ -9,12 +9,20 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.LapTime;
 import org.trd.app.teknichrono.model.Ping;
 import org.trd.app.teknichrono.util.InvalidArgumentException;
 
 @XmlRootElement
 public class LapTimeDTO implements Serializable {
+
+  /**
+   * 
+   */
+  private static final long serialVersionUID = -8453562523141344579L;
+
+  private Logger logger = Logger.getLogger(LapTimeDTO.class);
 
   private int id;
   private int version;
@@ -26,6 +34,8 @@ public class LapTimeDTO implements Serializable {
   // In milliseconds
   private long duration;
   private List<SectorDTO> sectors = new ArrayList<SectorDTO>();
+  private int lapIndex;
+  private int lapNumber;
 
   public LapTimeDTO() {
   }
@@ -80,7 +90,7 @@ public class LapTimeDTO implements Serializable {
       entity.setSession(this.session.fromDTO(entity.getSession(), em));
     }
     if (!this.getIntermediates().isEmpty()) {
-      System.err.println("Sorry I cannot rebuild a LapTime from a LapTimeDTO. Leaving list empty.");
+      logger.error("Sorry I cannot rebuild a LapTime from a LapTimeDTO. Leaving list empty.");
     }
     entity = em.merge(entity);
     return entity;
@@ -188,5 +198,21 @@ public class LapTimeDTO implements Serializable {
       this.sectors.add(new SectorDTO(startDate.getTime(), 0, endDate.getTime() - startDate.getTime()));
     }
     setEndDate(endDate);
+  }
+
+  public int getLapIndex() {
+    return lapIndex;
+  }
+
+  public void setLapIndex(int lapIndex) {
+    this.lapIndex = lapIndex;
+  }
+
+  public int getLapNumber() {
+    return lapNumber;
+  }
+
+  public void setLapNumber(int lapNumber) {
+    this.lapNumber = lapNumber;
   }
 }

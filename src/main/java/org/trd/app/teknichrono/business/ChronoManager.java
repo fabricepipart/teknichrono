@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.Beacon;
 import org.trd.app.teknichrono.model.Chronometer;
 import org.trd.app.teknichrono.model.LapTime;
@@ -13,6 +14,8 @@ import org.trd.app.teknichrono.model.Ping;
 import org.trd.app.teknichrono.model.Session;
 
 public class ChronoManager {
+
+  private Logger logger = Logger.getLogger(ChronoManager.class);
 
   private EntityManager em;
 
@@ -26,26 +29,26 @@ public class ChronoManager {
   public void addPing(Ping ping) {
     Beacon beacon = ping.getBeacon();
     if (beacon == null) {
-      System.err.println("Beacon is not in the DB, cannot updates laptimes for Ping @ " + ping.getDateTime());
+      logger.error("Beacon is not in the DB, cannot updates laptimes for Ping @ " + ping.getDateTime());
       return;
     }
 
     Pilot pilot = ping.getBeacon().getPilot();
     if (pilot == null) {
-      System.err.println("Pilot is not associated to Beacon " + beacon.getId() + ", cannot updates laptimes");
+      logger.error("Pilot is not associated to Beacon " + beacon.getId() + ", cannot updates laptimes");
       return;
     }
 
     Chronometer chronometer = ping.getChrono();
     if (chronometer == null) {
-      System.err.println("Chrono is not in the DB, cannot updates laptimes for Ping @ " + ping.getDateTime());
+      logger.error("Chrono is not in the DB, cannot updates laptimes for Ping @ " + ping.getDateTime());
       return;
     }
     int chronoIndex = chronometer.getChronoIndex().intValue();
 
     Session session = pickMostRelevant(ping.getChrono().getSessions(), ping);
     if (session == null) {
-      System.err.println("No Session associated to Chrono " + chronometer.getId() + ", cannot updates laptimes");
+      logger.error("No Session associated to Chrono " + chronometer.getId() + ", cannot updates laptimes");
       return;
     }
 
@@ -55,7 +58,7 @@ public class ChronoManager {
       long start = session.getStart().getTime();
       long inactivityEnd = start + inactivity;
       if (pingTime > start && pingTime < inactivityEnd) {
-        System.out.println("Ping ignored since Session " + session.getId() + " is during its inactivity period.");
+        logger.info("Ping ignored since Session " + session.getId() + " is during its inactivity period.");
         return;
       }
     }
@@ -81,7 +84,7 @@ public class ChronoManager {
             lapTimeOfPingBefore = lapTime;
             pingBefore = lapTimePing;
           } else if (lapTimePing.getDateTime().getTime() == ping.getDateTime().getTime()) {
-            System.err.println("Trying to store a ping that was already in DB " + ping.getDateTime());
+            logger.error("Trying to store a ping that was already in DB " + ping.getDateTime());
           } else if (lapTimePing.getDateTime().getTime() > ping.getDateTime().getTime()
               && (pingAfter == null || lapTimePing.getDateTime().getTime() < pingAfter.getDateTime().getTime())) {
             lapTimeOfPingAfter = lapTime;
@@ -97,7 +100,7 @@ public class ChronoManager {
 
       if (pingBefore == null) {
         if (pingAfter == null) {
-          System.err.println("We had previous laptimes but none before and none after ???");
+          logger.error("We had previous laptimes but none before and none after ???");
           return;
         } else {
           // Is it part of the lap of pingAfter ?

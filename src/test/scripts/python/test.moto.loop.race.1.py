@@ -103,6 +103,7 @@ for i in range(1, 20):
   ping(
       datetime(2018, 1, 2, 14, 1 + 2 * i, random.randint(0, 10), random.randint(0, 100000)), daniBeaconId, -26,
       chrono['id'])
+# TODO Display for each lap the intermediate display
 
 # Laps per pilot
 print("---- Laps Valentino ----")
@@ -151,5 +152,4 @@ printLaps(laps, True)
 laps = getLapsForSession(race['id'])
 printLaps(laps, True)
 
-# TODO Bugs : cannot run twice
-# Best laps shown, thats not what we want : order by time of last lap end
+#TODO Best laps shown, thats not what we want : order by time of last lap end

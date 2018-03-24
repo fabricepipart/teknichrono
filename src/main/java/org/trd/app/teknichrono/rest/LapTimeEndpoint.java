@@ -22,6 +22,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import org.trd.app.teknichrono.business.LapTimeDisplay;
 import org.trd.app.teknichrono.business.LapTimeManager;
 import org.trd.app.teknichrono.model.Category;
 import org.trd.app.teknichrono.model.Event;
@@ -29,6 +30,7 @@ import org.trd.app.teknichrono.model.LapTime;
 import org.trd.app.teknichrono.model.Location;
 import org.trd.app.teknichrono.model.Pilot;
 import org.trd.app.teknichrono.model.Session;
+import org.trd.app.teknichrono.model.SessionType;
 import org.trd.app.teknichrono.rest.dto.LapTimeDTO;
 import org.trd.app.teknichrono.rest.sql.OrderByClauseBuilder;
 import org.trd.app.teknichrono.rest.sql.WhereClauseBuilder;
@@ -113,12 +115,19 @@ public class LapTimeEndpoint {
 
     LapTimeManager lapTimeManager = new LapTimeManager();
     final List<LapTimeDTO> results = lapTimeManager.convert(searchResults);
-    if (pilotId == null) {
-      lapTimeManager.keepOnlyBest(results);
+    // Three displays : timesheet , best laps , race
+    LapTimeDisplay display = LapTimeDisplay.TIMESHEET;
+    if (pilotId != null) {
+      display = LapTimeDisplay.TIMESHEET;
+    } else if (sessionId != null) {
+      Session session = em.find(Session.class, sessionId);
+      if (session.getSessionType() == SessionType.RACE) {
+        display = LapTimeDisplay.RACE;
+      } else {
+        display = LapTimeDisplay.BEST;
+      }
     }
-    if (sessionId != null || locationId != null || eventId != null) {
-      lapTimeManager.orderByDuration(results);
-    }
+    lapTimeManager.arrangeDisplay(display, results);
 
     return results;
   }

@@ -58,9 +58,9 @@ def printLaps(laps, withDates=False):
     maxSectors = max(maxSectors, len(lap['intermediates']))
   #print("Max Sectors = "+ str(maxSectors))
   if withDates:
-    headers = ['Lap', 'Date', 'Pilot', 'Lap time']
+    headers = ['Lap', 'Date', 'Pilot', 'Lap index', 'Lap time']
   else:
-    headers = ['Lap', 'Pilot', 'Lap time']
+    headers = ['Lap', 'Pilot', 'Lap index', 'Lap time']
   for i in range(1, maxSectors + 1):
     headers.append("Sector " + str(i))
   #print(str(headers))
@@ -75,11 +75,12 @@ def printLaps(laps, withDates=False):
     else:
       startDate = ''
     pilot = str(lap['pilot']['firstName']) + ' ' + str(lap['pilot']['lastName'])
+    lapIndex = str(lap['lapIndex']) + ' / ' + str(lap['lapNumber'])
     lapTime = pretty_time_delta(lap['duration'])
     if withDates:
-      lapRow = [lapId, startDate, pilot, lapTime]
+      lapRow = [lapId, startDate, pilot, lapIndex, lapTime]
     else:
-      lapRow = [lapId, pilot, lapTime]
+      lapRow = [lapId, pilot, lapIndex, lapTime]
     intermediateIndex = 0
     intermediates = lap['intermediates']
     for i in range(0, maxSectors):

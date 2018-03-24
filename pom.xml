@@ -15,7 +15,6 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
     <version.wildfly.swarm>2017.10.0</version.wildfly.swarm>
     <version.h2>1.4.187</version.h2>
-    <!--swarm.debug.port>5005</swarm.debug.port-->
 	</properties>
 	
 	<dependencyManagement>
@@ -102,6 +101,12 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <properties>
+            <swarm.logging>INFO</swarm.logging>
+            <!--swarm.debug.port>5005</swarm.debug.port-->
+          </properties>
+        </configuration>
       </plugin>
 
 			<plugin>
