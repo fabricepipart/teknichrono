@@ -104,6 +104,8 @@
         <configuration>
           <properties>
             <swarm.logging>INFO</swarm.logging>
+            <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+
             <!--swarm.debug.port>5005</swarm.debug.port-->
           </properties>
         </configuration>
