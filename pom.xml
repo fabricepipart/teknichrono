@@ -5,6 +5,11 @@
   <modelVersion>4.0.0</modelVersion>
   <name>Teknichrono Mobile Web Application</name>
   <description>This project contains pre-requisites for demonstrating the use of JBoss Forge. The end-user will be instructed on how to scaffold a new application based on a pre-existing JPA entity. Refer to the embedded Eclipse cheatsheet for additional details.</description>
+  <parent>
+    <groupId>io.openshift</groupId>
+    <artifactId>booster-parent</artifactId>
+    <version>10</version>
+  </parent>
   <groupId>org.trd.app.teknichrono</groupId>
   <artifactId>frontend</artifactId>
   <version>0.2-SNAPSHOT</version>
@@ -13,7 +18,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
-    <version.wildfly.swarm>2018.2.0</version.wildfly.swarm>
+    <version.wildfly.swarm>2017.10.0</version.wildfly.swarm>
     <version.h2>1.4.187</version.h2>
   </properties>
   <dependencyManagement>
@@ -21,7 +26,7 @@
       <!-- From Booster -->
       <dependency>
         <groupId>org.wildfly.swarm</groupId>
-        <artifactId>bom-all</artifactId>
+        <artifactId>bom</artifactId>
         <version>${version.wildfly.swarm}</version>
         <type>pom</type>
         <scope>import</scope>
@@ -99,13 +104,6 @@
             <swarm.logging>INFO</swarm.logging>
             <!--swarm.debug.port>5005</swarm.debug.port-->
           </properties>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>io.fabric8</groupId>
-        <artifactId>docker-maven-plugin</artifactId>
-        <version>0.15.9</version>
-        <configuration>
           <images>
             <image>
               <name>${project.groupId}/${project.artifactId}:${project.version}</name>
@@ -214,31 +212,6 @@
                 </labels>
               </resources>
             </configuration>
-          </plugin>
-        </plugins>
-      </build>
-      <activation/>
-    </profile>
-    <profile>
-      <id>openshift-it</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <systemPropertyVariables>
-                <app.name>${project.artifactId}</app.name>
-              </systemPropertyVariables>
-            </configuration>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>integration-test</goal>
-                  <goal>verify</goal>
-                </goals>
-              </execution>
-            </executions>
           </plugin>
         </plugins>
       </build>

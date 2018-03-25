@@ -25,5 +25,6 @@
   * https://www.thoughts-on-java.org/best-practices-many-one-one-many-associations-mappings/
   * http://meri-stuff.blogspot.fr/2012/03/jpa-tutorial.html#RelationshipsBidirectionalOneToManyManyToOneConsistency
 * Docker build
+  * https://github.com/fabric8io/docker-maven-plugin
   * https://dmp.fabric8.io/#build-configuration
   
