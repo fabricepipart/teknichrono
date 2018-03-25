@@ -1,25 +1,24 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-
-	<name>Teknichrono Mobile Web Application</name>
-	<description>This project contains pre-requisites for demonstrating the use of JBoss Forge. The end-user will be instructed on how to scaffold a new application based on a pre-existing JPA entity. Refer to the embedded Eclipse cheatsheet for additional details.</description>
-
-	<groupId>org.trd.app.teknichrono</groupId>
-	<artifactId>frontend</artifactId>
-	<version>0.2-SNAPSHOT</version>
-	<packaging>war</packaging>
-	
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.target>1.8</maven.compiler.target>
-		<maven.compiler.source>1.8</maven.compiler.source>
-    <version.wildfly.swarm>2017.10.0</version.wildfly.swarm>
+<?xml version="1.0" encoding="UTF-8"?>
+<project 
+  xmlns="http://maven.apache.org/POM/4.0.0" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <name>Teknichrono Mobile Web Application</name>
+  <description>This project contains pre-requisites for demonstrating the use of JBoss Forge. The end-user will be instructed on how to scaffold a new application based on a pre-existing JPA entity. Refer to the embedded Eclipse cheatsheet for additional details.</description>
+  <groupId>org.trd.app.teknichrono</groupId>
+  <artifactId>frontend</artifactId>
+  <version>0.2-SNAPSHOT</version>
+  <packaging>war</packaging>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <version.wildfly.swarm>2018.2.0</version.wildfly.swarm>
     <version.h2>1.4.187</version.h2>
-	</properties>
-	
-	<dependencyManagement>
-		<dependencies>
-			<!-- From Booster -->
+  </properties>
+  <dependencyManagement>
+    <dependencies>
+      <!-- From Booster -->
       <dependency>
         <groupId>org.wildfly.swarm</groupId>
         <artifactId>bom-all</artifactId>
@@ -27,18 +26,15 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-
-			<dependency>
-			  <groupId>junit</groupId>
-			  <artifactId>junit</artifactId>
-			  <version>4.12</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-	
-	<dependencies>
-
-			<!-- From Booster -->
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.12</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <dependencies>
+    <!-- From Booster -->
     <dependency>
       <groupId>org.wildfly.swarm</groupId>
       <artifactId>jaxrs</artifactId>
@@ -47,49 +43,46 @@
       <groupId>org.wildfly.swarm</groupId>
       <artifactId>monitor</artifactId>
     </dependency>
-  	<dependency>
-			<groupId>org.wildfly.swarm</groupId>
-			<artifactId>jpa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.wildfly.swarm</groupId>
-			<artifactId>datasources</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.wildfly.swarm</groupId>
-			<artifactId>ejb</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.wildfly.swarm</groupId>
-			<artifactId>hibernate-validator</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.wildfly.swarm</groupId>
+      <artifactId>jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.wildfly.swarm</groupId>
+      <artifactId>datasources</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.wildfly.swarm</groupId>
+      <artifactId>ejb</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.wildfly.swarm</groupId>
+      <artifactId>hibernate-validator</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.wildfly.swarm</groupId>
       <artifactId>logging</artifactId>
     </dependency>
-
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <version>${version.h2}</version>
     </dependency>
-			<!-- From Forge -->
-
-		<dependency>
-		  <groupId>junit</groupId>
-		  <artifactId>junit</artifactId>
-		  <scope>test</scope>
-		</dependency>
-	</dependencies>
-	
-	<build>
-	  <resources>
+    <!-- From Forge -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <resources>
       <resource>
         <directory>src/main/resources</directory>
         <filtering>true</filtering>
       </resource>
     </resources>
-		<plugins>
+    <plugins>
       <plugin>
         <groupId>org.wildfly.swarm</groupId>
         <artifactId>wildfly-swarm-plugin</artifactId>
@@ -104,22 +97,58 @@
         <configuration>
           <properties>
             <swarm.logging>INFO</swarm.logging>
-            <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
-
             <!--swarm.debug.port>5005</swarm.debug.port-->
           </properties>
         </configuration>
       </plugin>
-
-			<plugin>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<failOnMissingWebXml>false</failOnMissingWebXml>
-					<warName>teknichrono</warName>
-				</configuration>
-			</plugin>
-		
+      <plugin>
+        <groupId>io.fabric8</groupId>
+        <artifactId>docker-maven-plugin</artifactId>
+        <version>0.15.9</version>
+        <configuration>
+          <images>
+            <image>
+              <name>${project.groupId}/${project.artifactId}:${project.version}</name>
+              <run>
+                <ports>
+                  <port>8080:8080</port>
+                </ports>
+              </run>
+              <build>
+                <from>docker.io/java:openjdk-8-jdk</from>
+                <ports>
+                  <port>8080</port>
+                </ports>
+                <assembly>
+                  <basedir>/opt</basedir>
+                  <inline>
+                    <fileSets>
+                      <fileSet>
+                        <includes>
+                          <include>${project.build.finalName}-swarm.jar</include>
+                        </includes>
+                        <directory>${project.build.directory}</directory>
+                        <outputDirectory>/</outputDirectory>
+                      </fileSet>
+                    </fileSets>
+                  </inline>
+                </assembly>
+                <entryPoint>
+                  <shell>java -jar /opt/${project.artifactId}-swarm.jar</shell>
+                </entryPoint>
+              </build>
+            </image>
+          </images>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+          <warName>teknichrono</warName>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>io.fabric8</groupId>
         <artifactId>fabric8-maven-plugin</artifactId>
@@ -132,7 +161,6 @@
             </goals>
           </execution>
         </executions>
-      
         <configuration>
           <resources>
             <labels>
@@ -144,9 +172,7 @@
         </configuration>
       </plugin>
     </plugins>
-	</build>
-
-
+  </build>
   <profiles>
     <profile>
       <id>openshift</id>
@@ -180,15 +206,14 @@
                   </wildfly-swarm-health-check>
                 </config>
               </enricher>
-            
-          <resources>
-            <labels>
-              <all>
-                <space>Teknirace_Days</space>
-              </all>
-            </labels>
-          </resources>
-        </configuration>
+              <resources>
+                <labels>
+                  <all>
+                    <space>Teknirace_Days</space>
+                  </all>
+                </labels>
+              </resources>
+            </configuration>
           </plugin>
         </plugins>
       </build>
@@ -220,6 +245,4 @@
       <activation/>
     </profile>
   </profiles>
-
-
 </project>
