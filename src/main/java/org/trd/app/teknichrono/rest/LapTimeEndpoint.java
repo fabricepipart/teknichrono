@@ -22,6 +22,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.business.LapTimeDisplay;
 import org.trd.app.teknichrono.business.LapTimeManager;
 import org.trd.app.teknichrono.model.Category;
@@ -44,6 +45,9 @@ import org.trd.app.teknichrono.util.InvalidArgumentException;
 public class LapTimeEndpoint {
   @PersistenceContext(unitName = "teknichrono-persistence-unit")
   private EntityManager em;
+
+  private Logger logger = Logger.getLogger(LapTimeEndpoint.class);
+  private LapTimeManager lapTimeManager = new LapTimeManager();
 
   @POST
   @Consumes("application/json")
@@ -87,14 +91,78 @@ public class LapTimeEndpoint {
   }
 
   @GET
+  @Path("/best")
+  @Produces("application/json")
+  public List<LapTimeDTO> best(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
+      @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
+      @QueryParam("categoryId") Integer categoryId, @QueryParam("start") Integer startPosition,
+      @QueryParam("max") Integer maxResult) {
+    if (sessionId == null && locationId == null && eventId == null) {
+      logger.error("Please define a sessiondId, locationId or eventId to get best laps.");
+      throw new InvalidArgumentException();
+    }
+    final List<LapTimeDTO> results = getAllLapsDTOOrderedByStartDate(pilotId, sessionId, locationId, eventId,
+        categoryId, startPosition, maxResult, lapTimeManager);
+    if (pilotId != null) {
+      lapTimeManager.arrangeDisplay(results, LapTimeDisplay.ORDER_BY_DURATION);
+    } else {
+      lapTimeManager.arrangeDisplay(results, LapTimeDisplay.KEEP_BEST, LapTimeDisplay.ORDER_BY_DURATION);
+    }
+    return results;
+  }
+
+  @GET
+  @Path("/race")
+  @Produces("application/json")
+  public List<LapTimeDTO> race(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
+      @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
+      @QueryParam("categoryId") Integer categoryId, @QueryParam("start") Integer startPosition,
+      @QueryParam("max") Integer maxResult) {
+    if (sessionId == null) {
+      logger.error("Please define a sessiondId to get race laps.");
+      throw new InvalidArgumentException();
+    }
+    Session session = em.find(Session.class, sessionId);
+    if (session.getSessionType() == SessionType.RACE) {
+      logger.error("Session ID (" + sessionId + ") mentioned is not a race.");
+      throw new InvalidArgumentException();
+    }
+    final List<LapTimeDTO> results = getAllLapsDTOOrderedByStartDate(pilotId, sessionId, locationId, eventId,
+        categoryId, startPosition, maxResult, lapTimeManager);
+
+    lapTimeManager.arrangeDisplay(results, LapTimeDisplay.KEEP_LAST, LapTimeDisplay.ORDER_FOR_RACE);
+    return results;
+
+  }
+
+  @GET
   @Produces("application/json")
   public List<LapTimeDTO> listAll(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
       @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
       @QueryParam("categoryId") Integer categoryId, @QueryParam("start") Integer startPosition,
       @QueryParam("max") Integer maxResult) {
     if (sessionId == null && locationId == null && eventId == null) {
+      logger.error("Please define a sessiondId, locationId or eventId to get laps.");
       throw new InvalidArgumentException();
     }
+
+    final List<LapTimeDTO> results = getAllLapsDTOOrderedByStartDate(pilotId, sessionId, locationId, eventId,
+        categoryId, startPosition, maxResult, lapTimeManager);
+    lapTimeManager.arrangeDisplay(results);
+
+    return results;
+  }
+
+  private List<LapTimeDTO> getAllLapsDTOOrderedByStartDate(Integer pilotId, Integer sessionId, Integer locationId,
+      Integer eventId, Integer categoryId, Integer startPosition, Integer maxResult, LapTimeManager lapTimeManager) {
+    final List<LapTime> searchResults = getAllLapsOrderedByStartDate(pilotId, sessionId, locationId, eventId,
+        categoryId, startPosition, maxResult);
+    final List<LapTimeDTO> results = lapTimeManager.convert(searchResults);
+    return results;
+  }
+
+  private List<LapTime> getAllLapsOrderedByStartDate(Integer pilotId, Integer sessionId, Integer locationId,
+      Integer eventId, Integer categoryId, Integer startPosition, Integer maxResult) {
     WhereClauseBuilder whereClauseBuilder = buildWhereClause(pilotId, sessionId, locationId, eventId, categoryId);
     OrderByClauseBuilder orderByClauseBuilder = new OrderByClauseBuilder();
     // Necessary to have the lapTimeManager.convert working
@@ -110,26 +178,8 @@ public class LapTimeEndpoint {
       findAllQuery.setMaxResults(maxResult);
     }
     whereClauseBuilder.applyClauses(findAllQuery);
-
     final List<LapTime> searchResults = findAllQuery.getResultList();
-
-    LapTimeManager lapTimeManager = new LapTimeManager();
-    final List<LapTimeDTO> results = lapTimeManager.convert(searchResults);
-    // Three displays : timesheet , best laps , race
-    LapTimeDisplay display = LapTimeDisplay.TIMESHEET;
-    if (pilotId != null) {
-      display = LapTimeDisplay.TIMESHEET;
-    } else if (sessionId != null) {
-      Session session = em.find(Session.class, sessionId);
-      if (session.getSessionType() == SessionType.RACE) {
-        display = LapTimeDisplay.RACE;
-      } else {
-        display = LapTimeDisplay.BEST;
-      }
-    }
-    lapTimeManager.arrangeDisplay(display, results);
-
-    return results;
+    return searchResults;
   }
 
   private WhereClauseBuilder buildWhereClause(Integer pilotId, Integer sessionId, Integer locationId, Integer eventId,

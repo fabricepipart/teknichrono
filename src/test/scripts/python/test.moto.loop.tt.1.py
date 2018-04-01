@@ -122,16 +122,18 @@ for i in range(0, 10):
 
 # Laps per pilot
 print("---- Laps Valentino ----")
-laps = getLapsOfPilot(valentino['id'], session['id'])
-printLaps(laps, True)
+
+printLaps(getLapsOfPilot(valentino['id'], session['id']), True)
+printLaps(getBestLapsOfPilot(valentino['id'], session['id']), True)
+
 #print(str(len(laps)))
 #assert len(laps) == 12
 
 print("---- Laps Marc ----")
-morningLaps = getLapsOfPilot(marc['id'], morningSession['id'])
-printLaps(morningLaps, True)
-laps = getLapsOfPilot(marc['id'], session['id'])
-printLaps(laps, True)
+printLaps(getLapsOfPilot(marc['id'], morningSession['id']), True)
+printLaps(getLapsOfPilot(marc['id'], session['id']), True)
+printLaps(getBestLapsOfPilot(marc['id'], morningSession['id']), True)
+printLaps(getBestLapsOfPilot(marc['id'], session['id']), True)
 
 print("---- Laps Dani ----")
 laps = getLapsOfPilot(dani['id'], session['id'])
@@ -150,12 +152,12 @@ laps = getLapsOfPilot(johann['id'], session['id'])
 printLaps(laps, True)
 
 # Laps of location
-laps = getLapsOfPilot(pilotId=johann['id'], locationId=ledenon['id'])
-printLaps(laps, True)
+printLaps(getLapsOfPilot(pilotId=johann['id'], locationId=ledenon['id']), True)
+printLaps(getBestLapsOfPilot(pilotId=johann['id'], locationId=ledenon['id']), True)
 
 # Laps of Event
-laps = getLapsOfPilot(pilotId=johann['id'], eventId=timeTrial['id'])
-printLaps(laps, True)
+printLaps(getLapsOfPilot(pilotId=johann['id'], eventId=timeTrial['id']), True)
+printLaps(getBestLapsOfPilot(pilotId=johann['id'], eventId=timeTrial['id']), True)
 
 print("---- Laps Cal ----")
 morningLaps = getLapsOfPilot(cal['id'], morningSession['id'])
@@ -163,36 +165,17 @@ printLaps(morningLaps, True)
 laps = getLapsOfPilot(cal['id'], session['id'])
 printLaps(laps, True)
 
+print("---- Laps of location ----")
 # Laps of location
-laps = getLaps(locationId=ledenon['id'])
-printLaps(laps, True)
+printLaps(getLaps(locationId=ledenon['id']), True)
+printLaps(getBestLaps(locationId=ledenon['id']), True)
 
+print("---- Laps of Event ----")
 # Laps of Event
-laps = getLaps(eventId=timeTrial['id'])
-printLaps(laps, True)
+printLaps(getLaps(eventId=timeTrial['id']), True)
+printLaps(getBestLaps(eventId=timeTrial['id']), True)
 
+print("---- Laps summary ----")
 # Session summary
-laps = getLapsForSession(session['id'])
-printLaps(laps, True)
-
-# -------------------------------
-# Race with just one chrono
-# -------------------------------
-
-# --------- TODO -------------
-# -------------------------------
-# Race with just one chrono
-# -------------------------------
-
-# Laps per pilot
-# All Laps
-# Session summary
-
-# --------- TODO -------------
-# -------------------------------
-# Race with several chronos
-# -------------------------------
-
-# Laps per pilot
-# All Laps
-# Session summary
+printLaps(getLapsForSession(session['id']), True)
+printLaps(getBestLapsForSession(session['id']), True)

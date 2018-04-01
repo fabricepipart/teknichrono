@@ -47,6 +47,31 @@ public class LapTimeManagerTest {
   }
 
   @Test
+  public void convertsAndFilters() {
+    LapTimeManager testMe = new LapTimeManager();
+    ArrayList<LapTime> searchResults = new ArrayList<LapTime>();
+    long time = System.currentTimeMillis();
+    ;
+    LapTime l1 = createLapTime(1, true, time += 101);
+    LapTime l2 = createLapTime(2, true, time += 102);
+    LapTime l3 = createLapTime(3, true, time += 103);
+    LapTime l4 = createLapTime(4, true, time += 502);
+    LapTime l5 = createLapTime(5, true, time += 98);
+    LapTime l6 = createLapTime(6, true, time += 99);
+    searchResults.add(l4);
+    searchResults.add(l1);
+    searchResults.add(l6);
+    searchResults.add(l5);
+    searchResults.add(l2);
+    searchResults.add(l3);
+    List<LapTimeDTO> result = testMe.convert(searchResults);
+    testMe.filterExtreme(result);
+    // Only the long laptime has been filtered
+    org.junit.Assert.assertEquals(5, result.size());
+    org.junit.Assert.assertTrue(!result.contains(l3));
+  }
+
+  @Test
   public void convertsAndOrderByStartTimeForLoopTrack() {
     LapTimeManager testMe = new LapTimeManager();
     ArrayList<LapTime> searchResults = new ArrayList<LapTime>();
@@ -69,6 +94,26 @@ public class LapTimeManagerTest {
     org.junit.Assert.assertEquals(4, result.get(3).getId());
     org.junit.Assert.assertEquals(5, result.get(4).getId());
     org.junit.Assert.assertEquals(6, result.get(5).getId());
+  }
+
+  private LapTime createLapTime(int i, boolean loop, long startDate) {
+    LapTime laptime = new LapTime();
+    laptime.setId(i);
+    Timestamp time = new Timestamp(startDate);
+    laptime.setStartDate(time);
+    Ping ping = new Ping();
+    Chronometer chrono = new Chronometer();
+    chrono.setChronoIndex(0);
+    ping.setChrono(chrono);
+    ping.setDateTime(time);
+    laptime.addIntermediates(ping);
+
+    Session session = new Session();
+    Location location = new Location();
+    session.setLocation(location);
+    location.setLoopTrack(loop);
+    laptime.setSession(session);
+    return laptime;
   }
 
   private LapTime createLapTime(int i, boolean loop) {

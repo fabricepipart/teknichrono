@@ -10,10 +10,13 @@ import java.util.Map.Entry;
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.LapTime;
 import org.trd.app.teknichrono.rest.dto.LapTimeDTO;
+import org.trd.app.teknichrono.rest.dto.NestedLocationDTO;
 import org.trd.app.teknichrono.rest.dto.NestedPilotDTO;
 import org.trd.app.teknichrono.rest.dto.NestedSessionDTO;
 
 public class LapTimeManager {
+
+  private static final int ACCEPTANCE_PERCENTAGE = 300;
 
   private Logger logger = Logger.getLogger(LapTimeManager.class);
 
@@ -53,6 +56,34 @@ public class LapTimeManager {
     }
     fillLapsNumber(lapsPerPilot);
     return results;
+  }
+
+  void filterExtreme(List<LapTimeDTO> results) {
+    // Needs to be done here since we did not have all info before
+    Map<Integer, LapTimeDTO> bestPerLocation = new HashMap<Integer, LapTimeDTO>();
+    for (LapTimeDTO dto : results) {
+      NestedLocationDTO location = dto.getSession().getLocation();
+      LapTimeDTO bestOfLocation = bestPerLocation.get(location.getId());
+      if (dto.getDuration() > 0) {
+        if (bestOfLocation == null || bestOfLocation.getDuration() > dto.getDuration()) {
+          bestPerLocation.put(location.getId(), dto);
+        }
+      }
+    }
+
+    List<LapTimeDTO> toRemove = new ArrayList<>();
+    for (LapTimeDTO lapTimeDTO : results) {
+      NestedLocationDTO location = lapTimeDTO.getSession().getLocation();
+      LapTimeDTO bestOfLocation = bestPerLocation.get(location.getId());
+      if (bestOfLocation != null) {
+        if (lapTimeDTO.getDuration() > (bestOfLocation.getDuration() * ACCEPTANCE_PERCENTAGE / 100)) {
+          logger.debug("Discarding lap ID " + lapTimeDTO.getId()
+              + " since it is too long compared to the min for this location : " + lapTimeDTO.getDuration());
+          toRemove.add(lapTimeDTO);
+        }
+      }
+    }
+    results.removeAll(toRemove);
   }
 
   private void fillLapsNumber(Map<Integer, List<LapTimeDTO>> lapsPerPilot) {
@@ -109,21 +140,25 @@ public class LapTimeManager {
     results.removeAll(toRemove);
   }
 
-  public void arrangeDisplay(LapTimeDisplay display, List<LapTimeDTO> results) {
-    switch (display) {
-    case RACE:
-      // In case of race, order by nb laps and then last lap start
-      keepOnlyLast(results);
-      orderForRace(results);
-      break;
-    case BEST:
-      keepOnlyBest(results);
-      orderByDuration(results);
-      break;
-    case TIMESHEET:
-    default:
-      // Order by startDate
-      break;
+  public void arrangeDisplay(List<LapTimeDTO> results, LapTimeDisplay... displays) {
+    filterExtreme(results);
+    for (LapTimeDisplay display : displays) {
+      switch (display) {
+      case KEEP_LAST:
+        keepOnlyLast(results);
+        break;
+      case ORDER_FOR_RACE:
+        orderForRace(results);
+        break;
+      case KEEP_BEST:
+        keepOnlyBest(results);
+        break;
+      case ORDER_BY_DURATION:
+        orderByDuration(results);
+        break;
+      default:
+        break;
+      }
     }
   }
 

@@ -17,6 +17,7 @@ public class NestedSessionDTO implements Serializable {
   private String name;
   private boolean loopTrack;
   private int chronometersCount;
+  private NestedLocationDTO location;
 
   public NestedSessionDTO() {
   }
@@ -30,6 +31,7 @@ public class NestedSessionDTO implements Serializable {
       this.name = entity.getName();
       this.loopTrack = entity.getLocation().isLoopTrack();
       this.chronometersCount = entity.getChronometers().size();
+      this.location = new NestedLocationDTO(entity.getLocation());
     }
   }
 
@@ -111,5 +113,13 @@ public class NestedSessionDTO implements Serializable {
 
   public void setChronometersCount(int chronometersCount) {
     this.chronometersCount = chronometersCount;
+  }
+
+  public NestedLocationDTO getLocation() {
+    return location;
+  }
+
+  public void setLocation(NestedLocationDTO location) {
+    this.location = location;
   }
 }

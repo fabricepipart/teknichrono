@@ -8,7 +8,15 @@ lapsUrl = '/teknichrono/rest/laptimes'
 # ----------------------------------------------------------------------
 
 
-def getLapsOfPilot(pilotId, sessionId=None, locationId=None, eventId=None):
+def getBestLapsOfPilot(pilotId, sessionId=None, locationId=None, eventId=None):
+  return getLapsOfPilot(pilotId, sessionId, locationId, eventId, '/best')
+
+
+def getRaceLapsOfPilot(pilotId, sessionId=None, locationId=None, eventId=None):
+  return getLapsOfPilot(pilotId, sessionId, locationId, eventId, '/race')
+
+
+def getLapsOfPilot(pilotId, sessionId=None, locationId=None, eventId=None, option=''):
   "This gets the laps of a given pilot and returns a json"
   sessionIdOption = ''
   if sessionId:
@@ -19,12 +27,20 @@ def getLapsOfPilot(pilotId, sessionId=None, locationId=None, eventId=None):
   eventIdOption = ''
   if eventId:
     eventIdOption = '&eventId=' + str(eventId)
-  url = lapsUrl + '?pilotId=' + str(pilotId) + str(sessionIdOption) + str(locationIdOption) + str(eventIdOption)
+  url = lapsUrl + option + '?pilotId=' + str(pilotId) + str(sessionIdOption) + str(locationIdOption) + str(eventIdOption)
   lapsResponse = get(url)
   return lapsResponse
 
 
-def getLaps(locationId=None, eventId=None, categoryId=None):
+def getBestLaps(locationId=None, eventId=None, categoryId=None, option=''):
+  return getLaps(locationId, eventId, categoryId, '/best')
+
+
+def getRaceLaps(locationId=None, eventId=None, categoryId=None, option=''):
+  return getLaps(locationId, eventId, categoryId, '/race')
+
+
+def getLaps(locationId=None, eventId=None, categoryId=None, option=''):
   "This gets all Laps"
   locationIdOption = ''
   if locationId:
@@ -35,19 +51,27 @@ def getLaps(locationId=None, eventId=None, categoryId=None):
   categoryIdOption = ''
   if categoryId:
     categoryIdOption = '&categoryId=' + str(categoryId)
-  url = lapsUrl
+  url = lapsUrl + option
   if locationId or eventIdOption:
     url = url + '?' + str(locationIdOption) + str(eventIdOption) + str(categoryIdOption)
   lapsResponse = get(url)
   return lapsResponse
 
 
-def getLapsForSession(sessionId, categoryId=None):
+def getBestLapsForSession(sessionId, categoryId=None, option=''):
+  return getLapsForSession(sessionId, categoryId, '/best')
+
+
+def getRaceLapsForSession(sessionId, categoryId=None, option=''):
+  return getLapsForSession(sessionId, categoryId, '/race')
+
+
+def getLapsForSession(sessionId, categoryId=None, option=''):
   "This gets the laps of a given session and returns a json"
   categoryIdOption = ''
   if categoryId:
     categoryIdOption = '&categoryId=' + str(categoryId)
-  url = lapsUrl + '?sessionId=' + str(sessionId) + str(categoryIdOption)
+  url = lapsUrl + option + '?sessionId=' + str(sessionId) + str(categoryIdOption)
   lapsResponse = get(url)
   return lapsResponse
 
