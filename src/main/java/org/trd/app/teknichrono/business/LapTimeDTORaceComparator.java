@@ -14,7 +14,7 @@ public class LapTimeDTORaceComparator implements Comparator<LapTimeDTO> {
 
   @Override
   public int compare(LapTimeDTO l1, LapTimeDTO l2) {
-    int lapNumberComparison = Integer.valueOf(l1.getLapNumber()).compareTo(l2.getLapNumber());
+    int lapNumberComparison = Integer.valueOf(l2.getLapNumber()).compareTo(l1.getLapNumber());
     if (lapNumberComparison == 0) {
       return Long.valueOf(l1.getStartDate().getTime()).compareTo(l2.getStartDate().getTime());
     }

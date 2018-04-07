@@ -58,6 +58,42 @@ public class LapTimeManager {
     return results;
   }
 
+  private void fillGaps(List<LapTimeDTO> results) {
+    long best = -1;
+    long previous = -1;
+    for (LapTimeDTO lapTimeDTO : results) {
+      if (best == -1) {
+        best = lapTimeDTO.getDuration();
+        previous = lapTimeDTO.getDuration();
+        lapTimeDTO.setGapWithBest(0);
+        lapTimeDTO.setGapWithPrevious(0);
+      } else {
+        long lapDuration = lapTimeDTO.getDuration();
+        lapTimeDTO.setGapWithBest(lapDuration - best);
+        lapTimeDTO.setGapWithPrevious(lapDuration - previous);
+        previous = lapDuration;
+      }
+    }
+  }
+
+  private void fillRaceGaps(List<LapTimeDTO> results) {
+    long best = -1;
+    long previous = -1;
+    for (LapTimeDTO lapTimeDTO : results) {
+      if (best == -1) {
+        best = lapTimeDTO.getStartDate().getTime();
+        previous = lapTimeDTO.getStartDate().getTime();
+        lapTimeDTO.setGapWithBest(0);
+        lapTimeDTO.setGapWithPrevious(0);
+      } else {
+        long lapStart = lapTimeDTO.getStartDate().getTime();
+        lapTimeDTO.setGapWithBest(lapStart - best);
+        lapTimeDTO.setGapWithPrevious(lapStart - previous);
+        previous = lapStart;
+      }
+    }
+  }
+
   void filterExtreme(List<LapTimeDTO> results) {
     // Needs to be done here since we did not have all info before
     Map<Integer, LapTimeDTO> bestPerLocation = new HashMap<Integer, LapTimeDTO>();
@@ -145,16 +181,20 @@ public class LapTimeManager {
     for (LapTimeDisplay display : displays) {
       switch (display) {
       case KEEP_LAST:
+        // TODO Should probably be merged with Best (best and last info present
+        // in DTO) and then its just a matter of order
         keepOnlyLast(results);
         break;
       case ORDER_FOR_RACE:
         orderForRace(results);
+        fillRaceGaps(results);
         break;
       case KEEP_BEST:
         keepOnlyBest(results);
         break;
       case ORDER_BY_DURATION:
         orderByDuration(results);
+        fillGaps(results);
         break;
       default:
         break;

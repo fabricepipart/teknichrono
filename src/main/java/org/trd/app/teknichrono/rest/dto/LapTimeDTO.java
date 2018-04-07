@@ -33,6 +33,8 @@ public class LapTimeDTO implements Serializable {
   private Timestamp endDate;
   // In milliseconds
   private long duration;
+  private long gapWithPrevious;
+  private long gapWithBest;
   private List<SectorDTO> sectors = new ArrayList<SectorDTO>();
   private int lapIndex;
   private int lapNumber;
@@ -214,5 +216,21 @@ public class LapTimeDTO implements Serializable {
 
   public void setLapNumber(int lapNumber) {
     this.lapNumber = lapNumber;
+  }
+
+  public long getGapWithPrevious() {
+    return gapWithPrevious;
+  }
+
+  public void setGapWithPrevious(long gapWithPrevious) {
+    this.gapWithPrevious = gapWithPrevious;
+  }
+
+  public long getGapWithBest() {
+    return gapWithBest;
+  }
+
+  public void setGapWithBest(long gapWithBest) {
+    this.gapWithBest = gapWithBest;
   }
 }

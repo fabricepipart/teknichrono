@@ -1,7 +1,9 @@
 # Teknichrono
 
 * [Project home ](https://github.com/fabricepipart/teknichrono)
+* [Alternative home](https://bitbucket.org/trdteam/teknichrono/overview)
 * [Entry point](http://teknichrono-fabrice-pipart-stage.b542.starter-us-east-2a.openshiftapps.com/teknichrono/app.html#/Events)
+* [OpenShift](https://console.starter-us-east-2a.openshift.com/console/project/fabrice-pipart/browse/pipelines)
 
 ## Description
 

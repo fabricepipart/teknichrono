@@ -81,12 +81,16 @@ def printLaps(laps, withDates=False):
   for lap in laps:
     maxSectors = max(maxSectors, len(lap['intermediates']))
   #print("Max Sectors = "+ str(maxSectors))
+  headers = ['Lap']
   if withDates:
-    headers = ['Lap', 'Date', 'Pilot', 'Lap index', 'Lap time']
-  else:
-    headers = ['Lap', 'Pilot', 'Lap index', 'Lap time']
+    headers.append('Date')
+  headers.append('Pilot')
+  headers.append('Lap index')
+  headers.append('Lap time')
   for i in range(1, maxSectors + 1):
     headers.append("Sector " + str(i))
+  headers.append('Gap with Best')
+  headers.append('Gap with Previous')
   #print(str(headers))
   #print("#Laps : " + str(len(laps)))
   table = PrettyTable(headers)
@@ -117,6 +121,8 @@ def printLaps(laps, withDates=False):
         else:
           lapRow.append(pretty_time_delta(intermediate['duration']))
           intermediateIndex += 1
+    lapRow.append(pretty_time_delta(lap['gapWithBest']))
+    lapRow.append(pretty_time_delta(lap['gapWithPrevious']))
     table.add_row(lapRow)
   print(table)
 
