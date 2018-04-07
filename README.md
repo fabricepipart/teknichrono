@@ -41,11 +41,11 @@ For the time being, you can have a look in: ```src/main/java/org/trd/app/teknich
     * http://meri-stuff.blogspot.fr/2012/03/jpa-tutorial.html#RelationshipsBidirectionalOneToManyManyToOneConsistency
   * Examples
     * [wildfly-swarm-examples](https://github.com/wildfly-swarm/wildfly-swarm-examples)
-* Pipeline
+* Fabric8
   * [fabric8-pipeline-library](https://github.com/fabric8io/fabric8-pipeline-library)
-* Docker build
   * https://github.com/fabric8io/docker-maven-plugin
   * https://dmp.fabric8.io/#build-configuration
+  * https://maven.fabric8.io/
 * OpenShift io
   * https://github.com/openshiftio/openshift.io/wiki/FAQ
   * https://github.com/openshiftio/openshift.io/issues/891

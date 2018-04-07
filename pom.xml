@@ -207,13 +207,6 @@
                   <exclude>webapp</exclude>
                 </excludes>
               </generator>
-              <enricher>
-                <config>
-                  <wildfly-swarm-health-check>
-                    <path>/</path>
-                  </wildfly-swarm-health-check>
-                </config>
-              </enricher>
               <resources>
                 <labels>
                   <all>
