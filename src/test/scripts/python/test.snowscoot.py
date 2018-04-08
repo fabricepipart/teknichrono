@@ -11,30 +11,8 @@ from chronometer import *
 from event import *
 from ping import *
 from laps import *
-
-# ----------------------------------------------------------------------
-# Test dqte primitives
-print("Date = " + formatDatetime(timestampToDate(1471863621321)))
-# 2016-08-22T11:00:21.321Z
-
-# ----------------------------------------------------------------------
-# Command line parameters
-print(len(sys.argv))
-if len(sys.argv) >= 2:
-  setHost(sys.argv[1])
-
-# ----------------------------------------------------------------------
-
-# Cleanup
-deleteBeacons()
-deletePilots()
-deleteChronometers()
-deleteEvents()
-
-# ----------------------------------------------------------------------
-# Add Beacons
-for i in range(0, 20):
-  addBeacon(i)
+from session import *
+from location import *
 
 # ----------------------------------------------------------------------
 # Add Pilots
@@ -66,15 +44,25 @@ for i in range(0, 3):
 
 # ----------------------------------------------------------------------
 # Add Events
-addEvent('Snowscoot Isola', date(2016, 8, 26), date(2016, 8, 27), False)
+event = addEvent('Snowscoot Isola')
+
+# ----------------------------------------------------------------------
+# Add Locations
+isola = addLocation('Isola', False)
+
+# ----------------------------------------------------------------------
+# Add Sessions
+session = addSession('Snowscoot Isola', datetime(2016, 8, 22), datetime(2016, 8, 22), 'tt')
+
+addSessionToLocation(isola['id'], session['id'])
+addSessionToEvent(event['id'], session['id'])
 
 # ----------------------------------------------------------------------
 # Associate chronometers to event in right order
-event = getEventByName('Snowscoot Isola')
 
-addChronometerToEvent(event['id'], getChronometerByName('Raspberry-0')['id'])
-addChronometerToEvent(event['id'], getChronometerByName('Raspberry-2')['id'])
-addChronometerToEvent(event['id'], getChronometerByName('Raspberry-1')['id'], 1)
+addChronometerToSession(session['id'], getChronometerByName('Raspberry-0')['id'])
+addChronometerToSession(session['id'], getChronometerByName('Raspberry-2')['id'])
+addChronometerToSession(session['id'], getChronometerByName('Raspberry-1')['id'], 1)
 
 # ----------------------------------------------------------------------
 # Send pings
@@ -154,11 +142,11 @@ ping(datetime(2017, 1, 27, 15, 2, 55, 1 * 1000), threeBeaconId, -83, chrono2)
 #
 # We should have per pilot all laps (12) in order with 4 intermediates in each (for 4 chronos)
 
-runsFabrice = getLapsOfPilot(getPilot('Fabrice', 'Pipart')['id'])
-runsBruce = getLapsOfPilot(getPilot('Bruce', 'Rulfo')['id'])
-runsOne = getLapsOfPilot(getPilot('Rider', 'One')['id'])
-runsTwo = getLapsOfPilot(getPilot('Rider', 'Two')['id'])
-runsThree = getLapsOfPilot(getPilot('Rider', 'Three')['id'])
+runsFabrice = getLapsOfPilot(getPilot('Fabrice', 'Pipart')['id'], sessionId=session['id'])
+runsBruce = getLapsOfPilot(getPilot('Bruce', 'Rulfo')['id'], sessionId=session['id'])
+runsOne = getLapsOfPilot(getPilot('Rider', 'One')['id'], sessionId=session['id'])
+runsTwo = getLapsOfPilot(getPilot('Rider', 'Two')['id'], sessionId=session['id'])
+runsThree = getLapsOfPilot(getPilot('Rider', 'Three')['id'], sessionId=session['id'])
 
 print("---- Laps Fabrice ----")
 printLaps(runsFabrice)
@@ -185,7 +173,7 @@ assert len(runsThree) == 2
 # --------- TODO -------------
 
 # Session summary
-laps = getLapsForEvent(event['id'])
+laps = getLaps(eventId=event['id'])
 printLaps(laps, True)
 
 # --------- TODO -------------

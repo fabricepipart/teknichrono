@@ -5,15 +5,13 @@ import json
 import sys
 
 from base import *
-from pilots import *
-from beacons import *
-from chronometer import *
-from event import *
-from category import *
-from session import *
-from location import *
-from ping import *
-from laps import *
+from pilots import deletePilots
+from beacons import deleteBeacons, addBeacon
+from chronometer import deleteChronometers
+from event import deleteEvents
+from category import deleteCategories
+from session import deleteSessions
+from location import deleteLocations
 
 # Cleanup
 deleteBeacons()

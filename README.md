@@ -49,3 +49,4 @@ For the time being, you can have a look in: ```src/main/java/org/trd/app/teknich
 * OpenShift io
   * https://github.com/openshiftio/openshift.io/wiki/FAQ
   * https://github.com/openshiftio/openshift.io/issues/891
+  * [WildFly booster](https://github.com/openshiftio/booster-parent/blob/master/pom.xml)
