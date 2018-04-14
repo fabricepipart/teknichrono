@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('EditPilotController', function($scope, $routeParams, $location, flash, PilotResource , BeaconResource, LapTimeResource) {
+angular.module('frontend').controller('EditPilotController', function($scope, $routeParams, $location, flash, PilotResource , SessionResource, CategoryResource, BeaconResource, LapTimeResource) {
     var self = this;
     $scope.disabled = false;
     $scope.$location = $location;
@@ -9,6 +9,44 @@ angular.module('frontend').controller('EditPilotController', function($scope, $r
         var successCallback = function(data){
             self.original = data;
             $scope.pilot = new PilotResource(self.original);
+            SessionResource.queryAll(function(items) {
+                $scope.sessionsSelectionList = $.map(items, function(item) {
+                    var wrappedObject = {
+                        id : item.id
+                    };
+                    var labelObject = {
+                        value : item.id,
+                        text : item.id
+                    };
+                    if($scope.pilot.sessions){
+                        $.each($scope.pilot.sessions, function(idx, element) {
+                            if(item.id == element.id) {
+                                $scope.sessionsSelection.push(labelObject);
+                                $scope.pilot.sessions.push(wrappedObject);
+                            }
+                        });
+                        self.original.sessions = $scope.pilot.sessions;
+                    }
+                    return labelObject;
+                });
+            });
+            CategoryResource.queryAll(function(items) {
+                $scope.categorySelectionList = $.map(items, function(item) {
+                    var wrappedObject = {
+                        id : item.id
+                    };
+                    var labelObject = {
+                        value : item.id,
+                        text : item.id
+                    };
+                    if($scope.pilot.category && item.id == $scope.pilot.category.id) {
+                        $scope.categorySelection = labelObject;
+                        $scope.pilot.category = wrappedObject;
+                        self.original.category = $scope.pilot.category;
+                    }
+                    return labelObject;
+                });
+            });
             BeaconResource.queryAll(function(items) {
                 $scope.currentBeaconSelectionList = $.map(items, function(item) {
                     var wrappedObject = {
@@ -93,6 +131,23 @@ angular.module('frontend').controller('EditPilotController', function($scope, $r
         $scope.pilot.$remove(successCallback, errorCallback);
     };
     
+    $scope.sessionsSelection = $scope.sessionsSelection || [];
+    $scope.$watch("sessionsSelection", function(selection) {
+        if (typeof selection != 'undefined' && $scope.pilot) {
+            $scope.pilot.sessions = [];
+            $.each(selection, function(idx,selectedItem) {
+                var collectionItem = {};
+                collectionItem.id = selectedItem.value;
+                $scope.pilot.sessions.push(collectionItem);
+            });
+        }
+    });
+    $scope.$watch("categorySelection", function(selection) {
+        if (typeof selection != 'undefined') {
+            $scope.pilot.category = {};
+            $scope.pilot.category.id = selection.value;
+        }
+    });
     $scope.$watch("currentBeaconSelection", function(selection) {
         if (typeof selection != 'undefined') {
             $scope.pilot.currentBeacon = {};

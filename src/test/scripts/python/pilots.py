@@ -2,7 +2,7 @@
 
 from base import *
 
-pilotsUrl = '/teknichrono/rest/pilots'
+pilotsUrl = '/rest/pilots'
 
 
 def addPilot(firstName, lastName):

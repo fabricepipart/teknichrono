@@ -1,8 +1,8 @@
 
-angular.module('frontend').controller('NewEventController', function ($scope, $location, locationParser, flash, EventResource , SessionResource) {
+angular.module('frontend').controller('NewLocationController', function ($scope, $location, locationParser, flash, LocationResource , SessionResource) {
     $scope.disabled = false;
     $scope.$location = $location;
-    $scope.event = $scope.event || {};
+    $scope.location = $scope.location || {};
     
     $scope.sessionsList = SessionResource.queryAll(function(items){
         $scope.sessionsSelectionList = $.map(items, function(item) {
@@ -14,21 +14,26 @@ angular.module('frontend').controller('NewEventController', function ($scope, $l
     });
     $scope.$watch("sessionsSelection", function(selection) {
         if (typeof selection != 'undefined') {
-            $scope.event.sessions = [];
+            $scope.location.sessions = [];
             $.each(selection, function(idx,selectedItem) {
                 var collectionItem = {};
                 collectionItem.id = selectedItem.value;
-                $scope.event.sessions.push(collectionItem);
+                $scope.location.sessions.push(collectionItem);
             });
         }
     });
+
+    $scope.loopTrackList = [
+        "true",
+        "false"
+    ];
 
 
     $scope.save = function() {
         var successCallback = function(data,responseHeaders){
             var id = locationParser(responseHeaders);
-            flash.setMessage({'type':'success','text':'The event was created successfully.'});
-            $location.path('/Events');
+            flash.setMessage({'type':'success','text':'The location was created successfully.'});
+            $location.path('/Locations');
         };
         var errorCallback = function(response) {
             if(response && response.data && response.data.message) {
@@ -37,10 +42,10 @@ angular.module('frontend').controller('NewEventController', function ($scope, $l
                 flash.setMessage({'type': 'error', 'text': 'Something broke. Retry, or cancel and start afresh.'}, true);
             }
         };
-        EventResource.save($scope.event, successCallback, errorCallback);
+        LocationResource.save($scope.location, successCallback, errorCallback);
     };
     
     $scope.cancel = function() {
-        $location.path("/Events");
+        $location.path("/Locations");
     };
 });

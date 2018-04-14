@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('SearchPilotController', function($scope, $http, $filter, PilotResource , SessionResource, CategoryResource, BeaconResource, LapTimeResource) {
+angular.module('frontend').controller('SearchSessionController', function($scope, $http, $filter, SessionResource , PilotResource, EventResource, LocationResource, ChronometerResource) {
 
     $scope.search={};
     $scope.currentPage = 0;
@@ -17,11 +17,15 @@ angular.module('frontend').controller('SearchPilotController', function($scope, 
         }
         return max;
     };
-    $scope.categoryList = CategoryResource.queryAll();
-    $scope.currentBeaconList = BeaconResource.queryAll();
+    $scope.eventList = EventResource.queryAll();
+    $scope.locationList = LocationResource.queryAll();
+    $scope.sessionTypeList = [
+        "TIME_TRIAL",
+        "RACE"
+    ];
 
     $scope.performSearch = function() {
-        $scope.searchResults = PilotResource.queryAll(function(){
+        $scope.searchResults = SessionResource.queryAll(function(){
             $scope.filteredResults = $filter('searchFilter')($scope.searchResults, $scope);
             $scope.currentPage = 0;
         });

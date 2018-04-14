@@ -5,27 +5,11 @@
 <form id="EventForm" name="EventForm" class="form-horizontal" role="form">
     
 
-    <div class="form-group" ng-class="{'has-error': EventForm.start.$invalid}">
-        <label for="start" class="col-sm-2 control-label">Start</label>
-        <div id="startControls" class="col-sm-10">
-            <input id="start" name="start" type="text" required class="form-control" ng-model="event.start" placeholder="Enter the Event Start"></input>
-            <span class="help-block error" ng-show="EventForm.start.$error.required">required</span> 
-        </div>
-    </div>
-
-    <div class="form-group" ng-class="{'has-error': EventForm.end.$invalid}">
-        <label for="end" class="col-sm-2 control-label">End</label>
-        <div id="endControls" class="col-sm-10">
-            <input id="end" name="end" type="text" required class="form-control" ng-model="event.end" placeholder="Enter the Event End"></input>
-            <span class="help-block error" ng-show="EventForm.end.$error.required">required</span> 
-        </div>
-    </div>
-
-    <div class="form-group" ng-class="{'has-error': EventForm.chronometers.$invalid}">
-        <label for="chronometers" class="col-sm-2 control-label">Chronometers</label>
-        <div id="chronometersControls" class="col-sm-10">
-            <select id="chronometers" name="chronometers" multiple class="form-control" ng-model="chronometersSelection" ng-options="c.text for c in chronometersSelectionList">
-                <option value="">Choose a Chronometers</option>
+    <div class="form-group" ng-class="{'has-error': EventForm.sessions.$invalid}">
+        <label for="sessions" class="col-sm-2 control-label">Sessions</label>
+        <div id="sessionsControls" class="col-sm-10">
+            <select id="sessions" name="sessions" multiple class="form-control" ng-model="sessionsSelection" ng-options="s.text for s in sessionsSelectionList">
+                <option value="">Choose a Sessions</option>
             </select>
         </div>
     </div>
@@ -35,13 +19,6 @@
         <div id="nameControls" class="col-sm-10">
             <input id="name" name="name" type="text" required class="form-control" ng-model="event.name" placeholder="Enter the Event Name"></input>
             <span class="help-block error" ng-show="EventForm.name.$error.required">required</span> 
-        </div>
-    </div>
-
-    <div class="form-group" ng-class="{'has-error': EventForm.loopTrack.$invalid}">
-        <label for="loopTrack" class="col-sm-2 control-label">Loop Track</label>
-        <div id="loopTrackControls" class="col-sm-10">
-            <input id="loopTrack" name="loopTrack" type="checkbox" class="checkbox" ng-model="event.loopTrack" placeholder="Enter the Event Loop Track"></input>
         </div>
     </div>
 

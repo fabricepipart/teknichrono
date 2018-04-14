@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('EditChronometerController', function($scope, $routeParams, $location, flash, ChronometerResource , PingResource, EventResource) {
+angular.module('frontend').controller('EditChronometerController', function($scope, $routeParams, $location, flash, ChronometerResource , PingResource, SessionResource) {
     var self = this;
     $scope.disabled = false;
     $scope.$location = $location;
@@ -30,8 +30,8 @@ angular.module('frontend').controller('EditChronometerController', function($sco
                     return labelObject;
                 });
             });
-            EventResource.queryAll(function(items) {
-                $scope.eventSelectionList = $.map(items, function(item) {
+            SessionResource.queryAll(function(items) {
+                $scope.sessionsSelectionList = $.map(items, function(item) {
                     var wrappedObject = {
                         id : item.id
                     };
@@ -39,10 +39,14 @@ angular.module('frontend').controller('EditChronometerController', function($sco
                         value : item.id,
                         text : item.id
                     };
-                    if($scope.chronometer.event && item.id == $scope.chronometer.event.id) {
-                        $scope.eventSelection = labelObject;
-                        $scope.chronometer.event = wrappedObject;
-                        self.original.event = $scope.chronometer.event;
+                    if($scope.chronometer.sessions){
+                        $.each($scope.chronometer.sessions, function(idx, element) {
+                            if(item.id == element.id) {
+                                $scope.sessionsSelection.push(labelObject);
+                                $scope.chronometer.sessions.push(wrappedObject);
+                            }
+                        });
+                        self.original.sessions = $scope.chronometer.sessions;
                     }
                     return labelObject;
                 });
@@ -104,10 +108,15 @@ angular.module('frontend').controller('EditChronometerController', function($sco
             });
         }
     });
-    $scope.$watch("eventSelection", function(selection) {
-        if (typeof selection != 'undefined') {
-            $scope.chronometer.event = {};
-            $scope.chronometer.event.id = selection.value;
+    $scope.sessionsSelection = $scope.sessionsSelection || [];
+    $scope.$watch("sessionsSelection", function(selection) {
+        if (typeof selection != 'undefined' && $scope.chronometer) {
+            $scope.chronometer.sessions = [];
+            $.each(selection, function(idx,selectedItem) {
+                var collectionItem = {};
+                collectionItem.id = selectedItem.value;
+                $scope.chronometer.sessions.push(collectionItem);
+            });
         }
     });
     

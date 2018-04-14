@@ -2,7 +2,7 @@
 
 from base import *
 
-beaconsUrl = '/teknichrono/rest/beacons'
+beaconsUrl = '/rest/beacons'
 
 # ----------------------------------------------------------------------
 

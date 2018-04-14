@@ -1,32 +1,31 @@
 <div class="form-horizontal">
-    <h3>Create a new Chronometer</h3>
+    <h3>Create a new Category</h3>
     <div class="form-group">
         <div class="col-md-offset-2 col-sm-2">
-            <a id="Create" name="Create" class="btn btn-primary" href="#/Chronometers/new"><span class="glyphicon glyphicon-plus-sign"></span> Create</a>
+            <a id="Create" name="Create" class="btn btn-primary" href="#/Categories/new"><span class="glyphicon glyphicon-plus-sign"></span> Create</a>
         </div>
     </div>
 </div>
 <hr/>
 <div>
-    <h3>Search for Chronometers</h3>
-    <form id="ChronometerSearch" class="form-horizontal">
+    <h3>Search for Categories</h3>
+    <form id="CategorySearch" class="form-horizontal">
         
+
 
     <div class="form-group">
         <label for="name" class="col-sm-2 control-label">Name</label>
         <div class="col-sm-10">
-            <input id="name" name="name" class="form-control" type="text" ng-model="search.name" placeholder="Enter the Chronometer Name"></input>
+            <input id="name" name="name" class="form-control" type="text" ng-model="search.name" placeholder="Enter the Category Name"></input>
         </div>
     </div>
 
     <div class="form-group">
-        <label for="chronoIndex" class="col-sm-2 control-label">Chrono Index</label>
+        <label for="SPilots" class="col-sm-2 control-label">S Pilots</label>
         <div class="col-sm-10">
-            <input id="chronoIndex" name="chronoIndex" class="form-control" type="text" ng-model="search.chronoIndex" placeholder="Enter the Chronometer Chrono Index"></input>
+            <input id="SPilots" name="SPilots" class="form-control" type="text" ng-model="search.SPilots" placeholder="Enter the Category S Pilots"></input>
         </div>
     </div>
-
-
 
 
         <div class="form-group">
@@ -42,13 +41,13 @@
             <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Chrono Index</th>
+                    <th>S Pilots</th>
                 </tr>
             </thead>
             <tbody id="search-results-body">
                 <tr ng-repeat="result in filteredResults | startFrom:currentPage*pageSize | limitTo:pageSize">
-                    <td><a href="#/Chronometers/edit/{{result.id}}">{{result.name}}</a></td>
-                    <td><a href="#/Chronometers/edit/{{result.id}}">{{result.chronoIndex}}</a></td>
+                    <td><a href="#/Categories/edit/{{result.id}}">{{result.name}}</a></td>
+                    <td><a href="#/Categories/edit/{{result.id}}">{{result.SPilots}}</a></td>
                 </tr>
             </tbody>
         </table>

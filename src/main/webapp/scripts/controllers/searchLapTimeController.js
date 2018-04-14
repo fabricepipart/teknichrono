@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('SearchLapTimeController', function($scope, $http, $filter, LapTimeResource , PilotResource, EventResource, PingResource) {
+angular.module('frontend').controller('SearchLapTimeController', function($scope, $http, $filter, LapTimeResource , PilotResource, SessionResource, PingResource) {
 
     $scope.search={};
     $scope.currentPage = 0;
@@ -18,7 +18,7 @@ angular.module('frontend').controller('SearchLapTimeController', function($scope
         return max;
     };
     $scope.pilotList = PilotResource.queryAll();
-    $scope.eventList = EventResource.queryAll();
+    $scope.sessionList = SessionResource.queryAll();
 
     $scope.performSearch = function() {
         $scope.searchResults = LapTimeResource.queryAll(function(){

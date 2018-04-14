@@ -1,8 +1,42 @@
 
-angular.module('frontend').controller('NewPilotController', function ($scope, $location, locationParser, flash, PilotResource , BeaconResource, LapTimeResource) {
+angular.module('frontend').controller('NewPilotController', function ($scope, $location, locationParser, flash, PilotResource , SessionResource, CategoryResource, BeaconResource, LapTimeResource) {
     $scope.disabled = false;
     $scope.$location = $location;
     $scope.pilot = $scope.pilot || {};
+    
+    $scope.sessionsList = SessionResource.queryAll(function(items){
+        $scope.sessionsSelectionList = $.map(items, function(item) {
+            return ( {
+                value : item.id,
+                text : item.id
+            });
+        });
+    });
+    $scope.$watch("sessionsSelection", function(selection) {
+        if (typeof selection != 'undefined') {
+            $scope.pilot.sessions = [];
+            $.each(selection, function(idx,selectedItem) {
+                var collectionItem = {};
+                collectionItem.id = selectedItem.value;
+                $scope.pilot.sessions.push(collectionItem);
+            });
+        }
+    });
+
+    $scope.categoryList = CategoryResource.queryAll(function(items){
+        $scope.categorySelectionList = $.map(items, function(item) {
+            return ( {
+                value : item.id,
+                text : item.id
+            });
+        });
+    });
+    $scope.$watch("categorySelection", function(selection) {
+        if ( typeof selection != 'undefined') {
+            $scope.pilot.category = {};
+            $scope.pilot.category.id = selection.value;
+        }
+    });
     
     $scope.currentBeaconList = BeaconResource.queryAll(function(items){
         $scope.currentBeaconSelectionList = $.map(items, function(item) {

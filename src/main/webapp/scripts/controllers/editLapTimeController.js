@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('EditLapTimeController', function($scope, $routeParams, $location, flash, LapTimeResource , PilotResource, EventResource, PingResource) {
+angular.module('frontend').controller('EditLapTimeController', function($scope, $routeParams, $location, flash, LapTimeResource , PilotResource, SessionResource, PingResource) {
     var self = this;
     $scope.disabled = false;
     $scope.$location = $location;
@@ -26,8 +26,8 @@ angular.module('frontend').controller('EditLapTimeController', function($scope, 
                     return labelObject;
                 });
             });
-            EventResource.queryAll(function(items) {
-                $scope.eventSelectionList = $.map(items, function(item) {
+            SessionResource.queryAll(function(items) {
+                $scope.sessionSelectionList = $.map(items, function(item) {
                     var wrappedObject = {
                         id : item.id
                     };
@@ -35,10 +35,10 @@ angular.module('frontend').controller('EditLapTimeController', function($scope, 
                         value : item.id,
                         text : item.id
                     };
-                    if($scope.lapTime.event && item.id == $scope.lapTime.event.id) {
-                        $scope.eventSelection = labelObject;
-                        $scope.lapTime.event = wrappedObject;
-                        self.original.event = $scope.lapTime.event;
+                    if($scope.lapTime.session && item.id == $scope.lapTime.session.id) {
+                        $scope.sessionSelection = labelObject;
+                        $scope.lapTime.session = wrappedObject;
+                        self.original.session = $scope.lapTime.session;
                     }
                     return labelObject;
                 });
@@ -116,10 +116,10 @@ angular.module('frontend').controller('EditLapTimeController', function($scope, 
             $scope.lapTime.pilot.id = selection.value;
         }
     });
-    $scope.$watch("eventSelection", function(selection) {
+    $scope.$watch("sessionSelection", function(selection) {
         if (typeof selection != 'undefined') {
-            $scope.lapTime.event = {};
-            $scope.lapTime.event.id = selection.value;
+            $scope.lapTime.session = {};
+            $scope.lapTime.session.id = selection.value;
         }
     });
     $scope.intermediatesSelection = $scope.intermediatesSelection || [];

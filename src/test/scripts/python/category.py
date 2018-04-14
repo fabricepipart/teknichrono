@@ -2,7 +2,7 @@
 
 from base import *
 
-categoryUrl = '/teknichrono/rest/categories'
+categoryUrl = '/rest/categories'
 
 # ----------------------------------------------------------------------
 

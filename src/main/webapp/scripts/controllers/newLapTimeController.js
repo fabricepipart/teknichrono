@@ -1,5 +1,5 @@
 
-angular.module('frontend').controller('NewLapTimeController', function ($scope, $location, locationParser, flash, LapTimeResource , PilotResource, EventResource, PingResource) {
+angular.module('frontend').controller('NewLapTimeController', function ($scope, $location, locationParser, flash, LapTimeResource , PilotResource, SessionResource, PingResource) {
     $scope.disabled = false;
     $scope.$location = $location;
     $scope.lapTime = $scope.lapTime || {};
@@ -19,18 +19,18 @@ angular.module('frontend').controller('NewLapTimeController', function ($scope, 
         }
     });
     
-    $scope.eventList = EventResource.queryAll(function(items){
-        $scope.eventSelectionList = $.map(items, function(item) {
+    $scope.sessionList = SessionResource.queryAll(function(items){
+        $scope.sessionSelectionList = $.map(items, function(item) {
             return ( {
                 value : item.id,
                 text : item.id
             });
         });
     });
-    $scope.$watch("eventSelection", function(selection) {
+    $scope.$watch("sessionSelection", function(selection) {
         if ( typeof selection != 'undefined') {
-            $scope.lapTime.event = {};
-            $scope.lapTime.event.id = selection.value;
+            $scope.lapTime.session = {};
+            $scope.lapTime.session.id = selection.value;
         }
     });
     

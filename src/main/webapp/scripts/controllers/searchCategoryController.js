@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('SearchPilotController', function($scope, $http, $filter, PilotResource , SessionResource, CategoryResource, BeaconResource, LapTimeResource) {
+angular.module('frontend').controller('SearchCategoryController', function($scope, $http, $filter, CategoryResource , PilotResource) {
 
     $scope.search={};
     $scope.currentPage = 0;
@@ -17,11 +17,9 @@ angular.module('frontend').controller('SearchPilotController', function($scope, 
         }
         return max;
     };
-    $scope.categoryList = CategoryResource.queryAll();
-    $scope.currentBeaconList = BeaconResource.queryAll();
 
     $scope.performSearch = function() {
-        $scope.searchResults = PilotResource.queryAll(function(){
+        $scope.searchResults = CategoryResource.queryAll(function(){
             $scope.filteredResults = $filter('searchFilter')($scope.searchResults, $scope);
             $scope.currentPage = 0;
         });

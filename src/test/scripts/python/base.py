@@ -28,7 +28,7 @@ def post(dataString, url, params=[]):
   return
 
 
-#curl -X POST http://localhost:8080/teknichrono/rest/sessions --data '{"type":"tt", name":"name", "start":"0", "end":"0"}' --header "Content-Type:application/json"
+#curl -X POST http://localhost:8080/rest/sessions --data '{"type":"tt", name":"name", "start":"0", "end":"0"}' --header "Content-Type:application/json"
 
 
 def put(dataString, url):

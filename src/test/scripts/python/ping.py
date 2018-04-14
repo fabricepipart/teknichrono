@@ -4,7 +4,7 @@ from base import *
 import random
 
 headers = {'Content-type': 'application/json'}
-pingsUrl = '/teknichrono/rest/pings'
+pingsUrl = '/rest/pings'
 
 
 # ----------------------------------------------------------------------

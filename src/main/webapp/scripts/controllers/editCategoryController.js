@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('EditEventController', function($scope, $routeParams, $location, flash, EventResource , SessionResource) {
+angular.module('frontend').controller('EditCategoryController', function($scope, $routeParams, $location, flash, CategoryResource , PilotResource) {
     var self = this;
     $scope.disabled = false;
     $scope.$location = $location;
@@ -8,9 +8,9 @@ angular.module('frontend').controller('EditEventController', function($scope, $r
     $scope.get = function() {
         var successCallback = function(data){
             self.original = data;
-            $scope.event = new EventResource(self.original);
-            SessionResource.queryAll(function(items) {
-                $scope.sessionsSelectionList = $.map(items, function(item) {
+            $scope.category = new CategoryResource(self.original);
+            PilotResource.queryAll(function(items) {
+                $scope.pilotsSelectionList = $.map(items, function(item) {
                     var wrappedObject = {
                         id : item.id
                     };
@@ -18,33 +18,33 @@ angular.module('frontend').controller('EditEventController', function($scope, $r
                         value : item.id,
                         text : item.id
                     };
-                    if($scope.event.sessions){
-                        $.each($scope.event.sessions, function(idx, element) {
+                    if($scope.category.pilots){
+                        $.each($scope.category.pilots, function(idx, element) {
                             if(item.id == element.id) {
-                                $scope.sessionsSelection.push(labelObject);
-                                $scope.event.sessions.push(wrappedObject);
+                                $scope.pilotsSelection.push(labelObject);
+                                $scope.category.pilots.push(wrappedObject);
                             }
                         });
-                        self.original.sessions = $scope.event.sessions;
+                        self.original.pilots = $scope.category.pilots;
                     }
                     return labelObject;
                 });
             });
         };
         var errorCallback = function() {
-            flash.setMessage({'type': 'error', 'text': 'The event could not be found.'});
-            $location.path("/Events");
+            flash.setMessage({'type': 'error', 'text': 'The category could not be found.'});
+            $location.path("/Categories");
         };
-        EventResource.get({EventId:$routeParams.EventId}, successCallback, errorCallback);
+        CategoryResource.get({CategoryId:$routeParams.CategoryId}, successCallback, errorCallback);
     };
 
     $scope.isClean = function() {
-        return angular.equals(self.original, $scope.event);
+        return angular.equals(self.original, $scope.category);
     };
 
     $scope.save = function() {
         var successCallback = function(){
-            flash.setMessage({'type':'success','text':'The event was updated successfully.'}, true);
+            flash.setMessage({'type':'success','text':'The category was updated successfully.'}, true);
             $scope.get();
         };
         var errorCallback = function(response) {
@@ -54,17 +54,17 @@ angular.module('frontend').controller('EditEventController', function($scope, $r
                 flash.setMessage({'type': 'error', 'text': 'Something broke. Retry, or cancel and start afresh.'}, true);
             }
         };
-        $scope.event.$update(successCallback, errorCallback);
+        $scope.category.$update(successCallback, errorCallback);
     };
 
     $scope.cancel = function() {
-        $location.path("/Events");
+        $location.path("/Categories");
     };
 
     $scope.remove = function() {
         var successCallback = function() {
-            flash.setMessage({'type': 'error', 'text': 'The event was deleted.'});
-            $location.path("/Events");
+            flash.setMessage({'type': 'error', 'text': 'The category was deleted.'});
+            $location.path("/Categories");
         };
         var errorCallback = function(response) {
             if(response && response.data && response.data.message) {
@@ -73,17 +73,17 @@ angular.module('frontend').controller('EditEventController', function($scope, $r
                 flash.setMessage({'type': 'error', 'text': 'Something broke. Retry, or cancel and start afresh.'}, true);
             }
         }; 
-        $scope.event.$remove(successCallback, errorCallback);
+        $scope.category.$remove(successCallback, errorCallback);
     };
     
-    $scope.sessionsSelection = $scope.sessionsSelection || [];
-    $scope.$watch("sessionsSelection", function(selection) {
-        if (typeof selection != 'undefined' && $scope.event) {
-            $scope.event.sessions = [];
+    $scope.pilotsSelection = $scope.pilotsSelection || [];
+    $scope.$watch("pilotsSelection", function(selection) {
+        if (typeof selection != 'undefined' && $scope.category) {
+            $scope.category.pilots = [];
             $.each(selection, function(idx,selectedItem) {
                 var collectionItem = {};
                 collectionItem.id = selectedItem.value;
-                $scope.event.sessions.push(collectionItem);
+                $scope.category.pilots.push(collectionItem);
             });
         }
     });

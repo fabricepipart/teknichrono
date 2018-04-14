@@ -2,7 +2,7 @@
 
 from base import *
 
-EventsUrl = '/teknichrono/rest/events'
+EventsUrl = '/rest/events'
 
 # ----------------------------------------------------------------------
 

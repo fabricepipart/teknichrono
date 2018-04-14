@@ -2,7 +2,7 @@
 
 from base import *
 
-LocationsUrl = '/teknichrono/rest/locations'
+LocationsUrl = '/rest/locations'
 
 # ----------------------------------------------------------------------
 

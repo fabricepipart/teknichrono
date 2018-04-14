@@ -35,11 +35,14 @@
                     <nav class="sidebar-nav" ng-controller="NavController" role="navigation">
                         <div id="sidebar-entries" class="list-group">
                         	<a class="list-group-item" ng-class="{active: matchesRoute('Beacons')}" href="#/Beacons" data-toggle="offcanvas">Beacons</a>
+                        	<a class="list-group-item" ng-class="{active: matchesRoute('Categories')}" href="#/Categories" data-toggle="offcanvas">Categories</a>
                         	<a class="list-group-item" ng-class="{active: matchesRoute('Chronometers')}" href="#/Chronometers" data-toggle="offcanvas">Chronometers</a>
                         	<a class="list-group-item" ng-class="{active: matchesRoute('Events')}" href="#/Events" data-toggle="offcanvas">Events</a>
                         	<a class="list-group-item" ng-class="{active: matchesRoute('LapTimes')}" href="#/LapTimes" data-toggle="offcanvas">LapTimes</a>
+                        	<a class="list-group-item" ng-class="{active: matchesRoute('Locations')}" href="#/Locations" data-toggle="offcanvas">Locations</a>
                         	<a class="list-group-item" ng-class="{active: matchesRoute('Pilots')}" href="#/Pilots" data-toggle="offcanvas">Pilots</a>
                         	<a class="list-group-item" ng-class="{active: matchesRoute('Pings')}" href="#/Pings" data-toggle="offcanvas">Pings</a>
+                        	<a class="list-group-item" ng-class="{active: matchesRoute('Sessions')}" href="#/Sessions" data-toggle="offcanvas">Sessions</a>
                         </div>
                     </nav>
                 </div>
@@ -83,6 +86,10 @@
     <script src="scripts/controllers/newBeaconController.js"></script>
     <script src="scripts/controllers/searchBeaconController.js"></script>
     <script src="scripts/controllers/editBeaconController.js"></script>
+    <script src="scripts/services/CategoryFactory.js"></script>
+    <script src="scripts/controllers/newCategoryController.js"></script>
+    <script src="scripts/controllers/searchCategoryController.js"></script>
+    <script src="scripts/controllers/editCategoryController.js"></script>
     <script src="scripts/services/ChronometerFactory.js"></script>
     <script src="scripts/controllers/newChronometerController.js"></script>
     <script src="scripts/controllers/searchChronometerController.js"></script>
@@ -95,6 +102,10 @@
     <script src="scripts/controllers/newLapTimeController.js"></script>
     <script src="scripts/controllers/searchLapTimeController.js"></script>
     <script src="scripts/controllers/editLapTimeController.js"></script>
+    <script src="scripts/services/LocationFactory.js"></script>
+    <script src="scripts/controllers/newLocationController.js"></script>
+    <script src="scripts/controllers/searchLocationController.js"></script>
+    <script src="scripts/controllers/editLocationController.js"></script>
     <script src="scripts/services/PilotFactory.js"></script>
     <script src="scripts/controllers/newPilotController.js"></script>
     <script src="scripts/controllers/searchPilotController.js"></script>
@@ -103,5 +114,9 @@
     <script src="scripts/controllers/newPingController.js"></script>
     <script src="scripts/controllers/searchPingController.js"></script>
     <script src="scripts/controllers/editPingController.js"></script>
+    <script src="scripts/services/SessionFactory.js"></script>
+    <script src="scripts/controllers/newSessionController.js"></script>
+    <script src="scripts/controllers/searchSessionController.js"></script>
+    <script src="scripts/controllers/editSessionController.js"></script>
 </body>
 </html>

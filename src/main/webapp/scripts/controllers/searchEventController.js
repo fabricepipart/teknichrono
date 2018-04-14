@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('SearchEventController', function($scope, $http, $filter, EventResource , ChronometerResource) {
+angular.module('frontend').controller('SearchEventController', function($scope, $http, $filter, EventResource , SessionResource) {
 
     $scope.search={};
     $scope.currentPage = 0;
@@ -17,10 +17,6 @@ angular.module('frontend').controller('SearchEventController', function($scope, 
         }
         return max;
     };
-    $scope.loopTrackList = [
-        "true",
-        "false"
-    ];
 
     $scope.performSearch = function() {
         $scope.searchResults = EventResource.queryAll(function(){

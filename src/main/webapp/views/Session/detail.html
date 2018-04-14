@@ -1,0 +1,101 @@
+<header ng-switch on="$location.path().indexOf('/Sessions/new') > -1">
+    <h3 ng-switch-when="true">Create a new Session</h3>
+    <h3 ng-switch-when="false">View or edit Session</h3>
+</header>
+<form id="SessionForm" name="SessionForm" class="form-horizontal" role="form">
+        <div class="form-group" ng-class="{'has-error': SessionForm.pilots.$invalid}">
+        <label for="pilots" class="col-sm-2 control-label">Pilots</label>
+        <div id="pilotsControls" class="col-sm-10">
+            <select id="pilots" name="pilots" multiple class="form-control" ng-model="pilotsSelection" ng-options="p.text for p in pilotsSelectionList">
+                <option value="">Choose a Pilots</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': SessionForm.event.$invalid}">
+        <label for="event" class="col-sm-2 control-label">Event</label>
+        <div id="eventControls" class="col-sm-10">
+        <select id="event" name="event" class="form-control" ng-model="eventSelection" ng-options="e.text for e in eventSelectionList"  >
+            <option value="">Choose a Event</option>
+        </select>
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': SessionForm.location.$invalid}">
+        <label for="location" class="col-sm-2 control-label">Location</label>
+        <div id="locationControls" class="col-sm-10">
+        <select id="location" name="location" class="form-control" ng-model="locationSelection" ng-options="l.text for l in locationSelectionList"  >
+            <option value="">Choose a Location</option>
+        </select>
+        </div>
+    </div>
+
+
+
+    <div class="form-group" ng-class="{'has-error': SessionForm.start.$invalid}">
+        <label for="start" class="col-sm-2 control-label">Start</label>
+        <div id="startControls" class="col-sm-10">
+            <input id="start" name="start" type="text" required class="form-control" ng-model="session.start" placeholder="Enter the Session Start"></input>
+            <span class="help-block error" ng-show="SessionForm.start.$error.required">required</span> 
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': SessionForm.end.$invalid}">
+        <label for="end" class="col-sm-2 control-label">End</label>
+        <div id="endControls" class="col-sm-10">
+            <input id="end" name="end" type="text" required class="form-control" ng-model="session.end" placeholder="Enter the Session End"></input>
+            <span class="help-block error" ng-show="SessionForm.end.$error.required">required</span> 
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': SessionForm.chronometers.$invalid}">
+        <label for="chronometers" class="col-sm-2 control-label">Chronometers</label>
+        <div id="chronometersControls" class="col-sm-10">
+            <select id="chronometers" name="chronometers" multiple class="form-control" ng-model="chronometersSelection" ng-options="c.text for c in chronometersSelectionList">
+                <option value="">Choose a Chronometers</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': SessionForm.name.$invalid}">
+        <label for="name" class="col-sm-2 control-label">Name</label>
+        <div id="nameControls" class="col-sm-10">
+            <input id="name" name="name" type="text" required class="form-control" ng-model="session.name" placeholder="Enter the Session Name"></input>
+            <span class="help-block error" ng-show="SessionForm.name.$error.required">required</span> 
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': SessionForm.sessionType.$invalid}">
+        <label for="sessionType" class="col-sm-2 control-label">Session Type</label>
+        <div id="sessionTypeControls" class="col-sm-10">
+        <select id="sessionType" name="sessionType" class="form-control" ng-model="session.sessionType" ng-options="s for s in sessionTypeList"  >
+            <option value="">Choose a Session Type</option>
+        </select>
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': SessionForm.type.$invalid}">
+        <label for="type" class="col-sm-2 control-label">Type</label>
+        <div id="typeControls" class="col-sm-10">
+            <input id="type" name="type" type="text" required class="form-control" ng-model="session.type" placeholder="Enter the Session Type"></input>
+            <span class="help-block error" ng-show="SessionForm.type.$error.required">required</span> 
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': SessionForm.inactivity.$invalid}">
+        <label for="inactivity" class="col-sm-2 control-label">Inactivity</label>
+        <div id="inactivityControls" class="col-sm-10">
+            <input id="inactivity" name="inactivity" type="number" class="form-control" ng-model="session.inactivity" placeholder="Enter the Session Inactivity"></input>
+            <span class="help-block error" ng-show="SessionForm.inactivity.$error.number">not a number</span>
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button id="saveSession" name="saveSession" class="btn btn-primary" ng-disabled="isClean() || SessionForm.$invalid" ng-click="save()"><span class="glyphicon glyphicon-ok-sign"></span> Save</button>
+            <button id="cancel" name="cancel" class="btn btn-default" ng-click="cancel()"><span class="glyphicon glyphicon-remove-sign"></span> Cancel</button>
+            <button id="deleteSession" name="deleteSession" class="btn btn-danger" ng-show="session.id" ng-click="remove()"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+        </div>
+    </div>
+</form>

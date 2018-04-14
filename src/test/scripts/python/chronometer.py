@@ -2,7 +2,7 @@
 
 from base import *
 
-ChronometersUrl = '/teknichrono/rest/chronometers'
+ChronometersUrl = '/rest/chronometers'
 
 # ----------------------------------------------------------------------
 

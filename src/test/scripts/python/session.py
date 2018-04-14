@@ -2,7 +2,7 @@
 
 from base import *
 
-SessionsUrl = '/teknichrono/rest/sessions'
+SessionsUrl = '/rest/sessions'
 
 # ----------------------------------------------------------------------
 

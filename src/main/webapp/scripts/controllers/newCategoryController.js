@@ -1,24 +1,24 @@
 
-angular.module('frontend').controller('NewEventController', function ($scope, $location, locationParser, flash, EventResource , SessionResource) {
+angular.module('frontend').controller('NewCategoryController', function ($scope, $location, locationParser, flash, CategoryResource , PilotResource) {
     $scope.disabled = false;
     $scope.$location = $location;
-    $scope.event = $scope.event || {};
+    $scope.category = $scope.category || {};
     
-    $scope.sessionsList = SessionResource.queryAll(function(items){
-        $scope.sessionsSelectionList = $.map(items, function(item) {
+    $scope.pilotsList = PilotResource.queryAll(function(items){
+        $scope.pilotsSelectionList = $.map(items, function(item) {
             return ( {
                 value : item.id,
                 text : item.id
             });
         });
     });
-    $scope.$watch("sessionsSelection", function(selection) {
+    $scope.$watch("pilotsSelection", function(selection) {
         if (typeof selection != 'undefined') {
-            $scope.event.sessions = [];
+            $scope.category.pilots = [];
             $.each(selection, function(idx,selectedItem) {
                 var collectionItem = {};
                 collectionItem.id = selectedItem.value;
-                $scope.event.sessions.push(collectionItem);
+                $scope.category.pilots.push(collectionItem);
             });
         }
     });
@@ -27,8 +27,8 @@ angular.module('frontend').controller('NewEventController', function ($scope, $l
     $scope.save = function() {
         var successCallback = function(data,responseHeaders){
             var id = locationParser(responseHeaders);
-            flash.setMessage({'type':'success','text':'The event was created successfully.'});
-            $location.path('/Events');
+            flash.setMessage({'type':'success','text':'The category was created successfully.'});
+            $location.path('/Categories');
         };
         var errorCallback = function(response) {
             if(response && response.data && response.data.message) {
@@ -37,10 +37,10 @@ angular.module('frontend').controller('NewEventController', function ($scope, $l
                 flash.setMessage({'type': 'error', 'text': 'Something broke. Retry, or cancel and start afresh.'}, true);
             }
         };
-        EventResource.save($scope.event, successCallback, errorCallback);
+        CategoryResource.save($scope.category, successCallback, errorCallback);
     };
     
     $scope.cancel = function() {
-        $location.path("/Events");
+        $location.path("/Categories");
     };
 });

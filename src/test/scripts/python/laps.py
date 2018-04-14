@@ -3,7 +3,7 @@
 from base import *
 from prettytable import PrettyTable
 
-lapsUrl = '/teknichrono/rest/laptimes'
+lapsUrl = '/rest/laptimes'
 
 # ----------------------------------------------------------------------
 
