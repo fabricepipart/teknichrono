@@ -6,12 +6,13 @@ import sys
 from datetime import date, datetime, timedelta
 
 #from base import *
+from random import randint
 from pilots import addPilot, getPilot, associatePilotBeacon
 from beacons import getBeacon
 from chronometer import addChronometer
 from event import addEvent, addSessionToEvent
-#from ping import *
-#from laps import *
+from ping import ping
+from laps import printLaps, getLapsForSession, getBestLapsForSession
 from session import addSession, addChronometerToSession
 from location import addLocation, addSessionToLocation
 from category import addCategory, addPilotToCategory
@@ -32,16 +33,16 @@ womanCategory = addCategory('Woman')
 juniorCategory = addCategory('Junior')
 
 # Add Pilots
-for i in range(0, 30):
+for i in range(10, 40):
   pilot = addPilot('Rider ' + str(i), 'Elite')
   addPilotToCategory(eliteCategory['id'], pilot['id'])
-for i in range(0, 20):
+for i in range(40, 60):
   pilot = addPilot('Rider ' + str(i), 'Open')
   addPilotToCategory(openCategory['id'], pilot['id'])
-for i in range(0, 20):
+for i in range(60, 80):
   pilot = addPilot('Rider ' + str(i), 'Woman')
   addPilotToCategory(womanCategory['id'], pilot['id'])
-for i in range(0, 10):
+for i in range(80, 90):
   pilot = addPilot('Rider ' + str(i), 'Junior')
   addPilotToCategory(juniorCategory['id'], pilot['id'])
 
@@ -59,41 +60,96 @@ valette = addLocation('Isola - Valette', False)
 redRiver = addLocation('Isola - Red river', False)
 roubines = addLocation('Isola - Roubines', False)
 
+# Add sessions
+
 # -------------------------------------
 # Thursday evening
 # -------------------------------------
 # jeudi soir	accueil concurrents et distribution transpondeurs
 
-for i in range(0, 30):
+for i in range(10, 40):
   pilot = getPilot('Rider ' + str(i), 'Elite')
-  associatePilotBeacon(pilot['id'], getBeacon(90 - i)['id'])
-for i in range(0, 20):
+  associatePilotBeacon(pilot['id'], getBeacon(i)['id'])
+for i in range(40, 60):
   pilot = getPilot('Rider ' + str(i), 'Open')
-  associatePilotBeacon(pilot['id'], getBeacon(60 - i)['id'])
-for i in range(0, 20):
+  associatePilotBeacon(pilot['id'], getBeacon(i)['id'])
+for i in range(60, 80):
   pilot = getPilot('Rider ' + str(i), 'Woman')
-  associatePilotBeacon(pilot['id'], getBeacon(40 - i)['id'])
-for i in range(0, 10):
+  associatePilotBeacon(pilot['id'], getBeacon(i)['id'])
+for i in range(80, 90):
   pilot = getPilot('Rider ' + str(i), 'Junior')
-  associatePilotBeacon(pilot['id'], getBeacon(20 - i)['id'])
+  associatePilotBeacon(pilot['id'], getBeacon(i)['id'])
 
 # -------------------------------------
-#vendredi matin	descente dans le boarder cross	Border cross	deux runs d essais (controle transpondeurs) deux runs chronos, le meilleur retenu	?	?	Donc à la fin il faut juste que tu aies un classement des meilleurs tours par pilote sur les deux runs, exact?
+# vendredi matin
+# descente dans le boarder cross
+# Border cross
+# deux runs d essais (controle transpondeurs)
+# deux runs chronos
+# le meilleur retenu
 # -------------------------------------
+
+# TODO Create sessions earlier and start it here
 
 friMorningTestSession = addSession('Friday morning tests', datetime(2000, 1, 1, 10), datetime(2000, 1, 1, 11), 'tt')
 addSessionToLocation(boarderCross['id'], friMorningTestSession['id'])
 addSessionToEvent(event['id'], friMorningTestSession['id'])
+addChronometerToSession(friMorningTestSession['id'], fake1['id'])
 addChronometerToSession(friMorningTestSession['id'], chrono['id'])
 
-#TODO Some do 1 test
-#TODO Some dont test
+# ---- Test #1 ----
+# Starts every 20s
+startDelta = 20
+# -- Start
+startMinute = 1
+for i in range(11, 90):
+  m, s = divmod(i * startDelta, 60)
+  h, m = divmod(startMinute + m, 60)
+  ping(datetime(2000, 1, 1, 10 + h, m, s, randint(0, 500000)), getBeacon(i)['id'], -99, fake1['id'])
+# -- End
+endMinute = startMinute + 2
+for i in range(11, 89):
+  delta = int(i / 3) + randint(0, int(i / 3))
+  m, s = divmod(i * startDelta + delta, 60)
+  h, m = divmod(endMinute + m, 60)
+  ping(datetime(2000, 1, 1, 10 + h, m, s, randint(0, 500000)), getBeacon(i)['id'], -99, chrono['id'])
+
+# ---- Test #2 ----
+# Starts every 20s
+# -- Start
+startMinute = 31
+for i in range(11, 90):
+  m, s = divmod(i * startDelta, 60)
+  h, m = divmod(startMinute + m, 60)
+  ping(datetime(2000, 1, 1, 10 + h, m, s, randint(0, 500000)), getBeacon(i)['id'], -99, fake1['id'])
+# -- End
+endMinute = startMinute + 2
+for i in range(11, 89):
+  delta = int(i / 3) + randint(0, int(i / 3))
+  m, s = divmod(i * startDelta + delta, 60)
+  h, m = divmod(endMinute + m, 60)
+  ping(datetime(2000, 1, 1, 10 + h, m, s, randint(0, 500000)), getBeacon(i)['id'], -99, chrono['id'])
+
+# ---- Results ----
+printLaps(getLapsForSession(friMorningTestSession['id']), True)
+printLaps(getBestLapsForSession(friMorningTestSession['id']), True)
+
+#TODO Checks - Asserts
+
+#TODO Some do 1 test (2nd
+#TODO Some dont test (1st)
+#TODO Some start but dont finish (last)
 #TODO Some finish after expected time
+
+# ----
 
 friMorningChronoSession = addSession('Friday morning Chrono', datetime(2000, 1, 1, 11), datetime(2000, 1, 1, 12), 'tt')
 addSessionToLocation(boarderCross['id'], friMorningChronoSession['id'])
 addSessionToEvent(event['id'], friMorningChronoSession['id'])
 addChronometerToSession(friMorningChronoSession['id'], chrono['id'])
+
+#TODO Have chart with startup list
+#TODO Have people that did not test
 
 #TODO Some do 1 chrono
 #TODO Some dont chrono
