@@ -1,6 +1,6 @@
 # Teknichrono
 
-* [Project home ](https://github.com/fabricepipart/teknichrono)
+* [Project home](https://github.com/fabricepipart/teknichrono)
 * [Alternative home](https://bitbucket.org/trdteam/teknichrono/overview)
 * [Entry point](http://teknichrono-fabrice-pipart-stage.b542.starter-us-east-2a.openshiftapps.com/app.html#/Events)
 * [OpenShift](https://console.starter-us-east-2a.openshift.com/console/project/fabrice-pipart/browse/pipelines)
@@ -10,6 +10,7 @@
 ### Purpose of the project
 
 This project is the backend part of the Software: the REST API that sits on a server receiving calls from two types of clients:
+
 * Chronometers that sends the pings to compute the lap times
 * End users that consult the lap times or Administrators
 
@@ -20,9 +21,19 @@ The testing part of the project is based on JUnits (very few) and Python end to 
 
 ## How to use
 
+### How to run locally
+
 * You may need to adapt ```src/main/resources/project-defaults.yaml```
-* Start the server : ```mvn wildfly-swarm:run```
-* Run the E2E tests : ```./src/test/scripts/bash/moto_tests.sh ```
+* Start the server 
+  * Normally : ```mvn wildfly-swarm:run```
+  * In debug mode : ```mvn wildfly-swarm:run -Dswarm.debug.port=5555```
+  * With debug logs : ```mvn wildfly-swarm:run -Dswarm.logging=DEBUG```
+* Run the E2E tests : ```./src/test/scripts/bash/moto_tests.sh```
+
+### How to re-generate scaffhold:
+
+* Delete ```src/main/webapp```
+* In Ecipse run Forge (Command + ' or Ctrl + 4) with default settings and AngularJS
 
 ### Services
 
