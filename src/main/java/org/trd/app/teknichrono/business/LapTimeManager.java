@@ -51,7 +51,6 @@ public class LapTimeManager {
         }
       }
       lapsOfPilot.add(dto);
-      dto.setLapIndex(lapsOfPilot.size());
       results.add(dto);
     }
     return results;
@@ -76,19 +75,19 @@ public class LapTimeManager {
   }
 
   private void fillRaceGaps(List<LapTimeDTO> results) {
-    long best = -1;
-    long previous = -1;
+    LapTimeDTORaceComparator comparator = new LapTimeDTORaceComparator();
+    LapTimeDTO best = null;
+    LapTimeDTO previous = null;
     for (LapTimeDTO lapTimeDTO : results) {
-      if (best == -1) {
-        best = lapTimeDTO.getStartDate().getTime();
-        previous = lapTimeDTO.getStartDate().getTime();
+      if (best == null) {
+        best = lapTimeDTO;
+        previous = lapTimeDTO;
         lapTimeDTO.setGapWithBest(0);
         lapTimeDTO.setGapWithPrevious(0);
       } else {
-        long lapStart = lapTimeDTO.getStartDate().getTime();
-        lapTimeDTO.setGapWithBest(lapStart - best);
-        lapTimeDTO.setGapWithPrevious(lapStart - previous);
-        previous = lapStart;
+        lapTimeDTO.setGapWithBest(comparator.distance(best, lapTimeDTO));
+        lapTimeDTO.setGapWithPrevious(comparator.distance(previous, lapTimeDTO));
+        previous = lapTimeDTO;
       }
     }
   }
@@ -137,8 +136,11 @@ public class LapTimeManager {
       lapsOfPilot.add(dto);
     }
     for (Entry<Integer, List<LapTimeDTO>> entry : lapsPerPilot.entrySet()) {
+      int lapIndex = 1;
       for (LapTimeDTO lap : entry.getValue()) {
+        lap.setLapIndex(lapIndex);
         lap.setLapNumber(entry.getValue().size());
+        lapIndex++;
       }
     }
   }

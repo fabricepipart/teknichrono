@@ -228,19 +228,19 @@ lapsJorge = getLapsOfPilot(jorge['id'], sessionId=session['id'])
 
 print("---- Laps Fabrice ----")
 printLaps(lapsFabrice)
-assert len(lapsFabrice) == 12
+assert len(lapsFabrice) == 11
 
 print("---- Laps Jeremy ----")
 printLaps(lapsJeremy)
-assert len(lapsJeremy) == 13
+assert len(lapsJeremy) == 11
 
 print("---- Laps Valentino ----")
 printLaps(lapsValentino)
-assert len(lapsValentino) == 13
+assert len(lapsValentino) == 11
 
 print("---- Laps Jorge ----")
 printLaps(lapsJorge)
-assert len(lapsJorge) == 12
+assert len(lapsJorge) == 9
 
 # TODO Add more assert
 
