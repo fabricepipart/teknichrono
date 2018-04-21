@@ -35,8 +35,8 @@ public class LapTimeManager {
       LapTimeDTO dto = new LapTimeDTO(searchResult);
       NestedSessionDTO session = dto.getSession();
       NestedPilotDTO pilot = dto.getPilot();
-      List<LapTimeDTO> lapsOfPilot = lapsPerPilot.get(pilot.getId());
       LapTimeDTO lastPilotLap = null;
+      List<LapTimeDTO> lapsOfPilot = lapsPerPilot.get(pilot.getId());
       if (lapsOfPilot != null && lapsOfPilot.size() > 0) {
         lastPilotLap = lapsOfPilot.get(lapsOfPilot.size() - 1);
       } else {
@@ -54,7 +54,6 @@ public class LapTimeManager {
       dto.setLapIndex(lapsOfPilot.size());
       results.add(dto);
     }
-    fillLapsNumber(lapsPerPilot);
     return results;
   }
 
@@ -94,6 +93,10 @@ public class LapTimeManager {
     }
   }
 
+  void filterNoDuration(List<LapTimeDTO> results) {
+    results.removeIf(r -> r.getDuration() <= 0);
+  }
+
   void filterExtreme(List<LapTimeDTO> results) {
     // Needs to be done here since we did not have all info before
     Map<Integer, LapTimeDTO> bestPerLocation = new HashMap<Integer, LapTimeDTO>();
@@ -122,7 +125,17 @@ public class LapTimeManager {
     results.removeAll(toRemove);
   }
 
-  private void fillLapsNumber(Map<Integer, List<LapTimeDTO>> lapsPerPilot) {
+  private void fillLapsNumber(List<LapTimeDTO> results) {
+    Map<Integer, List<LapTimeDTO>> lapsPerPilot = new HashMap<Integer, List<LapTimeDTO>>();
+    for (LapTimeDTO dto : results) {
+      NestedPilotDTO pilot = dto.getPilot();
+      List<LapTimeDTO> lapsOfPilot = lapsPerPilot.get(pilot.getId());
+      if (lapsOfPilot == null || lapsOfPilot.isEmpty()) {
+        lapsOfPilot = new ArrayList<>();
+        lapsPerPilot.put(pilot.getId(), lapsOfPilot);
+      }
+      lapsOfPilot.add(dto);
+    }
     for (Entry<Integer, List<LapTimeDTO>> entry : lapsPerPilot.entrySet()) {
       for (LapTimeDTO lap : entry.getValue()) {
         lap.setLapNumber(entry.getValue().size());
@@ -178,8 +191,14 @@ public class LapTimeManager {
 
   public void arrangeDisplay(List<LapTimeDTO> results, LapTimeDisplay... displays) {
     filterExtreme(results);
+    fillLapsNumber(results);
     for (LapTimeDisplay display : displays) {
       switch (display) {
+      case KEEP_COMPLETE:
+        filterNoDuration(results);
+        // Adjust
+        fillLapsNumber(results);
+        break;
       case KEEP_LAST:
         // TODO Should probably be merged with Best (best and last info present
         // in DTO) and then its just a matter of order

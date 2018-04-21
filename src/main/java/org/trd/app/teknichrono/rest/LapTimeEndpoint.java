@@ -106,7 +106,8 @@ public class LapTimeEndpoint {
     if (pilotId != null) {
       lapTimeManager.arrangeDisplay(results, LapTimeDisplay.ORDER_BY_DURATION);
     } else {
-      lapTimeManager.arrangeDisplay(results, LapTimeDisplay.KEEP_BEST, LapTimeDisplay.ORDER_BY_DURATION);
+      lapTimeManager.arrangeDisplay(results, LapTimeDisplay.KEEP_COMPLETE, LapTimeDisplay.KEEP_BEST,
+          LapTimeDisplay.ORDER_BY_DURATION);
     }
     return results;
   }
@@ -123,14 +124,20 @@ public class LapTimeEndpoint {
       throw new InvalidArgumentException();
     }
     Session session = em.find(Session.class, sessionId);
-    if (session.getSessionType() == SessionType.RACE) {
+    if (session.getSessionType() != SessionType.RACE) {
       logger.error("Session ID (" + sessionId + ") mentioned is not a race.");
       throw new InvalidArgumentException();
     }
     final List<LapTimeDTO> results = getAllLapsDTOOrderedByStartDate(pilotId, sessionId, locationId, eventId,
         categoryId, startPosition, maxResult, lapTimeManager);
 
-    lapTimeManager.arrangeDisplay(results, LapTimeDisplay.KEEP_LAST, LapTimeDisplay.ORDER_FOR_RACE);
+    if (pilotId != null) {
+      lapTimeManager.arrangeDisplay(results, LapTimeDisplay.ORDER_BY_DURATION);
+    } else {
+      // TODO Remove LapTimeDisplay.KEEP_COMPLETE if race is ongoing
+      lapTimeManager.arrangeDisplay(results, LapTimeDisplay.KEEP_COMPLETE, LapTimeDisplay.KEEP_LAST,
+          LapTimeDisplay.ORDER_FOR_RACE);
+    }
     return results;
 
   }
@@ -148,7 +155,8 @@ public class LapTimeEndpoint {
 
     final List<LapTimeDTO> results = getAllLapsDTOOrderedByStartDate(pilotId, sessionId, locationId, eventId,
         categoryId, startPosition, maxResult, lapTimeManager);
-    lapTimeManager.arrangeDisplay(results);
+    // TODO Remove LapTimeDisplay.KEEP_COMPLETE if session is ongoing
+    lapTimeManager.arrangeDisplay(results, LapTimeDisplay.KEEP_COMPLETE);
 
     return results;
   }

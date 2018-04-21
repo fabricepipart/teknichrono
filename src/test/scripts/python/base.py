@@ -74,7 +74,13 @@ def timestampToDate(t):
   "This creates a date from a timestamp in secs from 1970"
   secs = t / 1000
   millisecs = t - (secs * 1000)
-  return (datetime.utcfromtimestamp(secs) + timedelta(microseconds=(millisecs * 1000)))
+  return (datetime.utcfromtimestamp(secs) + timedelta(milliseconds=millisecs))
+
+
+def pretty_hour(t):
+  "This creates a String from a timestamp in secs from 1970"
+  dateToPrint = timestampToDate(t)
+  return dateToPrint.strftime('%H:%M:%S.%f')[:-3]
 
 
 def pretty_time_delta(milliseconds):
