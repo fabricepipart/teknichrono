@@ -76,7 +76,7 @@ addPilotToSession(race['id'], johann['id'])
 addPilotToSession(race['id'], cal['id'])
 
 # Start
-startRace(race['id'], datetime(2018, 1, 2, 14, 1, 0))
+startSession(race['id'], datetime(2018, 1, 2, 14, 1, 0))
 
 # TODO This should work
 # A few pilots started behind the chrono

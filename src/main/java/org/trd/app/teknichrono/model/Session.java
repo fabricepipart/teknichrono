@@ -52,6 +52,9 @@ public class Session implements java.io.Serializable {
   @Column(nullable = false)
   private String type;
 
+  @Column
+  private boolean current = false;
+
   /**
    * <pre>
    * List of chrono points used for the event. From start to finish line.
@@ -200,6 +203,14 @@ public class Session implements java.io.Serializable {
 
   public void setInactivity(long inactivity) {
     this.inactivity = inactivity;
+  }
+
+  public boolean isCurrent() {
+    return current;
+  }
+
+  public void setCurrent(boolean current) {
+    this.current = current;
   }
 
   @Override

@@ -1,5 +1,6 @@
 package org.trd.app.teknichrono.business;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -191,6 +192,15 @@ public class ChronoManager {
   }
 
   private Session pickMostRelevant(List<Session> sessions, Ping ping) {
+    List<Session> currentSessions = new ArrayList<>(sessions);
+    currentSessions.removeIf(s -> !s.isCurrent());
+    if (!currentSessions.isEmpty()) {
+      return pickMostRelevantByDistance(currentSessions, ping);
+    }
+    return pickMostRelevantByDistance(sessions, ping);
+  }
+
+  private Session pickMostRelevantByDistance(List<Session> sessions, Ping ping) {
     Session mostRelevant = null;
     long mostRelevantDistance = Long.MAX_VALUE;
     for (Session session : sessions) {

@@ -13,7 +13,7 @@ from chronometer import addChronometer
 from event import addEvent, addSessionToEvent
 from ping import ping
 from laps import printLaps, getLapsForSession, getBestLapsForSession
-from session import addSession, addChronometerToSession
+from session import addSession, addChronometerToSession, startSession
 from location import addLocation, addSessionToLocation
 from category import addCategory, addPilotToCategory
 
@@ -62,6 +62,17 @@ roubines = addLocation('Isola - Roubines', False)
 
 # Add sessions
 
+friMorningTestSession = addSession('Friday morning tests', datetime(2000, 1, 1, 10), datetime(2000, 1, 1, 11), 'tt')
+addSessionToLocation(boarderCross['id'], friMorningTestSession['id'])
+addSessionToEvent(event['id'], friMorningTestSession['id'])
+addChronometerToSession(friMorningTestSession['id'], fake1['id'])
+addChronometerToSession(friMorningTestSession['id'], chrono['id'])
+
+friMorningChronoSession = addSession('Friday morning Chrono', datetime(2000, 1, 1, 11), datetime(2000, 1, 1, 12), 'tt')
+addSessionToLocation(boarderCross['id'], friMorningChronoSession['id'])
+addSessionToEvent(event['id'], friMorningChronoSession['id'])
+addChronometerToSession(friMorningChronoSession['id'], chrono['id'])
+
 # -------------------------------------
 # Thursday evening
 # -------------------------------------
@@ -89,13 +100,8 @@ for i in range(80, 90):
 # le meilleur retenu
 # -------------------------------------
 
-# TODO Create sessions earlier and start it here
-
-friMorningTestSession = addSession('Friday morning tests', datetime(2000, 1, 1, 10), datetime(2000, 1, 1, 11), 'tt')
-addSessionToLocation(boarderCross['id'], friMorningTestSession['id'])
-addSessionToEvent(event['id'], friMorningTestSession['id'])
-addChronometerToSession(friMorningTestSession['id'], fake1['id'])
-addChronometerToSession(friMorningTestSession['id'], chrono['id'])
+# Created sessions earlier and start it here
+startSession(friMorningTestSession['id'], datetime(2000, 1, 1, 10, 0, 30))
 
 # ---- Test #1 ----
 # Starts every 20s
@@ -136,20 +142,18 @@ printLaps(getBestLapsForSession(friMorningTestSession['id']), True)
 
 #TODO Checks - Asserts
 
-#TODO Some do 1 test (2nd
+#TODO Some do 1 test (2nd)
 #TODO Some dont test (1st)
-#TODO Some start but dont finish (last)
+#TODO Some start but dont finish (last ie 89)
+
 #TODO Some finish after expected time
 
 # ----
 
-friMorningChronoSession = addSession('Friday morning Chrono', datetime(2000, 1, 1, 11), datetime(2000, 1, 1, 12), 'tt')
-addSessionToLocation(boarderCross['id'], friMorningChronoSession['id'])
-addSessionToEvent(event['id'], friMorningChronoSession['id'])
-addChronometerToSession(friMorningChronoSession['id'], chrono['id'])
-
 #TODO Have chart with startup list
 #TODO Have people that did not test
+
+startSession(friMorningChronoSession['id'], datetime(2000, 1, 1, 11, 5, 00))
 
 #TODO Some do 1 chrono
 #TODO Some dont chrono

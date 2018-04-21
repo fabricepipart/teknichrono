@@ -65,12 +65,12 @@ def addPilotToSession(sessionId, pilotId):
   return
 
 
-def startRace(sessionId, dateTime):
-  "Starts the race"
+def startSession(sessionId, dateTime):
+  "Starts the session"
   data = '{"dateTime":"' + formatDatetime(dateTime) + '"}'
-  url = SessionsUrl + '/' + str(sessionId) + '/race'
+  url = SessionsUrl + '/' + str(sessionId) + '/start'
   post(data, url)
-  print("Start the race " + str(sessionId) + " @ " + formatDatetime(dateTime))
+  print("Start the session " + str(sessionId))
   return
 
 

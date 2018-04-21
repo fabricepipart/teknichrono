@@ -1,6 +1,7 @@
 package org.trd.app.teknichrono.rest;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 import javax.ejb.Stateless;
@@ -22,11 +23,14 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.business.ChronoManager;
 import org.trd.app.teknichrono.model.Chronometer;
+import org.trd.app.teknichrono.model.Event;
 import org.trd.app.teknichrono.model.Pilot;
 import org.trd.app.teknichrono.model.Ping;
 import org.trd.app.teknichrono.model.Session;
+import org.trd.app.teknichrono.model.SessionType;
 
 /**
  * 
@@ -34,6 +38,8 @@ import org.trd.app.teknichrono.model.Session;
 @Stateless
 @Path("/sessions")
 public class SessionEndpoint {
+
+  private Logger logger = Logger.getLogger(SessionEndpoint.class);
 
   @PersistenceContext(unitName = "teknichrono-persistence-unit")
   private EntityManager em;
@@ -162,28 +168,71 @@ public class SessionEndpoint {
   }
 
   @POST
-  @Path("{sessionId:[0-9][0-9]*}/race")
+  @Path("{sessionId:[0-9][0-9]*}/start")
   @Produces("application/json")
-  public Response race(Ping start, @PathParam("sessionId") int sessionId) {
+  public Response start(Ping start, @PathParam("sessionId") int sessionId) {
     Session session = em.find(Session.class, sessionId);
     if (session == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    session.setStart(new Date(start.getDateTime().getTime()));
+
+    startSession(session, start.getDateTime());
+
+    if (session.getSessionType() == SessionType.RACE) {
+      startRace(session, start.getDateTime());
+    }
+
+    return Response.ok(session).build();
+  }
+
+  @POST
+  @Path("{sessionId:[0-9][0-9]*}/end")
+  @Produces("application/json")
+  public Response end(Ping end, @PathParam("sessionId") int sessionId) {
+    Session session = em.find(Session.class, sessionId);
+    if (session == null) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+    endSession(session, new Date(end.getDateTime().getTime()));
+
+    return Response.ok(session).build();
+  }
+
+  private void startSession(Session session, Timestamp timestamp) {
+    Date start = new Date(timestamp.getTime());
+    // Stop all other sessions of the event
+    Event event = session.getEvent();
+    if (event != null) {
+      for (Session otherSession : event.getSessions()) {
+        if (otherSession.getId() != session.getId() && otherSession.isCurrent()) {
+          endSession(otherSession, start);
+        }
+      }
+    }
+    // Start this one
+    session.setStart(start);
+    session.setCurrent(true);
     em.persist(session);
+  }
+
+  private void endSession(Session otherSession, Date start) {
+    otherSession.setEnd(start);
+    otherSession.setCurrent(false);
+    em.persist(otherSession);
+  }
+
+  private void startRace(Session session, Timestamp timestamp) {
     Chronometer chronometer = session.getChronometers().get(0);
     List<Pilot> pilots = session.getPilots();
     ChronoManager cm = new ChronoManager(em);
     for (Pilot pilot : pilots) {
       Ping ping = new Ping();
-      ping.setDateTime(start.getDateTime());
+      ping.setDateTime(timestamp);
       ping.setBeacon(pilot.getCurrentBeacon());
       ping.setChrono(chronometer);
       em.persist(ping);
       cm.addPing(ping);
     }
-
-    return Response.ok(session).build();
   }
 
   @PUT
