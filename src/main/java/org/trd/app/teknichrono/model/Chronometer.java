@@ -41,10 +41,6 @@ public class Chronometer implements Serializable {
   @Column
   private String name;
 
-  // I dont make it unique because I am unsure of the save order
-  @Column(nullable = true)
-  private Integer chronoIndex;
-
   // Can be null if after event, items are reassociated
   @OneToMany(mappedBy = "chrono")
   @JsonBackReference(value = "ping-chronometer")
@@ -77,14 +73,6 @@ public class Chronometer implements Serializable {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public Integer getChronoIndex() {
-    return chronoIndex;
-  }
-
-  public void setChronoIndex(Integer index) {
-    this.chronoIndex = index;
   }
 
   public List<Ping> getPings() {
@@ -122,7 +110,6 @@ public class Chronometer implements Serializable {
   @Override
   public String toString() {
     String result = getClass().getSimpleName() + " ";
-    result += "(" + chronoIndex + ") ";
     if (name != null && !name.trim().isEmpty())
       result += name;
     return result;

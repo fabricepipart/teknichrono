@@ -2,7 +2,9 @@ package org.trd.app.teknichrono.model;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -77,13 +79,13 @@ public class Session implements java.io.Serializable {
   private Event event = null;
 
   @ManyToMany(fetch = FetchType.EAGER)
-  private List<Pilot> pilots = new ArrayList<Pilot>();
+  private Set<Pilot> pilots = new HashSet<Pilot>();
 
-  public List<Pilot> getPilots() {
+  public Set<Pilot> getPilots() {
     return pilots;
   }
 
-  public void setPilots(List<Pilot> pilots) {
+  public void setPilots(Set<Pilot> pilots) {
     this.pilots = pilots;
   }
 
@@ -143,29 +145,25 @@ public class Session implements java.io.Serializable {
     this.chronometers = chronometers;
   }
 
-  public void addChronometer(Chronometer chronometer) {
-    int insertAtIndex = 0;
-    Integer expectedIndex = chronometer.getChronoIndex();
-    if (expectedIndex == null) {
-      this.chronometers.add(chronometer);
-    } else {
+  public int getChronoIndex(Chronometer chronometer) {
+    if (getChronometers() != null) {
       int index = 0;
-      for (Chronometer c : this.chronometers) {
-        if (c.getChronoIndex() == null || c.getChronoIndex() >= expectedIndex) {
-          insertAtIndex = index;
-          break;
+      for (Chronometer c : getChronometers()) {
+        if (c.getId() == chronometer.getId()) {
+          return index;
         }
         index++;
       }
-      this.chronometers.add(insertAtIndex, chronometer);
     }
+    return -1;
+  }
 
-    // Reset indexes
-    int index = 0;
-    for (Chronometer c : this.chronometers) {
-      c.setChronoIndex(index);
-      index++;
-    }
+  public void addChronometer(Chronometer chronometer, Integer insertAtIndex) {
+    this.chronometers.add(insertAtIndex, chronometer);
+  }
+
+  public void addChronometer(Chronometer chronometer) {
+    this.chronometers.add(chronometer);
   }
 
   public String getName() {

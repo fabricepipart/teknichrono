@@ -45,13 +45,13 @@ public class ChronoManager {
       logger.error("Chrono is not in the DB, cannot updates laptimes for Ping @ " + ping.getDateTime());
       return;
     }
-    int chronoIndex = chronometer.getChronoIndex().intValue();
 
     Session session = pickMostRelevant(ping.getChrono().getSessions(), ping);
     if (session == null) {
       logger.error("No Session associated to Chrono " + chronometer.getId() + ", cannot updates laptimes");
       return;
     }
+    int chronoIndex = session.getChronoIndex(chronometer);
 
     long inactivity = session.getInactivity();
     if (inactivity > 0) {
@@ -105,7 +105,7 @@ public class ChronoManager {
           return;
         } else {
           // Is it part of the lap of pingAfter ?
-          if (chronoIndex < pingAfter.getChrono().getChronoIndex().intValue()) {
+          if (chronoIndex < session.getChronoIndex(pingAfter.getChrono())) {
             int insertAtIdex = lapTimeOfPingAfter.getIntermediates().indexOf(pingAfter);
             lapTimeOfPingAfter.addIntermediates(insertAtIdex, ping);
             em.persist(lapTimeOfPingAfter);
@@ -116,7 +116,7 @@ public class ChronoManager {
         }
       } else if (pingAfter == null) {
         // Is it part of the lap of pingBefore ?
-        if (chronoIndex > pingBefore.getChrono().getChronoIndex().intValue()) {
+        if (chronoIndex > session.getChronoIndex(pingBefore.getChrono())) {
           int insertAtIndex = lapTimeOfPingBefore.getIntermediates().indexOf(pingBefore) + 1;
           lapTimeOfPingBefore.addIntermediates(insertAtIndex, ping);
           em.persist(lapTimeOfPingBefore);
@@ -127,12 +127,12 @@ public class ChronoManager {
       } else {
         // One before, one after
         // Is it part of the lap of pingBefore ?
-        if (chronoIndex > pingBefore.getChrono().getChronoIndex().intValue()) {
+        if (chronoIndex > session.getChronoIndex(pingBefore.getChrono())) {
           // We ll insert it in the lap of the ping before
           int insertAtIndex = lapTimeOfPingBefore.getIntermediates().indexOf(pingBefore) + 1;
           // Is this index taken by pingAfter ?
           if (lapTimeOfPingBefore.getId() == lapTimeOfPingAfter.getId()
-              && chronoIndex >= pingAfter.getChrono().getChronoIndex().intValue()) {
+              && chronoIndex >= session.getChronoIndex(pingAfter.getChrono())) {
             // Split
             List<Ping> toInsertInNewLap = lapTimeOfPingBefore.getIntermediates().subList(insertAtIndex,
                 lapTimeOfPingBefore.getIntermediates().size());
@@ -151,11 +151,11 @@ public class ChronoManager {
           }
         } else {
           // We ll insert it in the lap of the ping after
-          if (chronoIndex < pingAfter.getChrono().getChronoIndex().intValue()) {
+          if (chronoIndex < session.getChronoIndex(pingAfter.getChrono())) {
             int insertAtIdex = lapTimeOfPingAfter.getIntermediates().indexOf(pingAfter);
             // Is this index taken by pingBefore ?
             if (lapTimeOfPingBefore.getId() == lapTimeOfPingAfter.getId()
-                && chronoIndex <= pingBefore.getChrono().getChronoIndex().intValue()) {
+                && chronoIndex <= session.getChronoIndex(pingBefore.getChrono())) {
               // Split
               List<Ping> toInsertInNewLap = lapTimeOfPingAfter.getIntermediates().subList(0, insertAtIdex);
               LapTime lap = createLaptime(session, pilot, toInsertInNewLap, chronometer);

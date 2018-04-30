@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.LapTime;
@@ -192,6 +193,10 @@ public class LapTimeManager {
   }
 
   public void arrangeDisplay(List<LapTimeDTO> results, LapTimeDisplay... displays) {
+    arrangeDisplay(results, null, displays);
+  }
+
+  public void arrangeDisplay(List<LapTimeDTO> results, Set<NestedPilotDTO> pilots, LapTimeDisplay... displays) {
     filterExtreme(results);
     fillLapsNumber(results);
     for (LapTimeDisplay display : displays) {
@@ -221,6 +226,28 @@ public class LapTimeManager {
         break;
       }
     }
+    ensureAllPilotsPresent(results, pilots);
+  }
+
+  private void ensureAllPilotsPresent(List<LapTimeDTO> results, Set<NestedPilotDTO> mandatoryPilots) {
+    if (mandatoryPilots != null && !mandatoryPilots.isEmpty()) {
+      List<Integer> pilotsPresent = new ArrayList<>();
+      for (LapTimeDTO lapTimeDTO : results) {
+        pilotsPresent.add(lapTimeDTO.getPilot().getId());
+      }
+      for (NestedPilotDTO pilot : mandatoryPilots) {
+        int id = pilot.getId();
+        if (!pilotsPresent.contains(id)) {
+          addEmptyLap(results, pilot);
+        }
+      }
+    }
+  }
+
+  private void addEmptyLap(List<LapTimeDTO> results, NestedPilotDTO pilot) {
+    LapTimeDTO dummyLap = new LapTimeDTO();
+    dummyLap.setPilot(pilot);
+    results.add(dummyLap);
   }
 
 }

@@ -3,6 +3,7 @@ package org.trd.app.teknichrono.rest;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Set;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -137,9 +138,10 @@ public class SessionEndpoint {
     }
     chronometer.getSessions().add(session);
     if (index != null) {
-      chronometer.setChronoIndex(index);
+      session.addChronometer(chronometer, index);
+    } else {
+      session.addChronometer(chronometer);
     }
-    session.addChronometer(chronometer);
     em.persist(session);
     for (Chronometer c : session.getChronometers()) {
       em.persist(c);
@@ -152,6 +154,7 @@ public class SessionEndpoint {
   @Path("{sessionId:[0-9][0-9]*}/addPilot")
   @Produces("application/json")
   public Response addPilot(@PathParam("sessionId") int sessionId, @QueryParam("pilotId") Integer pilotId) {
+    long start = System.currentTimeMillis();
     Session session = em.find(Session.class, sessionId);
     if (session == null) {
       return Response.status(Status.NOT_FOUND).build();
@@ -161,9 +164,10 @@ public class SessionEndpoint {
       return Response.status(Status.NOT_FOUND).build();
     }
     session.getPilots().add(pilot);
+    pilot.getSessions().add(session);
     em.persist(session);
     em.persist(pilot);
-
+    logger.info("addPilot " + (System.currentTimeMillis() - start) + " ms");
     return Response.ok(session).build();
   }
 
@@ -223,7 +227,7 @@ public class SessionEndpoint {
 
   private void startRace(Session session, Timestamp timestamp) {
     Chronometer chronometer = session.getChronometers().get(0);
-    List<Pilot> pilots = session.getPilots();
+    Set<Pilot> pilots = session.getPilots();
     ChronoManager cm = new ChronoManager(em);
     for (Pilot pilot : pilots) {
       Ping ping = new Ping();

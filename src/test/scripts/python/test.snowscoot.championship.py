@@ -12,14 +12,14 @@ from beacons import getBeacon
 from chronometer import addChronometer
 from event import addEvent, addSessionToEvent
 from ping import ping
-from laps import printLaps, getLapsForSession, getBestLapsForSession
-from session import addSession, addChronometerToSession, startSession
+from laps import printLaps, getLapsForSession, getBestLapsForSession, getResultsForSession
+from session import addSession, addChronometerToSession, startSession, addPilotToSession
 from location import addLocation, addSessionToLocation
 from category import addCategory, addPilotToCategory
 
-# -------------------------------------
-# Pre-event
-# -------------------------------------
+print("-------------------------------------")
+print("Pre-event")
+print("-------------------------------------")
 
 # Add Events
 event = addEvent('Snowscoot championship')
@@ -32,19 +32,31 @@ openCategory = addCategory('Open')
 womanCategory = addCategory('Woman')
 juniorCategory = addCategory('Junior')
 
+allPilots = []
+elitePilots = []
+openPilots = []
+womanPilots = []
+juniorPilots = []
+
 # Add Pilots
 for i in range(10, 40):
   pilot = addPilot('Rider ' + str(i), 'Elite')
+  elitePilots.append(pilot)
   addPilotToCategory(eliteCategory['id'], pilot['id'])
 for i in range(40, 60):
   pilot = addPilot('Rider ' + str(i), 'Open')
+  openPilots.append(pilot)
   addPilotToCategory(openCategory['id'], pilot['id'])
 for i in range(60, 80):
   pilot = addPilot('Rider ' + str(i), 'Woman')
+  womanPilots.append(pilot)
   addPilotToCategory(womanCategory['id'], pilot['id'])
 for i in range(80, 90):
   pilot = addPilot('Rider ' + str(i), 'Junior')
+  juniorPilots.append(pilot)
   addPilotToCategory(juniorCategory['id'], pilot['id'])
+
+allPilots = elitePilots + openPilots + womanPilots + juniorPilots
 
 # Add Chronometers
 
@@ -67,45 +79,44 @@ addSessionToLocation(boarderCross['id'], friMorningTestSession['id'])
 addSessionToEvent(event['id'], friMorningTestSession['id'])
 addChronometerToSession(friMorningTestSession['id'], fake1['id'])
 addChronometerToSession(friMorningTestSession['id'], chrono['id'])
+for pilot in allPilots:
+  addPilotToSession(friMorningTestSession['id'], pilot['id'])
 
 friMorningChronoSession = addSession('Friday morning Chrono', datetime(2000, 1, 1, 11), datetime(2000, 1, 1, 12), 'tt')
 addSessionToLocation(boarderCross['id'], friMorningChronoSession['id'])
 addSessionToEvent(event['id'], friMorningChronoSession['id'])
+addChronometerToSession(friMorningChronoSession['id'], fake1['id'])
 addChronometerToSession(friMorningChronoSession['id'], chrono['id'])
+for pilot in allPilots:
+  addPilotToSession(friMorningChronoSession['id'], pilot['id'])
 
-# -------------------------------------
-# Thursday evening
-# -------------------------------------
+print("-------------------------------------")
+print("Thursday evening")
+print("-------------------------------------")
 # jeudi soir	accueil concurrents et distribution transpondeurs
 
-for i in range(10, 40):
-  pilot = getPilot('Rider ' + str(i), 'Elite')
-  associatePilotBeacon(pilot['id'], getBeacon(i)['id'])
-for i in range(40, 60):
-  pilot = getPilot('Rider ' + str(i), 'Open')
-  associatePilotBeacon(pilot['id'], getBeacon(i)['id'])
-for i in range(60, 80):
-  pilot = getPilot('Rider ' + str(i), 'Woman')
-  associatePilotBeacon(pilot['id'], getBeacon(i)['id'])
-for i in range(80, 90):
-  pilot = getPilot('Rider ' + str(i), 'Junior')
-  associatePilotBeacon(pilot['id'], getBeacon(i)['id'])
+beaconNumber = 10
+for pilot in allPilots:
+  associatePilotBeacon(pilot['id'], getBeacon(beaconNumber)['id'])
+  beaconNumber += 1
 
-# -------------------------------------
-# vendredi matin
+print("-------------------------------------")
+print("Friday morning")
+print("-------------------------------------")
 # descente dans le boarder cross
 # Border cross
 # deux runs d essais (controle transpondeurs)
 # deux runs chronos
 # le meilleur retenu
-# -------------------------------------
 
 # Created sessions earlier and start it here
 startSession(friMorningTestSession['id'], datetime(2000, 1, 1, 10, 0, 30))
 
-# ---- Test #1 ----
+print("---- Test #1 ----")
 # Starts every 20s
 startDelta = 20
+# TODO Check if there should be a specific start order
+# TODO Check if it is acceptable to start manually each rider. If not afke1 should be a real chrono
 # -- Start
 startMinute = 1
 for i in range(11, 90):
@@ -120,41 +131,92 @@ for i in range(11, 89):
   h, m = divmod(endMinute + m, 60)
   ping(datetime(2000, 1, 1, 10 + h, m, s, randint(0, 500000)), getBeacon(i)['id'], -99, chrono['id'])
 
-# ---- Test #2 ----
+print("---- Test #2 ----")
 # Starts every 20s
 # -- Start
 startMinute = 31
-for i in range(11, 90):
+for i in range(12, 90):
   m, s = divmod(i * startDelta, 60)
   h, m = divmod(startMinute + m, 60)
   ping(datetime(2000, 1, 1, 10 + h, m, s, randint(0, 500000)), getBeacon(i)['id'], -99, fake1['id'])
+# -- End
+endMinute = startMinute + 2
+for i in range(12, 88):
+  delta = int(i / 3) + randint(0, int(i / 3))
+  m, s = divmod(i * startDelta + delta, 60)
+  h, m = divmod(endMinute + m, 60)
+  ping(datetime(2000, 1, 1, 10 + h, m, s, randint(0, 500000)), getBeacon(i)['id'], -99, chrono['id'])
+
+print("---- Tests Results ----")
+
+#  ---- Results for display ----
+
+printLaps(getLapsForSession(friMorningTestSession['id']), True)
+printLaps(getBestLapsForSession(friMorningTestSession['id']), True)
+
+# 10 does not do #1 and #2
+# 11 does not do #2
+# 89 does not finish #1 and #2
+# 88 does not finish #2
+
+# TODO Checks - Asserts
+
+# Some do 1 test
+# Some dont test
+# Some start but dont finish
+# Some finish after expected time
+
+#  ---- Determine startup ----
+
+printLaps(getResultsForSession(friMorningTestSession['id']), True)
+# TODO Have chart with startup list
+# TODO Check if it should count points
+
+# TODO Checks - Asserts
+
+startSession(friMorningChronoSession['id'], datetime(2000, 1, 1, 11, 10, 00))
+print("---- Chrono #1 ----")
+# TODO Make start order the one of the previous results
+# Starts every 20s
+startDelta = 20
+# -- Start
+startMinute = 11
+for i in range(11, 90):
+  m, s = divmod(i * startDelta, 60)
+  h, m = divmod(startMinute + m, 60)
+  ping(datetime(2000, 1, 1, 11 + h, m, s, randint(0, 500000)), getBeacon(i)['id'], -99, fake1['id'])
 # -- End
 endMinute = startMinute + 2
 for i in range(11, 89):
   delta = int(i / 3) + randint(0, int(i / 3))
   m, s = divmod(i * startDelta + delta, 60)
   h, m = divmod(endMinute + m, 60)
-  ping(datetime(2000, 1, 1, 10 + h, m, s, randint(0, 500000)), getBeacon(i)['id'], -99, chrono['id'])
+  ping(datetime(2000, 1, 1, 11 + h, m, s, randint(0, 500000)), getBeacon(i)['id'], -99, chrono['id'])
+
+print("---- Chrono #2 ----")
+# Starts every 20s
+# -- Start
+startMinute = 45
+for i in range(12, 90):
+  m, s = divmod(i * startDelta, 60)
+  h, m = divmod(startMinute + m, 60)
+  ping(datetime(2000, 1, 1, 11 + h, m, s, randint(0, 500000)), getBeacon(i)['id'], -99, fake1['id'])
+# -- End
+endMinute = startMinute + 2
+for i in range(12, 88):
+  delta = int(i / 3) + randint(0, int(i / 3))
+  m, s = divmod(i * startDelta + delta, 60)
+  h, m = divmod(endMinute + m, 60)
+  ping(datetime(2000, 1, 1, 11 + h, m, s, randint(0, 500000)), getBeacon(i)['id'], -99, chrono['id'])
+
+print("---- Chrono Results ----")
 
 # ---- Results ----
-printLaps(getLapsForSession(friMorningTestSession['id']), True)
-printLaps(getBestLapsForSession(friMorningTestSession['id']), True)
+printLaps(getLapsForSession(friMorningChronoSession['id']), True)
+printLaps(getBestLapsForSession(friMorningChronoSession['id']), True)
+printLaps(getResultsForSession(friMorningChronoSession['id']), True)
 
-#TODO Checks - Asserts
-
-#TODO Some do 1 test (2nd)
-#TODO Some dont test (1st)
-#TODO Some start but dont finish (last ie 89)
-
-#TODO Some finish after expected time
-
-# ----
-
-#TODO Have chart with startup list
-#TODO Have people that did not test
-
-startSession(friMorningChronoSession['id'], datetime(2000, 1, 1, 11, 5, 00))
-
+# ---- Checks - Asserts ----
 #TODO Some do 1 chrono
 #TODO Some dont chrono
 #TODO Some finish after expected time

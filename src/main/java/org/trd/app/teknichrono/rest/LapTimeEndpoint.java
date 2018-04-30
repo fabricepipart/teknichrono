@@ -2,6 +2,7 @@ package org.trd.app.teknichrono.rest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -33,6 +34,7 @@ import org.trd.app.teknichrono.model.Pilot;
 import org.trd.app.teknichrono.model.Session;
 import org.trd.app.teknichrono.model.SessionType;
 import org.trd.app.teknichrono.rest.dto.LapTimeDTO;
+import org.trd.app.teknichrono.rest.dto.NestedPilotDTO;
 import org.trd.app.teknichrono.rest.sql.OrderByClauseBuilder;
 import org.trd.app.teknichrono.rest.sql.WhereClauseBuilder;
 import org.trd.app.teknichrono.util.InvalidArgumentException;
@@ -102,7 +104,7 @@ public class LapTimeEndpoint {
       throw new InvalidArgumentException();
     }
     final List<LapTimeDTO> results = getAllLapsDTOOrderedByStartDate(pilotId, sessionId, locationId, eventId,
-        categoryId, startPosition, maxResult, lapTimeManager);
+        categoryId, startPosition, maxResult);
     if (pilotId != null) {
       lapTimeManager.arrangeDisplay(results, LapTimeDisplay.ORDER_BY_DURATION);
     } else {
@@ -113,9 +115,9 @@ public class LapTimeEndpoint {
   }
 
   @GET
-  @Path("/race")
+  @Path("/results")
   @Produces("application/json")
-  public List<LapTimeDTO> race(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
+  public List<LapTimeDTO> results(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
       @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
       @QueryParam("categoryId") Integer categoryId, @QueryParam("start") Integer startPosition,
       @QueryParam("max") Integer maxResult) {
@@ -124,19 +126,29 @@ public class LapTimeEndpoint {
       throw new InvalidArgumentException();
     }
     Session session = em.find(Session.class, sessionId);
-    if (session.getSessionType() != SessionType.RACE) {
-      logger.error("Session ID (" + sessionId + ") mentioned is not a race.");
-      throw new InvalidArgumentException();
-    }
-    final List<LapTimeDTO> results = getAllLapsDTOOrderedByStartDate(pilotId, sessionId, locationId, eventId,
-        categoryId, startPosition, maxResult, lapTimeManager);
 
-    if (pilotId != null) {
-      lapTimeManager.arrangeDisplay(results, LapTimeDisplay.ORDER_BY_DURATION);
+    final List<LapTimeDTO> results = getAllLapsDTOOrderedByStartDate(pilotId, sessionId, locationId, eventId,
+        categoryId, startPosition, maxResult);
+
+    Set<NestedPilotDTO> pilots = NestedPilotDTO.fromPilots(session.getPilots());
+    if (session.getSessionType() == SessionType.RACE) {
+      if (pilotId != null) {
+        lapTimeManager.arrangeDisplay(results, LapTimeDisplay.KEEP_COMPLETE);
+      } else {
+        if (session.isCurrent()) {
+          lapTimeManager.arrangeDisplay(results, pilots, LapTimeDisplay.KEEP_LAST, LapTimeDisplay.ORDER_FOR_RACE);
+        } else {
+          lapTimeManager.arrangeDisplay(results, pilots, LapTimeDisplay.KEEP_COMPLETE, LapTimeDisplay.KEEP_LAST,
+              LapTimeDisplay.ORDER_FOR_RACE);
+        }
+      }
     } else {
-      // TODO Remove LapTimeDisplay.KEEP_COMPLETE if race is ongoing
-      lapTimeManager.arrangeDisplay(results, LapTimeDisplay.KEEP_COMPLETE, LapTimeDisplay.KEEP_LAST,
-          LapTimeDisplay.ORDER_FOR_RACE);
+      if (pilotId != null) {
+        lapTimeManager.arrangeDisplay(results, pilots, LapTimeDisplay.KEEP_COMPLETE);
+      } else {
+        lapTimeManager.arrangeDisplay(results, pilots, LapTimeDisplay.KEEP_COMPLETE, LapTimeDisplay.KEEP_BEST,
+            LapTimeDisplay.ORDER_BY_DURATION);
+      }
     }
     return results;
 
@@ -154,7 +166,7 @@ public class LapTimeEndpoint {
     }
 
     final List<LapTimeDTO> results = getAllLapsDTOOrderedByStartDate(pilotId, sessionId, locationId, eventId,
-        categoryId, startPosition, maxResult, lapTimeManager);
+        categoryId, startPosition, maxResult);
     // TODO Remove LapTimeDisplay.KEEP_COMPLETE if session is ongoing
     lapTimeManager.arrangeDisplay(results, LapTimeDisplay.KEEP_COMPLETE);
 
@@ -162,7 +174,7 @@ public class LapTimeEndpoint {
   }
 
   private List<LapTimeDTO> getAllLapsDTOOrderedByStartDate(Integer pilotId, Integer sessionId, Integer locationId,
-      Integer eventId, Integer categoryId, Integer startPosition, Integer maxResult, LapTimeManager lapTimeManager) {
+      Integer eventId, Integer categoryId, Integer startPosition, Integer maxResult) {
     final List<LapTime> searchResults = getAllLapsOrderedByStartDate(pilotId, sessionId, locationId, eventId,
         categoryId, startPosition, maxResult);
     final List<LapTimeDTO> results = lapTimeManager.convert(searchResults);

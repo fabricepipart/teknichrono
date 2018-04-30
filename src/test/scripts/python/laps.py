@@ -13,7 +13,7 @@ def getBestLapsOfPilot(pilotId, sessionId=None, locationId=None, eventId=None):
 
 
 def getRaceLapsOfPilot(pilotId, sessionId=None, locationId=None, eventId=None):
-  return getLapsOfPilot(pilotId, sessionId, locationId, eventId, '/race')
+  return getLapsOfPilot(pilotId, sessionId, locationId, eventId, '/results')
 
 
 def getLapsOfPilot(pilotId, sessionId=None, locationId=None, eventId=None, option=''):
@@ -37,7 +37,7 @@ def getBestLaps(locationId=None, eventId=None, categoryId=None, option=''):
 
 
 def getRaceLaps(locationId=None, eventId=None, categoryId=None, option=''):
-  return getLaps(locationId, eventId, categoryId, '/race')
+  return getLaps(locationId, eventId, categoryId, '/results')
 
 
 def getLaps(locationId=None, eventId=None, categoryId=None, option=''):
@@ -62,8 +62,8 @@ def getBestLapsForSession(sessionId, categoryId=None, option=''):
   return getLapsForSession(sessionId, categoryId, '/best')
 
 
-def getRaceLapsForSession(sessionId, categoryId=None, option=''):
-  return getLapsForSession(sessionId, categoryId, '/race')
+def getResultsForSession(sessionId, categoryId=None, option=''):
+  return getLapsForSession(sessionId, categoryId, '/results')
 
 
 def getLapsForSession(sessionId, categoryId=None, option=''):
@@ -81,23 +81,25 @@ def printLaps(laps, withDates=False):
   for lap in laps:
     maxSectors = max(maxSectors, len(lap['intermediates']))
   #print("Max Sectors = "+ str(maxSectors))
-  headers = ['Lap']
+  headers = ['#']
   if withDates:
     headers.append('Start')
     headers.append('End')
   headers.append('Pilot')
-  headers.append('Lap index')
+  headers.append('Lap')
   headers.append('Lap time')
-  for i in range(1, maxSectors + 1):
-    headers.append("Sector " + str(i))
+  if maxSectors > 1:
+    for i in range(1, maxSectors + 1):
+      headers.append("Sector " + str(i))
   headers.append('∆ Best')
   headers.append('∆ Prev')
   #print(str(headers))
   #print("#Laps : " + str(len(laps)))
+  rowIndex = 1
   table = PrettyTable(headers)
   for lap in laps:
     #print("Raw Lap : " + str(lap))
-    lapId = str(lap['id'])
+    #lapId = str(lap['id'])
     startDateValue = lap['startDate']
     if startDateValue:
       startDate = pretty_hour(startDateValue)
@@ -109,9 +111,9 @@ def printLaps(laps, withDates=False):
     else:
       endDate = ''
     pilot = str(lap['pilot']['firstName']) + ' ' + str(lap['pilot']['lastName'])
-    lapIndex = str(lap['lapIndex']) + ' / ' + str(lap['lapNumber'])
+    lapIndex = str(lap['lapIndex']) + '/' + str(lap['lapNumber'])
     lapTime = pretty_time_delta(lap['duration'])
-    lapRow = [lapId]
+    lapRow = [str(rowIndex)]
     if withDates:
       lapRow.append(startDate)
       lapRow.append(endDate)
@@ -120,19 +122,21 @@ def printLaps(laps, withDates=False):
     lapRow.append(lapTime)
     intermediateIndex = 0
     intermediates = lap['intermediates']
-    for i in range(0, maxSectors):
-      if intermediateIndex >= len(intermediates):
-        lapRow.append('')
-      else:
-        intermediate = intermediates[intermediateIndex]
-        if intermediate['fromChronoId'] != i:
+    if maxSectors > 1:
+      for i in range(0, maxSectors):
+        if intermediateIndex >= len(intermediates):
           lapRow.append('')
         else:
-          lapRow.append(pretty_time_delta(intermediate['duration']))
-          intermediateIndex += 1
+          intermediate = intermediates[intermediateIndex]
+          if intermediate['fromChronoId'] != i:
+            lapRow.append('')
+          else:
+            lapRow.append(pretty_time_delta(intermediate['duration']))
+            intermediateIndex += 1
     lapRow.append(pretty_time_delta(lap['gapWithBest']))
     lapRow.append(pretty_time_delta(lap['gapWithPrevious']))
     table.add_row(lapRow)
+    rowIndex += +1
   print(table)
 
 

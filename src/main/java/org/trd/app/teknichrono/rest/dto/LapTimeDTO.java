@@ -55,14 +55,14 @@ public class LapTimeDTO implements Serializable {
         if (previous != null) {
           this.sectors.add(new SectorDTO(previous, element));
         } else {
-          if (element.getChrono().getChronoIndex() == 0) {
+          if (entity.getSession().getChronoIndex(element.getChrono()) == 0) {
             this.setStartDate(element);
           }
         }
         previous = element;
       }
       boolean loop = session.isLoopTrack();
-      if (!loop && previous.getChrono().getChronoIndex() == (session.getChronometersCount() - 1)) {
+      if (!loop && entity.getSession().getChronoIndex(previous.getChrono()) == (session.getChronometersCount() - 1)) {
         this.setEndDate(previous);
       }
     }

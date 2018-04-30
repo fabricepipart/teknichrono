@@ -3,6 +3,7 @@
 import requests
 import json
 import sys
+from random import randint
 
 from base import *
 from pilots import *
@@ -85,25 +86,16 @@ startSession(race['id'], datetime(2018, 1, 2, 14, 1, 0))
 #ping(datetime(2018, 1, 2, 14, 1, 3, 0), calBeaconId, -5, chrono['id'])
 
 for i in range(1, 21):
-  ping(
-      datetime(2018, 1, 2, 14, 1 + 2 * i, random.randint(0, 10), random.randint(0, 100000)), jorgeBeaconId, -99,
-      chrono['id'])
-  ping(
-      datetime(2018, 1, 2, 14, 1 + 2 * i, random.randint(0, 10), random.randint(0, 100000)), marcBeaconId, -93,
-      chrono['id'])
-  ping(
-      datetime(2018, 1, 2, 14, 1 + 2 * i, random.randint(0, 10), random.randint(0, 100000)), calBeaconId, -35,
-      chrono['id'])
-  ping(
-      datetime(2018, 1, 2, 14, 1 + 2 * i, random.randint(0, 10), random.randint(0, 100000)), johannBeaconId, -5,
-      chrono['id'])
-  ping(
-      datetime(2018, 1, 2, 14, 1 + 2 * i, random.randint(0, 10), random.randint(0, 100000)), valeBeaconId, -46,
-      chrono['id'])
-  ping(
-      datetime(2018, 1, 2, 14, 1 + 2 * i, random.randint(0, 10), random.randint(0, 100000)), daniBeaconId, -26,
-      chrono['id'])
+  if (i < 10):
+    ping(datetime(2018, 1, 2, 14, 1 + 2 * i, randint(0, 10), randint(0, 100000)), jorgeBeaconId, -99, chrono['id'])
+  ping(datetime(2018, 1, 2, 14, 1 + 2 * i, randint(0, 10), randint(0, 100000)), marcBeaconId, -93, chrono['id'])
+  ping(datetime(2018, 1, 2, 14, 1 + 2 * i, randint(0, 10), randint(0, 100000)), calBeaconId, -35, chrono['id'])
+  ping(datetime(2018, 1, 2, 14, 1 + 2 * i, randint(0, 10), randint(0, 100000)), johannBeaconId, -5, chrono['id'])
+  ping(datetime(2018, 1, 2, 14, 1 + 2 * i, randint(0, 10), randint(0, 100000)), valeBeaconId, -46, chrono['id'])
+  ping(datetime(2018, 1, 2, 14, 1 + 2 * i, randint(0, 10), randint(0, 100000)), daniBeaconId, -26, chrono['id'])
 # TODO Display for each lap the intermediate display
+
+endSession(race['id'], datetime(2018, 1, 2, 15, 2, 1))
 
 # Laps per pilot
 print("---- Laps Valentino ----")
@@ -139,6 +131,7 @@ printLaps(laps, True)
 print("---- Laps Cal ----")
 laps = getLapsOfPilot(cal['id'], race['id'])
 printLaps(laps, True)
+printLaps(getRaceLapsOfPilot(pilotId=cal['id'], sessionId=race['id']), True)
 
 # Laps of location
 print("---- Laps location ----")
@@ -154,6 +147,6 @@ printLaps(laps, True)
 print("---- Session summary ----")
 printLaps(getLapsForSession(race['id']), True)
 printLaps(getBestLapsForSession(race['id']), True)
-printLaps(getRaceLapsForSession(race['id']), True)
+printLaps(getResultsForSession(race['id']), True)
 
 #TODO Best laps shown, thats not what we want : order by time of last lap end

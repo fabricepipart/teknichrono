@@ -278,7 +278,6 @@ public class LapTimeManagerTest {
     laptime.setStartDate(time);
     Ping ping = new Ping();
     Chronometer chrono = new Chronometer();
-    chrono.setChronoIndex(0);
     ping.setChrono(chrono);
     ping.setDateTime(time);
     laptime.addIntermediates(ping);
@@ -286,6 +285,7 @@ public class LapTimeManagerTest {
     p.setId(pilotId);
     laptime.setPilot(p);
     Session session = new Session();
+    session.addChronometer(chrono);
     Location location = new Location();
     session.setLocation(location);
     location.setLoopTrack(loop);
@@ -300,12 +300,12 @@ public class LapTimeManagerTest {
     laptime.setStartDate(time);
     Ping ping = new Ping();
     Chronometer chrono = new Chronometer();
-    chrono.setChronoIndex(0);
     ping.setChrono(chrono);
     ping.setDateTime(time);
     laptime.addIntermediates(ping);
 
     Session session = new Session();
+    session.addChronometer(chrono);
     Location location = new Location();
     session.setLocation(location);
     location.setLoopTrack(loop);
@@ -326,7 +326,6 @@ public class LapTimeManagerTest {
     for (int j = 0; j < 6; j++) {
       Ping ping = new Ping();
       Chronometer chrono = new Chronometer();
-      chrono.setChronoIndex(j);
       ping.setChrono(chrono);
       ping.setDateTime(new Timestamp(time.getTime() + (j * 10 * 60 * 1000)));
       laptime.addIntermediates(ping);

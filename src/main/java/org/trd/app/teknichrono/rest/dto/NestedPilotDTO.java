@@ -1,9 +1,13 @@
 package org.trd.app.teknichrono.rest.dto;
 
 import java.io.Serializable;
-import org.trd.app.teknichrono.model.Pilot;
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+
+import org.trd.app.teknichrono.model.Pilot;
 
 public class NestedPilotDTO implements Serializable {
 
@@ -22,6 +26,16 @@ public class NestedPilotDTO implements Serializable {
       this.firstName = entity.getFirstName();
       this.lastName = entity.getLastName();
     }
+  }
+
+  public static Set<NestedPilotDTO> fromPilots(Set<Pilot> pilots) {
+    Set<NestedPilotDTO> toReturn = new HashSet<NestedPilotDTO>();
+    if (pilots != null) {
+      for (Pilot p : pilots) {
+        toReturn.add(new NestedPilotDTO(p));
+      }
+    }
+    return toReturn;
   }
 
   public Pilot fromDTO(Pilot entity, EntityManager em) {

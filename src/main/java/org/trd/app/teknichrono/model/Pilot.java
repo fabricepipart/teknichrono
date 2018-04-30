@@ -2,7 +2,9 @@ package org.trd.app.teknichrono.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -68,15 +70,15 @@ public class Pilot implements Serializable {
 
   @ManyToMany(mappedBy = "pilots")
   @JsonBackReference(value = "session-pilot")
-  private List<Session> sessions = new ArrayList<Session>();
+  private Set<Session> sessions = new HashSet<Session>();
 
   /* ===================== Getters and setters ======================== */
 
-  public List<Session> getSessions() {
+  public Set<Session> getSessions() {
     return sessions;
   }
 
-  public void setSessions(List<Session> sessions) {
+  public void setSessions(Set<Session> sessions) {
     this.sessions = sessions;
   }
 
@@ -156,11 +158,12 @@ public class Pilot implements Serializable {
 
   @Override
   public String toString() {
-    String result = getClass().getSimpleName() + " ";
+    String result = getClass().getSimpleName() + "[#" + id;
     if (firstName != null && !firstName.trim().isEmpty())
-      result += "firstName: " + firstName;
+      result += ", firstName: " + firstName;
     if (lastName != null && !lastName.trim().isEmpty())
       result += ", lastName: " + lastName;
+    result += "]";
     return result;
   }
 }
