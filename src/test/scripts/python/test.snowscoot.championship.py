@@ -16,6 +16,7 @@ from laps import printLaps, getLapsForSession, getBestLapsForSession, getResults
 from session import addSession, addChronometerToSession, startSession, addPilotToSession
 from location import addLocation, addSessionToLocation
 from category import addCategory, addPilotToCategory
+from check import checkNumberLaps, checkPilotFilled, checkCountWithLapIndex, checkCountWithLapNumber, checkLaptimeFilled, checkDeltaBestInIncreasingOrder, checkDeltaPreviousFilled
 
 print("-------------------------------------")
 print("Pre-event")
@@ -151,15 +152,28 @@ print("---- Tests Results ----")
 
 #  ---- Results for display ----
 
-printLaps(getLapsForSession(friMorningTestSession['id']), True)
-printLaps(getBestLapsForSession(friMorningTestSession['id']), True)
-
 # 10 does not do #1 and #2
 # 11 does not do #2
 # 89 does not finish #1 and #2
 # 88 does not finish #2
 
-# TODO Checks - Asserts
+friMorningTestsLaps = getLapsForSession(friMorningTestSession['id'])
+printLaps(friMorningTestsLaps, True)
+checkNumberLaps(friMorningTestsLaps, 160 - 6)
+checkPilotFilled(friMorningTestsLaps)
+checkCountWithLapIndex(friMorningTestsLaps, 1, 78)
+checkCountWithLapIndex(friMorningTestsLaps, 2, 76)
+checkCountWithLapNumber(friMorningTestsLaps, 1, 2)
+checkLaptimeFilled(friMorningTestsLaps)
+
+friMorningTestsBests = getBestLapsForSession(friMorningTestSession['id'])
+printLaps(friMorningTestsBests, True)
+checkNumberLaps(friMorningTestsBests, 78)
+checkPilotFilled(friMorningTestsBests)
+checkCountWithLapNumber(friMorningTestsBests, 1, 2)
+checkLaptimeFilled(friMorningTestsBests)
+checkDeltaBestInIncreasingOrder(friMorningTestsBests)
+checkDeltaPreviousFilled(friMorningTestsBests)
 
 # Some do 1 test
 # Some dont test
@@ -168,11 +182,19 @@ printLaps(getBestLapsForSession(friMorningTestSession['id']), True)
 
 #  ---- Determine startup ----
 
-printLaps(getResultsForSession(friMorningTestSession['id']), True)
+friMorningTestsResults = getResultsForSession(friMorningTestSession['id'])
+printLaps(friMorningTestsResults, True)
 # TODO Have chart with startup list
 # TODO Check if it should count points
 
 # TODO Checks - Asserts
+checkNumberLaps(friMorningTestsResults, 80)
+checkPilotFilled(friMorningTestsResults)
+checkCountWithLapIndex(friMorningTestsResults, 0, 2)
+checkCountWithLapNumber(friMorningTestsResults, 0, 2)
+checkLaptimeFilled(friMorningTestsResults, True)
+checkDeltaBestInIncreasingOrder(friMorningTestsResults, True)
+checkDeltaPreviousFilled(friMorningTestsResults, True)
 
 startSession(friMorningChronoSession['id'], datetime(2000, 1, 1, 11, 10, 00))
 print("---- Chrono #1 ----")
@@ -214,7 +236,9 @@ print("---- Chrono Results ----")
 # ---- Results ----
 printLaps(getLapsForSession(friMorningChronoSession['id']), True)
 printLaps(getBestLapsForSession(friMorningChronoSession['id']), True)
-printLaps(getResultsForSession(friMorningChronoSession['id']), True)
+friMorningChronoResults = getResultsForSession(friMorningChronoSession['id'])
+printLaps(friMorningChronoResults, True)
+checkNumberLaps(friMorningChronoResults, 80)
 
 # ---- Checks - Asserts ----
 #TODO Some do 1 chrono
