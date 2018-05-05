@@ -11,10 +11,14 @@ import org.trd.app.teknichrono.model.Pilot;
 
 public class NestedPilotDTO implements Serializable {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = -6351473312188582718L;
   private int id;
-  private int version;
   private String firstName;
   private String lastName;
+  private int beaconNumber;
 
   public NestedPilotDTO() {
   }
@@ -22,9 +26,11 @@ public class NestedPilotDTO implements Serializable {
   public NestedPilotDTO(final Pilot entity) {
     if (entity != null) {
       this.id = entity.getId();
-      this.version = entity.getVersion();
       this.firstName = entity.getFirstName();
       this.lastName = entity.getLastName();
+      if (entity.getCurrentBeacon() != null) {
+        this.beaconNumber = entity.getCurrentBeacon().getNumber();
+      }
     }
   }
 
@@ -53,7 +59,6 @@ public class NestedPilotDTO implements Serializable {
       }
       return entity;
     }
-    entity.setVersion(this.version);
     entity.setFirstName(this.firstName);
     entity.setLastName(this.lastName);
     entity = em.merge(entity);
@@ -66,14 +71,6 @@ public class NestedPilotDTO implements Serializable {
 
   public void setId(final int id) {
     this.id = id;
-  }
-
-  public int getVersion() {
-    return this.version;
-  }
-
-  public void setVersion(final int version) {
-    this.version = version;
   }
 
   public String getFirstName() {
@@ -90,5 +87,13 @@ public class NestedPilotDTO implements Serializable {
 
   public void setLastName(final String lastName) {
     this.lastName = lastName;
+  }
+
+  public int getBeaconNumber() {
+    return beaconNumber;
+  }
+
+  public void setBeaconNumber(int beaconNumber) {
+    this.beaconNumber = beaconNumber;
   }
 }

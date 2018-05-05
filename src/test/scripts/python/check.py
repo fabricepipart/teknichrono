@@ -52,19 +52,46 @@ def checkDeltaBestInIncreasingOrder(laps, lastsCanBeEmpty=False):
   print('Checking that all laps have an increasing delta with best')
   firstLapEvaluated = False
   maxFound = 0
+  lastLapDuration = 0
   atLeastOneBeforeWasEmpty = False
   for lap in laps:
     if firstLapEvaluated:
       gapWithBest = lap['gapWithBest']
       if not lastsCanBeEmpty:
-        assert gapWithBest > maxFound
+        if gapWithBest == maxFound:
+          assert lastLapDuration == lap['duration']
+        else:
+          assert gapWithBest > maxFound
       else:
         if gapWithBest == 0:
           atLeastOneBeforeWasEmpty = True
         else:
-          assert gapWithBest > maxFound
-          assert not atLeastOneBeforeWasEmpty
+          if gapWithBest == maxFound:
+            assert lastLapDuration == lap['duration']
+          else:
+            assert gapWithBest > maxFound
+            assert not atLeastOneBeforeWasEmpty
+      maxFound = gapWithBest
     firstLapEvaluated = True
+    lastLapDuration = lap['duration']
+
+
+def checkStartsOrdered(laps):
+  print('Checking that all laps have increasing start dates')
+  maxFound = 0
+  for lap in laps:
+    start = lap['startDate']
+    assert start >= maxFound
+    maxFound = start
+
+
+def checkEndsOrdered(laps):
+  print('Checking that all laps have increasing end dates')
+  maxFound = 0
+  for lap in laps:
+    start = lap['endDate']
+    assert start >= maxFound
+    maxFound = start
 
 
 def checkDeltaPreviousFilled(laps, lastsCanBeEmpty=False):

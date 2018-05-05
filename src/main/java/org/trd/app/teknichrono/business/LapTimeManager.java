@@ -116,7 +116,7 @@ public class LapTimeManager {
       LapTimeDTO bestOfLocation = bestPerLocation.get(location.getId());
       if (bestOfLocation != null) {
         if (lapTimeDTO.getDuration() > (bestOfLocation.getDuration() * ACCEPTANCE_PERCENTAGE / 100)) {
-          logger.debug("Discarding lap ID " + lapTimeDTO.getId()
+          logger.info("Discarding lap ID " + lapTimeDTO.getId()
               + " since it is too long compared to the min for this location : " + lapTimeDTO.getDuration());
           toRemove.add(lapTimeDTO);
         }
@@ -222,11 +222,17 @@ public class LapTimeManager {
         orderByDuration(results);
         fillGaps(results);
         break;
+      case ORDER_BY_DATE:
+        orderByDate(results);
       default:
         break;
       }
     }
     ensureAllPilotsPresent(results, pilots);
+  }
+
+  private void orderByDate(List<LapTimeDTO> results) {
+    results.sort(new LapTimeDTODateComparator());
   }
 
   private void ensureAllPilotsPresent(List<LapTimeDTO> results, Set<NestedPilotDTO> mandatoryPilots) {

@@ -66,10 +66,7 @@ public class ChronoManager {
 
     List<LapTime> previousLaptimes = pilot.getLaps();
 
-    // System.out.println("\n\n");
-    // System.out.println("----------------------------");
-    // System.out.println("Trying to insert : " + ping);
-    // System.out.println("----------------------------");
+    logger.debug("Trying to insert : " + ping);
     if (previousLaptimes != null && !previousLaptimes.isEmpty()) {
       LapTime lapTimeOfPingBefore = null;
       Ping pingBefore = null;
@@ -93,11 +90,10 @@ public class ChronoManager {
           }
         }
       }
-      // System.out.println("----------------------------");
-      // System.out.println("lapTimeOfPingBefore " + lapTimeOfPingBefore);
-      // System.out.println("pingBefore " + pingBefore);
-      // System.out.println("lapTimeOfPingAfter " + lapTimeOfPingAfter);
-      // System.out.println("pingAfter " + pingAfter);
+      logger.debug("lapTimeOfPingBefore " + lapTimeOfPingBefore);
+      logger.debug("pingBefore " + pingBefore);
+      logger.debug("lapTimeOfPingAfter " + lapTimeOfPingAfter);
+      logger.debug("pingAfter " + pingAfter);
 
       if (pingBefore == null) {
         if (pingAfter == null) {

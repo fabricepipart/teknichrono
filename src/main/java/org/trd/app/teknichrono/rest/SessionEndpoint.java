@@ -32,6 +32,7 @@ import org.trd.app.teknichrono.model.Pilot;
 import org.trd.app.teknichrono.model.Ping;
 import org.trd.app.teknichrono.model.Session;
 import org.trd.app.teknichrono.model.SessionType;
+import org.trd.app.teknichrono.util.DurationLogger;
 
 /**
  * 
@@ -48,14 +49,18 @@ public class SessionEndpoint {
   @POST
   @Consumes("application/json")
   public Response create(Session entity) {
+    DurationLogger perf = DurationLogger.get(logger).start("Create session " + entity.getName());
     em.persist(entity);
-    return Response.created(UriBuilder.fromResource(SessionEndpoint.class).path(String.valueOf(entity.getId())).build())
-        .build();
+    Response response = Response
+        .created(UriBuilder.fromResource(SessionEndpoint.class).path(String.valueOf(entity.getId())).build()).build();
+    perf.end();
+    return response;
   }
 
   @DELETE
   @Path("/{id:[0-9][0-9]*}")
   public Response deleteById(@PathParam("id") int id) {
+    DurationLogger perf = DurationLogger.get(logger).start("Delete session " + id);
     Session entity = em.find(Session.class, id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
@@ -68,6 +73,7 @@ public class SessionEndpoint {
       p.getSessions().remove(entity);
     }
     em.remove(entity);
+    perf.end();
     return Response.noContent().build();
   }
 
@@ -75,6 +81,7 @@ public class SessionEndpoint {
   @Path("/{id:[0-9][0-9]*}")
   @Produces("application/json")
   public Response findById(@PathParam("id") int id) {
+    DurationLogger perf = DurationLogger.get(logger).start("Find session id " + id);
     TypedQuery<Session> findByIdQuery = em.createQuery(
         "SELECT DISTINCT e FROM Session e LEFT JOIN FETCH e.chronometers WHERE e.id = :entityId ORDER BY e.id",
         Session.class);
@@ -88,6 +95,7 @@ public class SessionEndpoint {
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
+    perf.end();
     return Response.ok(entity).build();
   }
 
@@ -95,6 +103,7 @@ public class SessionEndpoint {
   @Path("/name")
   @Produces("application/json")
   public Session findSessionByName(@QueryParam("name") String name) {
+    DurationLogger perf = DurationLogger.get(logger).start("Find session named " + name);
     TypedQuery<Session> findByNameQuery = em.createQuery(
         "SELECT DISTINCT e FROM Session e LEFT JOIN FETCH e.chronometers WHERE e.name = :name ORDER BY e.id",
         Session.class);
@@ -105,12 +114,14 @@ public class SessionEndpoint {
     } catch (NoResultException nre) {
       entity = null;
     }
+    perf.end();
     return entity;
   }
 
   @GET
   @Produces("application/json")
   public List<Session> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
+    DurationLogger perf = DurationLogger.get(logger).start("List sessions");
     TypedQuery<Session> findAllQuery = em
         .createQuery("SELECT DISTINCT e FROM Session e LEFT JOIN FETCH e.chronometers ORDER BY e.id", Session.class);
     if (startPosition != null) {
@@ -120,6 +131,7 @@ public class SessionEndpoint {
       findAllQuery.setMaxResults(maxResult);
     }
     final List<Session> results = findAllQuery.getResultList();
+    perf.end();
     return results;
   }
 
@@ -128,6 +140,7 @@ public class SessionEndpoint {
   @Produces("application/json")
   public Response addChronometer(@PathParam("sessionId") int sessionId, @QueryParam("chronoId") Integer chronoId,
       @QueryParam("index") Integer index) {
+    DurationLogger perf = DurationLogger.get(logger).start("Add chrono " + chronoId + " to session " + sessionId);
     Session session = em.find(Session.class, sessionId);
     if (session == null) {
       return Response.status(Status.NOT_FOUND).build();
@@ -146,6 +159,7 @@ public class SessionEndpoint {
     for (Chronometer c : session.getChronometers()) {
       em.persist(c);
     }
+    perf.end();
 
     return Response.ok(session).build();
   }
@@ -154,7 +168,7 @@ public class SessionEndpoint {
   @Path("{sessionId:[0-9][0-9]*}/addPilot")
   @Produces("application/json")
   public Response addPilot(@PathParam("sessionId") int sessionId, @QueryParam("pilotId") Integer pilotId) {
-    long start = System.currentTimeMillis();
+    DurationLogger perf = DurationLogger.get(logger).start("Add pilot " + pilotId + " to session " + sessionId);
     Session session = em.find(Session.class, sessionId);
     if (session == null) {
       return Response.status(Status.NOT_FOUND).build();
@@ -167,7 +181,7 @@ public class SessionEndpoint {
     pilot.getSessions().add(session);
     em.persist(session);
     em.persist(pilot);
-    logger.info("addPilot " + (System.currentTimeMillis() - start) + " ms");
+    perf.end();
     return Response.ok(session).build();
   }
 
@@ -175,6 +189,7 @@ public class SessionEndpoint {
   @Path("{sessionId:[0-9][0-9]*}/start")
   @Produces("application/json")
   public Response start(Ping start, @PathParam("sessionId") int sessionId) {
+    DurationLogger perf = DurationLogger.get(logger).start("Start session " + sessionId);
     Session session = em.find(Session.class, sessionId);
     if (session == null) {
       return Response.status(Status.NOT_FOUND).build();
@@ -185,6 +200,7 @@ public class SessionEndpoint {
     if (session.getSessionType() == SessionType.RACE) {
       startRace(session, start.getDateTime());
     }
+    perf.end();
 
     return Response.ok(session).build();
   }
@@ -193,11 +209,13 @@ public class SessionEndpoint {
   @Path("{sessionId:[0-9][0-9]*}/end")
   @Produces("application/json")
   public Response end(Ping end, @PathParam("sessionId") int sessionId) {
+    DurationLogger perf = DurationLogger.get(logger).start("End session " + sessionId);
     Session session = em.find(Session.class, sessionId);
     if (session == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
     endSession(session, new Date(end.getDateTime().getTime()));
+    perf.end();
 
     return Response.ok(session).build();
   }

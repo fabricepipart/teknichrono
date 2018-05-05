@@ -168,7 +168,7 @@ public class LapTimeEndpoint {
     final List<LapTimeDTO> results = getAllLapsDTOOrderedByStartDate(pilotId, sessionId, locationId, eventId,
         categoryId, startPosition, maxResult);
     // TODO Remove LapTimeDisplay.KEEP_COMPLETE if session is ongoing
-    lapTimeManager.arrangeDisplay(results, LapTimeDisplay.KEEP_COMPLETE);
+    lapTimeManager.arrangeDisplay(results, LapTimeDisplay.KEEP_COMPLETE, LapTimeDisplay.ORDER_BY_DATE);
 
     return results;
   }

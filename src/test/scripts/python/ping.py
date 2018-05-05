@@ -12,8 +12,9 @@ def ping(dateTime, pilotBeaconId, power, chronoId):
   "This adds a Ping"
   data = '{"dateTime":"' + formatDatetime(dateTime) + '", "power":"' + str(power) + '"}'
   url = pingsUrl + '/create?chronoId=' + str(chronoId) + '&beaconId=' + str(pilotBeaconId)
-  pingResponse = post(data, url)
-  #print("Ping " + formatDatetime(dateTime) + " added")
+  #pingResponse = post(data, url)
+  post(data, url)
+  #print("Ping " + formatDatetime(dateTime) + " added " + data)
   return
 
 
