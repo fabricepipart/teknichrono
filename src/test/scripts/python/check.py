@@ -1,5 +1,7 @@
 #!python3
 
+from base import pretty_time_delta
+
 # ----------------------------------------------------------------------
 
 
@@ -26,6 +28,14 @@ def checkLaptimeFilled(laps, lastsCanBeEmpty=False):
         atLeastOneBeforeWasEmpty = True
       else:
         assert not atLeastOneBeforeWasEmpty
+
+
+def checkLaptimeBetween(laps, fromMillis, toMillis):
+  print(
+      'Checking that all laptimes are between ' + pretty_time_delta(fromMillis) + ' and ' + pretty_time_delta(toMillis))
+  for lap in laps:
+    assert lap['duration'] < toMillis, 'Lap duration ' + str(lap['duration']) + ' is not < to ' + str(toMillis)
+    assert lap['duration'] > fromMillis, 'Lap duration ' + str(lap['duration']) + ' is not > to ' + str(fromMillis)
 
 
 def checkCountWithLapIndex(laps, index, count):
@@ -97,14 +107,20 @@ def checkEndsOrdered(laps):
 def checkDeltaPreviousFilled(laps, lastsCanBeEmpty=False):
   print('Checking that all laps have a delta with previous')
   firstLapEvaluated = False
+  lastLapDuration = 0
   atLeastOneBeforeWasEmpty = False
   for lap in laps:
     if firstLapEvaluated:
       if not lastsCanBeEmpty:
-        assert lap['gapWithPrevious'] > 0
+        if lastLapDuration == lap['duration']:
+          assert lap['gapWithPrevious'] == 0
+        else:
+          assert lap['gapWithPrevious'] > 0
       else:
         if lap['gapWithPrevious'] == 0:
-          atLeastOneBeforeWasEmpty = True
+          if lastLapDuration != lap['duration']:
+            atLeastOneBeforeWasEmpty = True
         else:
           assert not atLeastOneBeforeWasEmpty
     firstLapEvaluated = True
+    lastLapDuration = lap['duration']

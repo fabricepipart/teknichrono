@@ -13,10 +13,10 @@ from chronometer import addChronometer
 from event import addEvent, addSessionToEvent
 from ping import ping
 from laps import printLaps, getLapsForSession, getBestLapsForSession, getResultsForSession
-from session import addSession, addChronometerToSession, startSession, addPilotToSession
+from session import addSession, addChronometerToSession, startSession, addPilotToSession, endSession
 from location import addLocation, addSessionToLocation
 from category import addCategory, addPilotToCategory
-from check import checkNumberLaps, checkPilotFilled, checkCountWithLapIndex, checkCountWithLapNumber, checkLaptimeFilled, checkDeltaBestInIncreasingOrder, checkDeltaPreviousFilled, checkStartsOrdered, checkEndsOrdered
+from check import checkNumberLaps, checkPilotFilled, checkCountWithLapIndex, checkCountWithLapNumber, checkLaptimeFilled, checkDeltaBestInIncreasingOrder, checkDeltaPreviousFilled, checkStartsOrdered, checkEndsOrdered, checkLaptimeBetween
 
 print("-------------------------------------")
 print("Pre-event")
@@ -75,6 +75,8 @@ roubines = addLocation('Isola - Roubines', False)
 
 # Add sessions
 
+print("---- Create session of Friday morning ----")
+
 friMorningTestSession = addSession('Friday morning tests', datetime(2000, 1, 1, 10), datetime(2000, 1, 1, 11), 'tt')
 addSessionToLocation(boarderCross['id'], friMorningTestSession['id'])
 addSessionToEvent(event['id'], friMorningTestSession['id'])
@@ -90,6 +92,8 @@ addChronometerToSession(friMorningChronoSession['id'], fake1['id'])
 addChronometerToSession(friMorningChronoSession['id'], chrono['id'])
 for pilot in allPilots:
   addPilotToSession(friMorningChronoSession['id'], pilot['id'])
+
+print("---- Create session of Friday afternoon ----")
 
 friPm16Run1 = addSession('Fri pm Boarder X 1/16 #1', datetime(2000, 1, 1, 14, 0), datetime(2000, 1, 1, 14, 4), 'rc')
 friPm16Run2 = addSession('Fri pm Boarder X 1/16 #2', datetime(2000, 1, 1, 14, 4), datetime(2000, 1, 1, 14, 8), 'rc')
@@ -158,6 +162,40 @@ addSessionToEvent(event['id'], friPmFinale['id'])
 addChronometerToSession(friPmFinale['id'], fake1['id'])
 addChronometerToSession(friPmFinale['id'], chrono['id'])
 
+print("---- Create session of Saturday morning ----")
+
+satDerby1Elite = addSession('Sat Derby 1 - Elite', datetime(2000, 1, 2, 10, 5), datetime(2000, 1, 2, 10, 10), 'rc')
+addSessionToLocation(mercantour['id'], satDerby1Elite['id'])
+addSessionToEvent(event['id'], satDerby1Elite['id'])
+addChronometerToSession(satDerby1Elite['id'], fake1['id'])
+addChronometerToSession(satDerby1Elite['id'], chrono['id'])
+for pilot in elitePilots:
+  addPilotToSession(satDerby1Elite['id'], pilot['id'])
+
+satDerby1Open = addSession('Sat Derby 1 - Open', datetime(2000, 1, 2, 10, 15), datetime(2000, 1, 2, 10, 20), 'rc')
+addSessionToLocation(mercantour['id'], satDerby1Open['id'])
+addSessionToEvent(event['id'], satDerby1Open['id'])
+addChronometerToSession(satDerby1Open['id'], fake1['id'])
+addChronometerToSession(satDerby1Open['id'], chrono['id'])
+for pilot in openPilots:
+  addPilotToSession(satDerby1Open['id'], pilot['id'])
+
+satDerby1Woman = addSession('Sat Derby 1 - Woman', datetime(2000, 1, 2, 10, 25), datetime(2000, 1, 2, 10, 30), 'rc')
+addSessionToLocation(mercantour['id'], satDerby1Woman['id'])
+addSessionToEvent(event['id'], satDerby1Woman['id'])
+addChronometerToSession(satDerby1Woman['id'], fake1['id'])
+addChronometerToSession(satDerby1Woman['id'], chrono['id'])
+for pilot in womanPilots:
+  addPilotToSession(satDerby1Woman['id'], pilot['id'])
+
+satDerby1Junior = addSession('Sat Derby 1 - Junior', datetime(2000, 1, 2, 10, 35), datetime(2000, 1, 2, 10, 40), 'rc')
+addSessionToLocation(mercantour['id'], satDerby1Junior['id'])
+addSessionToEvent(event['id'], satDerby1Junior['id'])
+addChronometerToSession(satDerby1Junior['id'], fake1['id'])
+addChronometerToSession(satDerby1Junior['id'], chrono['id'])
+for pilot in juniorPilots:
+  addPilotToSession(satDerby1Junior['id'], pilot['id'])
+
 print("-------------------------------------")
 print("Thursday evening")
 print("-------------------------------------")
@@ -169,6 +207,7 @@ beaconNumber = 10
 for pilot in allPilots:
   beacons[beaconNumber] = getBeacon(beaconNumber)
   associatePilotBeacon(pilot['id'], beacons[beaconNumber]['id'])
+  pilot['currentBeacon'] = beacons[beaconNumber]
   beaconNumber += 1
 
 print("-------------------------------------")
@@ -385,9 +424,10 @@ for session in friPm16Sessions:
     if beaconNumber == 32:
       continue
     ping(datetime(2000, 1, 1, eh, em, es, randint(0, 500000)), beacons[beaconNumber]['id'], -99, chrono['id'])
+  endSession(session['id'], datetime(2000, 1, 1, eh, em, 59))
   sessionIndex += 1
 
-#TODO Add verifications
+friPm16SessionsResults = []
 for session in friPm16Sessions:
   print("---- Tests Results of " + session['name'] + "----")
   sessionLaps = getLapsForSession(session['id'])
@@ -422,6 +462,7 @@ for session in friPm16Sessions:
   checkDeltaPreviousFilled(sessionBests)
 
   sessionResults = getResultsForSession(session['id'])
+  friPm16SessionsResults.append(sessionResults)
   printLaps(sessionResults, True)
   if 32 in beaconsPerSession[session['id']]:
     checkCountWithLapIndex(sessionResults, 1, 4)
@@ -440,18 +481,470 @@ for session in friPm16Sessions:
 # -- 1/8 th - 8 x 6
 print("---- 1 / 8 th ----")
 # We keep 3 best
+# Order from results of 1/16 th
+beaconsPerSession = {}
+for i in range(0, 8):
+  s = friPm8Sessions[i]
+  results1 = friPm16SessionsResults[2 * i]
+  results2 = friPm16SessionsResults[(2 * i) + 1]
+  addPilotToSession(s['id'], results1[0]['pilot']['id'])
+  addPilotToSession(s['id'], results1[1]['pilot']['id'])
+  addPilotToSession(s['id'], results1[2]['pilot']['id'])
+  addPilotToSession(s['id'], results2[0]['pilot']['id'])
+  addPilotToSession(s['id'], results2[1]['pilot']['id'])
+  addPilotToSession(s['id'], results2[2]['pilot']['id'])
+  beaconsPerSession[s['id']] = [
+      results1[0]['pilot']['beaconNumber'],
+      results1[1]['pilot']['beaconNumber'],
+      results1[2]['pilot']['beaconNumber'],
+      results2[0]['pilot']['beaconNumber'],
+      results2[1]['pilot']['beaconNumber'],
+      results2[2]['pilot']['beaconNumber'],
+  ]
+
+startHour = 15
+startMinute = 16
+startDelta = 4
+sessionIndex = 0
+for session in friPm8Sessions:
+  # Starts all together
+  h, m = divmod((startHour * 60) + startMinute + (sessionIndex * startDelta), 60)
+  startSession(session['id'], datetime(2000, 1, 1, h, m, 5))
+  # Ends
+  beaconsOfSession = beaconsPerSession[session['id']]
+  # This one falls :)
+  doesNotFinish = beaconsOfSession[2]
+  eh, em = divmod((h * 60) + m + 2, 60)
+  for beaconNumber in beaconsOfSession:
+    es = randint(0, 30)
+    if beaconNumber != doesNotFinish:
+      ping(datetime(2000, 1, 1, eh, em, es, randint(0, 500000)), beacons[beaconNumber]['id'], -99, chrono['id'])
+  endSession(session['id'], datetime(2000, 1, 1, eh, em, 59))
+  sessionIndex += 1
+
+friPm8SessionsResults = []
+for session in friPm8Sessions:
+  print("---- Tests Results of " + session['name'] + "----")
+  sessionLaps = getLapsForSession(session['id'])
+  printLaps(sessionLaps, True)
+  checkNumberLaps(sessionLaps, 5)
+  checkCountWithLapIndex(sessionLaps, 1, 5)
+  checkCountWithLapNumber(sessionLaps, 1, 5)
+  checkPilotFilled(sessionLaps)
+  checkLaptimeFilled(sessionLaps)
+  checkStartsOrdered(sessionLaps)
+  checkEndsOrdered(sessionLaps)
+
+  sessionBests = getBestLapsForSession(session['id'])
+  printLaps(sessionBests, True)
+  checkNumberLaps(sessionBests, 5)
+  checkCountWithLapIndex(sessionBests, 1, 5)
+  checkCountWithLapNumber(sessionBests, 1, 5)
+  checkPilotFilled(sessionBests)
+  checkLaptimeFilled(sessionBests)
+  checkDeltaBestInIncreasingOrder(sessionBests)
+  checkDeltaPreviousFilled(sessionBests)
+
+  sessionResults = getResultsForSession(session['id'])
+  friPm8SessionsResults.append(sessionResults)
+  printLaps(sessionResults, True)
+  checkCountWithLapIndex(sessionResults, 1, 5)
+  checkCountWithLapNumber(sessionResults, 1, 5)
+  checkNumberLaps(sessionResults, 6)
+  checkPilotFilled(sessionResults)
+  checkLaptimeFilled(sessionResults, True)
+  checkDeltaBestInIncreasingOrder(sessionResults, True)
+  checkDeltaPreviousFilled(sessionResults, True)
+
 # -- 1/4 th - 4 x 6
 print("---- 1 / 4 th ----")
+# We keep 3 best
+# Order from results of 1/8 th
+beaconsPerSession = {}
+for i in range(0, 4):
+  s = friPm4Sessions[i]
+  results1 = friPm8SessionsResults[2 * i]
+  results2 = friPm8SessionsResults[(2 * i) + 1]
+  addPilotToSession(s['id'], results1[0]['pilot']['id'])
+  addPilotToSession(s['id'], results1[1]['pilot']['id'])
+  addPilotToSession(s['id'], results1[2]['pilot']['id'])
+  addPilotToSession(s['id'], results2[0]['pilot']['id'])
+  addPilotToSession(s['id'], results2[1]['pilot']['id'])
+  addPilotToSession(s['id'], results2[2]['pilot']['id'])
+  beaconsPerSession[s['id']] = [
+      results1[0]['pilot']['beaconNumber'],
+      results1[1]['pilot']['beaconNumber'],
+      results1[2]['pilot']['beaconNumber'],
+      results2[0]['pilot']['beaconNumber'],
+      results2[1]['pilot']['beaconNumber'],
+      results2[2]['pilot']['beaconNumber'],
+  ]
+
+startHour = 16
+startMinute = 0
+startDelta = 4
+sessionIndex = 0
+for session in friPm4Sessions:
+  # Starts all together
+  h, m = divmod((startHour * 60) + startMinute + (sessionIndex * startDelta), 60)
+  startSession(session['id'], datetime(2000, 1, 1, h, m, 5))
+  # Ends
+  beaconsOfSession = beaconsPerSession[session['id']]
+  # This one falls :)
+  doesNotFinish = beaconsOfSession[2]
+  eh, em = divmod((h * 60) + m + 2, 60)
+  for beaconNumber in beaconsOfSession:
+    es = randint(0, 30)
+    if beaconNumber != doesNotFinish:
+      ping(datetime(2000, 1, 1, eh, em, es, randint(0, 500000)), beacons[beaconNumber]['id'], -99, chrono['id'])
+  endSession(session['id'], datetime(2000, 1, 1, eh, em, 59))
+  sessionIndex += 1
+
+friPm4SessionsResults = []
+for session in friPm4Sessions:
+  print("---- Tests Results of " + session['name'] + "----")
+  sessionLaps = getLapsForSession(session['id'])
+  printLaps(sessionLaps, True)
+  checkNumberLaps(sessionLaps, 5)
+  checkCountWithLapIndex(sessionLaps, 1, 5)
+  checkCountWithLapNumber(sessionLaps, 1, 5)
+  checkPilotFilled(sessionLaps)
+  checkLaptimeFilled(sessionLaps)
+  checkStartsOrdered(sessionLaps)
+  checkEndsOrdered(sessionLaps)
+
+  sessionBests = getBestLapsForSession(session['id'])
+  printLaps(sessionBests, True)
+  checkNumberLaps(sessionBests, 5)
+  checkCountWithLapIndex(sessionBests, 1, 5)
+  checkCountWithLapNumber(sessionBests, 1, 5)
+  checkPilotFilled(sessionBests)
+  checkLaptimeFilled(sessionBests)
+  checkDeltaBestInIncreasingOrder(sessionBests)
+  checkDeltaPreviousFilled(sessionBests)
+
+  sessionResults = getResultsForSession(session['id'])
+  friPm4SessionsResults.append(sessionResults)
+  printLaps(sessionResults, True)
+  checkCountWithLapIndex(sessionResults, 1, 5)
+  checkCountWithLapNumber(sessionResults, 1, 5)
+  checkNumberLaps(sessionResults, 6)
+  checkPilotFilled(sessionResults)
+  checkLaptimeFilled(sessionResults, True)
+  checkDeltaBestInIncreasingOrder(sessionResults, True)
+  checkDeltaPreviousFilled(sessionResults, True)
+
 # -- 1/2 th - 2 x 6
 print("---- 1 / 2 th ----")
+# We keep 3 best
+beaconsPerSession = {}
+for i in range(0, 2):
+  s = friPmSemiSessions[i]
+  results1 = friPm4SessionsResults[2 * i]
+  results2 = friPm4SessionsResults[(2 * i) + 1]
+  addPilotToSession(s['id'], results1[0]['pilot']['id'])
+  addPilotToSession(s['id'], results1[1]['pilot']['id'])
+  addPilotToSession(s['id'], results1[2]['pilot']['id'])
+  addPilotToSession(s['id'], results2[0]['pilot']['id'])
+  addPilotToSession(s['id'], results2[1]['pilot']['id'])
+  addPilotToSession(s['id'], results2[2]['pilot']['id'])
+  beaconsPerSession[s['id']] = [
+      results1[0]['pilot']['beaconNumber'],
+      results1[1]['pilot']['beaconNumber'],
+      results1[2]['pilot']['beaconNumber'],
+      results2[0]['pilot']['beaconNumber'],
+      results2[1]['pilot']['beaconNumber'],
+      results2[2]['pilot']['beaconNumber'],
+  ]
+
+startHour = 16
+startMinute = 30
+startDelta = 4
+sessionIndex = 0
+for session in friPmSemiSessions:
+  # Starts all together
+  h, m = divmod((startHour * 60) + startMinute + (sessionIndex * startDelta), 60)
+  startSession(session['id'], datetime(2000, 1, 1, h, m, 5))
+  # Ends
+  beaconsOfSession = beaconsPerSession[session['id']]
+  # This one falls :)
+  doesNotFinish = beaconsOfSession[2]
+  eh, em = divmod((h * 60) + m + 2, 60)
+  for beaconNumber in beaconsOfSession:
+    es = randint(0, 30)
+    if beaconNumber != doesNotFinish:
+      ping(datetime(2000, 1, 1, eh, em, es, randint(0, 500000)), beacons[beaconNumber]['id'], -99, chrono['id'])
+  endSession(session['id'], datetime(2000, 1, 1, eh, em, 59))
+  sessionIndex += 1
+
+friPmSemiSessionsResults = []
+for session in friPmSemiSessions:
+  print("---- Tests Results of " + session['name'] + "----")
+  sessionLaps = getLapsForSession(session['id'])
+  printLaps(sessionLaps, True)
+  checkNumberLaps(sessionLaps, 5)
+  checkCountWithLapIndex(sessionLaps, 1, 5)
+  checkCountWithLapNumber(sessionLaps, 1, 5)
+  checkPilotFilled(sessionLaps)
+  checkLaptimeFilled(sessionLaps)
+  checkStartsOrdered(sessionLaps)
+  checkEndsOrdered(sessionLaps)
+
+  sessionBests = getBestLapsForSession(session['id'])
+  printLaps(sessionBests, True)
+  checkNumberLaps(sessionBests, 5)
+  checkCountWithLapIndex(sessionBests, 1, 5)
+  checkCountWithLapNumber(sessionBests, 1, 5)
+  checkPilotFilled(sessionBests)
+  checkLaptimeFilled(sessionBests)
+  checkDeltaBestInIncreasingOrder(sessionBests)
+  checkDeltaPreviousFilled(sessionBests)
+
+  sessionResults = getResultsForSession(session['id'])
+  friPmSemiSessionsResults.append(sessionResults)
+  printLaps(sessionResults, True)
+  checkCountWithLapIndex(sessionResults, 1, 5)
+  checkCountWithLapNumber(sessionResults, 1, 5)
+  checkNumberLaps(sessionResults, 6)
+  checkPilotFilled(sessionResults)
+  checkLaptimeFilled(sessionResults, True)
+  checkDeltaBestInIncreasingOrder(sessionResults, True)
+  checkDeltaPreviousFilled(sessionResults, True)
 # -- Finale - 1 x 6
 print("---- Finale ----")
+# We keep 3 best
+beaconsPerSession = {}
+s = friPmFinale
+session = friPmFinale
+results1 = friPmSemiSessionsResults[0]
+results2 = friPmSemiSessionsResults[1]
+addPilotToSession(s['id'], results1[0]['pilot']['id'])
+addPilotToSession(s['id'], results1[1]['pilot']['id'])
+addPilotToSession(s['id'], results1[2]['pilot']['id'])
+addPilotToSession(s['id'], results2[0]['pilot']['id'])
+addPilotToSession(s['id'], results2[1]['pilot']['id'])
+addPilotToSession(s['id'], results2[2]['pilot']['id'])
+beaconsPerSession[s['id']] = [
+    results1[0]['pilot']['beaconNumber'],
+    results1[1]['pilot']['beaconNumber'],
+    results1[2]['pilot']['beaconNumber'],
+    results2[0]['pilot']['beaconNumber'],
+    results2[1]['pilot']['beaconNumber'],
+    results2[2]['pilot']['beaconNumber'],
+]
+
+startHour = 16
+startMinute = 45
+# Starts all together
+h, m = divmod((startHour * 60) + startMinute, 60)
+startSession(session['id'], datetime(2000, 1, 1, h, m, 5))
+# Ends
+beaconsOfSession = beaconsPerSession[session['id']]
+eh, em = divmod((h * 60) + m + 2, 60)
+for beaconNumber in beaconsOfSession:
+  es = randint(0, 30)
+  ping(datetime(2000, 1, 1, eh, em, es, randint(0, 500000)), beacons[beaconNumber]['id'], -99, chrono['id'])
+endSession(session['id'], datetime(2000, 1, 1, eh, em, 59))
+
+print("---- Tests Results of " + session['name'] + "----")
+sessionLaps = getLapsForSession(session['id'])
+printLaps(sessionLaps, True)
+checkNumberLaps(sessionLaps, 6)
+checkCountWithLapIndex(sessionLaps, 1, 6)
+checkCountWithLapNumber(sessionLaps, 1, 6)
+checkPilotFilled(sessionLaps)
+checkLaptimeFilled(sessionLaps)
+checkStartsOrdered(sessionLaps)
+checkEndsOrdered(sessionLaps)
+
+sessionBests = getBestLapsForSession(session['id'])
+printLaps(sessionBests, True)
+checkNumberLaps(sessionBests, 6)
+checkCountWithLapIndex(sessionBests, 1, 6)
+checkCountWithLapNumber(sessionBests, 1, 6)
+checkPilotFilled(sessionBests)
+checkLaptimeFilled(sessionBests)
+checkDeltaBestInIncreasingOrder(sessionBests)
+checkDeltaPreviousFilled(sessionBests)
+
+friPmFinaleSessionResults = getResultsForSession(session['id'])
+printLaps(friPmFinaleSessionResults, True)
+checkCountWithLapIndex(friPmFinaleSessionResults, 1, 6)
+checkCountWithLapNumber(friPmFinaleSessionResults, 1, 6)
+checkNumberLaps(friPmFinaleSessionResults, 6)
+checkPilotFilled(friPmFinaleSessionResults)
+checkLaptimeFilled(friPmFinaleSessionResults, True)
+checkDeltaBestInIncreasingOrder(friPmFinaleSessionResults, True)
+checkDeltaPreviousFilled(friPmFinaleSessionResults, True)
 
 # -------------------------------------
-#Samedi matin	derby 1 mercantour	Mercantour
+# Samedi matin	derby 1 mercantour	Mercantour
 # -------------------------------------
 
-#	freestyle	-	pas de chronos
+h = 10
+m = 7
+startSession(satDerby1Elite['id'], datetime(2000, 1, 2, h, m, 5))
+eh, em = divmod((h * 60) + m + 2, 60)
+for pilot in elitePilots:
+  es = randint(5, 15)
+  ping(datetime(2000, 1, 2, eh, em, es, randint(0, 500000)), pilot['currentBeacon']['id'], -99, chrono['id'])
+endSession(satDerby1Elite['id'], datetime(2000, 1, 2, eh, em, 59))
+
+print("---- Tests Results of " + satDerby1Elite['name'] + "----")
+sessionLaps = getLapsForSession(satDerby1Elite['id'])
+printLaps(sessionLaps, True)
+checkNumberLaps(sessionLaps, len(elitePilots))
+checkCountWithLapIndex(sessionLaps, 1, len(elitePilots))
+checkCountWithLapNumber(sessionLaps, 1, len(elitePilots))
+checkPilotFilled(sessionLaps)
+checkLaptimeBetween(sessionLaps, 120000, 131000)
+checkStartsOrdered(sessionLaps)
+checkEndsOrdered(sessionLaps)
+
+sessionBests = getBestLapsForSession(satDerby1Elite['id'])
+printLaps(sessionBests, True)
+checkNumberLaps(sessionBests, len(elitePilots))
+checkCountWithLapIndex(sessionBests, 1, len(elitePilots))
+checkCountWithLapNumber(sessionBests, 1, len(elitePilots))
+checkPilotFilled(sessionBests)
+checkLaptimeBetween(sessionBests, 120000, 131000)
+checkDeltaBestInIncreasingOrder(sessionBests)
+checkDeltaPreviousFilled(sessionBests)
+
+sessionResults = getResultsForSession(satDerby1Elite['id'])
+printLaps(sessionResults, True)
+checkCountWithLapIndex(sessionResults, 1, len(elitePilots))
+checkCountWithLapNumber(sessionResults, 1, len(elitePilots))
+checkNumberLaps(sessionResults, len(elitePilots))
+checkPilotFilled(sessionResults)
+checkLaptimeBetween(sessionResults, 120000, 131000)
+checkDeltaBestInIncreasingOrder(sessionResults, True)
+checkDeltaPreviousFilled(sessionResults, True)
+
+h = 10
+m = 17
+startSession(satDerby1Open['id'], datetime(2000, 1, 2, h, m, 5))
+eh, em = divmod((h * 60) + m + 2, 60)
+for pilot in openPilots:
+  es = randint(15, 25)
+  ping(datetime(2000, 1, 2, eh, em, es, randint(0, 500000)), pilot['currentBeacon']['id'], -99, chrono['id'])
+endSession(satDerby1Open['id'], datetime(2000, 1, 2, eh, em, 59))
+
+print("---- Tests Results of " + satDerby1Open['name'] + "----")
+sessionLaps = getLapsForSession(satDerby1Open['id'])
+printLaps(sessionLaps, True)
+checkNumberLaps(sessionLaps, len(openPilots))
+checkCountWithLapIndex(sessionLaps, 1, len(openPilots))
+checkCountWithLapNumber(sessionLaps, 1, len(openPilots))
+checkPilotFilled(sessionLaps)
+checkLaptimeBetween(sessionLaps, 130000, 141000)
+checkStartsOrdered(sessionLaps)
+checkEndsOrdered(sessionLaps)
+
+sessionBests = getBestLapsForSession(satDerby1Open['id'])
+printLaps(sessionBests, True)
+checkNumberLaps(sessionBests, len(openPilots))
+checkCountWithLapIndex(sessionBests, 1, len(openPilots))
+checkCountWithLapNumber(sessionBests, 1, len(openPilots))
+checkPilotFilled(sessionBests)
+checkLaptimeBetween(sessionBests, 130000, 141000)
+checkDeltaBestInIncreasingOrder(sessionBests)
+checkDeltaPreviousFilled(sessionBests)
+
+sessionResults = getResultsForSession(satDerby1Open['id'])
+printLaps(sessionResults, True)
+checkCountWithLapIndex(sessionResults, 1, len(openPilots))
+checkCountWithLapNumber(sessionResults, 1, len(openPilots))
+checkNumberLaps(sessionResults, len(openPilots))
+checkPilotFilled(sessionResults)
+checkLaptimeBetween(sessionResults, 130000, 141000)
+checkDeltaBestInIncreasingOrder(sessionResults, True)
+checkDeltaPreviousFilled(sessionResults, True)
+
+h = 10
+m = 27
+startSession(satDerby1Woman['id'], datetime(2000, 1, 2, h, m, 5))
+eh, em = divmod((h * 60) + m + 2, 60)
+for pilot in womanPilots:
+  es = randint(25, 35)
+  ping(datetime(2000, 1, 2, eh, em, es, randint(0, 500000)), pilot['currentBeacon']['id'], -99, chrono['id'])
+endSession(satDerby1Woman['id'], datetime(2000, 1, 2, eh, em, 59))
+
+print("---- Tests Results of " + satDerby1Woman['name'] + "----")
+sessionLaps = getLapsForSession(satDerby1Woman['id'])
+printLaps(sessionLaps, True)
+checkNumberLaps(sessionLaps, len(womanPilots))
+checkCountWithLapIndex(sessionLaps, 1, len(womanPilots))
+checkCountWithLapNumber(sessionLaps, 1, len(womanPilots))
+checkPilotFilled(sessionLaps)
+checkLaptimeBetween(sessionLaps, 140000, 151000)
+checkStartsOrdered(sessionLaps)
+checkEndsOrdered(sessionLaps)
+
+sessionBests = getBestLapsForSession(satDerby1Woman['id'])
+printLaps(sessionBests, True)
+checkNumberLaps(sessionBests, len(womanPilots))
+checkCountWithLapIndex(sessionBests, 1, len(womanPilots))
+checkCountWithLapNumber(sessionBests, 1, len(womanPilots))
+checkPilotFilled(sessionBests)
+checkLaptimeBetween(sessionBests, 140000, 151000)
+checkDeltaBestInIncreasingOrder(sessionBests)
+checkDeltaPreviousFilled(sessionBests)
+
+sessionResults = getResultsForSession(satDerby1Woman['id'])
+printLaps(sessionResults, True)
+checkCountWithLapIndex(sessionResults, 1, len(womanPilots))
+checkCountWithLapNumber(sessionResults, 1, len(womanPilots))
+checkNumberLaps(sessionResults, len(womanPilots))
+checkPilotFilled(sessionResults)
+checkLaptimeBetween(sessionResults, 140000, 151000)
+checkDeltaBestInIncreasingOrder(sessionResults, True)
+checkDeltaPreviousFilled(sessionResults, True)
+
+h = 10
+m = 37
+startSession(satDerby1Junior['id'], datetime(2000, 1, 2, h, m, 5))
+eh, em = divmod((h * 60) + m + 2, 60)
+for pilot in juniorPilots:
+  es = randint(35, 45)
+  ping(datetime(2000, 1, 2, eh, em, es, randint(0, 500000)), pilot['currentBeacon']['id'], -99, chrono['id'])
+endSession(satDerby1Junior['id'], datetime(2000, 1, 2, eh, em, 59))
+
+print("---- Tests Results of " + satDerby1Junior['name'] + "----")
+sessionLaps = getLapsForSession(satDerby1Junior['id'])
+printLaps(sessionLaps, True)
+checkNumberLaps(sessionLaps, len(juniorPilots))
+checkCountWithLapIndex(sessionLaps, 1, len(juniorPilots))
+checkCountWithLapNumber(sessionLaps, 1, len(juniorPilots))
+checkPilotFilled(sessionLaps)
+checkLaptimeBetween(sessionLaps, 150000, 161000)
+checkStartsOrdered(sessionLaps)
+checkEndsOrdered(sessionLaps)
+
+sessionBests = getBestLapsForSession(satDerby1Junior['id'])
+printLaps(sessionBests, True)
+checkNumberLaps(sessionBests, len(juniorPilots))
+checkCountWithLapIndex(sessionBests, 1, len(juniorPilots))
+checkCountWithLapNumber(sessionBests, 1, len(juniorPilots))
+checkPilotFilled(sessionBests)
+checkLaptimeBetween(sessionBests, 150000, 161000)
+checkDeltaBestInIncreasingOrder(sessionBests)
+checkDeltaPreviousFilled(sessionBests)
+
+sessionResults = getResultsForSession(satDerby1Junior['id'])
+printLaps(sessionResults, True)
+checkCountWithLapIndex(sessionResults, 1, len(juniorPilots))
+checkCountWithLapNumber(sessionResults, 1, len(juniorPilots))
+checkNumberLaps(sessionResults, len(juniorPilots))
+checkPilotFilled(sessionResults)
+checkLaptimeBetween(sessionResults, 150000, 161000)
+checkDeltaBestInIncreasingOrder(sessionResults, True)
+checkDeltaPreviousFilled(sessionResults, True)
+
+# -------------------------------------
+# Samedi matin	freestyle
+# -------------------------------------
+# pas de chronos
 
 # -------------------------------------
 #samedi aprem 	qualification dual	dual	1 contre 1, deux runs, le cumul des deux pour gagner. soit on mesure  l ecart à l arrivée, soit on chronomètre le run complet
