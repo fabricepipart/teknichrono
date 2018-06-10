@@ -1,6 +1,6 @@
 #!python3
 
-from base import *
+from api.base import *
 from prettytable import PrettyTable
 
 lapsUrl = '/rest/laptimes'

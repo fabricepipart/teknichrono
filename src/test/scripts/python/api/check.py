@@ -1,6 +1,6 @@
 #!python3
 
-from base import pretty_time_delta
+from api.base import pretty_time_delta
 
 # ----------------------------------------------------------------------
 
@@ -15,6 +15,13 @@ def checkPilotFilled(laps):
   for lap in laps:
     pilot = str(lap['pilot']['firstName']) + ' ' + str(lap['pilot']['lastName'])
     assert pilot
+
+
+def checkCategory(laps, categoryName):
+  print('Checking that all laps have category ' + categoryName)
+  for lap in laps:
+    category = str(lap['pilot']['lastName'])
+    assert categoryName == category
 
 
 def checkLaptimeFilled(laps, lastsCanBeEmpty=False):

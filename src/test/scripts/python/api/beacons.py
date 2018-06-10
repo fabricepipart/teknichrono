@@ -1,6 +1,6 @@
 #!python3
 
-from base import *
+from api.base import *
 
 beaconsUrl = '/rest/beacons'
 

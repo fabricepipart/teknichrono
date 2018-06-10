@@ -1,6 +1,6 @@
 #!python3
 
-from base import *
+from api.base import *
 import random
 
 headers = {'Content-type': 'application/json'}

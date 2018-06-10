@@ -24,11 +24,11 @@ The testing part of the project is based on JUnits (very few) and Python end to 
 ### How to run locally
 
 * You may need to adapt ```src/main/resources/project-defaults.yaml```
-* Start the server 
+* Start the server:
   * Normally : ```mvn wildfly-swarm:run```
   * In debug mode : ```mvn wildfly-swarm:run -Dswarm.debug.port=5555```
   * With debug logs : ```mvn wildfly-swarm:run -Dswarm.logging=DEBUG```
-* Run the E2E tests : ```./src/test/scripts/bash/moto_tests.sh```
+* Run the E2E tests : ```./src/test/scripts/bash/moto_tests.sh``` (or any bash script in this folder)
 
 ### How to re-generate scaffhold:
 
