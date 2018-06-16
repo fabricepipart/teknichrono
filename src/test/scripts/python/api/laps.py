@@ -59,11 +59,15 @@ def getLaps(locationId=None, eventId=None, categoryId=None, option=''):
 
 
 def getBestLapsForSession(sessionId, categoryId=None, option=''):
-  return getLapsForSession(sessionId, categoryId, '/best')
+  laps = getLapsForSession(sessionId, categoryId, '/best')
+  printLaps(laps, True)
+  return laps
 
 
 def getResultsForSession(sessionId, categoryId=None, option=''):
-  return getLapsForSession(sessionId, categoryId, '/results')
+  laps = getLapsForSession(sessionId, categoryId, '/results')
+  printLaps(laps, True)
+  return laps
 
 
 def getLapsForSession(sessionId, categoryId=None, option=''):
@@ -73,6 +77,7 @@ def getLapsForSession(sessionId, categoryId=None, option=''):
     categoryIdOption = '&categoryId=' + str(categoryId)
   url = lapsUrl + option + '?sessionId=' + str(sessionId) + str(categoryIdOption)
   lapsResponse = get(url)
+  printLaps(lapsResponse, True)
   return lapsResponse
 
 

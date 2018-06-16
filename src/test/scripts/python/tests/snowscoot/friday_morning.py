@@ -5,18 +5,17 @@ from random import randint
 
 from api.check import (checkCategory, checkCountWithLapIndex, checkCountWithLapNumber, checkDeltaBestInIncreasingOrder,
                        checkDeltaPreviousFilled, checkLaptimeFilled, checkNumberLaps, checkPilotFilled)
-from api.event import addSessionToEvent
 from api.laps import (getBestLapsForSession, getLapsForSession, getResultsForSession, printLaps)
-from api.location import addSessionToLocation
 from api.ping import ping
-from api.session import (addChronometerToSession, addPilotToSession, addSession, startSession)
+from api.session import startSession
+from api.session_simulator import SessionSimulator
 
 
 class FridayMorningTest:
   def __init__(self, championship):
     self.championship = championship
-    self.friMorningTestSession = None
-    self.friMorningChronoSession = None
+    self.morningTest = SessionSimulator()
+    self.morningChrono = SessionSimulator()
     self.boarderCross = self.championship.boarderCross
     self.fake1 = self.championship.fake1
     self.chrono = self.championship.chrono
@@ -25,23 +24,16 @@ class FridayMorningTest:
   def createSessions(self):
     # Add sessions
     print("---- Create session of Friday morning ----")
-    self.friMorningTestSession = addSession('Friday morning tests', datetime(2000, 1, 1, 10), datetime(2000, 1, 1, 11),
-                                            'tt')
-    addSessionToLocation(self.boarderCross['id'], self.friMorningTestSession['id'])
-    addSessionToEvent(self.championship.event['id'], self.friMorningTestSession['id'])
-    addChronometerToSession(self.friMorningTestSession['id'], self.fake1['id'])
-    addChronometerToSession(self.friMorningTestSession['id'], self.chrono['id'])
-    for pilot in self.championship.allPilots:
-      addPilotToSession(self.friMorningTestSession['id'], pilot['id'])
-
-    self.friMorningChronoSession = addSession('Friday morning Chrono', datetime(2000, 1, 1, 11), datetime(
-        2000, 1, 1, 12), 'tt')
-    addSessionToLocation(self.boarderCross['id'], self.friMorningChronoSession['id'])
-    addSessionToEvent(self.championship.event['id'], self.friMorningChronoSession['id'])
-    addChronometerToSession(self.friMorningChronoSession['id'], self.fake1['id'])
-    addChronometerToSession(self.friMorningChronoSession['id'], self.chrono['id'])
-    for pilot in self.championship.allPilots:
-      addPilotToSession(self.friMorningChronoSession['id'], pilot['id'])
+    s1 = datetime(2000, 1, 1, 10)
+    e1 = datetime(2000, 1, 1, 11)
+    event = self.championship.event
+    location = self.boarderCross
+    chronos = [self.fake1, self.chrono]
+    pilots = self.championship.allPilots
+    self.morningTest.create('Friday am tests', s1, e1, 'tt', location, event, chronos, pilots)
+    s2 = datetime(2000, 1, 1, 11)
+    e2 = datetime(2000, 1, 1, 12)
+    self.morningChrono.create('Friday am Chrono', s2, e2, 'tt', location, event, chronos, pilots)
 
   def test(self):
     self.borderCross()
@@ -59,7 +51,7 @@ class FridayMorningTest:
     # le meilleur retenu
 
     # Created sessions earlier and start it here
-    startSession(self.friMorningTestSession['id'], datetime(2000, 1, 1, 10, 0, 30))
+    startSession(self.morningTest.session['id'], datetime(2000, 1, 1, 10, 0, 30))
 
     print("---- Test #1 ----")
     # Starts every 20s
@@ -105,7 +97,7 @@ class FridayMorningTest:
     # 89 does not finish #1 and #2
     # 88 does not finish #2
 
-    friMorningTestsLaps = getLapsForSession(self.friMorningTestSession['id'])
+    friMorningTestsLaps = getLapsForSession(self.morningTest.session['id'])
     printLaps(friMorningTestsLaps, True)
     checkNumberLaps(friMorningTestsLaps, 160 - 6)
     checkPilotFilled(friMorningTestsLaps)
@@ -114,8 +106,7 @@ class FridayMorningTest:
     checkCountWithLapNumber(friMorningTestsLaps, 1, 2)
     checkLaptimeFilled(friMorningTestsLaps)
 
-    friMorningTestsLapsElite = getLapsForSession(self.friMorningTestSession['id'],
-                                                 self.championship.eliteCategory['id'])
+    friMorningTestsLapsElite = getLapsForSession(self.morningTest.session['id'], self.championship.eliteCategory['id'])
     printLaps(friMorningTestsLapsElite, True)
     checkNumberLaps(friMorningTestsLapsElite, 60 - 3)
     checkCategory(friMorningTestsLapsElite, "Elite")
@@ -123,7 +114,7 @@ class FridayMorningTest:
     checkCountWithLapIndex(friMorningTestsLapsElite, 2, 30 - 2)
     checkLaptimeFilled(friMorningTestsLapsElite)
 
-    friMorningTestsBests = getBestLapsForSession(self.friMorningTestSession['id'])
+    friMorningTestsBests = getBestLapsForSession(self.morningTest.session['id'])
     printLaps(friMorningTestsBests, True)
     checkNumberLaps(friMorningTestsBests, 78)
     checkPilotFilled(friMorningTestsBests)
@@ -140,7 +131,7 @@ class FridayMorningTest:
 
     #  ---- Determine startup ----
 
-    friMorningTestsResults = getResultsForSession(self.friMorningTestSession['id'])
+    friMorningTestsResults = getResultsForSession(self.morningTest.session['id'])
     printLaps(friMorningTestsResults, True)
     # TODO Have chart with startup list
     # TODO Check if it should count points
@@ -159,7 +150,7 @@ class FridayMorningTest:
     for i in range(30, 80):
       beaconsStartOrder.append(friMorningTestsResults[i]['pilot']['beaconNumber'])
 
-    startSession(self.friMorningChronoSession['id'], datetime(2000, 1, 1, 11, 10, 00))
+    startSession(self.morningChrono.session['id'], datetime(2000, 1, 1, 11, 10, 00))
     print("---- Chrono #1 ----")
     # TODO Make start order the one of the previous results
     # Starts every 20s
@@ -202,7 +193,7 @@ class FridayMorningTest:
 
     # ---- Results ----
     # ---- Checks - Asserts ----
-    friMorningChronoLaps = getLapsForSession(self.friMorningChronoSession['id'])
+    friMorningChronoLaps = getLapsForSession(self.morningChrono.session['id'])
     printLaps(friMorningChronoLaps, True)
     checkNumberLaps(friMorningChronoLaps, 160 - 6)
     checkPilotFilled(friMorningChronoLaps)
@@ -211,7 +202,7 @@ class FridayMorningTest:
     checkCountWithLapNumber(friMorningChronoLaps, 1, 2)
     checkLaptimeFilled(friMorningChronoLaps)
 
-    friMorningChronoBests = getBestLapsForSession(self.friMorningChronoSession['id'])
+    friMorningChronoBests = getBestLapsForSession(self.morningChrono.session['id'])
     printLaps(friMorningChronoBests, True)
     checkNumberLaps(friMorningChronoBests, 78)
     checkPilotFilled(friMorningChronoBests)
@@ -220,7 +211,7 @@ class FridayMorningTest:
     checkDeltaBestInIncreasingOrder(friMorningChronoBests)
     checkDeltaPreviousFilled(friMorningChronoBests)
 
-    friMorningChronoResults = getResultsForSession(self.friMorningChronoSession['id'])
+    friMorningChronoResults = getResultsForSession(self.morningChrono.session['id'])
     printLaps(friMorningChronoResults, True)
     checkNumberLaps(friMorningChronoResults, 80)
     checkPilotFilled(friMorningChronoResults)
@@ -240,7 +231,7 @@ class FridayMorningTest:
     # Some finish after expected time
 
   def checkResults(self):
-    friMorningTestsResults = getResultsForSession(self.friMorningTestSession['id'])
+    friMorningTestsResults = getResultsForSession(self.morningTest.session['id'])
     printLaps(friMorningTestsResults, True)
 
     checkNumberLaps(friMorningTestsResults, 80)

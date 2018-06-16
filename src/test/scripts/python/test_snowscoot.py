@@ -4,15 +4,15 @@ import requests
 import json
 import sys
 
-from .api.base import *
-from .api.pilots import *
-from .api.beacons import *
-from .api.chronometer import *
-from .api.event import *
-from .api.ping import *
-from .api.laps import *
-from .api.session import *
-from .api.location import *
+from api.base import *
+from api.pilots import *
+from api.beacons import *
+from api.chronometer import *
+from api.event import *
+from api.ping import *
+from api.laps import *
+from api.session import *
+from api.location import *
 
 # ----------------------------------------------------------------------
 # Add Pilots

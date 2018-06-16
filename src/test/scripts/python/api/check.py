@@ -131,3 +131,39 @@ def checkDeltaPreviousFilled(laps, lastsCanBeEmpty=False):
           assert not atLeastOneBeforeWasEmpty
     firstLapEvaluated = True
     lastLapDuration = lap['duration']
+
+
+def checkLaps(laps, total, indexMap, numberMap):
+  checkNumberLaps(laps, total)
+  for index, count in indexMap.items():
+    checkCountWithLapIndex(laps, index, count)
+  for number, count in numberMap.items():
+    checkCountWithLapNumber(laps, number, count)
+  checkPilotFilled(laps)
+  checkLaptimeFilled(laps)
+  checkStartsOrdered(laps)
+  checkEndsOrdered(laps)
+
+
+def checkBestLaps(laps, total, indexMap, numberMap):
+  checkNumberLaps(laps, total)
+  for index, count in indexMap.items():
+    checkCountWithLapIndex(laps, index, count)
+  for number, count in numberMap.items():
+    checkCountWithLapNumber(laps, number, count)
+  checkPilotFilled(laps)
+  checkLaptimeFilled(laps)
+  checkDeltaBestInIncreasingOrder(laps)
+  checkDeltaPreviousFilled(laps)
+
+
+def checkResults(laps, total, indexMap, numberMap):
+  checkNumberLaps(laps, total)
+  for index, count in indexMap.items():
+    checkCountWithLapIndex(laps, index, count)
+  for number, count in numberMap.items():
+    checkCountWithLapNumber(laps, number, count)
+  checkPilotFilled(laps)
+  checkLaptimeFilled(laps, True)
+  checkDeltaBestInIncreasingOrder(laps, True)
+  checkDeltaPreviousFilled(laps, True)
