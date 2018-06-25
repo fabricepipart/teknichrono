@@ -3,8 +3,8 @@
 from datetime import datetime
 from random import randint
 
-from api.check import (checkCategory, checkCountWithLapIndex, checkCountWithLapNumber, checkDeltaBestInIncreasingOrder,
-                       checkDeltaPreviousFilled, checkLaptimeFilled, checkNumberLaps, checkPilotFilled)
+from api.check import (checkCategory, checkCountWithLapIndex, checkCountWithLapNumber, checkDeltaBestInIncreasingOrder, checkDeltaPreviousFilled, checkLaptimeFilled,
+                       checkNumberLaps, checkPilotFilled)
 from api.laps import (getBestLapsForSession, getLapsForSession, getResultsForSession, printLaps)
 from api.ping import ping
 from api.session import startSession

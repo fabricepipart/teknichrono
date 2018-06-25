@@ -44,7 +44,7 @@ class SessionSimulator:
       beaconsIdsOfSession.append(beacons[pilot['beaconNumber']]['id'])
     return beaconsIdsOfSession
 
-  def simRace(self, beaconsIdsOfSession, avgDurationMin, delta, chronoId):
+  def simRace(self, beaconsIdsOfSession, avgDurationMin, delta, chronoId, doNotFinish=[]):
     startHour = self.start.hour
     startMinute = self.start.minute
     # Starts all together
@@ -54,7 +54,6 @@ class SessionSimulator:
     eh, em = divmod((h * 60) + m + avgDurationMin, 60)
     for beaconId in beaconsIdsOfSession:
       es = randint(0, delta)
-      ping(
-          datetime(self.start.year, self.start.month, self.start.day, eh, em, es, randint(0, 500000)), beaconId, -99,
-          chronoId)
+      if beaconId not in doNotFinish:
+        ping(datetime(self.start.year, self.start.month, self.start.day, eh, em, es, randint(0, 500000)), beaconId, -99, chronoId)
     endSession(self.session['id'], datetime(self.start.year, self.start.month, self.start.day, eh, em, 59))
