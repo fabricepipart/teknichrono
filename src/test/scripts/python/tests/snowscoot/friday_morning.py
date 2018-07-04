@@ -4,7 +4,7 @@ from datetime import datetime
 from random import randint
 
 from api.check import (checkCategory, checkCountWithLapIndex, checkCountWithLapNumber, checkDeltaBestInIncreasingOrder, checkDeltaPreviousFilled, checkLaptimeFilled,
-                       checkNumberLaps, checkPilotFilled)
+                       checkNumberLaps, checkPilotFilled, checkResults, checkLaps, checkBestLaps)
 from api.laps import (getBestLapsForSession, getLapsForSession, getResultsForSession, printLaps)
 from api.ping import ping
 from api.session import startSession
@@ -30,10 +30,10 @@ class FridayMorningTest:
     location = self.boarderCross
     chronos = [self.fake1, self.chrono]
     pilots = self.championship.allPilots
-    self.morningTest.create('Friday am tests', s1, e1, 'tt', location, event, chronos, pilots)
+    self.morningTest.create('Friday am tests', s1, e1, 'tt', location, event, [self.fake1, self.chrono], self.beacons, pilots)
     s2 = datetime(2000, 1, 1, 11)
     e2 = datetime(2000, 1, 1, 12)
-    self.morningChrono.create('Friday am Chrono', s2, e2, 'tt', location, event, chronos, pilots)
+    self.morningChrono.create('Friday am Chrono', s2, e2, 'tt', location, event, [self.fake1, self.chrono], self.beacons, pilots)
 
   def test(self):
     self.borderCross()
@@ -50,78 +50,21 @@ class FridayMorningTest:
     # deux runs chronos
     # le meilleur retenu
 
-    # Created sessions earlier and start it here
-    startSession(self.morningTest.session['id'], datetime(2000, 1, 1, 10, 0, 30))
-
     print("---- Test #1 ----")
-    # Starts every 20s
-    startDelta = 20
-    # TODO Check if there should be a specific start order
-    # TODO Check if it is acceptable to start manually each rider. If not afke1 should be a real chrono
-    # -- Start
-    startMinute = 1
-    for i in range(11, 90):
-      m, s = divmod(i * startDelta, 60)
-      h, m = divmod(startMinute + m, 60)
-      ping(datetime(2000, 1, 1, 10 + h, m, s, randint(0, 500000)), self.beacons[i]['id'], -99, self.fake1['id'])
-    # -- End
-    endMinute = startMinute + 2
-    for i in range(11, 89):
-      delta = int(i / 3) + randint(0, int(i / 3))
-      m, s = divmod(i * startDelta + delta, 60)
-      h, m = divmod(endMinute + m, 60)
-      ping(datetime(2000, 1, 1, 10 + h, m, s, randint(0, 500000)), self.beacons[i]['id'], -99, self.chrono['id'])
-
+    self.morningTest.simTimeTrial(2, 19, 20, self.fake1['id'], self.chrono['id'], doNotStart=1, doNotFinish=1)
     print("---- Test #2 ----")
-    # Starts every 20s
-    # -- Start
-    startMinute = 31
-    for i in range(12, 90):
-      m, s = divmod(i * startDelta, 60)
-      h, m = divmod(startMinute + m, 60)
-      ping(datetime(2000, 1, 1, 10 + h, m, s, randint(0, 500000)), self.beacons[i]['id'], -99, self.fake1['id'])
-    # -- End
-    endMinute = startMinute + 2
-    for i in range(12, 88):
-      delta = int(i / 3) + randint(0, int(i / 3))
-      m, s = divmod(i * startDelta + delta, 60)
-      h, m = divmod(endMinute + m, 60)
-      ping(datetime(2000, 1, 1, 10 + h, m, s, randint(0, 500000)), self.beacons[i]['id'], -99, self.chrono['id'])
+    self.morningTest.simTimeTrial(2, 19, 20, self.fake1['id'], self.chrono['id'], doNotStart=2, doNotFinish=2, startShift=30)
 
     print("---- Tests Results ----")
-
-    #  ---- Results for display ----
-
-    # 10 does not do #1 and #2
-    # 11 does not do #2
-    # 89 does not finish #1 and #2
-    # 88 does not finish #2
-
     friMorningTestsLaps = getLapsForSession(self.morningTest.session['id'])
-    printLaps(friMorningTestsLaps, True)
-    checkNumberLaps(friMorningTestsLaps, 160 - 6)
-    checkPilotFilled(friMorningTestsLaps)
-    checkCountWithLapIndex(friMorningTestsLaps, 1, 78)
-    checkCountWithLapIndex(friMorningTestsLaps, 2, 76)
-    checkCountWithLapNumber(friMorningTestsLaps, 1, 2)
-    checkLaptimeFilled(friMorningTestsLaps)
+    checkLaps(friMorningTestsLaps, 160 - 6, {1: 78, 2: 76}, {1: 2})
 
     friMorningTestsLapsElite = getLapsForSession(self.morningTest.session['id'], self.championship.eliteCategory['id'])
-    printLaps(friMorningTestsLapsElite, True)
-    checkNumberLaps(friMorningTestsLapsElite, 60 - 3)
-    checkCategory(friMorningTestsLapsElite, "Elite")
-    checkCountWithLapIndex(friMorningTestsLapsElite, 1, 30 - 1)
-    checkCountWithLapIndex(friMorningTestsLapsElite, 2, 30 - 2)
-    checkLaptimeFilled(friMorningTestsLapsElite)
+    checkLaps(friMorningTestsLapsElite, 60 - 6, {1: 28, 2: 26}, {1: 2}, "Elite")
 
     friMorningTestsBests = getBestLapsForSession(self.morningTest.session['id'])
     printLaps(friMorningTestsBests, True)
-    checkNumberLaps(friMorningTestsBests, 78)
-    checkPilotFilled(friMorningTestsBests)
-    checkCountWithLapNumber(friMorningTestsBests, 1, 2)
-    checkLaptimeFilled(friMorningTestsBests)
-    checkDeltaBestInIncreasingOrder(friMorningTestsBests)
-    checkDeltaPreviousFilled(friMorningTestsBests)
+    checkBestLaps(friMorningTestsBests, 78, {}, {1: 2})
 
   def borderCrossChronos(self):
     # Some do 1 test
@@ -233,11 +176,4 @@ class FridayMorningTest:
   def checkResults(self):
     friMorningTestsResults = getResultsForSession(self.morningTest.session['id'])
     printLaps(friMorningTestsResults, True)
-
-    checkNumberLaps(friMorningTestsResults, 80)
-    checkPilotFilled(friMorningTestsResults)
-    checkCountWithLapIndex(friMorningTestsResults, 0, 2)
-    checkCountWithLapNumber(friMorningTestsResults, 0, 2)
-    checkLaptimeFilled(friMorningTestsResults, True)
-    checkDeltaBestInIncreasingOrder(friMorningTestsResults, True)
-    checkDeltaPreviousFilled(friMorningTestsResults, True)
+    checkResults(friMorningTestsResults, 80, {0: 2}, {0: 2})

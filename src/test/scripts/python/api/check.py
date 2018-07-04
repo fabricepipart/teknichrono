@@ -132,12 +132,14 @@ def checkDeltaPreviousFilled(laps, lastsCanBeEmpty=False):
     lastLapDuration = lap['duration']
 
 
-def checkLaps(laps, total, indexMap, numberMap):
+def checkLaps(laps, total, indexMap, numberMap, category=None):
   checkNumberLaps(laps, total)
   for index, count in indexMap.items():
     checkCountWithLapIndex(laps, index, count)
   for number, count in numberMap.items():
     checkCountWithLapNumber(laps, number, count)
+  if category != None:
+    checkCategory(laps, category)
   checkPilotFilled(laps)
   checkLaptimeFilled(laps)
   checkStartsOrdered(laps)

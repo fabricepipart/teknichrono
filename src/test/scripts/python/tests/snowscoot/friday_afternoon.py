@@ -1,15 +1,10 @@
 #!python3
 
 from datetime import datetime
-from random import randint
 
-from api.check import (checkCountWithLapIndex, checkCountWithLapNumber, checkDeltaBestInIncreasingOrder, checkDeltaPreviousFilled, checkLaptimeFilled, checkNumberLaps,
-                       checkPilotFilled, checkStartsOrdered, checkEndsOrdered, checkLaps, checkBestLaps, checkResults)
-from api.event import addSessionToEvent
-from api.laps import (getBestLapsForSession, getLapsForSession, getResultsForSession, printLaps)
-from api.location import addSessionToLocation
-from api.ping import ping
-from api.session import (addChronometerToSession, addPilotToSession, addSession, startSession, endSession, getSessionByName)
+from api.check import (checkLaps, checkBestLaps, checkResults)
+from api.laps import (getBestLapsForSession, getLapsForSession, getResultsForSession)
+from api.session import getSessionByName
 from api.session_simulator import SessionSimulator
 
 
@@ -44,37 +39,37 @@ class FridayAfternoonTest:
 
   def createPm16Sessions(self):
     friPm16Run1 = SessionSimulator()
-    friPm16Run1.create('Fri pm Boarder X 1/16 #1', datetime(2000, 1, 1, 14, 0), datetime(2000, 1, 1, 14, 4), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm16Run1.create('Fri pm Boarder X 1/16 #1', datetime(2000, 1, 1, 14, 0), datetime(2000, 1, 1, 14, 4), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm16Run2 = SessionSimulator()
-    friPm16Run2.create('Fri pm Boarder X 1/16 #2', datetime(2000, 1, 1, 14, 4), datetime(2000, 1, 1, 14, 8), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm16Run2.create('Fri pm Boarder X 1/16 #2', datetime(2000, 1, 1, 14, 4), datetime(2000, 1, 1, 14, 8), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm16Run3 = SessionSimulator()
-    friPm16Run3.create('Fri pm Boarder X 1/16 #3', datetime(2000, 1, 1, 14, 8), datetime(2000, 1, 1, 14, 12), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm16Run3.create('Fri pm Boarder X 1/16 #3', datetime(2000, 1, 1, 14, 8), datetime(2000, 1, 1, 14, 12), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm16Run4 = SessionSimulator()
-    friPm16Run4.create('Fri pm Boarder X 1/16 #4', datetime(2000, 1, 1, 14, 12), datetime(2000, 1, 1, 14, 16), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm16Run4.create('Fri pm Boarder X 1/16 #4', datetime(2000, 1, 1, 14, 12), datetime(2000, 1, 1, 14, 16), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm16Run5 = SessionSimulator()
-    friPm16Run5.create('Fri pm Boarder X 1/16 #5', datetime(2000, 1, 1, 14, 16), datetime(2000, 1, 1, 14, 20), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm16Run5.create('Fri pm Boarder X 1/16 #5', datetime(2000, 1, 1, 14, 16), datetime(2000, 1, 1, 14, 20), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm16Run6 = SessionSimulator()
-    friPm16Run6.create('Fri pm Boarder X 1/16 #6', datetime(2000, 1, 1, 14, 20), datetime(2000, 1, 1, 14, 24), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm16Run6.create('Fri pm Boarder X 1/16 #6', datetime(2000, 1, 1, 14, 20), datetime(2000, 1, 1, 14, 24), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm16Run7 = SessionSimulator()
-    friPm16Run7.create('Fri pm Boarder X 1/16 #7', datetime(2000, 1, 1, 14, 24), datetime(2000, 1, 1, 14, 28), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm16Run7.create('Fri pm Boarder X 1/16 #7', datetime(2000, 1, 1, 14, 24), datetime(2000, 1, 1, 14, 28), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm16Run8 = SessionSimulator()
-    friPm16Run8.create('Fri pm Boarder X 1/16 #8', datetime(2000, 1, 1, 14, 28), datetime(2000, 1, 1, 14, 32), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm16Run8.create('Fri pm Boarder X 1/16 #8', datetime(2000, 1, 1, 14, 28), datetime(2000, 1, 1, 14, 32), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm16Run9 = SessionSimulator()
-    friPm16Run9.create('Fri pm Boarder X 1/16 #9', datetime(2000, 1, 1, 14, 32), datetime(2000, 1, 1, 14, 36), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm16Run9.create('Fri pm Boarder X 1/16 #9', datetime(2000, 1, 1, 14, 32), datetime(2000, 1, 1, 14, 36), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm16Run10 = SessionSimulator()
-    friPm16Run10.create('Fri pm Boarder X 1/16 #10', datetime(2000, 1, 1, 14, 36), datetime(2000, 1, 1, 14, 40), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm16Run10.create('Fri pm Boarder X 1/16 #10', datetime(2000, 1, 1, 14, 36), datetime(2000, 1, 1, 14, 40), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm16Run11 = SessionSimulator()
-    friPm16Run11.create('Fri pm Boarder X 1/16 #11', datetime(2000, 1, 1, 14, 40), datetime(2000, 1, 1, 14, 44), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm16Run11.create('Fri pm Boarder X 1/16 #11', datetime(2000, 1, 1, 14, 40), datetime(2000, 1, 1, 14, 44), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm16Run12 = SessionSimulator()
-    friPm16Run12.create('Fri pm Boarder X 1/16 #12', datetime(2000, 1, 1, 14, 44), datetime(2000, 1, 1, 14, 48), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm16Run12.create('Fri pm Boarder X 1/16 #12', datetime(2000, 1, 1, 14, 44), datetime(2000, 1, 1, 14, 48), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm16Run13 = SessionSimulator()
-    friPm16Run13.create('Fri pm Boarder X 1/16 #13', datetime(2000, 1, 1, 14, 48), datetime(2000, 1, 1, 14, 52), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm16Run13.create('Fri pm Boarder X 1/16 #13', datetime(2000, 1, 1, 14, 48), datetime(2000, 1, 1, 14, 52), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm16Run14 = SessionSimulator()
-    friPm16Run14.create('Fri pm Boarder X 1/16 #14', datetime(2000, 1, 1, 14, 52), datetime(2000, 1, 1, 14, 56), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm16Run14.create('Fri pm Boarder X 1/16 #14', datetime(2000, 1, 1, 14, 52), datetime(2000, 1, 1, 14, 56), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm16Run15 = SessionSimulator()
-    friPm16Run15.create('Fri pm Boarder X 1/16 #15', datetime(2000, 1, 1, 14, 56), datetime(2000, 1, 1, 15, 0), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm16Run15.create('Fri pm Boarder X 1/16 #15', datetime(2000, 1, 1, 14, 56), datetime(2000, 1, 1, 15, 0), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm16Run16 = SessionSimulator()
-    friPm16Run16.create('Fri pm Boarder X 1/16 #16', datetime(2000, 1, 1, 15, 0), datetime(2000, 1, 1, 15, 4), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm16Run16.create('Fri pm Boarder X 1/16 #16', datetime(2000, 1, 1, 15, 0), datetime(2000, 1, 1, 15, 4), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     self.friPm16Sessions = [
         friPm16Run1, friPm16Run2, friPm16Run3, friPm16Run4, friPm16Run5, friPm16Run6, friPm16Run7, friPm16Run8, friPm16Run9, friPm16Run10, friPm16Run11, friPm16Run12, friPm16Run13,
         friPm16Run14, friPm16Run15, friPm16Run16
@@ -82,44 +77,44 @@ class FridayAfternoonTest:
 
   def createPm8Sessions(self):
     friPm8Run1 = SessionSimulator()
-    friPm8Run1.create('Fri pm Boarder X 1/8 #1', datetime(2000, 1, 1, 15, 16), datetime(2000, 1, 1, 15, 20), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm8Run1.create('Fri pm Boarder X 1/8 #1', datetime(2000, 1, 1, 15, 16), datetime(2000, 1, 1, 15, 20), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm8Run2 = SessionSimulator()
-    friPm8Run2.create('Fri pm Boarder X 1/8 #2', datetime(2000, 1, 1, 15, 20), datetime(2000, 1, 1, 15, 24), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm8Run2.create('Fri pm Boarder X 1/8 #2', datetime(2000, 1, 1, 15, 20), datetime(2000, 1, 1, 15, 24), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm8Run3 = SessionSimulator()
-    friPm8Run3.create('Fri pm Boarder X 1/8 #3', datetime(2000, 1, 1, 15, 24), datetime(2000, 1, 1, 15, 28), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm8Run3.create('Fri pm Boarder X 1/8 #3', datetime(2000, 1, 1, 15, 24), datetime(2000, 1, 1, 15, 28), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm8Run4 = SessionSimulator()
-    friPm8Run4.create('Fri pm Boarder X 1/8 #4', datetime(2000, 1, 1, 15, 28), datetime(2000, 1, 1, 15, 32), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm8Run4.create('Fri pm Boarder X 1/8 #4', datetime(2000, 1, 1, 15, 28), datetime(2000, 1, 1, 15, 32), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm8Run5 = SessionSimulator()
-    friPm8Run5.create('Fri pm Boarder X 1/8 #5', datetime(2000, 1, 1, 15, 32), datetime(2000, 1, 1, 15, 36), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm8Run5.create('Fri pm Boarder X 1/8 #5', datetime(2000, 1, 1, 15, 32), datetime(2000, 1, 1, 15, 36), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm8Run6 = SessionSimulator()
-    friPm8Run6.create('Fri pm Boarder X 1/8 #6', datetime(2000, 1, 1, 15, 36), datetime(2000, 1, 1, 15, 40), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm8Run6.create('Fri pm Boarder X 1/8 #6', datetime(2000, 1, 1, 15, 36), datetime(2000, 1, 1, 15, 40), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm8Run7 = SessionSimulator()
-    friPm8Run7.create('Fri pm Boarder X 1/8 #7', datetime(2000, 1, 1, 15, 40), datetime(2000, 1, 1, 15, 44), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm8Run7.create('Fri pm Boarder X 1/8 #7', datetime(2000, 1, 1, 15, 40), datetime(2000, 1, 1, 15, 44), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm8Run8 = SessionSimulator()
-    friPm8Run8.create('Fri pm Boarder X 1/8 #8', datetime(2000, 1, 1, 15, 44), datetime(2000, 1, 1, 15, 48), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm8Run8.create('Fri pm Boarder X 1/8 #8', datetime(2000, 1, 1, 15, 44), datetime(2000, 1, 1, 15, 48), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     self.friPm8Sessions = [friPm8Run1, friPm8Run2, friPm8Run3, friPm8Run4, friPm8Run5, friPm8Run6, friPm8Run7, friPm8Run8]
 
   def createPm4Sessions(self):
     friPm4Run1 = SessionSimulator()
-    friPm4Run1.create('Fri pm Boarder X 1/4 #1', datetime(2000, 1, 1, 16, 0), datetime(2000, 1, 1, 16, 4), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm4Run1.create('Fri pm Boarder X 1/4 #1', datetime(2000, 1, 1, 16, 0), datetime(2000, 1, 1, 16, 4), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm4Run2 = SessionSimulator()
-    friPm4Run2.create('Fri pm Boarder X 1/4 #2', datetime(2000, 1, 1, 16, 4), datetime(2000, 1, 1, 16, 8), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm4Run2.create('Fri pm Boarder X 1/4 #2', datetime(2000, 1, 1, 16, 4), datetime(2000, 1, 1, 16, 8), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm4Run3 = SessionSimulator()
-    friPm4Run3.create('Fri pm Boarder X 1/4 #3', datetime(2000, 1, 1, 16, 8), datetime(2000, 1, 1, 16, 12), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm4Run3.create('Fri pm Boarder X 1/4 #3', datetime(2000, 1, 1, 16, 8), datetime(2000, 1, 1, 16, 12), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPm4Run4 = SessionSimulator()
-    friPm4Run4.create('Fri pm Boarder X 1/4 #4', datetime(2000, 1, 1, 16, 12), datetime(2000, 1, 1, 16, 16), 'rc', self.boarderCross, self.event, self.chronos)
+    friPm4Run4.create('Fri pm Boarder X 1/4 #4', datetime(2000, 1, 1, 16, 12), datetime(2000, 1, 1, 16, 16), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     self.friPm4Sessions = [friPm4Run1, friPm4Run2, friPm4Run3, friPm4Run4]
 
   def createPmSemiSessions(self):
     friPmSemiRun1 = SessionSimulator()
-    friPmSemiRun1.create('Fri pm Boarder X 1/2 #1', datetime(2000, 1, 1, 16, 30), datetime(2000, 1, 1, 16, 34), 'rc', self.boarderCross, self.event, self.chronos)
+    friPmSemiRun1.create('Fri pm Boarder X 1/2 #1', datetime(2000, 1, 1, 16, 30), datetime(2000, 1, 1, 16, 34), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     friPmSemiRun2 = SessionSimulator()
-    friPmSemiRun2.create('Fri pm Boarder X 1/2 #2', datetime(2000, 1, 1, 16, 34), datetime(2000, 1, 1, 16, 38), 'rc', self.boarderCross, self.event, self.chronos)
+    friPmSemiRun2.create('Fri pm Boarder X 1/2 #2', datetime(2000, 1, 1, 16, 34), datetime(2000, 1, 1, 16, 38), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
     self.friPmSemiSessions = [friPmSemiRun1, friPmSemiRun2]
 
   def createPmFinale(self):
     self.friPmFinale = SessionSimulator()
-    self.friPmFinale.create('Fri pm Boarder X Finale', datetime(2000, 1, 1, 16, 45), datetime(2000, 1, 1, 17, 0), 'rc', self.boarderCross, self.event, self.chronos)
+    self.friPmFinale.create('Fri pm Boarder X Finale', datetime(2000, 1, 1, 16, 45), datetime(2000, 1, 1, 17, 0), 'rc', self.boarderCross, self.event, self.chronos, self.beacons)
 
   def test(self):
     # -------------------------------------
@@ -140,8 +135,7 @@ class FridayAfternoonTest:
     for s in self.friPm16Sessions:
       session = s.session
       # We keep 3 best
-      beaconsIdsOfSession = s.getBeaconsIdsOfSession(self.beacons)
-      s.simRace(beaconsIdsOfSession, 2, 30, self.chronos[-1]['id'], [])
+      s.simRace(2, 30, self.chronos[-1]['id'], 0)
       sessionIndex += 1
     friPm16SessionsResults = []
     for s in self.friPm16Sessions:
@@ -159,8 +153,7 @@ class FridayAfternoonTest:
       session = s.session
       # We keep 3 best
       addBestsOfSessions(friPm16SessionsResults[2 * sessionIndex], friPm16SessionsResults[(2 * sessionIndex) + 1], 3, s)
-      beaconsIdsOfSession = s.getBeaconsIdsOfSession(self.beacons)
-      s.simRace(beaconsIdsOfSession, 2, 30, self.chronos[-1]['id'], [beaconsIdsOfSession[0]])
+      s.simRace(2, 30, self.chronos[-1]['id'], 1)
       sessionIndex += 1
     friPm8SessionsResults = []
     for s in self.friPm8Sessions:
@@ -178,8 +171,7 @@ class FridayAfternoonTest:
       session = s.session
       # We keep 3 best
       addBestsOfSessions(friPm8SessionsResults[2 * sessionIndex], friPm8SessionsResults[(2 * sessionIndex) + 1], 3, s)
-      beaconsIdsOfSession = s.getBeaconsIdsOfSession(self.beacons)
-      s.simRace(beaconsIdsOfSession, 2, 30, self.chronos[-1]['id'], [beaconsIdsOfSession[0]])
+      s.simRace(2, 30, self.chronos[-1]['id'], 1)
       sessionIndex += 1
     friPm4SessionsResults = []
     for s in self.friPm4Sessions:
@@ -197,8 +189,7 @@ class FridayAfternoonTest:
       session = s.session
       # We keep 3 best
       addBestsOfSessions(friPm4SessionsResults[2 * sessionIndex], friPm4SessionsResults[(2 * sessionIndex) + 1], 3, s)
-      beaconsIdsOfSession = s.getBeaconsIdsOfSession(self.beacons)
-      s.simRace(beaconsIdsOfSession, 2, 30, self.chronos[-1]['id'], [beaconsIdsOfSession[2]])
+      s.simRace(2, 30, self.chronos[-1]['id'], 1)
       sessionIndex += 1
     friPmSemiSessionsResults = []
     for s in self.friPmSemiSessions:
@@ -213,7 +204,7 @@ class FridayAfternoonTest:
     print("---- Finale ----")
     # We keep 3 best
     addBestsOfSessions(friPmSemiSessionsResults[0], friPmSemiSessionsResults[1], 3, self.friPmFinale)
-    self.friPmFinale.simRace(self.friPmFinale.getBeaconsIdsOfSession(self.beacons), 2, 30, self.chronos[-1]['id'])
+    self.friPmFinale.simRace(2, 30, self.chronos[-1]['id'])
     print("---- Tests Results of " + self.friPmFinale.session['name'] + "----")
     checkLaps(getLapsForSession(self.friPmFinale.session['id']), 6, {1: 6}, {1: 6})
     checkBestLaps(getBestLapsForSession(self.friPmFinale.session['id']), 6, {1: 6}, {1: 6})
