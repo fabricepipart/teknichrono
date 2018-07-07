@@ -1,0 +1,4 @@
+prettytable
+requests
+yapf
+pylint

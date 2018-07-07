@@ -1,13 +1,18 @@
 #!python3
 
+import os
 import requests
 import json
 from datetime import date, datetime, timedelta
 import datetime as dt
 
 headers = {'Content-type': 'application/json'}
-host = 'http://localhost:8080'
 debug = True
+
+host = 'http://localhost:8080'
+specificTarget = os.environ.get('TEKNICHRONO_HOST')
+if specificTarget:
+  host = 'http://' + specificTarget
 
 
 def setHost(url):
@@ -22,8 +27,7 @@ def post(dataString, url, params=[]):
   response = requests.post(host + url, data=dataString, params=params, headers=headers)
   if (not response.ok):
     print("Request returned an invalid status. Text output : " + response.text)
-    print("To reproduce : curl -X POST " + host + url + " --data '" + dataString +
-          "' --header \"Content-Type:application/json\" with params " + str(params))
+    print("To reproduce : curl -X POST " + host + url + " --data '" + dataString + "' --header \"Content-Type:application/json\" with params " + str(params))
     response.raise_for_status()
   return
 

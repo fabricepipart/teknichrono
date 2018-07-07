@@ -1,7 +1,9 @@
-#!/bin/sh
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+#!/bin/bash
+DIR="$( cd "$( dirname "$0" )" && pwd )"
 
 set -e
 
-$DIR/moto_tests.sh
-$DIR/snowscoot_tests.sh
+export TEKNICHRONO_HOST=${1:-localhost:8080}
+
+bash $DIR/moto_tests.sh
+bash $DIR/snowscoot_tests.sh 
