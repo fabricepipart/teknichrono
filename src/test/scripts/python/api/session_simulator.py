@@ -62,11 +62,11 @@ class SessionSimulator:
     # Ends
     eh, em = divmod((startHour * 60) + startMinute + avgDurationMin, 60)
     for beaconId in beaconsIdsOfSession:
-      es = randint(0, delta)
+      es = randint(0, delta - 1) + 5
       if numberThatDidNotFinish < doNotFinish:
         numberThatDidNotFinish += 1
       else:
-        ping(datetime(self.start.year, self.start.month, self.start.day, eh, em, es, randint(0, 500000)), beaconId, -99, chronoId)
+        ping(datetime(self.start.year, self.start.month, self.start.day, eh, em, es, randint(0, 999999)), beaconId, -99, chronoId)
     endSession(self.session['id'], datetime(self.start.year, self.start.month, self.start.day, eh, em, 59))
 
   def simTimeTrial(self, avgDurationMin, delta, startPeriod, chronoStartId, chronoEndId, doNotStart=0, doNotFinish=0, startShift=0):
@@ -84,19 +84,19 @@ class SessionSimulator:
       if numberThatDidNotStart < doNotStart:
         numberThatDidNotStart += 1
       else:
-        ping(datetime(self.start.year, self.start.month, self.start.day, sh, sm, ss, randint(0, 500000)), beaconId, -99, chronoStartId)
+        ping(datetime(self.start.year, self.start.month, self.start.day, sh, sm, ss, randint(0, 999999)), beaconId, -99, chronoStartId)
       i += 1
     # Ends
     numberThatDidNotStart = 0
     i = 0
     for beaconId in beaconsIdsOfSession:
-      em, es = divmod(i * startPeriod + randint(0, delta), 60)
+      em, es = divmod(i * startPeriod + randint(0, delta - 1) + 5, 60)
       eh, em = divmod((startHour * 60) + startMinute + em + avgDurationMin, 60)
       if numberThatDidNotStart < doNotStart:
         numberThatDidNotStart += 1
       elif numberThatDidNotFinish < doNotFinish:
         numberThatDidNotFinish += 1
       else:
-        ping(datetime(self.start.year, self.start.month, self.start.day, eh, em, es, randint(0, 500000)), beaconId, -99, chronoEndId)
+        ping(datetime(self.start.year, self.start.month, self.start.day, eh, em, es, randint(0, 999999)), beaconId, -99, chronoEndId)
       i += 1
     endSession(self.session['id'], datetime(self.start.year, self.start.month, self.start.day, eh, em, 59))

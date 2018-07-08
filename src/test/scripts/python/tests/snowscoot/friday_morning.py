@@ -30,10 +30,10 @@ class FridayMorningTest:
     location = self.boarderCross
     chronos = [self.fake1, self.chrono]
     pilots = self.championship.allPilots
-    self.morningTest.create('Friday am tests', s1, e1, 'tt', location, event, [self.fake1, self.chrono], self.beacons, pilots)
+    self.morningTest.create('Friday am tests', s1, e1, 'tt', location, event, chronos, self.beacons, pilots)
     s2 = datetime(2000, 1, 1, 11)
     e2 = datetime(2000, 1, 1, 12)
-    self.morningChrono.create('Friday am Chrono', s2, e2, 'tt', location, event, [self.fake1, self.chrono], self.beacons)
+    self.morningChrono.create('Friday am Chrono', s2, e2, 'tt', location, event, chronos, self.beacons)
 
   def test(self):
     self.borderCrossQP()

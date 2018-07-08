@@ -49,7 +49,7 @@ def checkCountWithLapIndex(laps, index, count):
   increasingCount = 0
   for lap in laps:
     lapIndex = str(lap['lapIndex'])
-    if (lapIndex == str(index)):
+    if lapIndex == str(index):
       increasingCount += 1
   assert increasingCount == count
 
@@ -132,7 +132,7 @@ def checkDeltaPreviousFilled(laps, lastsCanBeEmpty=False):
     lastLapDuration = lap['duration']
 
 
-def checkLaps(laps, total, indexMap, numberMap, category=None):
+def checkLaps(laps, total, indexMap, numberMap, category=None, durationFrom=None, durationTo=None):
   checkNumberLaps(laps, total)
   for index, count in indexMap.items():
     checkCountWithLapIndex(laps, index, count)
@@ -144,21 +144,27 @@ def checkLaps(laps, total, indexMap, numberMap, category=None):
   checkLaptimeFilled(laps)
   checkStartsOrdered(laps)
   checkEndsOrdered(laps)
+  if durationFrom and durationTo:
+    checkLaptimeBetween(laps, durationFrom, durationTo)
 
 
-def checkBestLaps(laps, total, indexMap, numberMap):
+def checkBestLaps(laps, total, indexMap, numberMap, category=None, durationFrom=None, durationTo=None):
   checkNumberLaps(laps, total)
   for index, count in indexMap.items():
     checkCountWithLapIndex(laps, index, count)
   for number, count in numberMap.items():
     checkCountWithLapNumber(laps, number, count)
+  if category != None:
+    checkCategory(laps, category)
   checkPilotFilled(laps)
   checkLaptimeFilled(laps)
   checkDeltaBestInIncreasingOrder(laps)
   checkDeltaPreviousFilled(laps)
+  if durationFrom and durationTo:
+    checkLaptimeBetween(laps, durationFrom, durationTo)
 
 
-def checkResults(laps, total, indexMap, numberMap):
+def checkResults(laps, total, indexMap, numberMap, category=None, durationFrom=None, durationTo=None):
   checkNumberLaps(laps, total)
   for index, count in indexMap.items():
     checkCountWithLapIndex(laps, index, count)
@@ -168,3 +174,5 @@ def checkResults(laps, total, indexMap, numberMap):
   checkLaptimeFilled(laps, True)
   checkDeltaBestInIncreasingOrder(laps, True)
   checkDeltaPreviousFilled(laps, True)
+  if durationFrom and durationTo:
+    checkLaptimeBetween(laps, durationFrom, durationTo)
