@@ -2,7 +2,8 @@
     <h3>Create a new LapTime</h3>
     <div class="form-group">
         <div class="col-md-offset-2 col-sm-2">
-            <a id="Create" name="Create" class="btn btn-primary" href="#/LapTimes/new"><span class="glyphicon glyphicon-plus-sign"></span> Create</a>
+            <a id="Create" name="Create" class="btn btn-primary" href="#/LapTimes/new">
+                <span class="glyphicon glyphicon-plus-sign"></span> Create</a>
         </div>
     </div>
 </div>
@@ -10,44 +11,45 @@
 <div>
     <h3>Search for LapTimes</h3>
     <form id="LapTimeSearch" class="form-horizontal">
-        
 
-    <div class="form-group">
-        <label for="pilot" class="col-sm-2 control-label">Pilot</label>
-        <div class="col-sm-10">
-            <select id="pilot" name="pilot" class="form-control" ng-model="search.pilot" ng-options="p as p.id for p in pilotList">
-                <option value="">Choose a Pilot</option>
-            </select>
-        </div>
-    </div>
 
-    <div class="form-group">
-        <label for="startDate" class="col-sm-2 control-label">Start Date</label>
-        <div class="col-sm-10">
-            <input id="startDate" name="startDate" class="form-control" type="text" ng-model="search.startDate" placeholder="Enter the LapTime Start Date"></input>
+        <div class="form-group">
+            <label for="pilot" class="col-sm-2 control-label">Pilot</label>
+            <div class="col-sm-10">
+                <select id="pilot" name="pilot" class="form-control" ng-model="search.pilot" ng-options="p as p.firstName + ' ' + p.lastName for p in pilotList">
+                    <option value="">Choose a Pilot</option>
+                </select>
+            </div>
         </div>
-    </div>
 
-    <div class="form-group">
-        <label for="session" class="col-sm-2 control-label">Session</label>
-        <div class="col-sm-10">
-            <select id="session" name="session" class="form-control" ng-model="search.session" ng-options="s as s.id for s in sessionList">
-                <option value="">Choose a Session</option>
-            </select>
+        <div class="form-group">
+            <label for="startDate" class="col-sm-2 control-label">Start Date</label>
+            <div class="col-sm-10">
+                <input id="startDate" name="startDate" class="form-control" type="text" ng-model="search.startDate" placeholder="Enter the LapTime Start Date"></input>
+            </div>
         </div>
-    </div>
+
+        <div class="form-group">
+            <label for="session" class="col-sm-2 control-label">Session</label>
+            <div class="col-sm-10">
+                <select id="session" name="session" class="form-control" ng-model="search.session" ng-options="s as s.name for s in sessionList">
+                    <option value="">Choose a Session</option>
+                </select>
+            </div>
+        </div>
 
 
 
         <div class="form-group">
             <div class="col-md-offset-2 col-sm-10">
-                <a id="Search" name="Search" class="btn btn-primary" ng-click="performSearch()"><span class="glyphicon glyphicon-search"></span> Search</a>
+                <a id="Search" name="Search" class="btn btn-primary" ng-click="performSearch()">
+                    <span class="glyphicon glyphicon-search"></span> Search</a>
             </div>
         </div>
     </form>
 </div>
 <div id="search-results">
-        <div class="table-responsive">
+    <div class="table-responsive">
         <table class="table table-responsive table-bordered table-striped clearfix">
             <thead>
                 <tr>
@@ -58,15 +60,21 @@
             </thead>
             <tbody id="search-results-body">
                 <tr ng-repeat="result in filteredResults | startFrom:currentPage*pageSize | limitTo:pageSize">
-                        <td><a href="#/LapTimes/edit/{{result.id}}">{{result.pilot.id}}</a></td>
-                    <td><a href="#/LapTimes/edit/{{result.id}}">{{result.startDate}}</a></td>
-                        <td><a href="#/LapTimes/edit/{{result.id}}">{{result.session.id}}</a></td>
+                    <td>
+                        <a href="#/LapTimes/edit/{{result.id}}">{{result.pilot.id}}</a>
+                    </td>
+                    <td>
+                        <a href="#/LapTimes/edit/{{result.id}}">{{result.startDate}}</a>
+                    </td>
+                    <td>
+                        <a href="#/LapTimes/edit/{{result.id}}">{{result.session.id}}</a>
+                    </td>
                 </tr>
             </tbody>
         </table>
     </div>
 
-        <ul class="pagination pagination-centered">
+    <ul class="pagination pagination-centered">
         <li ng-class="{disabled:currentPage == 0}">
             <a id="prev" href ng-click="previous()">«</a>
         </li>

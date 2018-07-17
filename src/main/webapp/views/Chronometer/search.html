@@ -2,7 +2,8 @@
     <h3>Create a new Chronometer</h3>
     <div class="form-group">
         <div class="col-md-offset-2 col-sm-2">
-            <a id="Create" name="Create" class="btn btn-primary" href="#/Chronometers/new"><span class="glyphicon glyphicon-plus-sign"></span> Create</a>
+            <a id="Create" name="Create" class="btn btn-primary" href="#/Chronometers/new">
+                <span class="glyphicon glyphicon-plus-sign"></span> Create</a>
         </div>
     </div>
 </div>
@@ -10,51 +11,56 @@
 <div>
     <h3>Search for Chronometers</h3>
     <form id="ChronometerSearch" class="form-horizontal">
-        
 
-    <div class="form-group">
-        <label for="name" class="col-sm-2 control-label">Name</label>
-        <div class="col-sm-10">
-            <input id="name" name="name" class="form-control" type="text" ng-model="search.name" placeholder="Enter the Chronometer Name"></input>
+
+        <div class="form-group">
+            <label for="name" class="col-sm-2 control-label">Name</label>
+            <div class="col-sm-10">
+                <input id="name" name="name" class="form-control" type="text" ng-model="search.name" placeholder="Enter the Chronometer Name"></input>
+            </div>
         </div>
-    </div>
-
+        <!-- 
     <div class="form-group">
         <label for="chronoIndex" class="col-sm-2 control-label">Chrono Index</label>
         <div class="col-sm-10">
             <input id="chronoIndex" name="chronoIndex" class="form-control" type="text" ng-model="search.chronoIndex" placeholder="Enter the Chronometer Chrono Index"></input>
         </div>
-    </div>
+    </div> -->
 
 
 
 
         <div class="form-group">
             <div class="col-md-offset-2 col-sm-10">
-                <a id="Search" name="Search" class="btn btn-primary" ng-click="performSearch()"><span class="glyphicon glyphicon-search"></span> Search</a>
+                <a id="Search" name="Search" class="btn btn-primary" ng-click="performSearch()">
+                    <span class="glyphicon glyphicon-search"></span> Search</a>
             </div>
         </div>
     </form>
 </div>
 <div id="search-results">
-        <div class="table-responsive">
+    <div class="table-responsive">
         <table class="table table-responsive table-bordered table-striped clearfix">
             <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Chrono Index</th>
+                    <!-- <th>Chrono Index</th> -->
                 </tr>
             </thead>
             <tbody id="search-results-body">
                 <tr ng-repeat="result in filteredResults | startFrom:currentPage*pageSize | limitTo:pageSize">
-                    <td><a href="#/Chronometers/edit/{{result.id}}">{{result.name}}</a></td>
-                    <td><a href="#/Chronometers/edit/{{result.id}}">{{result.chronoIndex}}</a></td>
+                    <td>
+                        <a href="#/Chronometers/edit/{{result.id}}">{{result.name}}</a>
+                    </td>
+                    <!-- <td>
+                        <a href="#/Chronometers/edit/{{result.id}}">{{result.chronoIndex}}</a>
+                    </td> -->
                 </tr>
             </tbody>
         </table>
     </div>
 
-        <ul class="pagination pagination-centered">
+    <ul class="pagination pagination-centered">
         <li ng-class="{disabled:currentPage == 0}">
             <a id="prev" href ng-click="previous()">«</a>
         </li>

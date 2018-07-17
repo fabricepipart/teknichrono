@@ -1,7 +1,7 @@
 package org.trd.app.teknichrono.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,7 +40,7 @@ public class Category implements java.io.Serializable {
   @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true)
   @JoinColumn(name = "categoryId")
   @JsonBackReference(value = "pilot-category")
-  private List<Pilot> pilots = new ArrayList<Pilot>();
+  private Set<Pilot> pilots = new HashSet<>();
 
   @Column(nullable = false)
   private String name;
@@ -61,11 +61,11 @@ public class Category implements java.io.Serializable {
     this.version = version;
   }
 
-  public List<Pilot> getPilots() {
+  public Set<Pilot> getPilots() {
     return this.pilots;
   }
 
-  public void setSPilots(final List<Pilot> pilots) {
+  public void setPilots(final Set<Pilot> pilots) {
     this.pilots = pilots;
   }
 

@@ -3,7 +3,7 @@
     <h3 ng-switch-when="false">View or edit Chronometer</h3>
 </header>
 <form id="ChronometerForm" name="ChronometerForm" class="form-horizontal" role="form">
-    
+
 
     <div class="form-group" ng-class="{'has-error': ChronometerForm.name.$invalid}">
         <label for="name" class="col-sm-2 control-label">Name</label>
@@ -11,7 +11,7 @@
             <input id="name" name="name" type="text" class="form-control" ng-model="chronometer.name" placeholder="Enter the Chronometer Name"></input>
         </div>
     </div>
-
+    <!-- 
     <div class="form-group" ng-class="{'has-error': ChronometerForm.chronoIndex.$invalid}">
         <label for="chronoIndex" class="col-sm-2 control-label">Chrono Index</label>
         <div id="chronoIndexControls" class="col-sm-10">
@@ -36,14 +36,18 @@
                 <option value="">Choose a Sessions</option>
             </select>
         </div>
-    </div>
+    </div> -->
 
 
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
-            <button id="saveChronometer" name="saveChronometer" class="btn btn-primary" ng-disabled="isClean() || ChronometerForm.$invalid" ng-click="save()"><span class="glyphicon glyphicon-ok-sign"></span> Save</button>
-            <button id="cancel" name="cancel" class="btn btn-default" ng-click="cancel()"><span class="glyphicon glyphicon-remove-sign"></span> Cancel</button>
-            <button id="deleteChronometer" name="deleteChronometer" class="btn btn-danger" ng-show="chronometer.id" ng-click="remove()"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+            <button id="saveChronometer" name="saveChronometer" class="btn btn-primary" ng-disabled="isClean() || ChronometerForm.$invalid"
+                ng-click="save()">
+                <span class="glyphicon glyphicon-ok-sign"></span> Save</button>
+            <button id="cancel" name="cancel" class="btn btn-default" ng-click="cancel()">
+                <span class="glyphicon glyphicon-remove-sign"></span> Cancel</button>
+            <button id="deleteChronometer" name="deleteChronometer" class="btn btn-danger" ng-show="chronometer.id" ng-click="remove()">
+                <span class="glyphicon glyphicon-trash"></span> Delete</button>
         </div>
     </div>
 </form>

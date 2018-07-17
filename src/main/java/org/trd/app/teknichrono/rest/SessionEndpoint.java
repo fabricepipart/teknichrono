@@ -32,6 +32,7 @@ import org.trd.app.teknichrono.model.Pilot;
 import org.trd.app.teknichrono.model.Ping;
 import org.trd.app.teknichrono.model.Session;
 import org.trd.app.teknichrono.model.SessionType;
+import org.trd.app.teknichrono.rest.dto.SessionDTO;
 import org.trd.app.teknichrono.util.DurationLogger;
 
 /**
@@ -96,13 +97,14 @@ public class SessionEndpoint {
       return Response.status(Status.NOT_FOUND).build();
     }
     perf.end();
-    return Response.ok(entity).build();
+    SessionDTO dto = new SessionDTO(entity);
+    return Response.ok(dto).build();
   }
 
   @GET
   @Path("/name")
   @Produces("application/json")
-  public Session findSessionByName(@QueryParam("name") String name) {
+  public SessionDTO findSessionByName(@QueryParam("name") String name) {
     DurationLogger perf = DurationLogger.get(logger).start("Find session named " + name);
     TypedQuery<Session> findByNameQuery = em.createQuery(
         "SELECT DISTINCT e FROM Session e LEFT JOIN FETCH e.chronometers WHERE e.name = :name ORDER BY e.id",
@@ -115,12 +117,13 @@ public class SessionEndpoint {
       entity = null;
     }
     perf.end();
-    return entity;
+    SessionDTO dto = new SessionDTO(entity);
+    return dto;
   }
 
   @GET
   @Produces("application/json")
-  public List<Session> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
+  public List<SessionDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
     DurationLogger perf = DurationLogger.get(logger).start("List sessions");
     TypedQuery<Session> findAllQuery = em
         .createQuery("SELECT DISTINCT e FROM Session e LEFT JOIN FETCH e.chronometers ORDER BY e.id", Session.class);
@@ -131,8 +134,9 @@ public class SessionEndpoint {
       findAllQuery.setMaxResults(maxResult);
     }
     final List<Session> results = findAllQuery.getResultList();
+    final List<SessionDTO> converted = SessionDTO.convert(results);
     perf.end();
-    return results;
+    return converted;
   }
 
   @POST
@@ -200,9 +204,10 @@ public class SessionEndpoint {
     if (session.getSessionType() == SessionType.RACE) {
       startRace(session, start.getDateTime());
     }
+    SessionDTO dto = new SessionDTO(session);
     perf.end();
 
-    return Response.ok(session).build();
+    return Response.ok(dto).build();
   }
 
   @POST
@@ -215,9 +220,10 @@ public class SessionEndpoint {
       return Response.status(Status.NOT_FOUND).build();
     }
     endSession(session, new Date(end.getDateTime().getTime()));
+    SessionDTO dto = new SessionDTO(session);
     perf.end();
 
-    return Response.ok(session).build();
+    return Response.ok(dto).build();
   }
 
   private void startSession(Session session, Timestamp timestamp) {

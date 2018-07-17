@@ -22,8 +22,10 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import org.trd.app.teknichrono.model.Beacon;
+import org.trd.app.teknichrono.model.Category;
 import org.trd.app.teknichrono.model.Pilot;
 import org.trd.app.teknichrono.model.Session;
+import org.trd.app.teknichrono.rest.dto.PilotDTO;
 
 /**
  * 
@@ -73,7 +75,8 @@ public class PilotEndpoint {
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    return Response.ok(entity).build();
+    PilotDTO dto = new PilotDTO(entity);
+    return Response.ok(dto).build();
   }
 
   @GET
@@ -94,12 +97,13 @@ public class PilotEndpoint {
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    return Response.ok(entity).build();
+    PilotDTO dto = new PilotDTO(entity);
+    return Response.ok(dto).build();
   }
 
   @GET
   @Produces("application/json")
-  public List<Pilot> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
+  public List<PilotDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
     TypedQuery<Pilot> findAllQuery = em
         .createQuery("SELECT DISTINCT p FROM Pilot p LEFT JOIN FETCH p.currentBeacon ORDER BY p.id", Pilot.class);
     if (startPosition != null) {
@@ -109,7 +113,8 @@ public class PilotEndpoint {
       findAllQuery.setMaxResults(maxResult);
     }
     final List<Pilot> results = findAllQuery.getResultList();
-    return results;
+    final List<PilotDTO> converted = PilotDTO.convert(results);
+    return converted;
   }
 
   @POST
@@ -127,7 +132,8 @@ public class PilotEndpoint {
     pilot.setCurrentBeacon(beacon);
     em.persist(pilot);
     em.persist(beacon);
-    return Response.ok(pilot).build();
+    PilotDTO dto = new PilotDTO(pilot);
+    return Response.ok(dto).build();
   }
 
   @PUT
@@ -140,11 +146,24 @@ public class PilotEndpoint {
     if (id != entity.getId()) {
       return Response.status(Status.CONFLICT).entity(entity).build();
     }
-    if (em.find(Pilot.class, id) == null) {
+    Pilot pilot = em.find(Pilot.class, id);
+    if (pilot == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
+    // Update of category
+    if (entity.getCategory() != null && entity.getCategory().getId() > 0) {
+      Category category = em.find(Category.class, entity.getCategory().getId());
+      pilot.setCategory(category);
+    }
+    // Update of beacon
+    if (entity.getCurrentBeacon() != null && entity.getCurrentBeacon().getId() > 0) {
+      Beacon beacon = em.find(Beacon.class, entity.getCurrentBeacon().getId());
+      pilot.setCurrentBeacon(beacon);
+    }
+    pilot.setFirstName(entity.getFirstName());
+    pilot.setLastName(entity.getLastName());
     try {
-      entity = em.merge(entity);
+      em.persist(pilot);
     } catch (OptimisticLockException e) {
       return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
     }

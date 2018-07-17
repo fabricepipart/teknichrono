@@ -10,6 +10,10 @@ import org.trd.app.teknichrono.model.Session;
 
 public class NestedSessionDTO implements Serializable {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 4519531688362345387L;
   private int id;
   private int version;
   private Date start;

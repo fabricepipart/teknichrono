@@ -23,6 +23,7 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.trd.app.teknichrono.model.Category;
 import org.trd.app.teknichrono.model.Pilot;
+import org.trd.app.teknichrono.rest.dto.CategoryDTO;
 
 /**
  * 
@@ -69,13 +70,14 @@ public class CategoryEndpoint {
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    return Response.ok(entity).build();
+    CategoryDTO dto = new CategoryDTO(entity);
+    return Response.ok(dto).build();
   }
 
   @GET
   @Path("/name")
   @Produces("application/json")
-  public Category findCategoryByName(@QueryParam("name") String name) {
+  public CategoryDTO findCategoryByName(@QueryParam("name") String name) {
     TypedQuery<Category> findByNameQuery = em.createQuery(
         "SELECT DISTINCT e FROM Category e LEFT JOIN FETCH e.pilots WHERE e.name = :name ORDER BY e.id",
         Category.class);
@@ -86,12 +88,13 @@ public class CategoryEndpoint {
     } catch (NoResultException nre) {
       entity = null;
     }
-    return entity;
+    CategoryDTO dto = new CategoryDTO(entity);
+    return dto;
   }
 
   @GET
   @Produces("application/json")
-  public List<Category> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
+  public List<CategoryDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
     TypedQuery<Category> findAllQuery = em
         .createQuery("SELECT DISTINCT e FROM Category e LEFT JOIN FETCH e.pilots ORDER BY e.id", Category.class);
     if (startPosition != null) {
@@ -101,7 +104,8 @@ public class CategoryEndpoint {
       findAllQuery.setMaxResults(maxResult);
     }
     final List<Category> results = findAllQuery.getResultList();
-    return results;
+    final List<CategoryDTO> converted = CategoryDTO.convert(results);
+    return converted;
   }
 
   @POST
@@ -122,25 +126,28 @@ public class CategoryEndpoint {
     for (Pilot c : category.getPilots()) {
       em.persist(c);
     }
-
-    return Response.ok(category).build();
+    CategoryDTO dto = new CategoryDTO(category);
+    return Response.ok(dto).build();
   }
 
   @PUT
   @Path("/{id:[0-9][0-9]*}")
   @Consumes("application/json")
-  public Response update(@PathParam("id") int id, Category entity) {
+  public Response update(@PathParam("id") int id, CategoryDTO entity) {
     if (entity == null) {
       return Response.status(Status.BAD_REQUEST).build();
     }
     if (id != entity.getId()) {
       return Response.status(Status.CONFLICT).entity(entity).build();
     }
-    if (em.find(Category.class, id) == null) {
+    Category category = em.find(Category.class, id);
+    if (category == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
+
+    category = entity.fromDTO(category, em);
     try {
-      entity = em.merge(entity);
+      em.merge(category);
     } catch (OptimisticLockException e) {
       return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
     }

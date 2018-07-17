@@ -2,7 +2,8 @@
     <h3>Create a new Session</h3>
     <div class="form-group">
         <div class="col-md-offset-2 col-sm-2">
-            <a id="Create" name="Create" class="btn btn-primary" href="#/Sessions/new"><span class="glyphicon glyphicon-plus-sign"></span> Create</a>
+            <a id="Create" name="Create" class="btn btn-primary" href="#/Sessions/new">
+                <span class="glyphicon glyphicon-plus-sign"></span> Create</a>
         </div>
     </div>
 </div>
@@ -10,82 +11,83 @@
 <div>
     <h3>Search for Sessions</h3>
     <form id="SessionSearch" class="form-horizontal">
-        
-    <div class="form-group">
-        <label for="event" class="col-sm-2 control-label">Event</label>
-        <div class="col-sm-10">
-            <select id="event" name="event" class="form-control" ng-model="search.event" ng-options="e as e.id for e in eventList">
-                <option value="">Choose a Event</option>
-            </select>
+
+        <div class="form-group">
+            <label for="event" class="col-sm-2 control-label">Event</label>
+            <div class="col-sm-10">
+                <select id="event" name="event" class="form-control" ng-model="search.event" ng-options="e as e.id for e in eventList">
+                    <option value="">Choose a Event</option>
+                </select>
+            </div>
         </div>
-    </div>
 
-    <div class="form-group">
-        <label for="location" class="col-sm-2 control-label">Location</label>
-        <div class="col-sm-10">
-            <select id="location" name="location" class="form-control" ng-model="search.location" ng-options="l as l.id for l in locationList">
-                <option value="">Choose a Location</option>
-            </select>
+        <div class="form-group">
+            <label for="location" class="col-sm-2 control-label">Location</label>
+            <div class="col-sm-10">
+                <select id="location" name="location" class="form-control" ng-model="search.location" ng-options="l as l.id for l in locationList">
+                    <option value="">Choose a Location</option>
+                </select>
+            </div>
         </div>
-    </div>
 
 
 
-    <div class="form-group">
-        <label for="start" class="col-sm-2 control-label">Start</label>
-        <div class="col-sm-10">
-            <input id="start" name="start" class="form-control" type="text" ng-model="search.start" placeholder="Enter the Session Start"></input>
+        <div class="form-group">
+            <label for="start" class="col-sm-2 control-label">Start</label>
+            <div class="col-sm-10">
+                <input id="start" name="start" class="form-control" type="text" ng-model="search.start" placeholder="Enter the Session Start"></input>
+            </div>
         </div>
-    </div>
 
-    <div class="form-group">
-        <label for="end" class="col-sm-2 control-label">End</label>
-        <div class="col-sm-10">
-            <input id="end" name="end" class="form-control" type="text" ng-model="search.end" placeholder="Enter the Session End"></input>
+        <div class="form-group">
+            <label for="end" class="col-sm-2 control-label">End</label>
+            <div class="col-sm-10">
+                <input id="end" name="end" class="form-control" type="text" ng-model="search.end" placeholder="Enter the Session End"></input>
+            </div>
         </div>
-    </div>
 
 
-    <div class="form-group">
-        <label for="name" class="col-sm-2 control-label">Name</label>
-        <div class="col-sm-10">
-            <input id="name" name="name" class="form-control" type="text" ng-model="search.name" placeholder="Enter the Session Name"></input>
+        <div class="form-group">
+            <label for="name" class="col-sm-2 control-label">Name</label>
+            <div class="col-sm-10">
+                <input id="name" name="name" class="form-control" type="text" ng-model="search.name" placeholder="Enter the Session Name"></input>
+            </div>
         </div>
-    </div>
 
-    <div class="form-group">
-        <label for="sessionType" class="col-sm-2 control-label">Session Type</label>
-        <div class="col-sm-10">
-            <select id="sessionType" name="sessionType" class="form-control" ng-model="search.sessionType" ng-options="s as s for s in sessionTypeList">
-                <option value="">Choose a Session Type</option>
-            </select>
+        <div class="form-group">
+            <label for="sessionType" class="col-sm-2 control-label">Session Type</label>
+            <div class="col-sm-10">
+                <select id="sessionType" name="sessionType" class="form-control" ng-model="search.sessionType" ng-options="s as s for s in sessionTypeList">
+                    <option value="">Choose a Session Type</option>
+                </select>
+            </div>
         </div>
-    </div>
 
-    <div class="form-group">
-        <label for="type" class="col-sm-2 control-label">Type</label>
-        <div class="col-sm-10">
-            <input id="type" name="type" class="form-control" type="text" ng-model="search.type" placeholder="Enter the Session Type"></input>
+        <div class="form-group">
+            <label for="type" class="col-sm-2 control-label">Type</label>
+            <div class="col-sm-10">
+                <input id="type" name="type" class="form-control" type="text" ng-model="search.type" placeholder="Enter the Session Type"></input>
+            </div>
         </div>
-    </div>
 
-    <div class="form-group">
-        <label for="inactivity" class="col-sm-2 control-label">Inactivity</label>
-        <div class="col-sm-10">
-            <input id="inactivity" name="inactivity" class="form-control" type="text" ng-model="search.inactivity" placeholder="Enter the Session Inactivity"></input>
+        <div class="form-group">
+            <label for="inactivity" class="col-sm-2 control-label">Inactivity</label>
+            <div class="col-sm-10">
+                <input id="inactivity" name="inactivity" class="form-control" type="text" ng-model="search.inactivity" placeholder="Enter the Session Inactivity"></input>
+            </div>
         </div>
-    </div>
 
 
         <div class="form-group">
             <div class="col-md-offset-2 col-sm-10">
-                <a id="Search" name="Search" class="btn btn-primary" ng-click="performSearch()"><span class="glyphicon glyphicon-search"></span> Search</a>
+                <a id="Search" name="Search" class="btn btn-primary" ng-click="performSearch()">
+                    <span class="glyphicon glyphicon-search"></span> Search</a>
             </div>
         </div>
     </form>
 </div>
 <div id="search-results">
-        <div class="table-responsive">
+    <div class="table-responsive">
         <table class="table table-responsive table-bordered table-striped clearfix">
             <thead>
                 <tr>
@@ -101,20 +103,36 @@
             </thead>
             <tbody id="search-results-body">
                 <tr ng-repeat="result in filteredResults | startFrom:currentPage*pageSize | limitTo:pageSize">
-                        <td><a href="#/Sessions/edit/{{result.id}}">{{result.event.id}}</a></td>
-                        <td><a href="#/Sessions/edit/{{result.id}}">{{result.location.id}}</a></td>
-                    <td><a href="#/Sessions/edit/{{result.id}}">{{result.start}}</a></td>
-                    <td><a href="#/Sessions/edit/{{result.id}}">{{result.end}}</a></td>
-                    <td><a href="#/Sessions/edit/{{result.id}}">{{result.name}}</a></td>
-                    <td><a href="#/Sessions/edit/{{result.id}}">{{result.sessionType}}</a></td>
-                    <td><a href="#/Sessions/edit/{{result.id}}">{{result.type}}</a></td>
-                    <td><a href="#/Sessions/edit/{{result.id}}">{{result.inactivity}}</a></td>
+                    <td>
+                        <a href="#/Sessions/edit/{{result.id}}">{{result.event.name}}</a>
+                    </td>
+                    <td>
+                        <a href="#/Sessions/edit/{{result.id}}">{{result.location.name}}</a>
+                    </td>
+                    <td>
+                        <a href="#/Sessions/edit/{{result.id}}">{{result.start}}</a>
+                    </td>
+                    <td>
+                        <a href="#/Sessions/edit/{{result.id}}">{{result.end}}</a>
+                    </td>
+                    <td>
+                        <a href="#/Sessions/edit/{{result.id}}">{{result.name}}</a>
+                    </td>
+                    <td>
+                        <a href="#/Sessions/edit/{{result.id}}">{{result.sessionType}}</a>
+                    </td>
+                    <td>
+                        <a href="#/Sessions/edit/{{result.id}}">{{result.type}}</a>
+                    </td>
+                    <td>
+                        <a href="#/Sessions/edit/{{result.id}}">{{result.inactivity}}</a>
+                    </td>
                 </tr>
             </tbody>
         </table>
     </div>
 
-        <ul class="pagination pagination-centered">
+    <ul class="pagination pagination-centered">
         <li ng-class="{disabled:currentPage == 0}">
             <a id="prev" href ng-click="previous()">«</a>
         </li>

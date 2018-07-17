@@ -3,7 +3,8 @@
     <h3 ng-switch-when="false">View or edit Pilot</h3>
 </header>
 <form id="PilotForm" name="PilotForm" class="form-horizontal" role="form">
-        <div class="form-group" ng-class="{'has-error': PilotForm.sessions.$invalid}">
+    <!--
+    <div class="form-group" ng-class="{'has-error': PilotForm.sessions.$invalid}">
         <label for="sessions" class="col-sm-2 control-label">Sessions</label>
         <div id="sessionsControls" class="col-sm-10">
             <select id="sessions" name="sessions" multiple class="form-control" ng-model="sessionsSelection" ng-options="s.text for s in sessionsSelectionList">
@@ -11,13 +12,13 @@
             </select>
         </div>
     </div>
-
+-->
     <div class="form-group" ng-class="{'has-error': PilotForm.category.$invalid}">
         <label for="category" class="col-sm-2 control-label">Category</label>
         <div id="categoryControls" class="col-sm-10">
-        <select id="category" name="category" class="form-control" ng-model="categorySelection" ng-options="c.text for c in categorySelectionList"  >
-            <option value="">Choose a Category</option>
-        </select>
+            <select id="category" name="category" class="form-control" ng-model="categorySelection" ng-options="c.text for c in categorySelectionList">
+                <option value="">Choose a Category</option>
+            </select>
         </div>
     </div>
 
@@ -27,7 +28,7 @@
         <label for="firstName" class="col-sm-2 control-label">First Name</label>
         <div id="firstNameControls" class="col-sm-10">
             <input id="firstName" name="firstName" type="text" required class="form-control" ng-model="pilot.firstName" placeholder="Enter the Pilot First Name"></input>
-            <span class="help-block error" ng-show="PilotForm.firstName.$error.required">required</span> 
+            <span class="help-block error" ng-show="PilotForm.firstName.$error.required">required</span>
         </div>
     </div>
 
@@ -35,19 +36,19 @@
         <label for="lastName" class="col-sm-2 control-label">Last Name</label>
         <div id="lastNameControls" class="col-sm-10">
             <input id="lastName" name="lastName" type="text" required class="form-control" ng-model="pilot.lastName" placeholder="Enter the Pilot Last Name"></input>
-            <span class="help-block error" ng-show="PilotForm.lastName.$error.required">required</span> 
+            <span class="help-block error" ng-show="PilotForm.lastName.$error.required">required</span>
         </div>
     </div>
 
     <div class="form-group" ng-class="{'has-error': PilotForm.currentBeacon.$invalid}">
         <label for="currentBeacon" class="col-sm-2 control-label">Current Beacon</label>
         <div id="currentBeaconControls" class="col-sm-10">
-        <select id="currentBeacon" name="currentBeacon" class="form-control" ng-model="currentBeaconSelection" ng-options="c.text for c in currentBeaconSelectionList"  >
-            <option value="">Choose a Current Beacon</option>
-        </select>
+            <select id="currentBeacon" name="currentBeacon" class="form-control" ng-model="currentBeaconSelection" ng-options="c.text for c in currentBeaconSelectionList">
+                <option value="">Choose a Current Beacon</option>
+            </select>
         </div>
     </div>
-
+    <!--
     <div class="form-group" ng-class="{'has-error': PilotForm.laps.$invalid}">
         <label for="laps" class="col-sm-2 control-label">Laps</label>
         <div id="lapsControls" class="col-sm-10">
@@ -56,13 +57,16 @@
             </select>
         </div>
     </div>
-
+-->
 
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
-            <button id="savePilot" name="savePilot" class="btn btn-primary" ng-disabled="isClean() || PilotForm.$invalid" ng-click="save()"><span class="glyphicon glyphicon-ok-sign"></span> Save</button>
-            <button id="cancel" name="cancel" class="btn btn-default" ng-click="cancel()"><span class="glyphicon glyphicon-remove-sign"></span> Cancel</button>
-            <button id="deletePilot" name="deletePilot" class="btn btn-danger" ng-show="pilot.id" ng-click="remove()"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+            <button id="savePilot" name="savePilot" class="btn btn-primary" ng-disabled="isClean() || PilotForm.$invalid" ng-click="save()">
+                <span class="glyphicon glyphicon-ok-sign"></span> Save</button>
+            <button id="cancel" name="cancel" class="btn btn-default" ng-click="cancel()">
+                <span class="glyphicon glyphicon-remove-sign"></span> Cancel</button>
+            <button id="deletePilot" name="deletePilot" class="btn btn-danger" ng-show="pilot.id" ng-click="remove()">
+                <span class="glyphicon glyphicon-trash"></span> Delete</button>
         </div>
     </div>
 </form>

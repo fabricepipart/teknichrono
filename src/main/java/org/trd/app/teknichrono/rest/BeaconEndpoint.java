@@ -21,9 +21,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.Beacon;
 import org.trd.app.teknichrono.model.Pilot;
 import org.trd.app.teknichrono.model.Ping;
+import org.trd.app.teknichrono.rest.dto.BeaconDTO;
+import org.trd.app.teknichrono.util.DurationLogger;
 
 /**
  * 
@@ -31,20 +34,27 @@ import org.trd.app.teknichrono.model.Ping;
 @Stateless(name = "beacons")
 @Path("/beacons")
 public class BeaconEndpoint {
+
+  private Logger logger = Logger.getLogger(BeaconEndpoint.class);
+
   @PersistenceContext(unitName = "teknichrono-persistence-unit")
   private EntityManager em;
 
   @POST
   @Consumes("application/json")
   public Response create(Beacon entity) {
+    DurationLogger perf = DurationLogger.get(logger).start("Create beacon " + entity.getNumber());
     em.persist(entity);
-    return Response.created(UriBuilder.fromResource(BeaconEndpoint.class).path(String.valueOf(entity.getId())).build())
-        .build();
+    Response toReturn = Response
+        .created(UriBuilder.fromResource(BeaconEndpoint.class).path(String.valueOf(entity.getId())).build()).build();
+    perf.end();
+    return toReturn;
   }
 
   @DELETE
   @Path("/{id:[0-9][0-9]*}")
   public Response deleteById(@PathParam("id") int id) {
+    DurationLogger perf = DurationLogger.get(logger).start("Delete beacon id=" + id);
     Beacon entity = em.find(Beacon.class, id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
@@ -62,6 +72,7 @@ public class BeaconEndpoint {
       }
     }
     em.remove(entity);
+    perf.end();
     return Response.noContent().build();
   }
 
@@ -69,14 +80,16 @@ public class BeaconEndpoint {
   @Path("/{id:[0-9][0-9]*}")
   @Produces("application/json")
   public Response findById(@PathParam("id") int id) {
-    Beacon entity = findBeacon(id);
+    DurationLogger perf = DurationLogger.get(logger).start("Find beacon id=" + id);
+    BeaconDTO entity = findBeacon(id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
+    perf.end();
     return Response.ok(entity).build();
   }
 
-  public Beacon findBeacon(int id) {
+  public BeaconDTO findBeacon(int id) {
     TypedQuery<Beacon> findByIdQuery = em
         .createQuery("SELECT DISTINCT b FROM Beacon b WHERE b.id = :entityId ORDER BY b.id", Beacon.class);
     findByIdQuery.setParameter("entityId", id);
@@ -86,13 +99,15 @@ public class BeaconEndpoint {
     } catch (NoResultException nre) {
       entity = null;
     }
-    return entity;
+    BeaconDTO dto = new BeaconDTO(entity);
+    return dto;
   }
 
   @GET
   @Path("/number/{number:[0-9][0-9]*}")
   @Produces("application/json")
-  public Beacon findBeaconNumber(@PathParam("number") int number) {
+  public BeaconDTO findBeaconNumber(@PathParam("number") int number) {
+    DurationLogger perf = DurationLogger.get(logger).start("Find beacon number " + number);
     TypedQuery<Beacon> findByIdQuery = em
         .createQuery("SELECT DISTINCT b FROM Beacon b WHERE b.number = :entityId ORDER BY b.number", Beacon.class);
     findByIdQuery.setParameter("entityId", number);
@@ -102,12 +117,15 @@ public class BeaconEndpoint {
     } catch (NoResultException nre) {
       entity = null;
     }
-    return entity;
+    BeaconDTO dto = new BeaconDTO(entity);
+    perf.end();
+    return dto;
   }
 
   @GET
   @Produces("application/json")
-  public List<Beacon> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
+  public List<BeaconDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
+    DurationLogger perf = DurationLogger.get(logger).start("Find all beacons");
     TypedQuery<Beacon> findAllQuery = em.createQuery("SELECT DISTINCT b FROM Beacon b ORDER BY b.id", Beacon.class);
     if (startPosition != null) {
       findAllQuery.setFirstResult(startPosition);
@@ -116,7 +134,9 @@ public class BeaconEndpoint {
       findAllQuery.setMaxResults(maxResult);
     }
     final List<Beacon> results = findAllQuery.getResultList();
-    return results;
+    final List<BeaconDTO> converted = BeaconDTO.convert(results);
+    perf.end();
+    return converted;
   }
 
   @PUT
@@ -126,18 +146,30 @@ public class BeaconEndpoint {
     if (entity == null) {
       return Response.status(Status.BAD_REQUEST).build();
     }
+    DurationLogger perf = DurationLogger.get(logger).start("Update beacon number " + entity.getNumber());
     if (id != entity.getId()) {
+      perf.end();
       return Response.status(Status.CONFLICT).entity(entity).build();
     }
-    if (em.find(Beacon.class, id) == null) {
+    Beacon beacon = em.find(Beacon.class, id);
+    if (beacon == null) {
+      perf.end();
       return Response.status(Status.NOT_FOUND).build();
     }
+
+    // Update of pilot
+    if (entity.getPilot() != null && entity.getPilot().getId() > 0) {
+      Pilot pilot = em.find(Pilot.class, entity.getPilot().getId());
+      beacon.setPilot(pilot);
+    }
+    beacon.setNumber(entity.getNumber());
     try {
-      entity = em.merge(entity);
+      em.persist(beacon);
     } catch (OptimisticLockException e) {
       return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
     }
 
+    perf.end();
     return Response.noContent().build();
   }
 }

@@ -3,7 +3,7 @@
     <h3 ng-switch-when="false">View or edit Category</h3>
 </header>
 <form id="CategoryForm" name="CategoryForm" class="form-horizontal" role="form">
-    
+
 
     <div class="form-group" ng-class="{'has-error': CategoryForm.pilots.$invalid}">
         <label for="pilots" class="col-sm-2 control-label">Pilots</label>
@@ -18,23 +18,19 @@
         <label for="name" class="col-sm-2 control-label">Name</label>
         <div id="nameControls" class="col-sm-10">
             <input id="name" name="name" type="text" required class="form-control" ng-model="category.name" placeholder="Enter the Category Name"></input>
-            <span class="help-block error" ng-show="CategoryForm.name.$error.required">required</span> 
-        </div>
-    </div>
-
-    <div class="form-group" ng-class="{'has-error': CategoryForm.SPilots.$invalid}">
-        <label for="SPilots" class="col-sm-2 control-label">S Pilots</label>
-        <div id="SPilotsControls" class="col-sm-10">
-            <input id="SPilots" name="SPilots" type="text" class="form-control" ng-model="category.SPilots" placeholder="Enter the Category S Pilots"></input>
+            <span class="help-block error" ng-show="CategoryForm.name.$error.required">required</span>
         </div>
     </div>
 
 
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
-            <button id="saveCategory" name="saveCategory" class="btn btn-primary" ng-disabled="isClean() || CategoryForm.$invalid" ng-click="save()"><span class="glyphicon glyphicon-ok-sign"></span> Save</button>
-            <button id="cancel" name="cancel" class="btn btn-default" ng-click="cancel()"><span class="glyphicon glyphicon-remove-sign"></span> Cancel</button>
-            <button id="deleteCategory" name="deleteCategory" class="btn btn-danger" ng-show="category.id" ng-click="remove()"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+            <button id="saveCategory" name="saveCategory" class="btn btn-primary" ng-disabled="isClean() || CategoryForm.$invalid" ng-click="save()">
+                <span class="glyphicon glyphicon-ok-sign"></span> Save</button>
+            <button id="cancel" name="cancel" class="btn btn-default" ng-click="cancel()">
+                <span class="glyphicon glyphicon-remove-sign"></span> Cancel</button>
+            <button id="deleteCategory" name="deleteCategory" class="btn btn-danger" ng-show="category.id" ng-click="remove()">
+                <span class="glyphicon glyphicon-trash"></span> Delete</button>
         </div>
     </div>
 </form>
