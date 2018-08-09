@@ -1,6 +1,6 @@
 package org.trd.app.teknichrono.model;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -43,13 +43,13 @@ public class Session implements java.io.Serializable {
   private int version;
 
   @Column(nullable = false)
-  private Date start;
+  private Timestamp start;
 
   @Column
-  private long inactivity = 60000L;
+  private long inactivity = 0L;
 
   @Column(nullable = false)
-  private Date end;
+  private Timestamp end;
 
   @Column(nullable = false)
   private String type;
@@ -121,19 +121,19 @@ public class Session implements java.io.Serializable {
     this.version = version;
   }
 
-  public Date getStart() {
+  public Timestamp getStart() {
     return start;
   }
 
-  public void setStart(Date beginning) {
+  public void setStart(Timestamp beginning) {
     this.start = beginning;
   }
 
-  public Date getEnd() {
+  public Timestamp getEnd() {
     return end;
   }
 
-  public void setEnd(Date end) {
+  public void setEnd(Timestamp end) {
     this.end = end;
   }
 

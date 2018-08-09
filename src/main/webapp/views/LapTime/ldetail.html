@@ -1,16 +1,16 @@
-<header ng-switch on="$location.path().indexOf('/LapTimes/new') > -1">
+<header ng-switch on="$location.path().indexOf('/lLapTimes/new') > -1">
     <h3 ng-switch-when="true">Create a new LapTime</h3>
     <h3 ng-switch-when="false">View or edit LapTime</h3>
 </header>
 <form id="LapTimeForm" name="LapTimeForm" class="form-horizontal" role="form">
-    
+
 
     <div class="form-group" ng-class="{'has-error': LapTimeForm.pilot.$invalid}">
         <label for="pilot" class="col-sm-2 control-label">Pilot</label>
         <div id="pilotControls" class="col-sm-10">
-        <select id="pilot" name="pilot" class="form-control" ng-model="pilotSelection" ng-options="p.text for p in pilotSelectionList"  >
-            <option value="">Choose a Pilot</option>
-        </select>
+            <select id="pilot" name="pilot" class="form-control" ng-model="pilotSelection" ng-options="p.text for p in pilotSelectionList">
+                <option value="">Choose a Pilot</option>
+            </select>
         </div>
     </div>
 
@@ -24,9 +24,9 @@
     <div class="form-group" ng-class="{'has-error': LapTimeForm.session.$invalid}">
         <label for="session" class="col-sm-2 control-label">Session</label>
         <div id="sessionControls" class="col-sm-10">
-        <select id="session" name="session" class="form-control" ng-model="sessionSelection" ng-options="s.text for s in sessionSelectionList"  >
-            <option value="">Choose a Session</option>
-        </select>
+            <select id="session" name="session" class="form-control" ng-model="sessionSelection" ng-options="s.text for s in sessionSelectionList">
+                <option value="">Choose a Session</option>
+            </select>
         </div>
     </div>
 
@@ -42,9 +42,12 @@
 
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
-            <button id="saveLapTime" name="saveLapTime" class="btn btn-primary" ng-disabled="isClean() || LapTimeForm.$invalid" ng-click="save()"><span class="glyphicon glyphicon-ok-sign"></span> Save</button>
-            <button id="cancel" name="cancel" class="btn btn-default" ng-click="cancel()"><span class="glyphicon glyphicon-remove-sign"></span> Cancel</button>
-            <button id="deleteLapTime" name="deleteLapTime" class="btn btn-danger" ng-show="lapTime.id" ng-click="remove()"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+            <button id="saveLapTime" name="saveLapTime" class="btn btn-primary" ng-disabled="isClean() || LapTimeForm.$invalid" ng-click="save()">
+                <span class="glyphicon glyphicon-ok-sign"></span> Save</button>
+            <button id="cancel" name="cancel" class="btn btn-default" ng-click="cancel()">
+                <span class="glyphicon glyphicon-remove-sign"></span> Cancel</button>
+            <button id="deleteLapTime" name="deleteLapTime" class="btn btn-danger" ng-show="lapTime.id" ng-click="remove()">
+                <span class="glyphicon glyphicon-trash"></span> Delete</button>
         </div>
     </div>
 </form>

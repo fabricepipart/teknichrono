@@ -35,7 +35,7 @@
     <div class="form-group" ng-class="{'has-error': SessionForm.start.$invalid}">
         <label for="start" class="col-sm-2 control-label">Start</label>
         <div id="startControls" class="col-sm-10">
-            <input id="start" name="start" type="text" required class="form-control" ng-model="session.start" placeholder="Enter the Session Start"></input>
+            <input id="start" name="start" type="text" required class="form-control" ng-model="session.start" placeholder="Enter the Session Start (2019-10-23T14:13:12)"></input>
             <span class="help-block error" ng-show="SessionForm.start.$error.required">required</span>
         </div>
     </div>
@@ -43,7 +43,7 @@
     <div class="form-group" ng-class="{'has-error': SessionForm.end.$invalid}">
         <label for="end" class="col-sm-2 control-label">End</label>
         <div id="endControls" class="col-sm-10">
-            <input id="end" name="end" type="text" required class="form-control" ng-model="session.end" placeholder="Enter the Session End"></input>
+            <input id="end" name="end" type="text" required class="form-control" ng-model="session.end" placeholder="Enter the Session End (2019-10-23T15:14:13)"></input>
             <span class="help-block error" ng-show="SessionForm.end.$error.required">required</span>
         </div>
     </div>
@@ -68,7 +68,7 @@
     <div class="form-group" ng-class="{'has-error': SessionForm.sessionType.$invalid}">
         <label for="sessionType" class="col-sm-2 control-label">Session Type</label>
         <div id="sessionTypeControls" class="col-sm-10">
-            <select id="sessionType" name="sessionType" class="form-control" ng-model="session.sessionType" ng-options="s for s in sessionTypeList">
+            <select id="sessionType" name="sessionType" class="form-control" ng-model="session.type" ng-options="s.short as s.text for s in sessionTypeList">
                 <option value="">Choose a Session Type</option>
             </select>
         </div>

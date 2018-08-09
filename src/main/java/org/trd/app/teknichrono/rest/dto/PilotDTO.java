@@ -26,8 +26,12 @@ public class PilotDTO {
       this.version = entity.getVersion();
       this.firstName = entity.getFirstName();
       this.lastName = entity.getLastName();
-      this.currentBeacon = new NestedBeaconDTO(entity.getCurrentBeacon());
-      this.category = new NestedCategoryDTO(entity.getCategory());
+      if (entity.getCurrentBeacon() != null) {
+        this.currentBeacon = new NestedBeaconDTO(entity.getCurrentBeacon());
+      }
+      if (entity.getCategory() != null) {
+        this.category = new NestedCategoryDTO(entity.getCategory());
+      }
     }
   }
 

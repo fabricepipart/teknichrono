@@ -1,6 +1,5 @@
 package org.trd.app.teknichrono.rest;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
@@ -199,11 +198,13 @@ public class SessionEndpoint {
       return Response.status(Status.NOT_FOUND).build();
     }
 
-    startSession(session, start.getDateTime());
-
-    if (session.getSessionType() == SessionType.RACE) {
-      startRace(session, start.getDateTime());
+    if (!session.isCurrent()) {
+      startSession(session, start.getDateTime());
+      if (session.getSessionType() == SessionType.RACE) {
+        startRace(session, start.getDateTime());
+      }
     }
+
     SessionDTO dto = new SessionDTO(session);
     perf.end();
 
@@ -219,7 +220,7 @@ public class SessionEndpoint {
     if (session == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    endSession(session, new Date(end.getDateTime().getTime()));
+    endSession(session, end.getDateTime());
     SessionDTO dto = new SessionDTO(session);
     perf.end();
 
@@ -227,26 +228,29 @@ public class SessionEndpoint {
   }
 
   private void startSession(Session session, Timestamp timestamp) {
-    Date start = new Date(timestamp.getTime());
     // Stop all other sessions of the event
     Event event = session.getEvent();
     if (event != null) {
       for (Session otherSession : event.getSessions()) {
         if (otherSession.getId() != session.getId() && otherSession.isCurrent()) {
-          endSession(otherSession, start);
+          endSession(otherSession, timestamp);
         }
       }
     }
     // Start this one
-    session.setStart(start);
+    if (session.getStart().getTime() > timestamp.getTime()) {
+      session.setStart(timestamp);
+    }
     session.setCurrent(true);
     em.persist(session);
   }
 
-  private void endSession(Session otherSession, Date start) {
-    otherSession.setEnd(start);
-    otherSession.setCurrent(false);
-    em.persist(otherSession);
+  private void endSession(Session session, Timestamp end) {
+    if (session.getEnd().getTime() < end.getTime()) {
+      session.setEnd(end);
+    }
+    session.setCurrent(false);
+    em.persist(session);
   }
 
   private void startRace(Session session, Timestamp timestamp) {

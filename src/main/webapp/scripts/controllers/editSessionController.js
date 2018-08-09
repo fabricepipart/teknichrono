@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('EditSessionController', function ($scope, $routeParams, $location, flash, SessionResource, PilotResource, EventResource, LocationResource, ChronometerResource) {
+angular.module('frontend').controller('EditSessionController', function ($scope, $filter, $routeParams, $location, flash, SessionResource, PilotResource, EventResource, LocationResource, ChronometerResource) {
     var self = this;
     $scope.disabled = false;
     $scope.$location = $location;
@@ -9,6 +9,10 @@ angular.module('frontend').controller('EditSessionController', function ($scope,
         var successCallback = function (data) {
             self.original = data;
             $scope.session = new SessionResource(self.original);
+            $scope.session.start = $filter('date')(self.original.start, 'yyyy-MM-ddTHH:mm:ss', 'UTC')
+            $scope.session.end = $filter('date')(self.original.end, 'yyyy-MM-ddTHH:mm:ss', 'UTC')
+            $scope.session.pilots = []
+
             PilotResource.queryAll(function (items) {
                 $scope.pilotsSelectionList = $.map(items, function (item) {
                     var wrappedObject = {
@@ -18,14 +22,13 @@ angular.module('frontend').controller('EditSessionController', function ($scope,
                         value: item.id,
                         text: item.firstName + ' ' + item.lastName
                     };
-                    if ($scope.session.pilots) {
-                        $.each($scope.session.pilots, function (idx, element) {
+                    if (self.original.pilots) {
+                        $.each(self.original.pilots, function (idx, element) {
                             if (item.id == element.id) {
                                 $scope.pilotsSelection.push(labelObject);
                                 $scope.session.pilots.push(wrappedObject);
                             }
                         });
-                        self.original.pilots = $scope.session.pilots;
                     }
                     return labelObject;
                 });
@@ -165,9 +168,10 @@ angular.module('frontend').controller('EditSessionController', function ($scope,
             });
         }
     });
+
     $scope.sessionTypeList = [
-        "TIME_TRIAL",
-        "RACE"
+        { key: "TIME_TRIAL", short: "tt", text: "Time trial" },
+        { key: "RACE", short: "rc", text: "Race" }
     ];
 
     $scope.get();

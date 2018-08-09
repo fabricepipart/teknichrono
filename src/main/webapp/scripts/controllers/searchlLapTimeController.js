@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('SearchSessionController', function ($scope, $http, $filter, SessionResource, PilotResource, EventResource, LocationResource, ChronometerResource) {
+angular.module('frontend').controller('SearchlLapTimeController', function ($scope, $http, $filter, LapTimeResource, PilotResource, SessionResource, PingResource) {
 
     $scope.search = {};
     $scope.currentPage = 0;
@@ -8,7 +8,6 @@ angular.module('frontend').controller('SearchSessionController', function ($scop
     $scope.searchResults = [];
     $scope.filteredResults = [];
     $scope.pageRange = [];
-    $scope.sessionType = {};
     $scope.numberOfPages = function () {
         var result = Math.ceil($scope.filteredResults.length / $scope.pageSize);
         var max = (result == 0) ? 1 : result;
@@ -18,15 +17,11 @@ angular.module('frontend').controller('SearchSessionController', function ($scop
         }
         return max;
     };
-    $scope.eventList = EventResource.queryAll();
-    $scope.locationList = LocationResource.queryAll();
-    $scope.sessionTypeList = [
-        { key: "TIME_TRIAL", short: "tt", text: "Time trial" },
-        { key: "RACE", short: "rc", text: "Race" }
-    ];
+    $scope.pilotList = PilotResource.queryAll();
+    $scope.sessionList = SessionResource.queryAll();
 
     $scope.performSearch = function () {
-        $scope.searchResults = SessionResource.queryAll(function () {
+        $scope.searchResults = LapTimeResource.queryAll(function () {
             $scope.filteredResults = $filter('searchFilter')($scope.searchResults, $scope);
             $scope.currentPage = 0;
         });

@@ -52,9 +52,13 @@ angular.module('frontend').controller('EditPilotController', function ($scope, $
                     var wrappedObject = {
                         id: item.id
                     };
+                    beaconText = item.number
+                    if (item.pilot.id > 0) {
+                        beaconText = item.number + ' (' + item.pilot.firstName + ' ' + item.pilot.lastName + ')'
+                    }
                     var labelObject = {
                         value: item.id,
-                        text: item.number
+                        text: beaconText
                     };
                     if ($scope.pilot.currentBeacon && item.id == $scope.pilot.currentBeacon.id) {
                         $scope.currentBeaconSelection = labelObject;

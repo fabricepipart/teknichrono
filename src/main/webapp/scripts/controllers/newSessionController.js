@@ -73,8 +73,8 @@ angular.module('frontend').controller('NewSessionController', function ($scope, 
     });
 
     $scope.sessionTypeList = [
-        "TIME_TRIAL",
-        "RACE"
+        { key: "TIME_TRIAL", short: "tt", text: "Time trial" },
+        { key: "RACE", short: "rc", text: "Race" }
     ];
 
 
