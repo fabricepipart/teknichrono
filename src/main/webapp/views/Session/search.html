@@ -97,6 +97,7 @@
                     <th>Session Type</th>
                     <th>Event</th>
                     <th>Location</th>
+                    <th>Ongoing</th>
                 </tr>
             </thead>
             <tbody id="search-results-body">
@@ -119,6 +120,9 @@
                     </td>
                     <td>
                         <a href="#/Sessions/edit/{{result.id}}">{{result.location.name}}</a>
+                    </td>
+                    <td>
+                        <a href="#/Sessions/edit/{{result.id}}">{{result.current}}</a>
                     </td>
                 </tr>
             </tbody>

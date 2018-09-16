@@ -12,6 +12,7 @@ angular.module('frontend').controller('EditSessionController', function ($scope,
             $scope.session.start = $filter('date')(self.original.start, 'yyyy-MM-ddTHH:mm:ss', 'UTC')
             $scope.session.end = $filter('date')(self.original.end, 'yyyy-MM-ddTHH:mm:ss', 'UTC')
             $scope.session.pilots = []
+            $scope.session.chronometers = []
 
             PilotResource.queryAll(function (items) {
                 $scope.pilotsSelectionList = $.map(items, function (item) {
@@ -76,14 +77,13 @@ angular.module('frontend').controller('EditSessionController', function ($scope,
                         value: item.id,
                         text: item.name
                     };
-                    if ($scope.session.chronometers) {
-                        $.each($scope.session.chronometers, function (idx, element) {
+                    if (self.original.chronometers) {
+                        $.each(self.original.chronometers, function (idx, element) {
                             if (item.id == element.id) {
                                 $scope.chronometersSelection.push(labelObject);
                                 $scope.session.chronometers.push(wrappedObject);
                             }
                         });
-                        self.original.chronometers = $scope.session.chronometers;
                     }
                     return labelObject;
                 });
@@ -98,6 +98,10 @@ angular.module('frontend').controller('EditSessionController', function ($scope,
 
     $scope.isClean = function () {
         return angular.equals(self.original, $scope.session);
+    };
+
+    $scope.isCreation = function () {
+        return $location.path().indexOf('/Sessions/new') > -1;
     };
 
     $scope.save = function () {
@@ -117,6 +121,12 @@ angular.module('frontend').controller('EditSessionController', function ($scope,
 
     $scope.cancel = function () {
         $location.path("/Sessions");
+    };
+
+    $scope.startSession = function () {
+        var now = $filter('date')(new Date(), 'yyyy-MM-ddTHH:mm:ss', 'UTC')
+        SessionResource.start({ id: $routeParams.SessionId, dateTime: now });
+        //$location.path("/Sessions");
     };
 
     $scope.remove = function () {

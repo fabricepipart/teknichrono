@@ -99,6 +99,8 @@
                 <span class="glyphicon glyphicon-remove-sign"></span> Cancel</button>
             <button id="deleteSession" name="deleteSession" class="btn btn-danger" ng-show="session.id" ng-click="remove()">
                 <span class="glyphicon glyphicon-trash"></span> Delete</button>
+            <button id="startSession" name="startSession" class="btn btn-primary" ng-disabled="!isCreation" ng-click="startSession()">
+                <span class="glyphicon glyphicon-ok-sign"></span> Start</button>
         </div>
     </div>
 </form>

@@ -199,7 +199,7 @@ angular.module('frontend').controller('LapTimeController', function ($scope, $lo
         $scope.currentPage = n;
     };
     $scope.cancel = function () {
-        $location.path('/LapTimes');
+        $location.path('/LapTimes?');
     };
 
     $scope.performSearch();

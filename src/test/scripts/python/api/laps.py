@@ -60,13 +60,11 @@ def getLaps(locationId=None, eventId=None, categoryId=None, option=''):
 
 def getBestLapsForSession(sessionId, categoryId=None, option=''):
   laps = getLapsForSession(sessionId, categoryId, '/best')
-  printLaps(laps, True)
   return laps
 
 
 def getResultsForSession(sessionId, categoryId=None, option=''):
   laps = getLapsForSession(sessionId, categoryId, '/results')
-  printLaps(laps, True)
   return laps
 
 
@@ -86,7 +84,8 @@ def printLaps(laps, withDates=False):
   for lap in laps:
     maxSectors = max(maxSectors, len(lap['intermediates']))
   #print("Max Sectors = "+ str(maxSectors))
-  headers = ['#']
+  headers = ['']
+  headers.append('#')
   if withDates:
     headers.append('Start')
     headers.append('End')
@@ -119,6 +118,7 @@ def printLaps(laps, withDates=False):
     lapIndex = str(lap['lapIndex']) + '/' + str(lap['lapNumber'])
     lapTime = pretty_time_delta(lap['duration'])
     lapRow = [str(rowIndex)]
+    lapRow.append(str(lap['pilot']['beaconNumber']))
     if withDates:
       lapRow.append(startDate)
       lapRow.append(endDate)

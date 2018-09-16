@@ -2,14 +2,24 @@
     <h3>Search for Chronos Results</h3>
     <form id="LapTimeSearch" class="form-horizontal">
 
+
         <div class="form-group" ng-class="{'has-error': LapTimeSearch.searchType.$invalid}">
+            <label for="searchType" class="col-sm-2 control-label">Search Type</label>
+            <div id="searchTypeControls" class="col-sm-10">
+                <input type="radio" class="radio-inline" ng-model="searchTypeSelection" value="" name="searchType" ng-value="searchesTypesList[0]"> {{searchesTypesList[0].text}}
+                <input type="radio" class="radio-inline" ng-model="searchTypeSelection" value="" name="searchType" ng-value="searchesTypesList[1]"> {{searchesTypesList[1].text}}
+                <input type="radio" class="radio-inline" ng-model="searchTypeSelection" value="" name="searchType" ng-value="searchesTypesList[2]"> {{searchesTypesList[2].text}}
+            </div>
+        </div>
+
+        <!--div class="form-group" ng-class="{'has-error': LapTimeSearch.searchType.$invalid}">
             <label for="searchType" class="col-sm-2 control-label">Search Type</label>
             <div id="searchTypeControls" class="col-sm-10">
                 <select id="searchType" name="searchType" class="form-control" ng-model="searchTypeSelection" ng-options="s.text for s in searchesTypesList">
                     <option value="">Choose a Search Type</option>
                 </select>
             </div>
-        </div>
+        </div-->
 
         <div class="form-group" ng-class="{'has-error': LapTimeSearch.session.$invalid}">
             <label for="session" class="col-sm-2 control-label">Session</label>
@@ -39,7 +49,7 @@
         </div>
 
         <div class="form-group" ng-class="{'has-error': LapTimeSearch.pilot.$invalid}">
-            <label for="pilot" class="col-sm-2 control-label">Associated Pilot</label>
+            <label for="pilot" class="col-sm-2 control-label">Pilot</label>
             <div id="pilotControls" class="col-sm-10">
                 <select id="pilot" name="pilot" class="form-control" ng-model="pilotSelection" ng-options="p.text for p in pilotSelectionList">
                     <option value="">Choose a Pilot</option>
