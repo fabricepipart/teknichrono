@@ -46,13 +46,13 @@
                             <a class="list-group-item" ng-class="{active: matchesRoute('Pilots')}" href="#/Pilots" data-toggle="offcanvas">Pilots</a>
                             <!--a class="list-group-item" ng-class="{active: matchesRoute('Pings')}" href="#/Pings" data-toggle="offcanvas">Pings</a-->
                             <a class="list-group-item" ng-class="{active: matchesRoute('Sessions')}" href="#/Sessions" data-toggle="offcanvas">Sessions</a>
+                            <a class="list-group-item" ng-class="{active: matchesRoute('StartLapTime')}" href="#/StartLapTime" data-toggle="offcanvas">Start</a>
                         </div>
                     </nav>
                 </div>
                 <!-- main area-->
                 <div class="col-sm-offset-1 col-xs-12 col-sm-8 well mainarea">
-                    <div ng-controller="FlashController" class="alert alert-dismissible" ng-class="'alert-' + flash.getMessage().cssClass" role="alert"
-                        ng-show="showAlert">
+                    <div ng-controller="FlashController" class="alert alert-dismissible" ng-class="'alert-' + flash.getMessage().cssClass" role="alert" ng-show="showAlert">
                         <button type="button" class="close" ng-click="hideAlert()" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -129,6 +129,7 @@
     <script src="scripts/controllers/searchSessionController.js"></script>
     <script src="scripts/controllers/editSessionController.js"></script>
     <script src="scripts/controllers/searchLapTimeController.js"></script>
+    <script src="scripts/controllers/startLapTimeController.js"></script>
 </body>
 
 </html>

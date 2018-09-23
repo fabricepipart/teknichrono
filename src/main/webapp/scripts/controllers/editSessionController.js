@@ -124,10 +124,16 @@ angular.module('frontend').controller('EditSessionController', function ($scope,
     };
 
     $scope.startSession = function () {
-        var now = $filter('date')(new Date(), 'yyyy-MM-ddTHH:mm:ss', 'UTC')
+        var now = $filter('date')(new Date(), 'yyyy-MM-ddTHH:mm:ss.sss', 'UTC')
         SessionResource.start({ id: $routeParams.SessionId, dateTime: now });
-        //$location.path("/Sessions");
     };
+
+    $scope.endSession = function () {
+        var now = $filter('date')(new Date(), 'yyyy-MM-ddTHH:mm:ss.sss', 'UTC')
+        SessionResource.end({ id: $routeParams.SessionId, dateTime: now });
+    };
+
+
 
     $scope.remove = function () {
         var successCallback = function () {
