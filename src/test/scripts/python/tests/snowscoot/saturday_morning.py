@@ -20,7 +20,7 @@ class SaturdayMorningTest:
     self.openPilots = self.championship.openPilots
     self.womanPilots = self.championship.womanPilots
     self.juniorPilots = self.championship.juniorPilots
-    self.valette = self.championship.valette
+    self.mercantour = self.championship.mercantour
     self.satDerby1Elite = SessionSimulator()
     self.satDerby1Open = SessionSimulator()
     self.satDerby1Woman = SessionSimulator()
@@ -30,13 +30,13 @@ class SaturdayMorningTest:
     # Add sessions
     print("---- Create session of Saturday morning ----")
     chronos = [self.fake1, self.chrono]
-    self.satDerby1Elite.create('Sat Derby 1 - Elite', datetime(2000, 1, 2, 10, 5), datetime(2000, 1, 2, 10, 10), 'rc', self.valette, self.championship.event, chronos, self.beacons,
-                               self.elitePilots)
-    self.satDerby1Open.create('Sat Derby 1 - Open', datetime(2000, 1, 2, 10, 15), datetime(2000, 1, 2, 10, 20), 'rc', self.valette, self.championship.event, chronos, self.beacons,
-                              self.openPilots)
-    self.satDerby1Woman.create('Sat Derby 1 - Woman', datetime(2000, 1, 2, 10, 25), datetime(2000, 1, 2, 10, 30), 'rc', self.valette, self.championship.event, chronos,
+    self.satDerby1Elite.create('Sat Derby 1 - Elite', datetime(2000, 1, 2, 10, 5), datetime(2000, 1, 2, 10, 10), 'rc', self.mercantour, self.championship.event, chronos,
+                               self.beacons, self.elitePilots)
+    self.satDerby1Open.create('Sat Derby 1 - Open', datetime(2000, 1, 2, 10, 15), datetime(2000, 1, 2, 10, 20), 'rc', self.mercantour, self.championship.event, chronos,
+                              self.beacons, self.openPilots)
+    self.satDerby1Woman.create('Sat Derby 1 - Woman', datetime(2000, 1, 2, 10, 25), datetime(2000, 1, 2, 10, 30), 'rc', self.mercantour, self.championship.event, chronos,
                                self.beacons, self.womanPilots)
-    self.satDerby1Junior.create('Sat Derby 1 - Junior', datetime(2000, 1, 2, 10, 35), datetime(2000, 1, 2, 10, 40), 'rc', self.valette, self.championship.event, chronos,
+    self.satDerby1Junior.create('Sat Derby 1 - Junior', datetime(2000, 1, 2, 10, 35), datetime(2000, 1, 2, 10, 40), 'rc', self.mercantour, self.championship.event, chronos,
                                 self.beacons, self.juniorPilots)
 
   def test(self):

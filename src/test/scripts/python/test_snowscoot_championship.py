@@ -32,3 +32,8 @@ print("-------------------------------------")
 print("Saturday afternoon")
 print("-------------------------------------")
 championship.testSaturdayAfternoon()
+
+print("-------------------------------------")
+print("Sunday morning")
+print("-------------------------------------")
+championship.testSundayMorning()

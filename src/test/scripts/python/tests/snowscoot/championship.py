@@ -11,6 +11,7 @@ from tests.snowscoot.friday_morning import FridayMorningTest
 from tests.snowscoot.friday_afternoon import FridayAfternoonTest
 from tests.snowscoot.saturday_morning import SaturdayMorningTest
 from tests.snowscoot.saturday_afternoon import SaturdayAfternoonTest
+from tests.snowscoot.sunday_morning import SundayMorningTest
 
 
 class ChampionshipTest:
@@ -61,6 +62,11 @@ class ChampionshipTest:
     saturdayAfternoonTest = SaturdayAfternoonTest(self)
     saturdayAfternoonTest.createSessions()
     saturdayAfternoonTest.test()
+
+  def testSundayMorning(self):
+    sundayMorningTest = SundayMorningTest(self)
+    sundayMorningTest.createSessions()
+    sundayMorningTest.test()
 
   def createEvent(self):
     # Add Events

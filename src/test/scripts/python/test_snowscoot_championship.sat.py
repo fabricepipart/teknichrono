@@ -11,7 +11,7 @@ championship.prepare()
 print("-------------------------------------")
 print("Saturday morning")
 print("-------------------------------------")
-championship.testSaturdayMorning()
+#championship.testSaturdayMorning()
 
 print("-------------------------------------")
 print("Saturday afternoon")
