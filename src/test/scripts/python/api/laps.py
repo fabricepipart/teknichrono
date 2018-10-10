@@ -55,6 +55,7 @@ def getLaps(locationId=None, eventId=None, categoryId=None, option=''):
   if locationId or eventIdOption:
     url = url + '?' + str(locationIdOption) + str(eventIdOption) + str(categoryIdOption)
   lapsResponse = get(url)
+  printLaps(lapsResponse, True)
   return lapsResponse
 
 

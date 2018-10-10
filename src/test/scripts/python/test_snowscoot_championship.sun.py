@@ -10,11 +10,6 @@ championship.prepare()
 championship.testThursdayEvening()
 
 print("-------------------------------------")
-print("Saturday morning")
+print("Sunday morning")
 print("-------------------------------------")
-championship.testSaturdayMorning()
-
-print("-------------------------------------")
-print("Saturday afternoon")
-print("-------------------------------------")
-championship.testSaturdayAfternoon()
+championship.testSundayMorning()

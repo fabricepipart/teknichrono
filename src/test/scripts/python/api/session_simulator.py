@@ -44,6 +44,7 @@ class SessionSimulator:
     for pilot in self.pilots:
       beaconNumber = None
       # Because the structure might come from different sources. Still not very smart
+      print(str(pilot))
       #TODO Improve and insure always same structure is passed
       if 'currentBeacon' in pilot:
         beaconNumber = pilot['currentBeacon']['number']
