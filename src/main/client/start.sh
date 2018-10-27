@@ -10,7 +10,7 @@ export CHRONO_NAME="Raspberry-0"
 # FIRST / MID / HIGH / LAST
 export PING_SELECTION_STRATEGY="FIRST"
 # NONE / STORE / RESEND / SYNC / ASYNC
-export PING_SEND_STRATEGY="NONE"
+export PING_SEND_STRATEGY="SYNC"
 # Time after which we can take the MID or HIGH value of teh window
 export WINDOW="5"
 # Time during which we won't take a new value if it comes

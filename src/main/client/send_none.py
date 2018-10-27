@@ -5,4 +5,4 @@ import datetime
 
 class SendNoneStrategy:
   def send(self, sendme):
-    print(str(datetime.datetime.now()) + '\t Send Ping : ' + str(sendme))
+    print(str(datetime.datetime.now()) + '[NOSEND]\tPing : ' + str(sendme))

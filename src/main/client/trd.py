@@ -7,6 +7,7 @@ import datetime
 from bluetooth_scanner import BluetoothScanner
 from select_first import SelectFirstStrategy
 from send_none import SendNoneStrategy
+from send_sync import SendSyncStrategy
 from chrono import Chronometer
 
 DEBUG = (os.getenv('TEKNICHRONO_DEBUG', 'false') == 'true')
@@ -41,8 +42,8 @@ def getSelectionStrategy(key):
   return switcher.get(key)
 
 
-def getSendStrategy(key):
-  switcher = {'NONE': SendNoneStrategy()}
+def getSendStrategy(key, chronoId):
+  switcher = {'NONE': SendNoneStrategy(), 'SYNC': SendSyncStrategy(TEKNICHRONO_SERVER, chronoId)}
   # Get the function from switcher dictionary
   return switcher.get(key)
 
@@ -50,7 +51,7 @@ def getSendStrategy(key):
 chrono = Chronometer(CHRONO_NAME, TEKNICHRONO_SERVER)
 print('Using Chronometer ID=' + str(chrono.id))
 selectionStrategy = getSelectionStrategy(PING_SELECTION_STRATEGY)
-sendStrategy = getSendStrategy(PING_SEND_STRATEGY)
+sendStrategy = getSendStrategy(PING_SEND_STRATEGY, chrono.id)
 
 while True:
   current = scanner.scan()
