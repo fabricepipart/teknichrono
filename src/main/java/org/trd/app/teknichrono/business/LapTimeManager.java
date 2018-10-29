@@ -36,22 +36,24 @@ public class LapTimeManager {
       LapTimeDTO dto = new LapTimeDTO(searchResult);
       NestedSessionDTO session = dto.getSession();
       NestedPilotDTO pilot = dto.getPilot();
-      LapTimeDTO lastPilotLap = null;
-      List<LapTimeDTO> lapsOfPilot = lapsPerPilot.get(pilot.getId());
-      if (lapsOfPilot != null && lapsOfPilot.size() > 0) {
-        lastPilotLap = lapsOfPilot.get(lapsOfPilot.size() - 1);
-      } else {
-        lapsOfPilot = new ArrayList<>();
-        lapsPerPilot.put(pilot.getId(), lapsOfPilot);
-      }
-      if (session.isLoopTrack() && lastPilotLap != null && lastPilotLap.getSession().getId() == session.getId()) {
-        Timestamp startDate = dto.getStartDate();
-        if (startDate != null && startDate.getTime() > 0) {
-          logger.debug("Add last sector to lap " + lastPilotLap + " because we now found " + dto);
-          lastPilotLap.addLastSector(startDate);
+      if (pilot != null) {
+        LapTimeDTO lastPilotLap = null;
+        List<LapTimeDTO> lapsOfPilot = lapsPerPilot.get(pilot.getId());
+        if (lapsOfPilot != null && lapsOfPilot.size() > 0) {
+          lastPilotLap = lapsOfPilot.get(lapsOfPilot.size() - 1);
+        } else {
+          lapsOfPilot = new ArrayList<>();
+          lapsPerPilot.put(pilot.getId(), lapsOfPilot);
         }
+        if (session.isLoopTrack() && lastPilotLap != null && lastPilotLap.getSession().getId() == session.getId()) {
+          Timestamp startDate = dto.getStartDate();
+          if (startDate != null && startDate.getTime() > 0) {
+            logger.debug("Add last sector to lap " + lastPilotLap + " because we now found " + dto);
+            lastPilotLap.addLastSector(startDate);
+          }
+        }
+        lapsOfPilot.add(dto);
       }
-      lapsOfPilot.add(dto);
       results.add(dto);
     }
     return results;

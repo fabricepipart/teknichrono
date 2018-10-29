@@ -21,11 +21,11 @@
             </div>
         </div-->
 
-        <div class="form-group" ng-class="{'has-error': LapTimeSearch.session.$invalid}">
-            <label for="session" class="col-sm-2 control-label">Session</label>
-            <div id="sessionControls" class="col-sm-10">
-                <select id="session" name="session" class="form-control" ng-model="sessionSelection" ng-options="s.text for s in sessionSelectionList">
-                    <option value="">Choose a Session</option>
+        <div class="form-group" ng-class="{'has-error': LapTimeSearch.event.$invalid}">
+            <label for="event" class="col-sm-2 control-label">Event</label>
+            <div id="eventControls" class="col-sm-10">
+                <select id="event" name="event" class="form-control" ng-model="eventSelection" ng-options="e.text for e in eventSelectionList">
+                    <option value="">Choose a Event</option>
                 </select>
             </div>
         </div>
@@ -39,20 +39,11 @@
             </div>
         </div>
 
-        <div class="form-group" ng-class="{'has-error': LapTimeSearch.event.$invalid}">
-            <label for="event" class="col-sm-2 control-label">Event</label>
-            <div id="eventControls" class="col-sm-10">
-                <select id="event" name="event" class="form-control" ng-model="eventSelection" ng-options="e.text for e in eventSelectionList">
-                    <option value="">Choose a Event</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="form-group" ng-class="{'has-error': LapTimeSearch.pilot.$invalid}">
-            <label for="pilot" class="col-sm-2 control-label">Pilot</label>
-            <div id="pilotControls" class="col-sm-10">
-                <select id="pilot" name="pilot" class="form-control" ng-model="pilotSelection" ng-options="p.text for p in pilotSelectionList">
-                    <option value="">Choose a Pilot</option>
+        <div class="form-group" ng-class="{'has-error': LapTimeSearch.session.$invalid}">
+            <label for="session" class="col-sm-2 control-label">Session</label>
+            <div id="sessionControls" class="col-sm-10">
+                <select id="session" name="session" class="form-control" ng-model="sessionSelection" ng-options="s.text for s in sessionSelectionList">
+                    <option value="">Choose a Session</option>
                 </select>
             </div>
         </div>
@@ -62,6 +53,15 @@
             <div id="categoryControls" class="col-sm-10">
                 <select id="category" name="category" class="form-control" ng-model="categorySelection" ng-options="c.text for c in categorySelectionList">
                     <option value="">Choose a Category</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group" ng-class="{'has-error': LapTimeSearch.pilot.$invalid}">
+            <label for="pilot" class="col-sm-2 control-label">Pilot</label>
+            <div id="pilotControls" class="col-sm-10">
+                <select id="pilot" name="pilot" class="form-control" ng-model="pilotSelection" ng-options="p.text for p in pilotSelectionList">
+                    <option value="">Choose a Pilot</option>
                 </select>
             </div>
         </div>

@@ -45,7 +45,8 @@ angular.module('frontend').controller('LapTimeController', function ($scope, $lo
                 value: item.id,
                 text: item.name,
                 locationId: item.location.id,
-                eventId: item.event.id
+                eventId: item.event.id,
+                current: item.current
             });
         });
     });
@@ -56,6 +57,9 @@ angular.module('frontend').controller('LapTimeController', function ($scope, $lo
             $scope.locationSelection = $filter("filter")($scope.locationSelectionList, { value: selection.locationId })[0];
             $scope.eventSelection = $filter("filter")($scope.eventSelectionList, { value: selection.eventId })[0];
             $scope.performSearch();
+            if (selection.current == 'true') {
+                $interval($scope.reload, 2000);
+            }
         }
     });
 

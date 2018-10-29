@@ -2,7 +2,9 @@
 
 * [Project home](https://github.com/fabricepipart/teknichrono)
 * [Alternative home](https://bitbucket.org/trdteam/teknichrono/overview)
-* [Entry point](http://teknichrono-fabrice-pipart-stage.b542.starter-us-east-2a.openshiftapps.com/app.html#/Events)
+* [Staging](http://teknichrono-fabrice-pipart-stage.b542.starter-us-east-2a.openshiftapps.com/)
+* [Prod](http://frontend-fabrice-pipart-run.b542.starter-us-east-2a.openshiftapps.com/)
+* [Jenkins](https://jenkins.openshift.io/job/fabricepipart/job/teknichrono/)
 * [OpenShift](https://console.starter-us-east-2a.openshift.com/console/project/fabrice-pipart/browse/pipelines)
 
 ## Description

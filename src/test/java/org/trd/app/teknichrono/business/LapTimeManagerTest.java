@@ -303,6 +303,9 @@ public class LapTimeManagerTest {
     ping.setChrono(chrono);
     ping.setDateTime(time);
     laptime.addIntermediates(ping);
+    Pilot p = new Pilot();
+    p.setId(1);
+    laptime.setPilot(p);
 
     Session session = new Session();
     session.addChronometer(chrono);
