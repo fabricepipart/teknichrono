@@ -42,8 +42,12 @@ public class SessionDTO {
       this.type = entity.getType();
       this.current = entity.isCurrent();
       this.name = entity.getName();
-      this.location = new NestedLocationDTO(entity.getLocation());
-      this.event = new NestedEventDTO(entity.getEvent());
+      if (entity.getLocation() != null) {
+        this.location = new NestedLocationDTO(entity.getLocation());
+      }
+      if (entity.getEvent() != null) {
+        this.event = new NestedEventDTO(entity.getEvent());
+      }
       this.pilots = new HashSet<>();
       if (entity.getPilots() != null) {
         for (Pilot p : entity.getPilots()) {

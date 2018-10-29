@@ -41,7 +41,7 @@ angular.module('frontend').controller('NewPilotController', function ($scope, $l
     $scope.currentBeaconList = BeaconResource.queryAll(function (items) {
         $scope.currentBeaconSelectionList = $.map(items, function (item) {
             beaconText = item.number
-            if (item.pilot.id > 0) {
+            if (item.pilot && item.pilot.id > 0) {
                 beaconText = item.number + ' (' + item.pilot.firstName + ' ' + item.pilot.lastName + ')'
             }
             return ({

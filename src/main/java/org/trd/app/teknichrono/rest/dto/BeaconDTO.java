@@ -25,7 +25,9 @@ public class BeaconDTO {
       this.id = entity.getId();
       this.version = entity.getVersion();
       this.number = entity.getNumber();
-      this.pilot = new NestedPilotDTO(entity.getPilot());
+      if (entity.getPilot() != null) {
+        this.pilot = new NestedPilotDTO(entity.getPilot());
+      }
     }
   }
 

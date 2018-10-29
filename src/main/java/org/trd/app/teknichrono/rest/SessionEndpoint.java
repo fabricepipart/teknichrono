@@ -27,6 +27,7 @@ import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.business.ChronoManager;
 import org.trd.app.teknichrono.model.Chronometer;
 import org.trd.app.teknichrono.model.Event;
+import org.trd.app.teknichrono.model.Location;
 import org.trd.app.teknichrono.model.Pilot;
 import org.trd.app.teknichrono.model.Ping;
 import org.trd.app.teknichrono.model.Session;
@@ -50,6 +51,14 @@ public class SessionEndpoint {
   @Consumes("application/json")
   public Response create(Session entity) {
     DurationLogger perf = DurationLogger.get(logger).start("Create session " + entity.getName());
+    if (entity.getEvent() != null && entity.getEvent().getId() > 0) {
+      Event event = em.find(Event.class, entity.getEvent().getId());
+      entity.setEvent(event);
+    }
+    if (entity.getLocation() != null && entity.getLocation().getId() > 0) {
+      Location loc = em.find(Location.class, entity.getLocation().getId());
+      entity.setLocation(loc);
+    }
     em.persist(entity);
     Response response = Response
         .created(UriBuilder.fromResource(SessionEndpoint.class).path(String.valueOf(entity.getId())).build()).build();

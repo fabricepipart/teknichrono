@@ -44,6 +44,10 @@ public class BeaconEndpoint {
   @Consumes("application/json")
   public Response create(Beacon entity) {
     DurationLogger perf = DurationLogger.get(logger).start("Create beacon " + entity.getNumber());
+    if (entity.getPilot() != null && entity.getPilot().getId() > 0) {
+      Pilot pilot = em.find(Pilot.class, entity.getPilot().getId());
+      entity.setPilot(pilot);
+    }
     em.persist(entity);
     Response toReturn = Response
         .created(UriBuilder.fromResource(BeaconEndpoint.class).path(String.valueOf(entity.getId())).build()).build();
@@ -93,33 +97,34 @@ public class BeaconEndpoint {
     TypedQuery<Beacon> findByIdQuery = em
         .createQuery("SELECT DISTINCT b FROM Beacon b WHERE b.id = :entityId ORDER BY b.id", Beacon.class);
     findByIdQuery.setParameter("entityId", id);
-    Beacon entity;
+    BeaconDTO dto = null;
     try {
-      entity = findByIdQuery.getSingleResult();
+      Beacon entity = findByIdQuery.getSingleResult();
+      dto = new BeaconDTO(entity);
     } catch (NoResultException nre) {
-      entity = null;
+      logger.warn("Beacon ID=" + id + " not found");
     }
-    BeaconDTO dto = new BeaconDTO(entity);
     return dto;
   }
 
   @GET
   @Path("/number/{number:[0-9][0-9]*}")
   @Produces("application/json")
-  public BeaconDTO findBeaconNumber(@PathParam("number") int number) {
+  public Response findBeaconNumber(@PathParam("number") int number) {
     DurationLogger perf = DurationLogger.get(logger).start("Find beacon number " + number);
     TypedQuery<Beacon> findByIdQuery = em
         .createQuery("SELECT DISTINCT b FROM Beacon b WHERE b.number = :entityId ORDER BY b.number", Beacon.class);
     findByIdQuery.setParameter("entityId", number);
-    Beacon entity;
+    BeaconDTO dto = null;
     try {
-      entity = findByIdQuery.getSingleResult();
+      Beacon entity = findByIdQuery.getSingleResult();
+      dto = new BeaconDTO(entity);
     } catch (NoResultException nre) {
-      entity = null;
+      logger.warn("Beacon Number=" + number + " not found");
+      return Response.status(Status.NOT_FOUND).build();
     }
-    BeaconDTO dto = new BeaconDTO(entity);
     perf.end();
-    return dto;
+    return Response.ok(dto).build();
   }
 
   @GET

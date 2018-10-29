@@ -36,6 +36,7 @@
                     </a>
                     <nav class="sidebar-nav" ng-controller="NavController" role="navigation">
                         <div id="sidebar-entries" class="list-group">
+                            <a class="list-group-item" ng-class="{active: matchesRoute('StartLapTime')}" href="#/StartLapTime" data-toggle="offcanvas">Manage sessions</a>
                             <a class="list-group-item" ng-class="{active: matchesRoute('LapTimes')}" href="#/LapTimes" data-toggle="offcanvas">LapTimes</a>
                         </div>
                     </nav>

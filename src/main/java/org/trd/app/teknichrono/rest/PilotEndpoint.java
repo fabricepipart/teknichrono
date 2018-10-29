@@ -39,6 +39,10 @@ public class PilotEndpoint {
   @POST
   @Consumes("application/json")
   public Response create(Pilot entity) {
+    if (entity.getCurrentBeacon() != null && entity.getCurrentBeacon().getId() > 0) {
+      Beacon beacon = em.find(Beacon.class, entity.getCurrentBeacon().getId());
+      entity.setCurrentBeacon(beacon);
+    }
     em.persist(entity);
     return Response.created(UriBuilder.fromResource(PilotEndpoint.class).path(String.valueOf(entity.getId())).build())
         .build();

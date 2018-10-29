@@ -1,8 +1,18 @@
 #!python3
 
+from api.base import *
+
 ChronometersUrl = '/rest/chronometers'
 
+
 # ----------------------------------------------------------------------
+def addChronometer(name):
+  "This adds a Chronometer"
+  data = '{"name":"' + name + '" }'
+  post(data, ChronometersUrl)
+  print("Chronometer " + name + " added")
+  chronometerResponse = getChronometerByName(name)
+  return chronometerResponse
 
 
 def getChronometerByName(name):

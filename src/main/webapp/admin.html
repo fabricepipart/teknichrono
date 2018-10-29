@@ -36,6 +36,16 @@
                     </a>
                     <nav class="sidebar-nav" ng-controller="NavController" role="navigation">
                         <div id="sidebar-entries" class="list-group">
+                            <a class="list-group-item" ng-class="{active: matchesRoute('Beacons')}" href="#/Beacons" data-toggle="offcanvas">Beacons</a>
+                            <a class="list-group-item" ng-class="{active: matchesRoute('Categories')}" href="#/Categories" data-toggle="offcanvas">Categories</a>
+                            <a class="list-group-item" ng-class="{active: matchesRoute('Pilots')}" href="#/Pilots" data-toggle="offcanvas">Pilots</a>
+                            <a class="list-group-item" ng-class="{active: matchesRoute('Locations')}" href="#/Locations" data-toggle="offcanvas">Locations</a>
+                            <a class="list-group-item" ng-class="{active: matchesRoute('Events')}" href="#/Events" data-toggle="offcanvas">Events</a>
+                            <a class="list-group-item" ng-class="{active: matchesRoute('Chronometers')}" href="#/Chronometers" data-toggle="offcanvas">Chronometers</a>
+                            <!--a class="list-group-item" ng-class="{active: matchesRoute('lLapTimes')}" href="#/lLapTimes" data-toggle="offcanvas">lLapTimes</a-->
+                            <!--a class="list-group-item" ng-class="{active: matchesRoute('Pings')}" href="#/Pings" data-toggle="offcanvas">Pings</a-->
+                            <a class="list-group-item" ng-class="{active: matchesRoute('Sessions')}" href="#/Sessions" data-toggle="offcanvas">Sessions</a>
+                            <a class="list-group-item" ng-class="{active: matchesRoute('StartLapTime')}" href="#/StartLapTime" data-toggle="offcanvas">Manage sessions</a>
                             <a class="list-group-item" ng-class="{active: matchesRoute('LapTimes')}" href="#/LapTimes" data-toggle="offcanvas">LapTimes</a>
                         </div>
                     </nav>

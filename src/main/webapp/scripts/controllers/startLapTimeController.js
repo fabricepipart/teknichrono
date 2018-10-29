@@ -26,8 +26,8 @@ angular.module('frontend').controller('StartLapTimeController', function ($scope
         if (typeof selection != 'undefined' && selection) {
             $scope.location = {};
             $scope.location.id = selection.value;
-            $scope.filter();
         }
+        $scope.filterSessions();
     });
     EventResource.queryAll(function (items) {
         $scope.eventSelectionList = $.map(items, function (item) {
@@ -41,8 +41,8 @@ angular.module('frontend').controller('StartLapTimeController', function ($scope
         if (typeof selection != 'undefined' && selection) {
             $scope.event = {};
             $scope.event.id = selection.value;
-            $scope.filter();
         }
+        $scope.filterSessions();
     });
 
     $scope.categoryList = CategoryResource.queryAll(function (items) {
@@ -57,14 +57,14 @@ angular.module('frontend').controller('StartLapTimeController', function ($scope
         if (typeof selection != 'undefined' && selection) {
             $scope.category = {};
             $scope.category.id = selection.value;
-            $scope.filter();
         }
+        $scope.filterPilots();
     });
 
 
 
     $scope.pilotList = PilotResource.queryAll(function (items) {
-        $scope.pilotSelectionList = $.map(items, function (item) {
+        $scope.pilotSelectionListComplete = $.map(items, function (item) {
             return ({
                 value: item.id,
                 text: (item.currentBeacon ? item.currentBeacon.number + ' - ' : '') + item.firstName + ' ' + item.lastName,
@@ -72,13 +72,13 @@ angular.module('frontend').controller('StartLapTimeController', function ($scope
                 beaconId: (item.currentBeacon ? item.currentBeacon.id : '')
             });
         });
+        $scope.pilotSelectionList = $scope.pilotSelectionListComplete
     });
     $scope.$watch("pilotSelection", function (selection) {
         if (typeof selection != 'undefined') {
             $scope.pilot = {};
             $scope.pilot.id = selection.value;
             $scope.pilot.beaconId = selection.beaconId;
-            $scope.filter();
         }
     });
 
@@ -94,12 +94,11 @@ angular.module('frontend').controller('StartLapTimeController', function ($scope
         if (typeof selection != 'undefined') {
             $scope.chrono = {};
             $scope.chrono.id = selection.value;
-            $scope.filter();
         }
     });
 
-    $scope.sessionSelectionList = SessionResource.queryAll(function (items) {
-        $scope.sessionSelectionList = $.map(items, function (item) {
+    $scope.sessionList = SessionResource.queryAll(function (items) {
+        $scope.sessionSelectionListComplete = $.map(items, function (item) {
             return ({
                 value: item.id,
                 text: item.name,
@@ -110,7 +109,9 @@ angular.module('frontend').controller('StartLapTimeController', function ($scope
                 pilotsIds: item.pilots.map(a => a.id)
             });
         });
+        $scope.sessionSelectionList = $scope.sessionSelectionListComplete
     });
+
     $scope.$watch("sessionSelection", function (selection) {
         if (typeof selection != 'undefined' && selection) {
             $scope.session = {};
@@ -119,35 +120,48 @@ angular.module('frontend').controller('StartLapTimeController', function ($scope
             $scope.eventSelection = $filter("filter")($scope.eventSelectionList, { value: selection.eventId })[0];
             $scope.chronoSelectionList = $filter("filter")($scope.chronoSelectionList, $scope.filterChronosBySession);
             $scope.pilotSelectionList = $filter("filter")($scope.pilotSelectionList, $scope.filterPilotsBySession);
-            $scope.filter();
         }
+        $scope.filterPilots();
     });
 
     $scope.filterChronosBySession = function (chrono) {
+        if (!$scope.sessionSelection.chronosIds || !chrono) {
+            return false
+        }
         return ($scope.sessionSelection.chronosIds.indexOf(chrono.value) !== -1);
     };
 
     $scope.filterPilotsBySession = function (pilot) {
+        if (!$scope.sessionSelection.pilotsIds || !pilot) {
+            return false
+        }
         return ($scope.sessionSelection.pilotsIds.indexOf(pilot.value) !== -1);
     };
 
-    $scope.filter = function () {
+    $scope.filterSessions = function () {
+        $scope.sessionSelectionList = $scope.sessionSelectionListComplete
         if ($scope.locationSelection) {
             $scope.sessionSelectionList = $filter("filter")($scope.sessionSelectionList, { locationId: $scope.locationSelection.value });
         }
         if ($scope.eventSelection) {
             $scope.sessionSelectionList = $filter("filter")($scope.sessionSelectionList, { eventId: $scope.eventSelection.value });
         }
+    };
+
+    $scope.filterPilots = function () {
+        $scope.pilotSelectionList = $scope.pilotSelectionListComplete
         if ($scope.categorySelection) {
             $scope.pilotSelectionList = $filter("filter")($scope.pilotSelectionList, { categoryId: $scope.categorySelection.value });
         }
     };
 
     $scope.cancel = function () {
+        $scope.sessionSelection = {};
         $scope.eventSelection = {};
         $scope.locationSelection = {};
         $scope.categorySelection = {};
-        $scope.filter();
+        $scope.filterSessions();
+        $scope.filterPilots();
     };
 
     $scope.cancelLaptime = function () {
@@ -174,6 +188,4 @@ angular.module('frontend').controller('StartLapTimeController', function ($scope
         PingResource.create({ chronoId: $scope.chronoSelection.value, beaconId: $scope.pilotSelection.beaconId }, { power: '1', dateTime: now });
     }
 
-
-    $scope.filter();
 });
