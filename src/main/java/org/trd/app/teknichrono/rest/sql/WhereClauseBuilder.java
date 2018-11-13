@@ -9,8 +9,8 @@ import javax.persistence.TypedQuery;
 
 public class WhereClauseBuilder {
 
-  Map<String, Object> whereEqualMap = new HashMap<String, Object>();
-  Map<String, Object> whereInMap = new HashMap<String, Object>();
+  Map<String, String> whereEqualMap = new HashMap<String, String>();
+  Map<String, String> whereInMap = new HashMap<String, String>();
   Map<String, Object> parameters = new HashMap<String, Object>();
   Map<String, List> parametersList = new HashMap<String, List>();
 
@@ -18,16 +18,16 @@ public class WhereClauseBuilder {
     return "";
   }
 
-  public void addEqualsClause(String left, String parameterName, Object parameterValue) {
+  public void addEqualsClause(String toMatch, String parameterName, Object parameterValue) {
     if (parameterValue != null) {
-      whereEqualMap.put(left, parameterName);
+      whereEqualMap.put(parameterName, toMatch);
       parameters.put(parameterName, parameterValue);
     }
   }
 
-  public void addInClause(String left, String parameterName, List<Integer> parameterValue) {
+  public void addInClause(String toMatch, String parameterName, List<Integer> parameterValue) {
     if (parameterValue != null && !parameterValue.isEmpty()) {
-      whereInMap.put(left, parameterName);
+      whereInMap.put(parameterName, toMatch);
       parametersList.put(parameterName, parameterValue);
     }
   }
@@ -44,24 +44,24 @@ public class WhereClauseBuilder {
   public String build() {
     StringBuilder builder = new StringBuilder();
     boolean startedBuilding = false;
-    for (Entry<String, Object> entry : whereEqualMap.entrySet()) {
+    for (Entry<String, String> entry : whereEqualMap.entrySet()) {
       if (!startedBuilding) {
         builder.append(" WHERE ");
         startedBuilding = true;
       } else {
         builder.append(" AND ");
       }
-      builder.append(entry.getKey()).append(" = :").append(entry.getValue());
+      builder.append(entry.getValue()).append(" = :").append(entry.getKey());
     }
-    for (Entry<String, Object> entry : whereInMap.entrySet()) {
+    for (Entry<String, String> entry : whereInMap.entrySet()) {
       if (!startedBuilding) {
         builder.append(" WHERE ");
         startedBuilding = true;
       } else {
         builder.append(" AND ");
       }
-      Object value = entry.getValue();
-      builder.append(entry.getKey()).append(" IN ( :").append(value).append(" )");
+      String value = entry.getKey();
+      builder.append(entry.getValue()).append(" IN ( :").append(value).append(" )");
     }
     return builder.toString();
   }
