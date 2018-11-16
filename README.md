@@ -49,6 +49,7 @@ For the time being, you can have a look in: ```src/main/java/org/trd/app/teknich
   * wildfly-swarm documentation
     * [create-a-datasource](https://howto.wildfly-swarm.io/create-a-datasource/)
     * [command_line](https://wildfly-swarm.gitbooks.io/wildfly-swarm-users-guide/configuration/command_line.html)
+    * [thorntail-examples](https://github.com/thorntail/thorntail-examples)
   * JPA
     * https://www.thoughts-on-java.org/best-practices-many-one-one-many-associations-mappings/
     * http://meri-stuff.blogspot.fr/2012/03/jpa-tutorial.html#RelationshipsBidirectionalOneToManyManyToOneConsistency
@@ -62,4 +63,10 @@ For the time being, you can have a look in: ```src/main/java/org/trd/app/teknich
 * OpenShift io
   * https://github.com/openshiftio/openshift.io/wiki/FAQ
   * https://github.com/openshiftio/openshift.io/issues/891
+  * https://github.com/openshiftio/openshift.io/issues/4504
   * [WildFly booster](https://github.com/openshiftio/booster-parent/blob/master/pom.xml)
+* GitHub setup
+  * https://embeddedartistry.com/blog/2017/12/21/jenkins-kick-off-a-ci-build-with-github-push-notifications
+* Jenkins
+  * https://github.com/jenkinsci/kubernetes-plugin
+  * https://github.com/openshift/jenkins/tree/master/agent-maven-3.5
