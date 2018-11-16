@@ -105,6 +105,9 @@
             </tbody>
         </table>
     </div>
+    <div ng-switch on="filteredResults.length > 0">
+        <a ng-switch-when="true" href="{{jsonUrl}}" download="download.json">Download</a>
+    </div>
 
     <ul class="pagination pagination-centered">
         <li ng-class="{disabled:currentPage == 0}">
