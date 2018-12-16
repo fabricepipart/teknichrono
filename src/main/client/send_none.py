@@ -1,8 +1,12 @@
 #!python3
 
 import datetime
+import logging
 
 
 class SendNoneStrategy:
+  def __init__(self):
+    self.logger = logging.getLogger('SendStrategy')
+
   def send(self, sendme):
-    print(str(datetime.datetime.now()) + '[NOSEND]\tPing : ' + str(sendme))
+    self.logger.info('[NOSEND] Ping : ' + str(sendme))

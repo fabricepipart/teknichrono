@@ -8,6 +8,8 @@
     <link href="styles/bootstrap.css" rel="stylesheet" media="screen">
     <link href="styles/bootstrap-theme.css" rel="stylesheet" media="screen">
     <link href="styles/main.css" rel="stylesheet" media="screen">
+    <link href="styles/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+
 </head>
 
 <body>
@@ -47,6 +49,7 @@
                             <a class="list-group-item" ng-class="{active: matchesRoute('Sessions')}" href="#/Sessions" data-toggle="offcanvas">Sessions</a>
                             <a class="list-group-item" ng-class="{active: matchesRoute('StartLapTime')}" href="#/StartLapTime" data-toggle="offcanvas">Manage sessions</a>
                             <a class="list-group-item" ng-class="{active: matchesRoute('LapTimes')}" href="#/LapTimes" data-toggle="offcanvas">LapTimes</a>
+                            <a class="list-group-item" ng-class="{active: matchesRoute('Live')}" href="#/Live" data-toggle="offcanvas">Live</a>
                         </div>
                     </nav>
                 </div>
@@ -79,6 +82,8 @@
     <script src="scripts/vendor/modernizr-2.8.3.min.js"></script>
     <script src="scripts/vendor/jquery-2.1.1.js"></script>
     <script src="scripts/vendor/bootstrap.js"></script>
+    <script src="scripts/vendor/moment.min.js"></script>
+    <script src="scripts/vendor/bootstrap-datetimepicker.min.js"></script>
     <script src="scripts/vendor/angular.js"></script>
     <script src="scripts/vendor/angular-route.js"></script>
     <script src="scripts/vendor/angular-resource.js"></script>
@@ -130,6 +135,7 @@
     <script src="scripts/controllers/editSessionController.js"></script>
     <script src="scripts/controllers/searchLapTimeController.js"></script>
     <script src="scripts/controllers/startLapTimeController.js"></script>
+    <script src="scripts/controllers/liveController.js"></script>
 </body>
 
 </html>

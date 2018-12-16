@@ -1,9 +1,14 @@
 
 
-angular.module('frontend').controller('LapTimeController', function ($scope, $location, $http, $filter, flash, LapTimeResource, PilotResource, SessionResource, LocationResource, EventResource, CategoryResource) {
+angular.module('frontend').controller('LapTimeController', function ($scope, $sce, $location, $http, $filter, flash, LapTimeResource, PilotResource, SessionResource, LocationResource, EventResource, CategoryResource) {
 
     $scope.search = {};
-    $scope.searchTypeSelection = {}
+    $scope.searchesTypesList = [
+        { key: "", text: "All laps" },
+        { key: "results", text: "Race results" },
+        { key: "best", text: "Best laps" }
+    ];
+    $scope.searchTypeSelection = $scope.searchesTypesList[0];
     $scope.session = {};
     $scope.event = {};
     $scope.location = {};
@@ -110,11 +115,6 @@ angular.module('frontend').controller('LapTimeController', function ($scope, $lo
         }
     });
 
-    $scope.searchesTypesList = [
-        { key: "", text: "All laps" },
-        { key: "results", text: "Race results" },
-        { key: "best", text: "Best laps" }
-    ];
     $scope.$watch("searchTypeSelection", function (selection) {
         if (typeof selection != 'undefined' && selection) {
             $scope.performSearch();
@@ -205,6 +205,44 @@ angular.module('frontend').controller('LapTimeController', function ($scope, $lo
     $scope.cancel = function () {
         $location.path('/LapTimes?');
     };
+
+    $scope.downloadJson = function () {
+        var a = document.createElement("a");
+        var theJSON = JSON.stringify($scope.searchResults);
+
+        if (window.navigator.msSaveOrOpenBlob) {
+            var blob = new Blob([decodeURIComponent(encodeURI(theJSON))], {
+                type: "text/json;charset=utf-8;"
+            });
+            navigator.msSaveBlob(blob, 'session.json');
+        } else {
+
+            a.href = 'data:attachment/json;charset=utf-8,' + encodeURI(theJSON);
+            a.target = '_blank';
+            a.download = 'session.json';
+            document.body.appendChild(a);
+            a.click();
+        }
+    }
+
+    $scope.downloadCsv = function () {
+        var a = document.createElement("a");
+        var csv = Papa.unparse(json_pre);
+
+        if (window.navigator.msSaveOrOpenBlob) {
+            var blob = new Blob([decodeURIComponent(encodeURI(csv))], {
+                type: "text/csv;charset=utf-8;"
+            });
+            navigator.msSaveBlob(blob, 'sample.csv');
+        } else {
+
+            a.href = 'data:attachment/csv;charset=utf-8,' + encodeURI(csv);
+            a.target = '_blank';
+            a.download = 'session.csv';
+            document.body.appendChild(a);
+            a.click();
+        }
+    }
 
     $scope.performSearch();
 });

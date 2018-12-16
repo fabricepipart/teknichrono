@@ -1,6 +1,5 @@
 package org.trd.app.teknichrono.business;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,7 +45,8 @@ public class ChronoManager {
       return;
     }
 
-    Session session = pickMostRelevant(ping.getChrono().getSessions(), ping);
+    SessionSelector selector = new SessionSelector();
+    Session session = selector.pickMostRelevant(ping.getChrono().getSessions(), ping);
     if (session == null) {
       logger.error("No Session associated to Chrono " + chronometer.getId() + ", cannot updates laptimes");
       return;
@@ -185,43 +185,6 @@ public class ChronoManager {
     // The chronopoint is the last one of the session
 
     // New Laptime but not first intermediate
-  }
-
-  private Session pickMostRelevant(List<Session> sessions, Ping ping) {
-    List<Session> currentSessions = new ArrayList<>(sessions);
-    currentSessions.removeIf(s -> !s.isCurrent());
-    if (!currentSessions.isEmpty()) {
-      return pickMostRelevantByDistance(currentSessions, ping);
-    }
-    return pickMostRelevantByDistance(sessions, ping);
-  }
-
-  private Session pickMostRelevantByDistance(List<Session> sessions, Ping ping) {
-    Session mostRelevant = null;
-    long mostRelevantDistance = Long.MAX_VALUE;
-    for (Session session : sessions) {
-      long pingTime = ping.getDateTime().getTime();
-      long distance = distanceBetween(session, pingTime);
-      if (distance == 0) {
-        return session;
-      }
-      if (distance < mostRelevantDistance) {
-        mostRelevant = session;
-        mostRelevantDistance = distance;
-      }
-    }
-    return mostRelevant;
-  }
-
-  private long distanceBetween(Session session, long pingTime) {
-    long start = session.getStart().getTime();
-    long end = session.getEnd().getTime();
-    if (pingTime > end) {
-      return (pingTime - end);
-    } else if (pingTime < start) {
-      return (start - pingTime);
-    }
-    return 0;
   }
 
   private LapTime createLaptime(Session session, Pilot pilot, List<Ping> toInsertInNewLap, Chronometer chronometer) {

@@ -106,7 +106,8 @@
         </table>
     </div>
     <div ng-switch on="filteredResults.length > 0">
-        <a ng-switch-when="true" href="{{jsonUrl}}" download="download.json">Download</a>
+        <button ng-switch-when="true" data-ng-click="downloadJson()">Download as JSON</button>
+        <button ng-switch-when="true" data-ng-click="downloadCsv()">Download as CSV</button>
     </div>
 
     <ul class="pagination pagination-centered">

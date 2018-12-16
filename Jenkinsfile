@@ -4,7 +4,7 @@ def version = "1.0.${env.BUILD_NUMBER}"
 podTemplate(cloud: 'openshift', label: 'maven') {
   node('maven') {
     checkout scm
-    stage('Build qnd Deploy') {
+    stage('Build and Deploy') {
       sh "mvn -B -U versions:set -DnewVersion=${version}"
       sh "mvn clean -B -e -U install -P openshift"
     }

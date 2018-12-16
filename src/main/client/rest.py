@@ -2,8 +2,10 @@
 
 import json
 import requests
+import logging
 
 HEADERS = {'Content-type': 'application/json'}
+LOGGER = logging.getLogger('REST')
 
 
 def get(url, params=[]):
@@ -20,8 +22,8 @@ def post(data, url, params=[]):
   dataString = json.dumps(data, separators=(',', ':'))
   response = requests.post(url, data=dataString, params=params, headers=HEADERS)
   if (not response.ok):
-    print("Request returned an invalid status. Text output : " + response.text)
-    print("To reproduce : curl -X POST " + url + " --data '" + dataString + "' --header \"Content-Type:application/json\" with params " + str(params))
+    LOGGER.error("Request returned an invalid status. Text output : " + response.text)
+    LOGGER.error("To reproduce : curl -X POST " + url + " --data '" + dataString + "' --header \"Content-Type:application/json\" with params " + str(params))
     response.raise_for_status()
   return response
 

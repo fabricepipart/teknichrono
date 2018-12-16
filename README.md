@@ -27,10 +27,21 @@ The testing part of the project is based on JUnits (very few) and Python end to 
 
 * You may need to adapt ```src/main/resources/project-defaults.yaml```
 * Start the server:
-  * Normally : ```mvn wildfly-swarm:run```
-  * In debug mode : ```mvn wildfly-swarm:run -Dswarm.debug.port=5555```
-  * With debug logs : ```mvn wildfly-swarm:run -Dswarm.logging=DEBUG```
+  * Normally : ```mvn thorntail:run```
+  * In debug mode : ```mvn thorntail:run -Dswarm.debug.port=5555```
+  * With debug logs : ```mvn thorntail:run -Dswarm.logging=DEBUG```
 * Run the E2E tests : ```./src/test/scripts/bash/moto_tests.sh``` (or any bash script in this folder)
+
+### How to build and run from local
+
+* ```oc login https://api.starter-us-east-2a.openshift.com --token=******```
+* ```mvn clean install -P openshift```
+* ```mvn -B fabric8:apply -P openshift```
+
+
+### Interact with Raspberry
+
+See [the client documentation](src/main/client/Readme.md)
 
 ### How to re-generate scaffhold:
 
@@ -46,19 +57,20 @@ For the time being, you can have a look in: ```src/main/java/org/trd/app/teknich
 ## Interesting pointers
 
 * Wildfly
-  * wildfly-swarm documentation
-    * [create-a-datasource](https://howto.wildfly-swarm.io/create-a-datasource/)
-    * [command_line](https://wildfly-swarm.gitbooks.io/wildfly-swarm-users-guide/configuration/command_line.html)
+  * thorntail documentation
+    * [create-a-datasource](https://howto.thorntail.io/create-a-datasource/)
+    * [command_line](https://thorntail.gitbooks.io/thorntail-users-guide/configuration/command_line.html)
     * [thorntail-examples](https://github.com/thorntail/thorntail-examples)
+    * https://docs.thorntail.io/
   * JPA
     * https://www.thoughts-on-java.org/best-practices-many-one-one-many-associations-mappings/
     * http://meri-stuff.blogspot.fr/2012/03/jpa-tutorial.html#RelationshipsBidirectionalOneToManyManyToOneConsistency
   * Examples
-    * [wildfly-swarm-examples](https://github.com/wildfly-swarm/wildfly-swarm-examples)
+    * [thorntail-examples](https://github.com/thorntail/thorntail-examples)
 * Fabric8
   * [fabric8-pipeline-library](https://github.com/fabric8io/fabric8-pipeline-library)
   * https://github.com/fabric8io/docker-maven-plugin
-  * https://dmp.fabric8.io/#build-configuration
+  * https://dmp.fabric8.io/
   * https://maven.fabric8.io/
 * OpenShift io
   * https://github.com/openshiftio/openshift.io/wiki/FAQ
@@ -70,3 +82,4 @@ For the time being, you can have a look in: ```src/main/java/org/trd/app/teknich
 * Jenkins
   * https://github.com/jenkinsci/kubernetes-plugin
   * https://github.com/openshift/jenkins/tree/master/agent-maven-3.5
+  * https://github.com/jenkinsci/kubernetes-plugin

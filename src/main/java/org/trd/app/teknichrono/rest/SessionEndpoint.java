@@ -25,6 +25,7 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.business.ChronoManager;
+import org.trd.app.teknichrono.business.SessionSelector;
 import org.trd.app.teknichrono.model.Chronometer;
 import org.trd.app.teknichrono.model.Event;
 import org.trd.app.teknichrono.model.Location;
@@ -110,6 +111,20 @@ public class SessionEndpoint {
   }
 
   @GET
+  @Path("/current")
+  @Produces("application/json")
+  public Response findCurrent() {
+    List<Session> allSessions = listAllSessions(null, null);
+    SessionSelector selector = new SessionSelector();
+    Session session = selector.pickMostRelevantCurrent(allSessions);
+    if (session == null) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+    SessionDTO dto = new SessionDTO(session);
+    return Response.ok(dto).build();
+  }
+
+  @GET
   @Path("/name")
   @Produces("application/json")
   public SessionDTO findSessionByName(@QueryParam("name") String name) {
@@ -133,6 +148,13 @@ public class SessionEndpoint {
   @Produces("application/json")
   public List<SessionDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
     DurationLogger perf = DurationLogger.get(logger).start("List sessions");
+    final List<Session> results = listAllSessions(startPosition, maxResult);
+    final List<SessionDTO> converted = SessionDTO.convert(results);
+    perf.end();
+    return converted;
+  }
+
+  private List<Session> listAllSessions(Integer startPosition, Integer maxResult) {
     TypedQuery<Session> findAllQuery = em
         .createQuery("SELECT DISTINCT e FROM Session e LEFT JOIN FETCH e.chronometers ORDER BY e.id", Session.class);
     if (startPosition != null) {
@@ -142,9 +164,7 @@ public class SessionEndpoint {
       findAllQuery.setMaxResults(maxResult);
     }
     final List<Session> results = findAllQuery.getResultList();
-    final List<SessionDTO> converted = SessionDTO.convert(results);
-    perf.end();
-    return converted;
+    return results;
   }
 
   @POST
