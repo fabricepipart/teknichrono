@@ -39,6 +39,12 @@ public class NestedSessionDTO implements Serializable {
     }
   }
 
+
+  @Override
+  public String toString() {
+    return name;
+  }
+
   public Session fromDTO(Session entity, EntityManager em) {
     if (entity == null) {
       entity = new Session();

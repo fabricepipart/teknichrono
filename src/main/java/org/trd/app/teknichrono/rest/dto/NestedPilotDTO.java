@@ -12,7 +12,7 @@ import org.trd.app.teknichrono.model.Pilot;
 public class NestedPilotDTO implements Serializable {
 
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = -6351473312188582718L;
   private int id;
@@ -32,6 +32,11 @@ public class NestedPilotDTO implements Serializable {
         this.beaconNumber = entity.getCurrentBeacon().getNumber();
       }
     }
+  }
+
+  @Override
+  public String toString() {
+    return this.firstName + ' ' + this.lastName;
   }
 
   public static Set<NestedPilotDTO> fromPilots(Set<Pilot> pilots) {

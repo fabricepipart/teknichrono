@@ -1,6 +1,6 @@
 
 
-angular.module('frontend').controller('LapTimeController', function ($scope, $sce, $location, $http, $filter, flash, LapTimeResource, PilotResource, SessionResource, LocationResource, EventResource, CategoryResource) {
+angular.module('frontend').controller('LapTimeController', function ($scope, $location, $filter, flash, LapTimeResource, LapTimeExportResource, PilotResource, SessionResource, LocationResource, EventResource, CategoryResource) {
 
     $scope.search = {};
     $scope.searchesTypesList = [
@@ -227,21 +227,25 @@ angular.module('frontend').controller('LapTimeController', function ($scope, $sc
 
     $scope.downloadCsv = function () {
         var a = document.createElement("a");
-        var csv = Papa.unparse(json_pre);
+        $scope.csvSearchResults = LapTimeExportResource.queryAll({ SearchType: $scope.searchTypeSelection.key, sessionId: $scope.sessionId, eventId: $scope.eventId, locationId: $scope.locationId, pilotId: $scope.pilotId, categoryId: $scope.categoryId }, function (result) {
+            $scope.csvSearchResults = result.csv;
 
-        if (window.navigator.msSaveOrOpenBlob) {
-            var blob = new Blob([decodeURIComponent(encodeURI(csv))], {
-                type: "text/csv;charset=utf-8;"
-            });
-            navigator.msSaveBlob(blob, 'sample.csv');
-        } else {
+            if (window.navigator.msSaveOrOpenBlob) {
+                var blob = new Blob([decodeURIComponent(encodeURI($scope.csvSearchResults))], {
+                    type: "text/csv;charset=utf-8;"
+                });
+                navigator.msSaveBlob(blob, 'session.csv');
+            } else {
 
-            a.href = 'data:attachment/csv;charset=utf-8,' + encodeURI(csv);
-            a.target = '_blank';
-            a.download = 'session.csv';
-            document.body.appendChild(a);
-            a.click();
-        }
+                a.href = 'data:attachment/csv;charset=utf-8,' + encodeURI($scope.csvSearchResults);
+                a.target = '_blank';
+                a.download = 'session.csv';
+                document.body.appendChild(a);
+                a.click();
+            }
+
+        });
+
     }
 
     $scope.performSearch();
