@@ -22,10 +22,10 @@ class SendSyncStrategy:
         try:
           self.sendone(failure)
         except:
-          self.logger.error('Ping : ' + str(sendme))
+          self.logger.error('Could not send again Ping : ' + str(failure))
     except:
       self.failures.append(sendme)
-      self.logger.error('Ping : ' + str(sendme))
+      self.logger.error('Could not send for the moment Ping : ' + str(sendme))
 
   def sendone(self, sendme):
     p = Ping(self.server)

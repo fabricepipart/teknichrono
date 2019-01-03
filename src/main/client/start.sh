@@ -8,8 +8,8 @@ export REST_SERVER_IO="teknichrono-fabrice-pipart.b542.starter-us-east-2a.opensh
 
 export TEKNICHRONO_SERVER=$REST_SERVER_IO
 export CHRONO_NAME="Raspberry-0"
-# FIRST / MID / HIGH / LAST
-export PING_SELECTION_STRATEGY="FIRST"
+# FIRST / (MID) / HIGH / LAST
+export PING_SELECTION_STRATEGY="HIGH"
 # NONE / STORE / RESEND / SYNC / ASYNC
 export PING_SEND_STRATEGY="SYNC"
 # Minimum duration between the last ping to consider it is a new ping 

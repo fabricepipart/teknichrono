@@ -7,6 +7,7 @@ import os
 from bluetooth_scanner import BluetoothScanner
 from select_first import SelectFirstStrategy
 from select_last import SelectLastStrategy
+from select_high import SelectHighStrategy
 from send_none import SendNoneStrategy
 from send_sync import SendSyncStrategy
 from chrono import Chronometer
@@ -52,6 +53,7 @@ def getSelectionStrategy(key):
   switcher = {
       'FIRST': SelectFirstStrategy(INACTIVITY_WINDOW),
       'LAST': SelectLastStrategy(INACTIVITY_WINDOW),
+      'HIGH': SelectHighStrategy(INACTIVITY_WINDOW),
   }
   # Get the function from switcher dictionary
   return switcher.get(key)
