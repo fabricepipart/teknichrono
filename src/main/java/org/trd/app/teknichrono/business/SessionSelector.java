@@ -16,7 +16,7 @@ public class SessionSelector {
   public Session pickMostRelevant(List<Session> sessions, Ping ping) {
     List<Session> currentSessions = new ArrayList<>(sessions);
     final Chronometer chrono = ping != null ? ping.getChrono() : null;
-    currentSessions.removeIf(s -> sessionCanBeCurrent(s, chrono));
+    currentSessions.removeIf(s -> !sessionCanBeCurrent(s, chrono));
     long time = ping != null ? ping.getDateTime().getTime() : System.currentTimeMillis();
     if (!currentSessions.isEmpty()) {
       return pickMostRelevantByDistance(currentSessions, chrono, time);
