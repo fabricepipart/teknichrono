@@ -1,0 +1,13 @@
+thorntail:
+  datasources:
+    jdbc-drivers:
+      com.mysql:
+        driver-class-name: com.mysql.jdbc.Driver
+        xa-datasource-class-name: com.mysql.jdbc.jdbc2.optional.MysqlXADataSource
+        driver-module-name: com.mysql
+    data-sources:
+      TeknichronoDS:
+        driver-name: com.mysql
+        connection-url: jdbc:mysql://mariadb:3306/teknichrono
+        user-name: teknichrono
+        password: Q4u6ebocaU4mFYWn

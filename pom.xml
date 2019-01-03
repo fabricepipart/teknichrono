@@ -17,8 +17,9 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
-    <version.thorntail>2.2.0.Final</version.thorntail>
+    <version.thorntail>2.2.1.Final</version.thorntail>
     <version.h2>1.4.187</version.h2>
+    <version.mysql>5.1.38</version.mysql>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -82,6 +83,11 @@
       <artifactId>h2</artifactId>
       <version>${version.h2}</version>
     </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>${version.mysql}</version>
+    </dependency>
     <!-- From Forge -->
     <dependency>
       <groupId>junit</groupId>
@@ -92,6 +98,7 @@
       <groupId>com.opencsv</groupId>
       <artifactId>opencsv</artifactId>
     </dependency>
+
   </dependencies>
   <build>
     <finalName>${project.artifactId}</finalName>
@@ -110,42 +117,34 @@
             <skip>true</skip>
           </configuration>
         </plugin>
-        <plugin>
-          <groupId>io.thorntail</groupId>
-          <artifactId>thorntail-maven-plugin</artifactId>
-          <version>${version.thorntail}</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>package</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
       <plugin>
         <artifactId>maven-war-plugin</artifactId>
-        <!--version>2.4</version-->
         <configuration>
           <failOnMissingWebXml>false</failOnMissingWebXml>
-          <!--warName>teknichrono</warName-->
         </configuration>
       </plugin>
       <plugin>
         <groupId>io.thorntail</groupId>
         <artifactId>thorntail-maven-plugin</artifactId>
+        <version>${version.thorntail}</version>
         <executions>
           <execution>
             <goals>
               <goal>package</goal>
             </goals>
           </execution>
+          <execution>
+            <id>start</id>
+            <configuration>
+              <arguments>-Sh2</arguments>
+            </configuration>
+          </execution>
         </executions>
         <configuration>
-          <format>dir</format>
-          <mode>thin</mode>
+          <arguments>-Sh2</arguments>
         </configuration>
       </plugin>
 
@@ -204,13 +203,6 @@
                     <env>
                       <JAVA_OPTIONS>-XX:MaxMetaspaceSize=128m</JAVA_OPTIONS>
                     </env>
-                    <entryPoint>
-                      <exec>
-                        <arg>java</arg>
-                        <arg>-jar</arg>
-                        <arg>/deployments/${project.artifactId}-thorntail.jar</arg>
-                      </exec>
-                    </entryPoint>
                   </build>
                 </image>
               </images>

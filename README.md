@@ -27,12 +27,14 @@ The testing part of the project is based on JUnits (very few) and Python end to 
 
 * You may need to adapt ```src/main/resources/project-defaults.yaml```
 * Start the server:
-  * Normally : ```mvn thorntail:run```
+  * Normally : ```mvn thorntail:run``` 
+  * With MySQL Datasource : ```java -jar target/teknichrono-thorntail.jar -Smysql```
+  * Package ```mvn clean package``` and run ```java -jar target/teknichrono-thorntail.jar -Sh2```
   * In debug mode : ```mvn thorntail:run -Dswarm.debug.port=5555```
   * With debug logs : ```mvn thorntail:run -Dswarm.logging=DEBUG```
 * Run the E2E tests : ```./src/test/scripts/bash/moto_tests.sh``` (or any bash script in this folder)
 
-### How to build and run from local
+### How to run on OpenShift
 
 * ```oc login https://api.starter-us-east-2a.openshift.com --token=******```
 * ```mvn clean install -P openshift```
@@ -56,12 +58,15 @@ For the time being, you can have a look in: ```src/main/java/org/trd/app/teknich
 
 ## Interesting pointers
 
-* Wildfly
+* Thorntail
   * thorntail documentation
     * [create-a-datasource](https://howto.thorntail.io/create-a-datasource/)
     * [command_line](https://thorntail.gitbooks.io/thorntail-users-guide/configuration/command_line.html)
     * [thorntail-examples](https://github.com/thorntail/thorntail-examples)
     * https://docs.thorntail.io/
+    * https://docs.thorntail.io/2.2.0.Final/#configuring-a-thorntail-application-using-yaml-files_thorntail
+    * https://docs.thorntail.io/2.2.0.Final/#using-thorntail-maven-plugin_thorntail
+    * https://github.com/thorntail/thorntail/blob/master/docs/index.adoc
   * JPA
     * https://www.thoughts-on-java.org/best-practices-many-one-one-many-associations-mappings/
     * http://meri-stuff.blogspot.fr/2012/03/jpa-tutorial.html#RelationshipsBidirectionalOneToManyManyToOneConsistency
@@ -83,3 +88,5 @@ For the time being, you can have a look in: ```src/main/java/org/trd/app/teknich
   * https://github.com/jenkinsci/kubernetes-plugin
   * https://github.com/openshift/jenkins/tree/master/agent-maven-3.5
   * https://github.com/jenkinsci/kubernetes-plugin
+* Database
+  * https://webmasters.stackexchange.com/questions/2242/how-to-create-separate-users-in-phpmyadmin-each-one-cant-see-others-databases
