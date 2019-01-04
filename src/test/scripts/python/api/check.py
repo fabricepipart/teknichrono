@@ -40,8 +40,8 @@ def checkLaptimeFilled(laps, lastsCanBeEmpty=False):
 def checkLaptimeBetween(laps, fromMillis, toMillis):
   print('Checking that all laptimes are between ' + pretty_time_delta(fromMillis) + ' and ' + pretty_time_delta(toMillis))
   for lap in laps:
-    assert lap['duration'] < toMillis, 'Lap duration ' + str(lap['duration']) + ' is not < to ' + str(toMillis)
-    assert lap['duration'] > fromMillis, 'Lap duration ' + str(lap['duration']) + ' is not > to ' + str(fromMillis)
+    assert lap['duration'] <= toMillis, 'Lap duration ' + str(lap['duration']) + ' is not < to ' + str(toMillis)
+    assert lap['duration'] >= fromMillis, 'Lap duration ' + str(lap['duration']) + ' is not > to ' + str(fromMillis)
 
 
 def checkCountWithLapIndex(laps, index, count):
@@ -73,13 +73,14 @@ def checkDeltaBestInIncreasingOrder(laps, lastsCanBeEmpty=False):
   for lap in laps:
     if firstLapEvaluated:
       gapWithBest = lap['gapWithBest']
+      duration = lap['duration']
       if not lastsCanBeEmpty:
         if gapWithBest == maxFound:
           assert lastLapDuration == lap['duration']
         else:
           assert gapWithBest > maxFound
       else:
-        if gapWithBest == 0:
+        if duration == 0:
           atLeastOneBeforeWasEmpty = True
         else:
           if gapWithBest == maxFound:
