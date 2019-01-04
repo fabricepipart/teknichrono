@@ -6,4 +6,4 @@ spec:
             - java
             - '-jar'
             - /deployments/${project.artifactId}-thorntail.jar
-            - '-Smysql'
+            - '-Smariadb'

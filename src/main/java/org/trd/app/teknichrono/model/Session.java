@@ -42,13 +42,13 @@ public class Session implements java.io.Serializable {
   @Column(name = "version")
   private int version;
 
-  @Column(nullable = false)
+  @Column(columnDefinition="TIMESTAMP(3)", nullable = false)
   private Timestamp start;
 
   @Column
   private long inactivity = 0L;
 
-  @Column(nullable = false)
+  @Column(columnDefinition="TIMESTAMP(3)", nullable = false)
   private Timestamp end;
 
   @Column(nullable = false)

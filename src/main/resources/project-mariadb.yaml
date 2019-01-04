@@ -1,0 +1,8 @@
+thorntail:
+  datasources:
+    data-sources:
+      TeknichronoDS:
+        driver-name: mariadb
+        connection-url: jdbc:mysql://mariadb:3306/teknichrono
+        user-name: teknichrono
+        password: Q4u6ebocaU4mFYWn

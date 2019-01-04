@@ -28,7 +28,7 @@ The testing part of the project is based on JUnits (very few) and Python end to 
 * You may need to adapt ```src/main/resources/project-defaults.yaml```
 * Start the server:
   * Normally : ```mvn thorntail:run``` 
-  * With MySQL Datasource : ```java -jar target/teknichrono-thorntail.jar -Smysql```
+  * With MariaDB Datasource : ```java -jar target/teknichrono-thorntail.jar -Smariadb```
   * Package ```mvn clean package``` and run ```java -jar target/teknichrono-thorntail.jar -Sh2```
   * In debug mode : ```mvn thorntail:run -Dswarm.debug.port=5555```
   * With debug logs : ```mvn thorntail:run -Dswarm.logging=DEBUG```

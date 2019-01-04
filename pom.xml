@@ -84,9 +84,9 @@
       <version>${version.h2}</version>
     </dependency>
     <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>${version.mysql}</version>
+      <groupId>org.mariadb.jdbc</groupId>
+      <artifactId>mariadb-java-client</artifactId>
+      <version>2.2.3</version>
     </dependency>
     <!-- From Forge -->
     <dependency>

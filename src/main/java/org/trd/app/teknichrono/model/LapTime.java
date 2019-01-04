@@ -48,7 +48,7 @@ public class LapTime implements java.io.Serializable {
   private Pilot pilot;
 
   // Used to order the laps for the pilot relationship
-  @Column
+  @Column(columnDefinition="TIMESTAMP(3)")
   private Timestamp startDate;
 
   @ManyToOne(fetch = FetchType.LAZY)

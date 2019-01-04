@@ -38,7 +38,7 @@ public class Ping implements Serializable {
 
   /* =============================== Fields =============================== */
 
-  @Column(nullable = false)
+  @Column(columnDefinition="TIMESTAMP(3)", nullable = false)
   private Timestamp dateTime;
 
   // Can be null if after event, items are reassociated
