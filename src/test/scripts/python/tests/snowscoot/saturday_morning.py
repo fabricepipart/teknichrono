@@ -40,24 +40,32 @@ class SaturdayMorningTest:
                                 self.beacons, self.juniorPilots)
 
   def test(self):
+    self.satDerby1Elite.startSession()
     self.satDerby1Elite.simRace(3, 10, self.chrono['id'])
+    self.satDerby1Elite.endSession()
     print("---- Tests Results of " + self.satDerby1Elite.session['name'] + "----")
     checkLaps(getLapsForSession(self.satDerby1Elite.session['id']), len(self.elitePilots), {1: len(self.elitePilots)}, {1: len(self.elitePilots)}, 'Elite', 180000, 190000)
     checkBestLaps(getBestLapsForSession(self.satDerby1Elite.session['id']), len(self.elitePilots), {1: len(self.elitePilots)}, {1: len(self.elitePilots)}, 'Elite', 180000, 190000)
     checkResults(getResultsForSession(self.satDerby1Elite.session['id']), len(self.elitePilots), {1: len(self.elitePilots)}, {1: len(self.elitePilots)}, 'Elite', 180000, 190000)
 
+    self.satDerby1Open.startSession()
     self.satDerby1Open.simRace(3, 20, self.chrono['id'])
+    self.satDerby1Open.endSession()
     print("---- Tests Results of " + self.satDerby1Open.session['name'] + "----")
     checkLaps(getLapsForSession(self.satDerby1Open.session['id']), len(self.openPilots), {1: len(self.openPilots)}, {1: len(self.openPilots)}, 'Open', 180000, 200000)
     checkBestLaps(getBestLapsForSession(self.satDerby1Open.session['id']), len(self.openPilots), {1: len(self.openPilots)}, {1: len(self.openPilots)}, 'Open', 180000, 200000)
     checkResults(getResultsForSession(self.satDerby1Open.session['id']), len(self.openPilots), {1: len(self.openPilots)}, {1: len(self.openPilots)}, 'Open', 180000, 200000)
 
+    self.satDerby1Woman.startSession()
     self.satDerby1Woman.simRace(3, 30, self.chrono['id'])
+    self.satDerby1Woman.endSession()
     checkLaps(getLapsForSession(self.satDerby1Woman.session['id']), len(self.womanPilots), {1: len(self.womanPilots)}, {1: len(self.womanPilots)}, 'Woman', 180000, 210000)
     checkBestLaps(getBestLapsForSession(self.satDerby1Woman.session['id']), len(self.womanPilots), {1: len(self.womanPilots)}, {1: len(self.womanPilots)}, 'Woman', 180000, 210000)
     checkResults(getResultsForSession(self.satDerby1Woman.session['id']), len(self.womanPilots), {1: len(self.womanPilots)}, {1: len(self.womanPilots)}, 'Woman', 180000, 210000)
 
+    self.satDerby1Junior.startSession()
     self.satDerby1Junior.simRace(3, 40, self.chrono['id'])
+    self.satDerby1Junior.endSession()
     checkLaps(getLapsForSession(self.satDerby1Junior.session['id']), len(self.juniorPilots), {1: len(self.juniorPilots)}, {1: len(self.juniorPilots)}, 'Junior', 180000, 220000)
     checkBestLaps(
         getBestLapsForSession(self.satDerby1Junior.session['id']), len(self.juniorPilots), {1: len(self.juniorPilots)}, {1: len(self.juniorPilots)}, 'Junior', 180000, 220000)

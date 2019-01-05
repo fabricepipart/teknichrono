@@ -46,11 +46,15 @@ public class ChronoManager {
     }
 
     SessionSelector selector = new SessionSelector();
-    Session session = selector.pickMostRelevant(ping.getChrono().getSessions(), ping);
+    Session session = selector.pickMostRelevant(ping);
     if (session == null) {
       logger.error("No Session associated to Chrono " + chronometer.getId() + ", cannot updates laptimes");
       return;
     }
+    addPing(ping, pilot, chronometer, session);
+  }
+
+  public void addPing(Ping ping, Pilot pilot, Chronometer chronometer, Session session) {
     int chronoIndex = session.getChronoIndex(chronometer);
 
     long inactivity = session.getInactivity();

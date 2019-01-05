@@ -18,6 +18,7 @@ class SessionSimulator:
     self.chronometers = []
     self.pilots = []
     self.beacons = []
+    self.lastPingDate = None
 
   def create(self, name, start, end, sessionType, location, event, chronometers, beacons, pilots=[]):
     self.name = name
@@ -52,13 +53,18 @@ class SessionSimulator:
       beaconsIdsOfSession.append(self.beacons[beaconNumber]['id'])
     return beaconsIdsOfSession
 
+  def startSession(self):
+    # Starts all together in case of race
+    startSession(self.session['id'], datetime(self.start.year, self.start.month, self.start.day, self.start.hour, self.start.minute, 5))
+
+  def endSession(self):
+    endSession(self.session['id'], self.lastPingDate)
+
   def simRace(self, avgDurationMin, delta, chronoId, doNotFinish=0):
     numberThatDidNotFinish = 0
     beaconsIdsOfSession = self.getBeaconsIdsOfSession()
     startHour = self.start.hour
     startMinute = self.start.minute
-    # Starts all together
-    startSession(self.session['id'], datetime(self.start.year, self.start.month, self.start.day, startHour, startMinute, 5))
     # Ends
     eh, em = divmod((startHour * 60) + startMinute + avgDurationMin, 60)
     for beaconId in beaconsIdsOfSession:
@@ -66,8 +72,8 @@ class SessionSimulator:
       if numberThatDidNotFinish < doNotFinish:
         numberThatDidNotFinish += 1
       else:
-        ping(datetime(self.start.year, self.start.month, self.start.day, eh, em, es, randint(0, 999999)), beaconId, -99, chronoId)
-    endSession(self.session['id'], datetime(self.start.year, self.start.month, self.start.day, eh, em, 59))
+        self.lastPingDate = datetime(self.start.year, self.start.month, self.start.day, eh, em, es, randint(0, 999999))
+        ping(self.lastPingDate, beaconId, -99, chronoId)
 
   def simTimeTrial(self, avgDurationMin, delta, startPeriod, chronoStartId, chronoEndId, doNotStart=0, doNotFinish=0, startShift=0):
     numberThatDidNotStart = 0
@@ -76,7 +82,6 @@ class SessionSimulator:
     startHour = self.start.hour
     startMinute = self.start.minute + startShift
     # Starts
-    startSession(self.session['id'], datetime(self.start.year, self.start.month, self.start.day, startHour, startMinute, 5))
     i = 0
     for beaconId in beaconsIdsOfSession:
       sm, ss = divmod(i * startPeriod, 60)
@@ -97,6 +102,6 @@ class SessionSimulator:
       elif numberThatDidNotFinish < doNotFinish:
         numberThatDidNotFinish += 1
       else:
-        ping(datetime(self.start.year, self.start.month, self.start.day, eh, em, es, randint(100000, 999999)), beaconId, -99, chronoEndId)
+        self.lastPingDate = datetime(self.start.year, self.start.month, self.start.day, eh, em, es, randint(100000, 999999))
+        ping(self.lastPingDate, beaconId, -99, chronoEndId)
       i += 1
-    endSession(self.session['id'], datetime(self.start.year, self.start.month, self.start.day, eh, em, 59))

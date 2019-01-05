@@ -257,11 +257,11 @@ public class SessionEndpoint {
   }
 
   private void startSession(Session session, Timestamp timestamp) {
-    // Stop all other sessions of the event
+    // Stop all other sessions of the event that are not concurrent
     Event event = session.getEvent();
     if (event != null) {
       for (Session otherSession : event.getSessions()) {
-        if (otherSession.getId() != session.getId() && otherSession.isCurrent()) {
+        if (otherSession.getId() != session.getId() && otherSession.isCurrent() && !intersect(otherSession, session)) {
           endSession(otherSession, timestamp);
         }
       }
@@ -272,6 +272,16 @@ public class SessionEndpoint {
     }
     session.setCurrent(true);
     em.persist(session);
+  }
+
+  private boolean intersect(Session otherSession, Session session) {
+    if((otherSession.getStart().getTime() >= session.getStart().getTime()) && (otherSession.getStart().getTime() <= otherSession.getEnd().getTime())){
+      return true;
+    }
+    if(otherSession.getEnd().getTime() >= otherSession.getStart().getTime() && otherSession.getEnd().getTime() <= otherSession.getEnd().getTime()){
+      return true;
+    }
+    return false;
   }
 
   private void endSession(Session session, Timestamp end) {
@@ -292,7 +302,7 @@ public class SessionEndpoint {
       ping.setBeacon(pilot.getCurrentBeacon());
       ping.setChrono(chronometer);
       em.persist(ping);
-      cm.addPing(ping);
+      cm.addPing(ping, pilot, chronometer, session);
     }
   }
 

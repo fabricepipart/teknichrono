@@ -63,11 +63,19 @@ class SundayMorningTest:
   def testDouble(self):
     print("---- Double of Sunday morning ----")
     print("-- First runs")
+    self.sunDoubleRedRiver1.startSession()
     self.sunDoubleRedRiver1.simTimeTrial(2, 19, 30, self.fake1['id'], self.chrono['id'])
+    self.sunDoubleRedRiver1.endSession()
+    self.sunDoubleRoubines1.startSession()
     self.sunDoubleRoubines1.simTimeTrial(2, 19, 30, self.fake2['id'], self.chrono['id'])
+    self.sunDoubleRoubines1.endSession()
     print("-- Second runs")
+    self.sunDoubleRedRiver2.startSession()
     self.sunDoubleRedRiver2.simTimeTrial(2, 19, 30, self.fake1['id'], self.chrono['id'], 2, 2)
+    self.sunDoubleRedRiver2.endSession()
+    self.sunDoubleRoubines2.startSession()
     self.sunDoubleRoubines2.simTimeTrial(2, 19, 30, self.fake2['id'], self.chrono['id'], 3, 3)
+    self.sunDoubleRoubines2.endSession()
     print("---- Tests Results (general) ----")
     bestLapsRedRiver = getBestLaps(self.redRiver['id'])
     bestLapsRoubines = getBestLaps(self.roubines['id'])
@@ -78,24 +86,33 @@ class SundayMorningTest:
 
   def testDerby(self):
     print("---- Derby of Sunday morning ----")
+    self.sunDerby2Elite.startSession()
     self.sunDerby2Elite.simRace(3, 10, self.chrono['id'])
+    self.sunDerby2Elite.endSession()
     print("---- Tests Results of " + self.sunDerby2Elite.session['name'] + "----")
     checkLaps(getLapsForSession(self.sunDerby2Elite.session['id']), len(self.elitePilots), {1: len(self.elitePilots)}, {1: len(self.elitePilots)}, 'Elite', 180000, 190000)
     checkBestLaps(getBestLapsForSession(self.sunDerby2Elite.session['id']), len(self.elitePilots), {1: len(self.elitePilots)}, {1: len(self.elitePilots)}, 'Elite', 180000, 190000)
     checkResults(getResultsForSession(self.sunDerby2Elite.session['id']), len(self.elitePilots), {1: len(self.elitePilots)}, {1: len(self.elitePilots)}, 'Elite', 180000, 190000)
 
+    self.sunDerby2Open.startSession()
     self.sunDerby2Open.simRace(3, 20, self.chrono['id'])
+    # We forget to end that one
+    #self.sunDerby2Open.endSession()
     print("---- Tests Results of " + self.sunDerby2Open.session['name'] + "----")
     checkLaps(getLapsForSession(self.sunDerby2Open.session['id']), len(self.openPilots), {1: len(self.openPilots)}, {1: len(self.openPilots)}, 'Open', 180000, 200000)
     checkBestLaps(getBestLapsForSession(self.sunDerby2Open.session['id']), len(self.openPilots), {1: len(self.openPilots)}, {1: len(self.openPilots)}, 'Open', 180000, 200000)
     checkResults(getResultsForSession(self.sunDerby2Open.session['id']), len(self.openPilots), {1: len(self.openPilots)}, {1: len(self.openPilots)}, 'Open', 180000, 200000)
 
+    self.sunDerby2Woman.startSession()
     self.sunDerby2Woman.simRace(3, 30, self.chrono['id'])
+    self.sunDerby2Woman.endSession()
     checkLaps(getLapsForSession(self.sunDerby2Woman.session['id']), len(self.womanPilots), {1: len(self.womanPilots)}, {1: len(self.womanPilots)}, 'Woman', 180000, 210000)
     checkBestLaps(getBestLapsForSession(self.sunDerby2Woman.session['id']), len(self.womanPilots), {1: len(self.womanPilots)}, {1: len(self.womanPilots)}, 'Woman', 180000, 210000)
     checkResults(getResultsForSession(self.sunDerby2Woman.session['id']), len(self.womanPilots), {1: len(self.womanPilots)}, {1: len(self.womanPilots)}, 'Woman', 180000, 210000)
 
+    self.sunDerby2Junior.startSession()
     self.sunDerby2Junior.simRace(3, 40, self.chrono['id'])
+    self.sunDerby2Junior.endSession()
     checkLaps(getLapsForSession(self.sunDerby2Junior.session['id']), len(self.juniorPilots), {1: len(self.juniorPilots)}, {1: len(self.juniorPilots)}, 'Junior', 180000, 220000)
     checkBestLaps(
         getBestLapsForSession(self.sunDerby2Junior.session['id']), len(self.juniorPilots), {1: len(self.juniorPilots)}, {1: len(self.juniorPilots)}, 'Junior', 180000, 220000)
