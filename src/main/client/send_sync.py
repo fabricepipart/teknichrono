@@ -18,11 +18,16 @@ class SendSyncStrategy:
     try:
       self.sendone(sendme)
       # We succeeded with one let's recover
+      finallySent = []
       for failure in self.failures:
         try:
+          self.logger.info('[SYNC] Trying again to send Ping : ' + str(failure))
           self.sendone(failure)
+          finallySent.append(failure)
         except:
           self.logger.error('Could not send again Ping : ' + str(failure))
+      for failure in finallySent:
+        self.failures.remove(failure)
     except:
       self.failures.append(sendme)
       self.logger.error('Could not send for the moment Ping : ' + str(sendme))
@@ -35,4 +40,4 @@ class SendSyncStrategy:
       self.beacons[beaconNumber] = Beacon(beaconNumber, self.server)
     beaconId = self.beacons[beaconNumber].id
     p.ping(d, beaconId, sendme.tx, self.chronoId)
-    self.logger.info('[SYNC] Ping : ' + str(sendme))
+    self.logger.info('[SYNC] Ping sent : ' + str(sendme))
