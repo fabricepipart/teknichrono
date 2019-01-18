@@ -4,6 +4,7 @@
 
 import logging
 import os
+import socket
 from bluetooth_scanner import BluetoothScanner
 from select_first import SelectFirstStrategy
 from select_last import SelectLastStrategy
@@ -67,6 +68,7 @@ def getSendStrategy(key, chronoId):
 
 setupLogging()
 logger = logging.getLogger('startup')
+socket.setdefaulttimeout(2.0)
 
 logger.info('--------------------------------------')
 logger.info('Teknichrono client Startup')

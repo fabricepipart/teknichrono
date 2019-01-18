@@ -44,3 +44,9 @@ sudo systemctl status teknichrono.service
 ## References
 
 * http://www.diegoacuna.me/how-to-run-a-script-as-a-service-in-raspberry-pi-raspbian-jessie/
+
+
+
+rfkill unblock all
+sudo hciconfig
+sudo bluetoothctl

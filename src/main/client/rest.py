@@ -10,7 +10,7 @@ LOGGER = logging.getLogger('REST')
 
 def get(url, params=[]):
   "This sends a get to a URL and returns a json"
-  response = requests.get(url, params=params, headers=HEADERS)
+  response = requests.get(url, params=params, headers=HEADERS, timeout=2.0)
   if not response.ok:
     response.raise_for_status()
   jData = response.json()
@@ -20,7 +20,7 @@ def get(url, params=[]):
 def post(data, url, params=[]):
   "This posts a json to a URL and returns a json"
   dataString = json.dumps(data, separators=(',', ':'))
-  response = requests.post(url, data=dataString, params=params, headers=HEADERS)
+  response = requests.post(url, data=dataString, params=params, headers=HEADERS, timeout=2.0)
   if (not response.ok):
     LOGGER.error("Request returned an invalid status. Text output : " + response.text)
     LOGGER.error("To reproduce : curl -X POST " + url + " --data '" + dataString + "' --header \"Content-Type:application/json\" with params " + str(params))
