@@ -75,10 +75,11 @@ def startSession(sessionId, dateTime):
 
 def endSession(sessionId, dateTime):
   "Ends the session"
-  data = '{"dateTime":"' + formatDatetime(dateTime) + '"}'
+  date = formatDatetime(dateTime)
+  data = '{"dateTime":"' + date + '"}'
   url = SessionsUrl + '/' + str(sessionId) + '/end'
   post(data, url)
-  print("End the session " + str(sessionId))
+  print("End the session " + str(sessionId) + " @ " + date)
   return
 
 

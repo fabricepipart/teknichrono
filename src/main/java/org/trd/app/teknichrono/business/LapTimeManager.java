@@ -2,6 +2,7 @@ package org.trd.app.teknichrono.business;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,7 @@ import org.trd.app.teknichrono.rest.dto.NestedSessionDTO;
 
 public class LapTimeManager {
 
-  private static final int ACCEPTANCE_PERCENTAGE = 300;
+  private static final int ACCEPTANCE_FACTOR = 5;
 
   private Logger logger = Logger.getLogger(LapTimeManager.class);
 
@@ -101,30 +102,45 @@ public class LapTimeManager {
 
   void filterExtreme(List<LapTimeDTO> results) {
     // Needs to be done here since we did not have all info before
-    Map<Integer, LapTimeDTO> bestPerLocation = new HashMap<Integer, LapTimeDTO>();
+    Map<Integer, List<LapTimeDTO>> lapsPerLocation = new HashMap<Integer, List<LapTimeDTO>>();
     for (LapTimeDTO dto : results) {
       NestedLocationDTO location = dto.getSession().getLocation();
-      LapTimeDTO bestOfLocation = bestPerLocation.get(location.getId());
-      if (dto.getDuration() > 0) {
-        if (bestOfLocation == null || bestOfLocation.getDuration() > dto.getDuration()) {
-          bestPerLocation.put(location.getId(), dto);
-        }
+      if(lapsPerLocation.containsKey(location.getId())){
+        lapsPerLocation.get(location.getId()).add(dto);
+      } else {
+        List<LapTimeDTO> lapsOfLocation = new ArrayList<>();
+        lapsOfLocation.add(dto);
+        lapsPerLocation.put(location.getId(), lapsOfLocation);
       }
+    }
+    Map<Integer, Long> averagePerLocation = new HashMap<Integer, Long>();
+    for (Entry<Integer, List<LapTimeDTO>> entry : lapsPerLocation.entrySet()) {
+      Integer locationId = entry.getKey();
+      List<LapTimeDTO> laps = entry.getValue();
+      long sum = laps.stream().mapToLong(LapTimeDTO::getDuration).sum();
+      averagePerLocation.put(locationId, sum / laps.size());
     }
 
     List<LapTimeDTO> toRemove = new ArrayList<>();
     for (LapTimeDTO lapTimeDTO : results) {
       NestedLocationDTO location = lapTimeDTO.getSession().getLocation();
-      LapTimeDTO bestOfLocation = bestPerLocation.get(location.getId());
-      if (bestOfLocation != null) {
-        if (lapTimeDTO.getDuration() > (bestOfLocation.getDuration() * ACCEPTANCE_PERCENTAGE / 100)) {
+      Long averageOfLocation = averagePerLocation.get(location.getId());
+      if (averageOfLocation != null && lapTimeDTO.getDuration() > 0) {
+        if (lapTimeDTO.getDuration() > (averageOfLocation.longValue() * ACCEPTANCE_FACTOR)) {
           logger.info("Discarding lap ID " + lapTimeDTO.getId()
-              + " since it is too long compared to the min for this location : " + lapTimeDTO.getDuration());
+              + " since it is too long (" + lapTimeDTO.getDuration() +
+              ") compared to the average for this location : " + averageOfLocation.longValue());
+          toRemove.add(lapTimeDTO);
+        } else if (lapTimeDTO.getDuration() < (averageOfLocation.longValue() / ACCEPTANCE_FACTOR)) {
+          logger.info("Discarding lap ID " + lapTimeDTO.getId()
+              + " since it is too short (" + lapTimeDTO.getDuration() +
+              ") compared to the average for this location : " + averageOfLocation.longValue());
           toRemove.add(lapTimeDTO);
         }
       }
     }
     results.removeAll(toRemove);
+
   }
 
   private void fillLapsNumber(List<LapTimeDTO> results) {

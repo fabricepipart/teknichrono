@@ -74,8 +74,8 @@ public class Session implements java.io.Serializable {
   @JoinColumn(name = "locationId")
   private Location location;
 
-  @ManyToOne
-  @JsonIgnoreProperties
+  @ManyToOne(optional = true)
+  @JoinColumn(name = "eventId")
   private Event event = null;
 
   @ManyToMany(fetch = FetchType.EAGER)
@@ -214,8 +214,11 @@ public class Session implements java.io.Serializable {
   @Override
   public String toString() {
     String result = getClass().getSimpleName() + " ";
-    if (name != null && !name.trim().isEmpty())
+    if (name != null && !name.trim().isEmpty()) {
       result += "name: " + name;
+      result += " from: " + start;
+      result += " to: " + end;
+    }
     return result;
   }
 

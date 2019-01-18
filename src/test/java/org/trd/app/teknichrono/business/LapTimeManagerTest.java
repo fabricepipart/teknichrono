@@ -56,21 +56,28 @@ public class LapTimeManagerTest {
     ;
     LapTime l1 = createLapTimeWithNoIntermediate(1, true, time += 101);
     LapTime l2 = createLapTimeWithNoIntermediate(2, true, time += 102);
-    LapTime l3 = createLapTimeWithNoIntermediate(3, true, time += 103);
-    LapTime l4 = createLapTimeWithNoIntermediate(4, true, time += 502);
+    LapTime l3 = createLapTimeWithNoIntermediate(3, true, time += 103); // long
+    LapTime l4 = createLapTimeWithNoIntermediate(4, true, time += 1502);
     LapTime l5 = createLapTimeWithNoIntermediate(5, true, time += 98);
     LapTime l6 = createLapTimeWithNoIntermediate(6, true, time += 99);
+    LapTime l7 = createLapTimeWithNoIntermediate(1, true, time += 104);
+    LapTime l8 = createLapTimeWithNoIntermediate(2, true, time += 101); // short
+    LapTime l9 = createLapTimeWithNoIntermediate(3, true, time += 10); // not finished
     searchResults.add(l4);
     searchResults.add(l1);
     searchResults.add(l6);
     searchResults.add(l5);
     searchResults.add(l2);
     searchResults.add(l3);
+    searchResults.add(l7);
+    searchResults.add(l8);
+    searchResults.add(l9);
     List<LapTimeDTO> result = testMe.convert(searchResults);
     testMe.filterExtreme(result);
-    // Only the long laptime has been filtered
-    org.junit.Assert.assertEquals(5, result.size());
+    // Only the long laptime and short has been filtered
+    org.junit.Assert.assertEquals(7, result.size());
     org.junit.Assert.assertTrue(!result.contains(l3));
+    org.junit.Assert.assertTrue(!result.contains(l8));
   }
 
   @Test
