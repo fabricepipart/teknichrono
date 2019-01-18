@@ -60,6 +60,9 @@ angular.module('frontend').controller('LiveController', function ($scope, $inter
             if (valid) {
                 $scope.searchResults = LapTimeResource.queryAll({ SearchType: $scope.searchTypeSelection.key, sessionId: $scope.sessionId, eventId: $scope.eventId, locationId: $scope.locationId, pilotId: $scope.pilotId, categoryId: $scope.categoryId }, function () {
                     $scope.filteredResults = $filter('searchFilter')($scope.searchResults, $scope);
+                    if ($scope.searchTypeSelection.key == "") {
+                        $scope.filteredResults.reverse()
+                    }
                     $scope.currentPage = 0;
                 });
             } else {
@@ -85,8 +88,11 @@ angular.module('frontend').controller('LiveController', function ($scope, $inter
         $scope.currentPage = n;
     };
 
-    $interval(function () {
+    var refresher = $interval(function () {
         $scope.performSearch();
     }, 5000);
+    $scope.$on('$destroy', function () {
+        $interval.cancel(refresher);
+    });
 
 });

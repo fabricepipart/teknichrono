@@ -84,6 +84,7 @@
                     <th>#</th>
                     <th ng-switch-when="true">Start Date</th>
                     <th ng-switch-when="true">End Date</th>
+                    <th>Beacon</th>
                     <th>Pilot</th>
                     <th>Lap</th>
                     <th>Laptime</th>
@@ -96,6 +97,7 @@
                     <td>{{$index + 1}}</td>
                     <td ng-switch-when="true">{{result.startDate | date : 'HH:mm:ss.sss' : 'UTC' }}</td>
                     <td ng-switch-when="true">{{result.endDate | date : 'HH:mm:ss.sss' : 'UTC'}}</td>
+                    <td>{{result.pilot.beaconNumber}}</td>
                     <td>{{result.pilot.firstName}} {{result.pilot.lastName}}</td>
                     <td>{{result.lapIndex}} / {{result.lapNumber}}</td>
                     <td>{{result.duration | date : 'm:ss.sss' : 'UTC'}}</td>
