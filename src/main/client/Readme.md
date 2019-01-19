@@ -5,8 +5,14 @@
 ```
 sudo apt-get install bluetooth libbluetooth-dev
 sudo python3 -m pip install pybluez
-systemctl info systemd-timesyncd
+systemctl status systemd-timesyncd
+mkdir -p /home/pi/scripts/logs
 ```
+
+## Password
+
+```passwd```
+
 
 ## Connect
 
@@ -43,7 +49,7 @@ sudo systemctl status teknichrono.service
 
 ## Backup / Restore SD
 
-Backup
+### Backup
 ```
 df -h
 sudo diskutil unmount /dev/disk4s6
@@ -52,7 +58,7 @@ sudo dd if=/dev/rdisk4 of=/Users/fabricepipart/Documents/teknichrono-sd.img bs=1
 sudo diskutil eject /dev/rdisk3
 ```
 
-Restore
+### Restore
 ```
 df -h
 sudo diskutil unmount /dev/disk3s5
