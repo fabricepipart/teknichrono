@@ -134,8 +134,10 @@ class FridayAfternoonTest:
     sessionIndex = 0
     for s in self.friPm16Sessions:
       session = s.session
-      # We keep 3 best
+      # We keep best
+      s.startSession()
       s.simRace(2, 30, self.chronos[-1]['id'], 0)
+      s.endSession()
       sessionIndex += 1
     friPm16SessionsResults = []
     for s in self.friPm16Sessions:
@@ -151,9 +153,12 @@ class FridayAfternoonTest:
     sessionIndex = 0
     for s in self.friPm8Sessions:
       session = s.session
-      # We keep 3 best
+      # We keep best
       addBestsOfSessions(friPm16SessionsResults[2 * sessionIndex], friPm16SessionsResults[(2 * sessionIndex) + 1], 3, s)
+      s.startSession()
       s.simRace(2, 30, self.chronos[-1]['id'], 1)
+      # We forget to end that one
+      # s.endSession()
       sessionIndex += 1
     friPm8SessionsResults = []
     for s in self.friPm8Sessions:
@@ -162,16 +167,19 @@ class FridayAfternoonTest:
       print("---- Tests Results of " + s.session['name'] + "----")
       checkLaps(getLapsForSession(s.session['id']), 5, {1: 5}, {1: 5})
       checkBestLaps(getBestLapsForSession(s.session['id']), 5, {1: 5}, {1: 5})
-      checkResults(sessionResults, 6, {1: 5}, {1: 5})
+      # Because we skipped the endSession, the unfinished laps still looks ongoing
+      checkResults(sessionResults, 6, {1: 6}, {1: 6})
 
     # -- 1/4 th - 4 x 6
     print("---- 1 / 4 th ----")
     sessionIndex = 0
     for s in self.friPm4Sessions:
       session = s.session
-      # We keep 3 best
+      # We keep best
       addBestsOfSessions(friPm8SessionsResults[2 * sessionIndex], friPm8SessionsResults[(2 * sessionIndex) + 1], 3, s)
+      s.startSession()
       s.simRace(2, 30, self.chronos[-1]['id'], 1)
+      s.endSession()
       sessionIndex += 1
     friPm4SessionsResults = []
     for s in self.friPm4Sessions:
@@ -187,9 +195,11 @@ class FridayAfternoonTest:
     sessionIndex = 0
     for s in self.friPmSemiSessions:
       session = s.session
-      # We keep 3 best
+      # We keep best
       addBestsOfSessions(friPm4SessionsResults[2 * sessionIndex], friPm4SessionsResults[(2 * sessionIndex) + 1], 3, s)
+      s.startSession()
       s.simRace(2, 30, self.chronos[-1]['id'], 1)
+      s.endSession()
       sessionIndex += 1
     friPmSemiSessionsResults = []
     for s in self.friPmSemiSessions:
@@ -202,9 +212,11 @@ class FridayAfternoonTest:
 
     # -- Finale - 1 x 6
     print("---- Finale ----")
-    # We keep 3 best
+    # We keep best
     addBestsOfSessions(friPmSemiSessionsResults[0], friPmSemiSessionsResults[1], 3, self.friPmFinale)
+    self.friPmFinale.startSession()
     self.friPmFinale.simRace(2, 30, self.chronos[-1]['id'])
+    self.friPmFinale.endSession()
     print("---- Tests Results of " + self.friPmFinale.session['name'] + "----")
     checkLaps(getLapsForSession(self.friPmFinale.session['id']), 6, {1: 6}, {1: 6})
     checkBestLaps(getBestLapsForSession(self.friPmFinale.session['id']), 6, {1: 6}, {1: 6})

@@ -33,10 +33,19 @@ angular.module('frontend', ['ngRoute', 'ngResource'])
       .when('/Sessions/edit/:SessionId', { templateUrl: 'views/Session/detail.html', controller: 'EditSessionController' })
       .when('/LapTimes', { templateUrl: 'views/LapTime/search.html', controller: 'LapTimeController' })
       .when('/StartLapTime', { templateUrl: 'views/LapTime/start.html', controller: 'StartLapTimeController' })
+      .when('/Live', { templateUrl: 'views/LapTime/live.html', controller: 'LiveController' })
       .otherwise({
         redirectTo: '/'
       });
   }])
+  .config([
+    '$compileProvider',
+    function ($compileProvider) {
+      //$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|data|chrome-extension):/);
+      $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|mailto|data):/);
+      // Angular before v1.2 uses $compileProvider.urlSanitizationWhitelist(...)
+    }
+  ])
   .controller('LandingPageController', function LandingPageController() {
   })
   .controller('NavController', function NavController($scope, $location) {

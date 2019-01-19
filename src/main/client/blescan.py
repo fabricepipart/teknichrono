@@ -4,6 +4,7 @@ import os
 # JCS 06/07/14
 
 DEBUG = (os.getenv('TEKNICHRONO_BT_DEBUG', 'false') == 'true')
+VERBOSE = False
 # BLE scanner based on https://github.com/adamf/BLE/blob/master/ble-scanner.py
 # BLE scanner, based on https://code.google.com/p/pybluez/source/browse/trunk/examples/advanced/inquiry-with-rssi.py
 
@@ -138,6 +139,7 @@ def parse_events(sock, loop_count=100):
   results = []
   myFullList = []
   for i in range(0, loop_count):
+    sock.settimeout(2.0)
     pkt = sock.recv(255)
     ptype, event, plen = struct.unpack("BBB", pkt[:3])
     #print "--------------"
@@ -158,7 +160,7 @@ def parse_events(sock, loop_count=100):
         report_pkt_offset = 0
         for i in range(0, num_reports):
 
-          if (DEBUG == True):
+          if (DEBUG and VERBOSE):
             print("-------------")
             sys.stdout.write("\tPACKET: ")
             printpacket(pkt)

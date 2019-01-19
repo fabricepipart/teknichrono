@@ -47,9 +47,12 @@ class FridayMorningTest:
     # le meilleur retenu
 
     print("---- Test #1 ----")
+    self.morningTest.startSession()
     self.morningTest.simTimeTrial(2, 19, 20, self.fake1['id'], self.chrono['id'], doNotStart=1, doNotFinish=1)
     print("---- Test #2 ----")
     self.morningTest.simTimeTrial(2, 19, 20, self.fake1['id'], self.chrono['id'], doNotStart=2, doNotFinish=2, startShift=30)
+    # We forget to stop that one
+    self.morningTest.endSession()
 
     print("---- Tests Results ----")
     friMorningTestsLaps = getLapsForSession(self.morningTest.session['id'])
@@ -81,10 +84,12 @@ class FridayMorningTest:
     # Some finish after expected time
 
     print("---- Chrono #1 ----")
+    self.morningChrono.startSession()
     self.morningChrono.simTimeTrial(2, 19, 20, self.fake1['id'], self.chrono['id'], doNotStart=1, doNotFinish=1, startShift=10)
 
     print("---- Chrono #2 ----")
     self.morningChrono.simTimeTrial(2, 19, 20, self.fake1['id'], self.chrono['id'], doNotStart=2, doNotFinish=2, startShift=45)
+    self.morningTest.endSession()
 
     print("---- Chrono Results ----")
     # ---- Results ----

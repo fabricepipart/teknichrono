@@ -21,9 +21,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.Chronometer;
 import org.trd.app.teknichrono.model.Ping;
 import org.trd.app.teknichrono.model.Session;
+import org.trd.app.teknichrono.rest.dto.CategoryDTO;
+import org.trd.app.teknichrono.rest.dto.ChronometerDTO;
+import org.trd.app.teknichrono.util.DurationLogger;
 
 /**
  * 
@@ -31,36 +35,41 @@ import org.trd.app.teknichrono.model.Session;
 @Stateless
 @Path("/chronometers")
 public class ChronometerEndpoint {
+  private Logger logger = Logger.getLogger(ChronometerEndpoint.class);
   @PersistenceContext(unitName = "teknichrono-persistence-unit")
   private EntityManager em;
 
   @POST
   @Consumes("application/json")
   public Response create(Chronometer entity) {
-    em.persist(entity);
-    return Response
-        .created(UriBuilder.fromResource(ChronometerEndpoint.class).path(String.valueOf(entity.getId())).build())
-        .build();
+    try(DurationLogger dl = new DurationLogger(logger, "Create chronometer " + entity.getName())) {
+        em.persist(entity);
+        return Response
+            .created(UriBuilder.fromResource(ChronometerEndpoint.class).path(String.valueOf(entity.getId())).build())
+            .build();
+    }
   }
 
   @DELETE
   @Path("/{id:[0-9][0-9]*}")
   public Response deleteById(@PathParam("id") int id) {
-    Chronometer entity = em.find(Chronometer.class, id);
-    if (entity == null) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
-    for (Session s : entity.getSessions()) {
-      s.getChronometers().remove(entity);
-    }
-    List<Ping> pings = entity.getPings();
-    if (pings != null) {
-      for (Ping ping : pings) {
-        ping.setChrono(null);
-        em.persist(ping);
+    try(DurationLogger dl = new DurationLogger(logger, "Delete chronometer ID=" + id)) {
+      Chronometer entity = em.find(Chronometer.class, id);
+      if (entity == null) {
+        return Response.status(Status.NOT_FOUND).build();
       }
+      for (Session s : entity.getSessions()) {
+        s.getChronometers().remove(entity);
+      }
+      List<Ping> pings = entity.getPings();
+      if (pings != null) {
+        for (Ping ping : pings) {
+          ping.setChrono(null);
+          em.persist(ping);
+        }
+      }
+      em.remove(entity);
     }
-    em.remove(entity);
     return Response.noContent().build();
   }
 
@@ -68,74 +77,85 @@ public class ChronometerEndpoint {
   @Path("/{id:[0-9][0-9]*}")
   @Produces("application/json")
   public Response findById(@PathParam("id") int id) {
-    TypedQuery<Chronometer> findByIdQuery = em
-        .createQuery("SELECT DISTINCT c FROM Chronometer c WHERE c.id = :entityId ORDER BY c.id", Chronometer.class);
-    findByIdQuery.setParameter("entityId", id);
-    Chronometer entity;
-    try {
-      entity = findByIdQuery.getSingleResult();
-    } catch (NoResultException nre) {
-      entity = null;
+    try(DurationLogger dl = new DurationLogger(logger, "Find chronometer ID=" + id)) {
+      TypedQuery<Chronometer> findByIdQuery = em
+          .createQuery("SELECT DISTINCT c FROM Chronometer c LEFT JOIN FETCH c.pings WHERE c.id = :entityId ORDER BY c.id", Chronometer.class);
+      findByIdQuery.setParameter("entityId", id);
+      Chronometer entity;
+      try {
+        entity = findByIdQuery.getSingleResult();
+      } catch (NoResultException nre) {
+        entity = null;
+      }
+      if (entity == null) {
+        return Response.status(Status.NOT_FOUND).build();
+      }
+      ChronometerDTO dto = new ChronometerDTO(entity);
+      return Response.ok(dto).build();
     }
-    if (entity == null) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
-    return Response.ok(entity).build();
   }
 
   @GET
   @Path("/name")
   @Produces("application/json")
   public Response findChronometerByName(@QueryParam("name") String name) {
-    TypedQuery<Chronometer> findByNameQuery = em
-        .createQuery("SELECT DISTINCT c FROM Chronometer c WHERE c.name = :name ORDER BY c.id", Chronometer.class);
-    findByNameQuery.setParameter("name", name);
-    Chronometer entity;
-    try {
-      entity = findByNameQuery.getSingleResult();
-    } catch (NoResultException nre) {
-      entity = null;
+    try(DurationLogger dl = new DurationLogger(logger, "Find chronometer " + name)) {
+      TypedQuery<Chronometer> findByNameQuery = em
+          .createQuery("SELECT DISTINCT c FROM Chronometer c WHERE c.name = :name ORDER BY c.id", Chronometer.class);
+      findByNameQuery.setParameter("name", name);
+      Chronometer entity;
+      try {
+        entity = findByNameQuery.getSingleResult();
+      } catch (NoResultException nre) {
+        entity = null;
+      }
+      if (entity == null) {
+        return Response.status(Status.NOT_FOUND).build();
+      }
+      ChronometerDTO dto = new ChronometerDTO(entity);
+      return Response.ok(dto).build();
     }
-    if (entity == null) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
-    return Response.ok(entity).build();
   }
 
   @GET
   @Produces("application/json")
-  public List<Chronometer> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
-    TypedQuery<Chronometer> findAllQuery = em.createQuery("SELECT DISTINCT c FROM Chronometer c ORDER BY c.id",
-        Chronometer.class);
-    if (startPosition != null) {
-      findAllQuery.setFirstResult(startPosition);
+  public List<ChronometerDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
+    try(DurationLogger dl = new DurationLogger(logger, "Get all chronometers")) {
+      TypedQuery<Chronometer> findAllQuery = em.createQuery("SELECT DISTINCT c FROM Chronometer c ORDER BY c.id",
+          Chronometer.class);
+      if (startPosition != null) {
+        findAllQuery.setFirstResult(startPosition);
+      }
+      if (maxResult != null) {
+        findAllQuery.setMaxResults(maxResult);
+      }
+      final List<Chronometer> results = findAllQuery.getResultList();
+      final List<ChronometerDTO> converted = ChronometerDTO.convert(results);
+      return converted;
     }
-    if (maxResult != null) {
-      findAllQuery.setMaxResults(maxResult);
-    }
-    final List<Chronometer> results = findAllQuery.getResultList();
-    return results;
   }
 
   @PUT
   @Path("/{id:[0-9][0-9]*}")
   @Consumes("application/json")
   public Response update(@PathParam("id") int id, Chronometer entity) {
-    if (entity == null) {
-      return Response.status(Status.BAD_REQUEST).build();
-    }
-    if (id != entity.getId()) {
-      return Response.status(Status.CONFLICT).entity(entity).build();
-    }
-    if (em.find(Chronometer.class, id) == null) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
-    try {
-      entity = em.merge(entity);
-    } catch (OptimisticLockException e) {
-      return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
-    }
+    try(DurationLogger dl = new DurationLogger(logger, "Update chronometer ID=" + id)) {
+      if (entity == null) {
+        return Response.status(Status.BAD_REQUEST).build();
+      }
+      if (id != entity.getId()) {
+        return Response.status(Status.CONFLICT).entity(entity).build();
+      }
+      if (em.find(Chronometer.class, id) == null) {
+        return Response.status(Status.NOT_FOUND).build();
+      }
+      try {
+        entity = em.merge(entity);
+      } catch (OptimisticLockException e) {
+        return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
+      }
 
-    return Response.noContent().build();
+      return Response.noContent().build();
+    }
   }
 }

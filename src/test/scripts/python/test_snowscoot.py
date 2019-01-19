@@ -52,7 +52,7 @@ isola = addLocation('Isola', False)
 
 # ----------------------------------------------------------------------
 # Add Sessions
-session = addSession('Snowscoot Isola', datetime(2016, 8, 22, 8), datetime(2016, 8, 22, 18), 'tt')
+session = addSession('Snowscoot Isola', datetime(2017, 1, 27, 8), datetime(2017, 1, 27, 18), 'tt')
 
 addSessionToLocation(isola['id'], session['id'])
 addSessionToEvent(event['id'], session['id'])

@@ -1,0 +1,57 @@
+<div>
+    <form id="LiveSearch" class="form-horizontal">
+        <div class="form-group">
+            <label for="searchType" class="col-sm-2 control-label">Search Type</label>
+            <div id="searchTypeControls" class="col-sm-10">
+                <input type="radio" class="radio-inline" ng-model="searchTypeSelection" value="" name="searchType" ng-value="searchesTypesList[0]"> {{searchesTypesList[0].text}}
+                <input type="radio" class="radio-inline" ng-model="searchTypeSelection" value="" name="searchType" ng-value="searchesTypesList[1]"> {{searchesTypesList[1].text}}
+                <input type="radio" class="radio-inline" ng-model="searchTypeSelection" value="" name="searchType" ng-value="searchesTypesList[2]"> {{searchesTypesList[2].text}}
+            </div>
+        </div>
+    </form>
+</div>
+<div id="search-results">
+    <div class="table-responsive">
+        <table class="table table-responsive table-bordered table-striped clearfix text-nowrap">
+            <thead>
+                <tr ng-switch on="searchTypeSelection.key == ''">
+                    <th>#</th>
+                    <th ng-switch-when="true">Start Date</th>
+                    <th ng-switch-when="true">End Date</th>
+                    <th>Beacon</th>
+                    <th>Pilot</th>
+                    <th>Lap</th>
+                    <th>Laptime</th>
+                    <th ng-switch-when="false">∆ Best</th>
+                    <th ng-switch-when="false">∆ Previous</th>
+                </tr>
+            </thead>
+            <tbody id="search-results-body">
+                <tr ng-repeat="result in filteredResults | startFrom:currentPage*pageSize | limitTo:pageSize" ng-switch on="searchTypeSelection.key == ''">
+                    <td>{{$index + 1}}</td>
+                    <td ng-switch-when="true">{{result.startDate | date : 'HH:mm:ss.sss' : 'UTC' }}</td>
+                    <td ng-switch-when="true">{{result.endDate | date : 'HH:mm:ss.sss' : 'UTC'}}</td>
+                    <td>{{result.pilot.beaconNumber}}</td>
+                    <td>{{result.pilot.firstName}} {{result.pilot.lastName}}</td>
+                    <td>{{result.lapIndex}} / {{result.lapNumber}}</td>
+                    <td>{{result.duration | date : 'm:ss.sss' : 'UTC'}}</td>
+                    <td ng-switch-when="false">{{result.gapWithBest | date : 'm:ss.sss' : 'UTC'}}</td>
+                    <td ng-switch-when="false">{{result.gapWithPrevious | date : 'm:ss.sss' : 'UTC'}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <ul class="pagination pagination-centered">
+        <li ng-class="{disabled:currentPage == 0}">
+            <a id="prev" href ng-click="previous()">«</a>
+        </li>
+        <li ng-repeat="n in pageRange" ng-class="{active:currentPage == n}" ng-click="setPage(n)">
+            <a href ng-bind="n + 1">1</a>
+        </li>
+        <li ng-class="{disabled: currentPage == (numberOfPages() - 1)}">
+            <a id="next" href ng-click="next()">»</a>
+        </li>
+    </ul>
+
+</div>

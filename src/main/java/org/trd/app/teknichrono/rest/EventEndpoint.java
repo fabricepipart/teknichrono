@@ -21,8 +21,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.Event;
 import org.trd.app.teknichrono.model.Session;
+import org.trd.app.teknichrono.util.DurationLogger;
 
 /**
  * 
@@ -32,6 +34,9 @@ import org.trd.app.teknichrono.model.Session;
 public class EventEndpoint {
   @PersistenceContext(unitName = "teknichrono-persistence-unit")
   private EntityManager em;
+
+
+  private Logger logger = Logger.getLogger(EventEndpoint.class);
 
   @POST
   @Consumes("application/json")
@@ -106,22 +111,22 @@ public class EventEndpoint {
   @Path("{eventId:[0-9][0-9]*}/addSession")
   @Produces("application/json")
   public Response addSession(@PathParam("eventId") int eventId, @QueryParam("sessionId") Integer sessionId) {
-    Event event = em.find(Event.class, eventId);
-    if (event == null) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
-    Session session = em.find(Session.class, sessionId);
-    if (session == null) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
-    session.setEvent(event);
-    event.getSessions().add(session);
-    em.persist(event);
-    for (Session c : event.getSessions()) {
-      em.persist(c);
-    }
+    try(DurationLogger dl = new DurationLogger(logger, "Add session session ID=" + sessionId + " to event ID=" + eventId)) {
+      Event event = em.find(Event.class, eventId);
+      if (event == null) {
+        return Response.status(Status.NOT_FOUND).build();
+      }
+      Session session = em.find(Session.class, sessionId);
+      if (session == null) {
+        return Response.status(Status.NOT_FOUND).build();
+      }
+      session.setEvent(event);
+      event.getSessions().add(session);
+      em.persist(event);
+      em.persist(session);
 
-    return Response.ok(event).build();
+      return Response.ok(event).build();
+    }
   }
 
   @PUT

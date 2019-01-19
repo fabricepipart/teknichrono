@@ -7,7 +7,7 @@
         </div>
     </div>
 </div>
-<hr/>
+<hr />
 <div>
     <h3>Search for Chronometers</h3>
     <form id="ChronometerSearch" class="form-horizontal">
@@ -44,7 +44,7 @@
             <thead>
                 <tr>
                     <th>Name</th>
-                    <!-- <th>Chrono Index</th> -->
+                    <th>Last seen</th>
                 </tr>
             </thead>
             <tbody id="search-results-body">
@@ -52,9 +52,9 @@
                     <td>
                         <a href="#/Chronometers/edit/{{result.id}}">{{result.name}}</a>
                     </td>
-                    <!-- <td>
-                        <a href="#/Chronometers/edit/{{result.id}}">{{result.chronoIndex}}</a>
-                    </td> -->
+                    <td>
+                        <a>{{result.lastSeen | date : 'yyyy-MM-dd HH:mm:ss.sss' : 'UTC' }}</a>
+                    </td>
                 </tr>
             </tbody>
         </table>

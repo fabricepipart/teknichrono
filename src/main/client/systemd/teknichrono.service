@@ -1,0 +1,11 @@
+[Unit]
+Description=Teknichrono Client
+After=multi-user.target
+ 
+[Service]
+Type=simple
+ExecStart=/home/pi/scripts/client/start.sh
+Restart=always
+ 
+[Install]
+WantedBy=multi-user.target

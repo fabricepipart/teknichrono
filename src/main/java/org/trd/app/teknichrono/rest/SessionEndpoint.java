@@ -25,6 +25,8 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.business.ChronoManager;
+import org.trd.app.teknichrono.business.SessionSelector;
+import org.trd.app.teknichrono.model.Beacon;
 import org.trd.app.teknichrono.model.Chronometer;
 import org.trd.app.teknichrono.model.Event;
 import org.trd.app.teknichrono.model.Location;
@@ -110,6 +112,20 @@ public class SessionEndpoint {
   }
 
   @GET
+  @Path("/current")
+  @Produces("application/json")
+  public Response findCurrent() {
+    List<Session> allSessions = listAllSessions(null, null);
+    SessionSelector selector = new SessionSelector();
+    Session session = selector.pickMostRelevantCurrent(allSessions);
+    if (session == null) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+    SessionDTO dto = new SessionDTO(session);
+    return Response.ok(dto).build();
+  }
+
+  @GET
   @Path("/name")
   @Produces("application/json")
   public SessionDTO findSessionByName(@QueryParam("name") String name) {
@@ -133,6 +149,13 @@ public class SessionEndpoint {
   @Produces("application/json")
   public List<SessionDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
     DurationLogger perf = DurationLogger.get(logger).start("List sessions");
+    final List<Session> results = listAllSessions(startPosition, maxResult);
+    final List<SessionDTO> converted = SessionDTO.convert(results);
+    perf.end();
+    return converted;
+  }
+
+  private List<Session> listAllSessions(Integer startPosition, Integer maxResult) {
     TypedQuery<Session> findAllQuery = em
         .createQuery("SELECT DISTINCT e FROM Session e LEFT JOIN FETCH e.chronometers ORDER BY e.id", Session.class);
     if (startPosition != null) {
@@ -142,9 +165,7 @@ public class SessionEndpoint {
       findAllQuery.setMaxResults(maxResult);
     }
     final List<Session> results = findAllQuery.getResultList();
-    final List<SessionDTO> converted = SessionDTO.convert(results);
-    perf.end();
-    return converted;
+    return results;
   }
 
   @POST
@@ -224,7 +245,7 @@ public class SessionEndpoint {
   @Path("{sessionId:[0-9][0-9]*}/end")
   @Produces("application/json")
   public Response end(Ping end, @PathParam("sessionId") int sessionId) {
-    DurationLogger perf = DurationLogger.get(logger).start("End session " + sessionId);
+    DurationLogger perf = DurationLogger.get(logger).start("End session " + sessionId + " @ " + end.getDateTime());
     Session session = em.find(Session.class, sessionId);
     if (session == null) {
       return Response.status(Status.NOT_FOUND).build();
@@ -237,11 +258,11 @@ public class SessionEndpoint {
   }
 
   private void startSession(Session session, Timestamp timestamp) {
-    // Stop all other sessions of the event
+    // Stop all other sessions of the event that are not concurrent
     Event event = session.getEvent();
     if (event != null) {
       for (Session otherSession : event.getSessions()) {
-        if (otherSession.getId() != session.getId() && otherSession.isCurrent()) {
+        if (otherSession.getId() != session.getId() && otherSession.isCurrent() && !intersect(otherSession, session)) {
           endSession(otherSession, timestamp);
         }
       }
@@ -252,6 +273,16 @@ public class SessionEndpoint {
     }
     session.setCurrent(true);
     em.persist(session);
+  }
+
+  private boolean intersect(Session otherSession, Session session) {
+    if((otherSession.getStart().getTime() >= session.getStart().getTime()) && (otherSession.getStart().getTime() <= otherSession.getEnd().getTime())){
+      return true;
+    }
+    if(otherSession.getEnd().getTime() >= otherSession.getStart().getTime() && otherSession.getEnd().getTime() <= otherSession.getEnd().getTime()){
+      return true;
+    }
+    return false;
   }
 
   private void endSession(Session session, Timestamp end) {
@@ -272,7 +303,7 @@ public class SessionEndpoint {
       ping.setBeacon(pilot.getCurrentBeacon());
       ping.setChrono(chronometer);
       em.persist(ping);
-      cm.addPing(ping);
+      cm.addPing(ping, pilot, chronometer, session);
     }
   }
 
@@ -283,18 +314,39 @@ public class SessionEndpoint {
     if (entity == null) {
       return Response.status(Status.BAD_REQUEST).build();
     }
+    DurationLogger perf = DurationLogger.get(logger).start("Update session id " + entity.getId());
     if (id != entity.getId()) {
+      perf.end();
       return Response.status(Status.CONFLICT).entity(entity).build();
     }
-    if (em.find(Session.class, id) == null) {
+    Session session = em.find(Session.class, id);
+    if (session == null) {
+      perf.end();
       return Response.status(Status.NOT_FOUND).build();
     }
+
+    if (entity.getLocation() != null && entity.getLocation().getId() > 0) {
+      Location location = em.find(Location.class, entity.getLocation().getId());
+      session.setLocation(location);
+    }
+    if (entity.getEvent() != null && entity.getEvent().getId() > 0) {
+      Event event = em.find(Event.class, entity.getEvent().getId());
+      session.setEvent(event);
+    }
+    session.setName(entity.getName());
+    session.setStart(entity.getStart());
+    session.setEnd(entity.getEnd());
+    session.setType(entity.getType());
+    session.setInactivity(entity.getInactivity());
+    session.setCurrent(entity.isCurrent());
+
     try {
-      entity = em.merge(entity);
+      em.persist(session);
     } catch (OptimisticLockException e) {
       return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
     }
 
+    perf.end();
     return Response.noContent().build();
   }
 }

@@ -1,0 +1,9 @@
+spec:
+  template:
+    spec:
+      containers:
+        - command:
+            - java
+            - '-jar'
+            - /deployments/${project.artifactId}-thorntail.jar
+            - '-Smariadb'

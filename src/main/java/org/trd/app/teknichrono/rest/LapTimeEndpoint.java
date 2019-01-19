@@ -1,43 +1,31 @@
 package org.trd.app.teknichrono.rest;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.OptimisticLockException;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
-
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.business.LapTimeDisplay;
 import org.trd.app.teknichrono.business.LapTimeManager;
-import org.trd.app.teknichrono.model.Category;
-import org.trd.app.teknichrono.model.Event;
-import org.trd.app.teknichrono.model.LapTime;
-import org.trd.app.teknichrono.model.Location;
-import org.trd.app.teknichrono.model.Pilot;
-import org.trd.app.teknichrono.model.Session;
-import org.trd.app.teknichrono.model.SessionType;
+import org.trd.app.teknichrono.model.*;
 import org.trd.app.teknichrono.rest.dto.LapTimeDTO;
 import org.trd.app.teknichrono.rest.dto.NestedPilotDTO;
 import org.trd.app.teknichrono.rest.sql.OrderByClauseBuilder;
 import org.trd.app.teknichrono.rest.sql.WhereClauseBuilder;
 import org.trd.app.teknichrono.util.InvalidArgumentException;
+
+import javax.ejb.Stateless;
+import javax.persistence.*;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 
@@ -93,6 +81,16 @@ public class LapTimeEndpoint {
   }
 
   @GET
+  @Path("/csv/best")
+  @Produces("text/csv")
+  public String bestToCsv(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
+                             @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
+                             @QueryParam("categoryId") Integer categoryId) {
+    List<LapTimeDTO> results =  best(pilotId,sessionId,locationId,  eventId,categoryId, null, null);
+    return convertToCsv(results);
+  }
+
+  @GET
   @Path("/best")
   @Produces("application/json")
   public List<LapTimeDTO> best(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
@@ -112,6 +110,32 @@ public class LapTimeEndpoint {
           LapTimeDisplay.ORDER_BY_DURATION);
     }
     return results;
+  }
+
+  @GET
+  @Path("/csv/results")
+  @Produces("text/csv")
+  public String resultsToCsv(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
+                                  @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
+                                  @QueryParam("categoryId") Integer categoryId) {
+
+    List<LapTimeDTO> results =  results(pilotId,sessionId,locationId,  eventId,categoryId, null, null);
+    return convertToCsv(results);
+  }
+
+  private String convertToCsv(List<LapTimeDTO> results) {
+    String csvResult = null;
+        StringWriter writer = new StringWriter();
+    // TODO StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder<LapTimeDTO>(writer).withMappingStrategy(new LapTimeMappingStrategy()).build();
+    StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder<LapTimeDTO>(writer).build();
+    try {
+      beanToCsv.write(results);
+      csvResult = writer.toString();
+      writer.close();
+    } catch (CsvDataTypeMismatchException | CsvRequiredFieldEmptyException | IOException e) {
+      e.printStackTrace();
+    }
+    return csvResult;
   }
 
   @GET
@@ -152,6 +176,16 @@ public class LapTimeEndpoint {
     }
     return results;
 
+  }
+
+  @GET
+  @Path("/csv")
+  @Produces("text/csv")
+  public String listAllToCsv(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
+                             @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
+                             @QueryParam("categoryId") Integer categoryId) {
+    List<LapTimeDTO> results =  listAll(pilotId,sessionId,locationId,  eventId,categoryId, null, null);
+    return convertToCsv(results);
   }
 
   @GET

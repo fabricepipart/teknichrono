@@ -119,9 +119,7 @@ public class LocationEndpoint {
     session.setLocation(location);
     location.getSessions().add(session);
     em.persist(location);
-    for (Session c : location.getSessions()) {
-      em.persist(c);
-    }
+    em.persist(session);
 
     return Response.ok(location).build();
   }

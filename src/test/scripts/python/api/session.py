@@ -9,8 +9,7 @@ SessionsUrl = '/rest/sessions'
 
 def addSession(name, start, end, sessionType):
   "This adds a Session"
-  data = '{"type":"' + sessionType + '", "name":"' + name + '", "start":"' + formatDatetime(
-      start) + '", "end":"' + formatDatetime(end) + '"}'
+  data = '{"type":"' + sessionType + '", "name":"' + name + '", "start":"' + formatDatetime(start) + '", "end":"' + formatDatetime(end) + '"}'
   post(data, SessionsUrl)
   print("Session " + name + " added")
   sessionResponse = getSessionByName(name)
@@ -75,11 +74,12 @@ def startSession(sessionId, dateTime):
 
 
 def endSession(sessionId, dateTime):
-  "Starts the session"
-  data = '{"dateTime":"' + formatDatetime(dateTime) + '"}'
+  "Ends the session"
+  date = formatDatetime(dateTime)
+  data = '{"dateTime":"' + date + '"}'
   url = SessionsUrl + '/' + str(sessionId) + '/end'
   post(data, url)
-  print("End the session " + str(sessionId))
+  print("End the session " + str(sessionId) + " @ " + date)
   return
 
 

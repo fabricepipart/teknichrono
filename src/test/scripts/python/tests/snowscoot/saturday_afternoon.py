@@ -86,7 +86,9 @@ class SaturdayAfternoonTest:
       session = sessions[i]
       session.addPilot(qualified[2 * i]['pilot'])
       session.addPilot(qualified[2 * i + 1]['pilot'])
+      session.startSession()
       session.simRace(1, 10, self.chrono['id'], 0)
+      session.endSession()
       # We keep winner
       sessionResults = getResultsForSession(session.session['id'])
       results.append(sessionResults[0])
@@ -97,10 +99,13 @@ class SaturdayAfternoonTest:
     return results
 
   def qualify(self):
+
+    self.qualification.startSession()
     print("---- Test #1 ----")
     self.qualification.simTimeTrial(2, 19, 20, self.fake1['id'], self.chrono['id'])
     print("---- Test #2 ----")
     self.qualification.simTimeTrial(2, 19, 20, self.fake1['id'], self.chrono['id'], startShift=30)
+    self.qualification.endSession()
 
     print("---- Tests Results (general) ----")
     bestLaps = getBestLapsForSession(self.qualification.session['id'])

@@ -191,4 +191,5 @@ angular.module('frontend').controller('EditSessionController', function ($scope,
     ];
 
     $scope.get();
+
 });
