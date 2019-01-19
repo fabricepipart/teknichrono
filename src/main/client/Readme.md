@@ -41,12 +41,35 @@ sudo systemctl stop teknichrono.service
 sudo systemctl status teknichrono.service
 ```
 
+## Backup / Restore SD
+
+Backup
+```
+df -h
+sudo diskutil unmount /dev/disk4s6
+sudo diskutil unmount /dev/disk4s1
+sudo dd if=/dev/rdisk4 of=/Users/fabricepipart/Documents/teknichrono-sd.img bs=1m
+sudo diskutil eject /dev/rdisk3
+```
+
+Restore
+```
+df -h
+sudo diskutil unmount /dev/disk3s5
+sudo diskutil unmount /dev/disk3s1
+sudo dd bs=1m if=2018-11-13-raspbian-stretch.img of=/dev/rdisk3 conv=sync
+sudo diskutil eject /dev/rdisk3
+```
+
 ## References
 
 * http://www.diegoacuna.me/how-to-run-a-script-as-a-service-in-raspberry-pi-raspbian-jessie/
+* https://www.raspberrypi.org/documentation/installation/installing-images/mac.md
 
+## Bluetooth
 
-
+```
 rfkill unblock all
 sudo hciconfig
 sudo bluetoothctl
+```
