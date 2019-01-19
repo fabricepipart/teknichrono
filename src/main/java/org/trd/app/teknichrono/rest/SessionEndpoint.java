@@ -1,6 +1,8 @@
 package org.trd.app.teknichrono.rest;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -287,8 +289,9 @@ public class SessionEndpoint {
 
   private void endSession(Session session, Timestamp end) {
     if (session.getEnd().getTime() < end.getTime()) {
-      session.setEnd(end);
+      logger.warn("Session ID=" + session.getId() + " has been stopped after expected end");
     }
+    session.setEnd(end);
     session.setCurrent(false);
     em.persist(session);
   }
@@ -332,6 +335,27 @@ public class SessionEndpoint {
     if (entity.getEvent() != null && entity.getEvent().getId() > 0) {
       Event event = em.find(Event.class, entity.getEvent().getId());
       session.setEvent(event);
+    }
+    if (entity.getPilots() != null && entity.getPilots().size() > 0) {
+      Set<Pilot> pilotsToSet = new HashSet<>();
+      for (Pilot p : entity.getPilots()) {
+        if (p != null && p.getId() > 0) {
+          Pilot pilot = em.find(Pilot.class, p.getId());
+          pilotsToSet.add(pilot);
+        }
+      }
+      session.setPilots(pilotsToSet);
+    }
+    if (entity.getChronometers() != null && entity.getChronometers().size() > 0) {
+      logger.warn("Session ID=" + session.getId() + " Chronometers list has not been updated to avoid messing order");
+//      List<Chronometer> chronosToSet = new ArrayList<>();
+//      for (Chronometer c : entity.getChronometers()) {
+//        if (c != null && c.getId() > 0) {
+//          Chronometer chrono = em.find(Chronometer.class, c.getId());
+//          chronosToSet.add(chrono);
+//        }
+//      }
+//      session.setChronometers(chronosToSet);
     }
     session.setName(entity.getName());
     session.setStart(entity.getStart());
