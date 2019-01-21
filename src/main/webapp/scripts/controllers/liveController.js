@@ -88,6 +88,7 @@ angular.module('frontend').controller('LiveController', function ($scope, $inter
         $scope.currentPage = n;
     };
 
+    $scope.performSearch();
     var refresher = $interval(function () {
         $scope.performSearch();
     }, 5000);

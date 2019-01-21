@@ -79,3 +79,20 @@ rfkill unblock all
 sudo hciconfig
 sudo bluetoothctl
 ```
+
+## How to verify it runs fine
+
+### Preparation
+
+Have a mobile hotspot (real hotspot or mobile in hotspot mode).
+Connect each Raspberry manually to this hotspot so that it knows the Wifi and connects to it automatically when seen.
+
+### Test with organizer beacon
+
+Reserve one beacon for the organizer. Create a session that spans over the whole event, with organizers as pilots and all chronos.
+Switch on and off the organizer beacon next to the chrono. If everything went fine, you should see the beacon as last seen in the Chronometers search section.
+
+### Debug if necessary
+
+```arp -a``` to know possible IPs in network
+ssh to raspberry

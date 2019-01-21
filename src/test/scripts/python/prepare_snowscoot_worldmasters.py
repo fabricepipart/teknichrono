@@ -9,14 +9,14 @@ championship = WorldMasters('Isola WorldMasters')
 championship.prepare()
 
 # Elite
-championship.addElitePilot('Bruce', 'Rolfo', 246)
+championship.addElitePilot('Bruce', 'Rulfo', 246)
 
 # Open
 
 # Woman
 
 # Junior
-championship.addJuniorPilot('Fabrice', 'Pipart', 122)
+championship.addOrganizerPilot('Fabrice', 'Pipart', 122)
 
 print("-------------------------------------")
 print("Friday morning")

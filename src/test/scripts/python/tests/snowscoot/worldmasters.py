@@ -31,6 +31,7 @@ class WorldMasters:
     self.openPilots = []
     self.womanPilots = []
     self.juniorPilots = []
+    self.organizerPilots = []
     self.fake = None
     self.chrono0 = None
     self.chrono1 = None
@@ -146,6 +147,10 @@ class WorldMasters:
     self.createSession('Sun Double - Red River', datetime(2019, 1, 27, 11, 0), datetime(2019, 1, 27, 13, 00), 'tt', redRiver, chronos1, allPilots)
     self.createSession('Sun Double - Roubines', datetime(2019, 1, 27, 11, 0), datetime(2019, 1, 27, 13, 00), 'tt', roubines, chronos2, allPilots)
 
+  def prepareTestSessions(self):
+    chronos = [self.chrono0, self.chrono1, self.chrono2]
+    self.createSession('Verify', datetime(2019, 1, 25, 8, 0), datetime(2019, 1, 27, 20, 00), 'tt', self.redRiver, chronos, self.organizerPilots)
+
   def prepareEvent(self):
     # Add Events
     self.event = addEvent(self.name)
@@ -157,6 +162,14 @@ class WorldMasters:
     self.openCategory = addCategory('Open')
     self.womanCategory = addCategory('Woman')
     self.juniorCategory = addCategory('Junior')
+    self.organizerCategory = addCategory('Organizer')
+
+  def addOrganizerPilot(self, firstname, lastname, beaconNumber):
+    pilot = addPilot(firstname, lastname)
+    self.organizerPilots.append(pilot)
+    self.allPilots.append(pilot)
+    addPilotToCategory(self.organizerCategory['id'], pilot['id'])
+    associatePilotBeacon(pilot['id'], self.beacons[beaconNumber]['id'])
 
   def addElitePilot(self, firstname, lastname, beaconNumber):
     pilot = addPilot(firstname, lastname)
@@ -218,3 +231,4 @@ class WorldMasters:
     self.prepareBeacons()
     self.prepareChronos()
     self.prepareLocations()
+    self.prepareTestSessions()

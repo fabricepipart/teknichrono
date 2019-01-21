@@ -14,7 +14,7 @@ public class ChronometerDTO {
   private int id;
   private int version;
   private String name;
-  private Timestamp lastSeen;
+  private NestedPingDTO lastSeen;
 
   public ChronometerDTO() {
   }
@@ -27,10 +27,10 @@ public class ChronometerDTO {
       if (entity.getPings() != null) {
         for (Ping p : entity.getPings()){
           if(p.getDateTime() != null){
-            boolean moreRecent = this.lastSeen != null && this.lastSeen.getTime() < p.getDateTime().getTime();
+            boolean moreRecent = this.lastSeen != null && this.lastSeen.getDateTime().getTime() < p.getDateTime().getTime();
             boolean isFirst = this.lastSeen == null;
             if(moreRecent || isFirst){
-              this.lastSeen = p.getDateTime();
+              this.lastSeen = new NestedPingDTO(p);
             }
           }
         }
@@ -92,11 +92,11 @@ public class ChronometerDTO {
     this.name = name;
   }
 
-  public Timestamp getLastSeen() {
+  public NestedPingDTO getLastSeen() {
     return lastSeen;
   }
 
-  public void setLastSeen(Timestamp lastSeen) {
+  public void setLastSeen(NestedPingDTO lastSeen) {
     this.lastSeen = lastSeen;
   }
 
