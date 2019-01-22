@@ -7,6 +7,7 @@ angular.module('frontend').controller('StartLapTimeController', function ($scope
     $scope.pilot = {};
     $scope.chrono = {};
     $scope.beacon = {};
+    $scope.ping = {};
 
 
     $scope.beaconList = BeaconResource.queryAll(function (items) {
@@ -87,9 +88,19 @@ angular.module('frontend').controller('StartLapTimeController', function ($scope
     }
 
     $scope.startLapTimeManual = function () {
-        var now = $filter('date')(new Date(), 'yyyy-MM-ddTHH:mm:ss.sss', 'UTC')
+        var pingDate = $filter('date')(new Date(), 'yyyy-MM-ddTHH:mm:ss.sss', 'UTC')
+        if ($scope.ping.date) {
+            pingDate = $scope.ping.date
+        }
         var beaconSelection = $filter("filter")($scope.beaconSelectionList, { number: $scope.beacon.number })[0];
-        PingResource.create({ chronoId: $scope.chronoSelection.value, beaconId: beaconSelection.id }, { power: '1', dateTime: now });
+        PingResource.create({ chronoId: $scope.chronoSelection.value, beaconId: beaconSelection.id }, { power: '1', dateTime: pingDate });
     }
+
+
+    $('#ping').datetimepicker({ format: 'YYYY-MM-DDTHH:mm:ss.SSS' });
+    $('#ping').on('dp.change', function (event) {
+        $scope.ping.date = event.date.format('YYYY-MM-DDTHH:mm:ss.SSS');
+    })
+
 
 });

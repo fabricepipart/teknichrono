@@ -23,6 +23,10 @@ TEKNICHRONO_SERVER = os.getenv('TEKNICHRONO_SERVER', 'http://localhost:8080')
 CHRONO_NAME = os.getenv('CHRONO_NAME', 'Raspberry')
 
 
+def setupBackupFile():
+  return open('/home/pi/scripts/logs/all_pings.log', 'a', buffering=1)
+
+
 def setupLogging():
   # set up logging to file
   fh = logging.FileHandler('/home/pi/scripts/logs/teknichrono.log')
@@ -68,6 +72,7 @@ def getSendStrategy(key, chronoId, workQueue):
 
 
 setupLogging()
+backupFile = setupBackupFile()
 logger = logging.getLogger('startup')
 socket.setdefaulttimeout(2.0)
 
@@ -93,8 +98,13 @@ work_q = Queue()
 sendStrategy = getSendStrategy(PING_SEND_STRATEGY, chrono.id, work_q)
 sendStrategy.start()
 
-while True:
-  current = scanner.scan()
-  toSend = selectionStrategy.select(current)
-  if toSend:
-    work_q.put(toSend)
+try:
+  while True:
+    current = scanner.scan()
+    toSend = selectionStrategy.select(current)
+    if toSend:
+      print(toSend.toJson(), file=backupFile)
+      work_q.put(toSend)
+finally:
+  sendStrategy.terminate()
+  backupFile.close()

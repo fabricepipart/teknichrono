@@ -44,6 +44,20 @@
     <form id="LapTimeStartManual" class="form-horizontal" ng-controller="StartLapTimeController" ng-submit="startLapTimeManual()">
         <h3>Ping by Beacon</h3>
 
+        <div class="form-group" ng-class="{'has-error': LapTimeStartManual.ping.date.$invalid}">
+            <label for="ping" class="col-sm-2 control-label">Date</label>
+
+            <div id="pingControls" class="col-sm-10">
+                <div class='input-group date' id='ping'>
+                    <input type='text' id="ping" name="ping" required ng-model="ping.date" class="form-control" placeholder="Now or Enter the Ping date (2019-10-23T12:13:14.567)" />
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+                <span class="help-block error" ng-show="LapTimeStartManual.ping.date.$error.required">required</span>
+            </div>
+        </div>
+
         <div class="form-group" ng-class="{'has-error': LapTimeStartManual.chrono.$invalid}">
             <label for="chrono" class="col-sm-2 control-label">Chrono</label>
             <div id="chronoControls" class="col-sm-10">

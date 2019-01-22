@@ -1,6 +1,7 @@
 #!python3
 
 import datetime
+from rest import formatDatetime
 
 
 class BeaconScan:
@@ -21,6 +22,9 @@ class BeaconScan:
     self.minor = int(data[3])
     self.tx = data[5]
     self.rssi = data[4]
+
+  def toJson(self):
+    return '{date:' + str(formatDatetime(datetime.datetime.fromtimestamp(self.scanDate))) + ',major:' + str(self.major) + ', minor:' + str(self.minor) + ',tx:' + self.tx + '}'
 
   def __str__(self):
     return '(' + str(datetime.datetime.fromtimestamp(self.scanDate)) + ') ' + str(self.major) + ' / ' + str(self.minor) + ' @ ' + self.tx + ' dB'
