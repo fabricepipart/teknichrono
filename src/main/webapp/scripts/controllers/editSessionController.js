@@ -192,4 +192,16 @@ angular.module('frontend').controller('EditSessionController', function ($scope,
 
     $scope.get();
 
+
+    $('#sessionStart').datetimepicker({ format: 'YYYY-MM-DDTHH:mm:ss' });
+    $('#sessionStart').on('dp.change', function (event) {
+        $scope.session.start = event.date.format('YYYY-MM-DDTHH:mm:ss');
+    })
+
+
+    $('#sessionEnd').datetimepicker({ format: 'YYYY-MM-DDTHH:mm:ss' });
+    $('#sessionEnd').on('dp.change', function (event) {
+        $scope.session.end = event.date.format('YYYY-MM-DDTHH:mm:ss');
+    })
+
 });
