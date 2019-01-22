@@ -98,5 +98,3 @@ while True:
   toSend = selectionStrategy.select(current)
   if toSend:
     work_q.put(toSend)
-
-sendStrategy.join()
