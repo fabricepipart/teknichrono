@@ -95,8 +95,8 @@
             <tbody id="search-results-body">
                 <tr ng-repeat="result in filteredResults | startFrom:currentPage*pageSize | limitTo:pageSize" ng-switch on="searchTypeSelection.key == ''">
                     <td>{{$index + 1}}</td>
-                    <td ng-switch-when="true">{{result.startDate | date : 'HH:mm:ss.sss' : 'UTC' }}</td>
-                    <td ng-switch-when="true">{{result.endDate | date : 'HH:mm:ss.sss' : 'UTC'}}</td>
+                    <td ng-switch-when="true">{{result.startDate | date : 'HH:mm:ss.sss' }}</td>
+                    <td ng-switch-when="true">{{result.endDate | date : 'HH:mm:ss.sss' }}</td>
                     <td>{{result.pilot.beaconNumber}}</td>
                     <td>{{result.pilot.firstName}} {{result.pilot.lastName}}</td>
                     <td>{{result.lapIndex}} / {{result.lapNumber}}</td>
