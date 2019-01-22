@@ -90,3 +90,6 @@ For the time being, you can have a look in: ```src/main/java/org/trd/app/teknich
   * https://github.com/jenkinsci/kubernetes-plugin
 * Database
   * https://webmasters.stackexchange.com/questions/2242/how-to-create-separate-users-in-phpmyadmin-each-one-cant-see-others-databases
+* Python
+  * https://stackoverflow.com/questions/9190169/threading-and-information-passing-how-to
+  * https://pymotw.com/2/threading/

@@ -1,55 +1,7 @@
 <div>
     <form id="LapTimeStart" class="form-horizontal">
-        <h3>Start Session</h3>
 
-        <div class="form-group" ng-class="{'has-error': LapTimeStart.location.$invalid}">
-            <label for="location" class="col-sm-2 control-label">Location</label>
-            <div id="locationControls" class="col-sm-10">
-                <select id="location" name="location" class="form-control" ng-model="locationSelection" ng-options="l.text for l in locationSelectionList">
-                    <option value="">Choose a Location</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="form-group" ng-class="{'has-error': LapTimeStart.event.$invalid}">
-            <label for="event" class="col-sm-2 control-label">Event</label>
-            <div id="eventControls" class="col-sm-10">
-                <select id="event" name="event" class="form-control" ng-model="eventSelection" ng-options="e.text for e in eventSelectionList">
-                    <option value="">Choose a Event</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="form-group" ng-class="{'has-error': LapTimeStart.session.$invalid}">
-            <label for="session" class="col-sm-2 control-label">Session</label>
-            <div id="sessionControls" class="col-sm-10">
-                <select id="session" name="session" class="form-control" ng-model="sessionSelection" ng-options="s.text for s in sessionSelectionList">
-                    <option value="">Choose a Session</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="col-md-offset-2 col-sm-10">
-                <a id="StartSession" name="StartSession" class="btn btn-primary" ng-disabled="sessionSelection.current" ng-click="startSession()">
-                    <span class="glyphicon glyphicon-ok-sign"></span> Start Session</a>
-                <button id="endSession" name="endSession" class="btn btn-primary" ng-disabled="!sessionSelection.current" ng-click="endSession()">
-                    <span class="glyphicon glyphicon-remove-sign"></span> End</button>
-                <button id="cancel" name="cancel" class="btn btn-default" ng-click="cancel()">
-                    <span class="glyphicon glyphicon-remove-sign"></span> Reset</button>
-            </div>
-        </div>
-
-        <!--div class="form-group">
-            <div class="col-md-offset-2 col-sm-10">
-                <a id="Filter" name="Filter" class="btn btn-primary" ng-click="filter()">
-                    <span class="glyphicon glyphicon-search"></span> Filter</a>
-                <button id="cancel" name="cancel" class="btn btn-default" ng-click="cancel()">
-                    <span class="glyphicon glyphicon-remove-sign"></span> Reset</button>
-            </div>
-        </div-->
-
-        <h3>Simulate Chrono / Lap</h3>
+        <h3>Ping by Pilot</h3>
 
         <div class="form-group" ng-class="{'has-error': LapTimeStart.category.$invalid}">
             <label for="category" class="col-sm-2 control-label">Category</label>
@@ -80,13 +32,43 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-sm-10">
+                <a id="Start" name="Start" class="btn btn-danger" ng-click="startLapTime()">
+                    <span class="glyphicon glyphicon-ok-sign"></span> Ping</a>
                 <button id="cancelLaptime" name="cancelLaptime" class="btn btn-default" ng-click="cancelLaptime()">
                     <span class="glyphicon glyphicon-remove-sign"></span> Reset</button>
-                <a id="Start" name="Start" class="btn btn-danger" ng-click="startLapTime()">
-                    <span class="glyphicon glyphicon-ok-sign"></span> Start LapTime</a>
             </div>
         </div>
 
-
     </form>
+
+    <form id="LapTimeStartManual" class="form-horizontal" ng-controller="StartLapTimeController" ng-submit="startLapTimeManual()">
+        <h3>Ping by Beacon</h3>
+
+        <div class="form-group" ng-class="{'has-error': LapTimeStartManual.chrono.$invalid}">
+            <label for="chrono" class="col-sm-2 control-label">Chrono</label>
+            <div id="chronoControls" class="col-sm-10">
+                <select id="chrono" name="chrono" class="form-control" ng-model="chronoSelection" ng-options="c.text for c in chronoSelectionList">
+                    <option value="">Choose a Chrono</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group" ng-class="{'has-error': LapTimeStartManual.number.$invalid}">
+            <label for="number" class="col-sm-2 control-label">Beacon number</label>
+            <div id="numberControls" class="col-sm-10">
+                <input id="number" name="number" type="number" required class="form-control" ng-model="beacon.number" placeholder="Enter the Beacon Number"></input>
+                <span class="help-block error" ng-show="LapTimeStartManual.number.$error.required">required</span>
+                <span class="help-block error" ng-show="LapTimeStartManual.number.$error.number">not a number</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-sm-10">
+                <button type="submit" id="ping" name="ping" class="btn btn-danger" ng-disabled="beaconNumber.$invalid" ng-click="startLapTimeManual()">
+                    <span class="glyphicon glyphicon-ok-sign"></span> Ping</button>
+                <button id="cancelLaptime" name="cancelLaptime" class="btn btn-default" ng-click="cancelLaptime()">
+                    <span class="glyphicon glyphicon-remove-sign"></span> Reset</button>
+            </div>
+        </div>
+
 </div>

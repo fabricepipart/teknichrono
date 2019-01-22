@@ -32,6 +32,7 @@ angular.module('frontend', ['ngRoute', 'ngResource'])
       .when('/Sessions/new', { templateUrl: 'views/Session/detail.html', controller: 'NewSessionController' })
       .when('/Sessions/edit/:SessionId', { templateUrl: 'views/Session/detail.html', controller: 'EditSessionController' })
       .when('/LapTimes', { templateUrl: 'views/LapTime/search.html', controller: 'LapTimeController' })
+      .when('/ManageSessions', { templateUrl: 'views/Session/manage.html', controller: 'ManageSessionsController' })
       .when('/StartLapTime', { templateUrl: 'views/LapTime/start.html', controller: 'StartLapTimeController' })
       .when('/Live', { templateUrl: 'views/LapTime/live.html', controller: 'LiveController' })
       .otherwise({

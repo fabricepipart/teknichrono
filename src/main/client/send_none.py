@@ -9,4 +9,5 @@ class SendNoneStrategy:
     self.logger = logging.getLogger('SendStrategy')
 
   def send(self, sendme):
-    self.logger.info('[NOSEND] Ping : ' + str(sendme))
+    if sendme is not None:
+      self.logger.info('[NOSEND] Ping : ' + str(sendme))

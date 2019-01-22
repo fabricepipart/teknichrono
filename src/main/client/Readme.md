@@ -4,9 +4,15 @@
 
 ```
 sudo apt-get install bluetooth libbluetooth-dev
-sudo python3 -m pip install pybluez
-systemctl info systemd-timesyncd
+sudo python3 -m pip install pybluez queue
+systemctl status systemd-timesyncd
+mkdir -p /home/pi/scripts/logs
 ```
+
+## Password
+
+```passwd```
+
 
 ## Connect
 
@@ -19,7 +25,7 @@ ssh pi@192.168.69.31
 
 ## Sync code
 ```
-scp -r src/main/client pi@192.168.69.32:/home/pi/scripts/
+scp -r src/main/client pi@192.168.69.39:/home/pi/scripts/
 ```
 
 ## Start manually
@@ -43,7 +49,7 @@ sudo systemctl status teknichrono.service
 
 ## Backup / Restore SD
 
-Backup
+### Backup
 ```
 df -h
 sudo diskutil unmount /dev/disk4s6
@@ -52,7 +58,7 @@ sudo dd if=/dev/rdisk4 of=/Users/fabricepipart/Documents/teknichrono-sd.img bs=1
 sudo diskutil eject /dev/rdisk3
 ```
 
-Restore
+### Restore
 ```
 df -h
 sudo diskutil unmount /dev/disk3s5
@@ -73,3 +79,24 @@ rfkill unblock all
 sudo hciconfig
 sudo bluetoothctl
 ```
+
+## How to verify it runs fine
+
+### Preparation
+
+Have a mobile hotspot (real hotspot or mobile in hotspot mode).
+Connect each Raspberry manually to this hotspot so that it knows the Wifi and connects to it automatically when seen.
+
+### Test with organizer beacon
+
+Reserve one beacon for the organizer. Create a session that spans over the whole event, with organizers as pilots and all chronos.
+Switch on and off the organizer beacon next to the chrono. If everything went fine, you should see the beacon as last seen in the Chronometers search section.
+
+### Debug if necessary
+
+```arp -a``` to know possible IPs in network
+ssh to raspberry
+
+# Ways to approximate distances and make extrapolations to be more precise
+* https://en.wikipedia.org/wiki/IBeacon
+* https://stackoverflow.com/questions/19007306/what-are-the-nominal-distances-for-ibeacon-far-near-and-immediate

@@ -4,7 +4,7 @@ angular.module('frontend').controller('SearchSessionController', function ($scop
 
     $scope.search = {};
     $scope.currentPage = 0;
-    $scope.pageSize = 10;
+    $scope.pageSize = 50;
     $scope.searchResults = [];
     $scope.filteredResults = [];
     $scope.pageRange = [];
@@ -18,6 +18,10 @@ angular.module('frontend').controller('SearchSessionController', function ($scop
         }
         return max;
     };
+    $scope.currentSessionList = [
+        "true",
+        "false"
+    ];
     $scope.eventList = EventResource.queryAll();
     $scope.locationList = LocationResource.queryAll();
     $scope.sessionTypeList = [
