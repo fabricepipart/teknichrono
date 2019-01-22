@@ -93,5 +93,4 @@ sendStrategy = getSendStrategy(PING_SEND_STRATEGY, chrono.id)
 while True:
   current = scanner.scan()
   toSend = selectionStrategy.select(current)
-  if toSend is not None:
-    sendStrategy.send(toSend)
+  sendStrategy.send(toSend)
