@@ -1,0 +1,53 @@
+<div>
+    <form id="LapTimeStart" class="form-horizontal">
+
+        <h3>Add pilots to Session</h3>
+
+        TODO
+
+        <h3>Organize chronometers of Session</h3>
+
+        TODO
+
+        <h3>Start Session</h3>
+
+        <div class="form-group" ng-class="{'has-error': LapTimeStart.location.$invalid}">
+            <label for="location" class="col-sm-2 control-label">Location</label>
+            <div id="locationControls" class="col-sm-10">
+                <select id="location" name="location" class="form-control" ng-model="locationSelection" ng-options="l.text for l in locationSelectionList">
+                    <option value="">Choose a Location</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group" ng-class="{'has-error': LapTimeStart.event.$invalid}">
+            <label for="event" class="col-sm-2 control-label">Event</label>
+            <div id="eventControls" class="col-sm-10">
+                <select id="event" name="event" class="form-control" ng-model="eventSelection" ng-options="e.text for e in eventSelectionList">
+                    <option value="">Choose a Event</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group" ng-class="{'has-error': LapTimeStart.session.$invalid}">
+            <label for="session" class="col-sm-2 control-label">Session</label>
+            <div id="sessionControls" class="col-sm-10">
+                <select id="session" name="session" class="form-control" ng-model="sessionSelection" ng-options="s.text for s in sessionSelectionList">
+                    <option value="">Choose a Session</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-sm-10">
+                <a id="StartSession" name="StartSession" class="btn btn-primary" ng-disabled="sessionSelection.current" ng-click="startSession()">
+                    <span class="glyphicon glyphicon-ok-sign"></span> Start Session</a>
+                <button id="endSession" name="endSession" class="btn btn-primary" ng-disabled="!sessionSelection.current" ng-click="endSession()">
+                    <span class="glyphicon glyphicon-remove-sign"></span> End</button>
+                <button id="cancel" name="cancel" class="btn btn-default" ng-click="cancel()">
+                    <span class="glyphicon glyphicon-remove-sign"></span> Reset</button>
+            </div>
+        </div>
+
+    </form>
+</div>

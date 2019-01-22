@@ -96,3 +96,7 @@ Switch on and off the organizer beacon next to the chrono. If everything went fi
 
 ```arp -a``` to know possible IPs in network
 ssh to raspberry
+
+# Ways to approximate distances and make extrapolations to be more precise
+* https://en.wikipedia.org/wiki/IBeacon
+* https://stackoverflow.com/questions/19007306/what-are-the-nominal-distances-for-ibeacon-far-near-and-immediate
