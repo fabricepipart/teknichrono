@@ -4,7 +4,7 @@
 
 ```
 sudo apt-get install bluetooth libbluetooth-dev
-sudo python3 -m pip install pybluez
+sudo python3 -m pip install pybluez queue
 systemctl status systemd-timesyncd
 mkdir -p /home/pi/scripts/logs
 ```
@@ -25,7 +25,7 @@ ssh pi@192.168.69.31
 
 ## Sync code
 ```
-scp -r src/main/client pi@192.168.69.32:/home/pi/scripts/
+scp -r src/main/client pi@192.168.69.39:/home/pi/scripts/
 ```
 
 ## Start manually
