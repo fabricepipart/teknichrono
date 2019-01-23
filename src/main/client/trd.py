@@ -66,7 +66,7 @@ def getSelectionStrategy(key):
 
 
 def getSendStrategy(key, chronoId, workQueue):
-  switcher = {'NONE': SendNoneStrategy(), 'SYNC': SendAsyncStrategy(TEKNICHRONO_SERVER, chronoId, workQueue)}
+  switcher = {'NONE': SendNoneStrategy(), 'ASYNC': SendAsyncStrategy(TEKNICHRONO_SERVER, chronoId, workQueue)}
   # Get the function from switcher dictionary
   return switcher.get(key)
 

@@ -10,11 +10,11 @@ export REST_SERVER_HY_COM="teknichrono.hand-you.com"
 
 
 export TEKNICHRONO_SERVER=$REST_SERVER_HY_FR
-export CHRONO_NAME="Raspberry-0"
+export CHRONO_NAME="Raspberry-2"
 # FIRST / (MID) / HIGH / LAST
 export PING_SELECTION_STRATEGY="HIGH"
 # NONE / STORE / RESEND / SYNC / ASYNC
-export PING_SEND_STRATEGY="SYNC"
+export PING_SEND_STRATEGY="ASYNC"
 # Minimum duration between the last ping to consider it is a new ping 
 export INACTIVITY_WINDOW="5"
 export TEKNICHRONO_BT_DEBUG='false'
