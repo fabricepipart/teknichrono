@@ -2,6 +2,7 @@ package org.trd.app.teknichrono.rest;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -348,14 +349,15 @@ public class SessionEndpoint {
     }
     if (entity.getChronometers() != null && entity.getChronometers().size() > 0) {
       logger.warn("Session ID=" + session.getId() + " Chronometers list has not been updated to avoid messing order");
-//      List<Chronometer> chronosToSet = new ArrayList<>();
-//      for (Chronometer c : entity.getChronometers()) {
-//        if (c != null && c.getId() > 0) {
-//          Chronometer chrono = em.find(Chronometer.class, c.getId());
-//          chronosToSet.add(chrono);
-//        }
-//      }
-//      session.setChronometers(chronosToSet);
+      List<Chronometer> chronosToSet = new ArrayList<>();
+      for (Chronometer c : entity.getChronometers()) {
+        if (c != null && c.getId() > 0) {
+          Chronometer chrono = em.find(Chronometer.class, c.getId());
+          chronosToSet.add(chrono);
+        }
+      }
+      chronosToSet.sort(Comparator.comparing(Chronometer::getName));
+      session.setChronometers(chronosToSet);
     }
     session.setName(entity.getName());
     session.setStart(entity.getStart());

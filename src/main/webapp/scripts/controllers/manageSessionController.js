@@ -55,7 +55,6 @@ angular.module('frontend').controller('ManageSessionsController', function ($sco
             $scope.category = {};
             $scope.category.id = selection.value;
         }
-        $scope.filterPilots();
     });
 
 
@@ -115,24 +114,22 @@ angular.module('frontend').controller('ManageSessionsController', function ($sco
             $scope.session.id = selection.value;
             $scope.locationSelection = $filter("filter")($scope.locationSelectionList, { value: selection.locationId })[0];
             $scope.eventSelection = $filter("filter")($scope.eventSelectionList, { value: selection.eventId })[0];
-            $scope.chronoSelectionList = $filter("filter")($scope.chronoSelectionList, $scope.filterChronosBySession);
             $scope.pilotSelectionList = $filter("filter")($scope.pilotSelectionList, $scope.filterPilotsBySession);
         }
-        $scope.filterPilots();
     });
-
-    $scope.filterChronosBySession = function (chrono) {
-        if (!$scope.sessionSelection.chronosIds || !chrono) {
-            return false
-        }
-        return ($scope.sessionSelection.chronosIds.indexOf(chrono.value) !== -1);
-    };
 
     $scope.filterPilotsBySession = function (pilot) {
         if (!$scope.sessionSelection.pilotsIds || !pilot) {
             return false
         }
         return ($scope.sessionSelection.pilotsIds.indexOf(pilot.value) !== -1);
+    };
+
+    $scope.filterPilotsByBeacon = function (pilot) {
+        if (!$scope.beacon.number || !pilot) {
+            return false
+        }
+        return pilot.currentBeacon && (pilot.currentBeacon.number == $scope.beacon.number);
     };
 
     $scope.filterSessions = function () {
@@ -145,26 +142,12 @@ angular.module('frontend').controller('ManageSessionsController', function ($sco
         }
     };
 
-    $scope.filterPilots = function () {
-        $scope.pilotSelectionList = $scope.pilotSelectionListComplete
-        if ($scope.categorySelection) {
-            $scope.pilotSelectionList = $filter("filter")($scope.pilotSelectionList, { categoryId: $scope.categorySelection.value });
-        }
-    };
-
     $scope.cancel = function () {
         $scope.sessionSelection = {};
         $scope.eventSelection = {};
         $scope.locationSelection = {};
         $scope.categorySelection = {};
         $scope.filterSessions();
-        $scope.filterPilots();
-    };
-
-    $scope.cancelLaptime = function () {
-        $scope.sessionSelection = {};
-        $scope.chronoSelection = {};
-        $scope.pilotSelection = {};
     };
 
     $scope.startSession = function () {
@@ -179,10 +162,13 @@ angular.module('frontend').controller('ManageSessionsController', function ($sco
         $scope.sessionSelection.current = false;
     };
 
+    $scope.addChrono = function () {
+        SessionResource.addChronometer({ id: $scope.session.id, chronoId: $scope.chrono.id });
+    };
 
-    $scope.startLapTime = function () {
-        var now = $filter('date')(new Date(), 'yyyy-MM-ddTHH:mm:ss.sss', 'UTC')
-        PingResource.create({ chronoId: $scope.chronoSelection.value, beaconId: $scope.pilotSelection.beaconId }, { power: '1', dateTime: now });
-    }
+    $scope.addPilot = function () {
+        var pilotSelection = $filter("filter")($scope.pilotList, $scope.filterPilotsByBeacon)[0];
+        SessionResource.addPilot({ id: $scope.session.id, pilotId: pilotSelection.id });
+    };
 
 });

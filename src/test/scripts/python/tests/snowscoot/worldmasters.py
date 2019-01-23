@@ -54,14 +54,14 @@ class WorldMasters:
 
   def prepareFridayMorning(self):
     print("---- Create session of Friday morning ----")
-    chronos = [self.chrono2, self.chrono1]
+    chronos = [self.chrono1, self.chrono2]
     pilots = self.allPilots
     self.createSession('Friday am tests', datetime(2019, 1, 25, 10), datetime(2019, 1, 25, 11), 'tt', self.boarderCross, chronos, pilots)
     self.createSession('Friday am Chrono', datetime(2019, 1, 25, 11), datetime(2019, 1, 25, 12), 'tt', self.boarderCross, chronos)
 
   def prepareFridayAfternoon(self):
     print("---- Create sessions of Friday afternoon ----")
-    chronos = [self.fake, self.chrono1]
+    chronos = [self.fake, self.chrono2]
     self.createSession('Fri pm Boarder X 1/16 #1', datetime(2019, 1, 25, 14, 0), datetime(2019, 1, 25, 14, 4), 'rc', self.boarderCross, chronos)
     self.createSession('Fri pm Boarder X 1/16 #2', datetime(2019, 1, 25, 14, 4), datetime(2019, 1, 25, 14, 8), 'rc', self.boarderCross, chronos)
     self.createSession('Fri pm Boarder X 1/16 #3', datetime(2019, 1, 25, 14, 8), datetime(2019, 1, 25, 14, 12), 'rc', self.boarderCross, chronos)
@@ -96,7 +96,7 @@ class WorldMasters:
 
   def prepareSaturdayMorning(self):
     print("---- Create session of Saturday morning ----")
-    chronos = [self.fake, self.chrono1]
+    chronos = [self.fake, self.chrono2]
     self.createSession('Sat Derby 1 - Elite', datetime(2019, 1, 26, 10, 5), datetime(2019, 1, 26, 10, 10), 'rc', self.mercantour, chronos, self.elitePilots)
     self.createSession('Sat Derby 1 - Open', datetime(2019, 1, 26, 10, 15), datetime(2019, 1, 26, 10, 20), 'rc', self.mercantour, chronos, self.openPilots)
     self.createSession('Sat Derby 1 - Woman', datetime(2019, 1, 26, 10, 25), datetime(2019, 1, 26, 10, 30), 'rc', self.mercantour, chronos, self.womanPilots)
@@ -108,7 +108,7 @@ class WorldMasters:
     e1 = datetime(2019, 1, 26, 15)
     event = self.event
     location = self.dual
-    chronos = [self.fake, self.chrono1]
+    chronos = [self.fake, self.chrono2]
     pilots = self.allPilots
     self.createSession('Saturday pm qualification', s1, e1, 'tt', location, chronos, pilots)
     for i in range(1, 33):
@@ -134,18 +134,18 @@ class WorldMasters:
     print("---- Create session of Sunday morning ----")
     valette = self.valette
     event = self.event
-    chronos = [self.fake, self.chrono1]
+    chronos = [self.fake, self.chrono2]
     self.createSession('Sun Derby 2 - Elite', datetime(2019, 1, 27, 10, 5), datetime(2019, 1, 27, 10, 10), 'rc', valette, chronos, self.elitePilots)
     self.createSession('Sun Derby 2 - Open', datetime(2019, 1, 27, 10, 15), datetime(2019, 1, 27, 10, 20), 'rc', valette, chronos, self.openPilots)
     self.createSession('Sun Derby 2 - Woman', datetime(2019, 1, 27, 10, 25), datetime(2019, 1, 27, 10, 30), 'rc', valette, chronos, self.womanPilots)
     self.createSession('Sun Derby 2 - Junior', datetime(2019, 1, 27, 10, 35), datetime(2019, 1, 27, 10, 40), 'rc', valette, chronos, self.juniorPilots)
-    chronos1 = [self.fake, self.chrono1]
-    chronos2 = [self.chrono0, self.chrono1]
+    chronos1 = [self.chrono1, self.chrono2]
+    chronos0 = [self.chrono0, self.chrono2]
     redRiver = self.redRiver
     roubines = self.roubines
     allPilots = self.allPilots
     self.createSession('Sun Double - Red River', datetime(2019, 1, 27, 11, 0), datetime(2019, 1, 27, 13, 00), 'tt', redRiver, chronos1, allPilots)
-    self.createSession('Sun Double - Roubines', datetime(2019, 1, 27, 11, 0), datetime(2019, 1, 27, 13, 00), 'tt', roubines, chronos2, allPilots)
+    self.createSession('Sun Double - Roubines', datetime(2019, 1, 27, 11, 0), datetime(2019, 1, 27, 13, 00), 'tt', roubines, chronos0, allPilots)
 
   def prepareTestSessions(self):
     chronos = [self.chrono0, self.chrono1, self.chrono2]
