@@ -23,9 +23,9 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.business.ChronoManager;
-import org.trd.app.teknichrono.model.Beacon;
-import org.trd.app.teknichrono.model.Chronometer;
-import org.trd.app.teknichrono.model.Ping;
+import org.trd.app.teknichrono.model.jpa.Beacon;
+import org.trd.app.teknichrono.model.jpa.Chronometer;
+import org.trd.app.teknichrono.model.jpa.Ping;
 import org.trd.app.teknichrono.util.DurationLogger;
 
 /**

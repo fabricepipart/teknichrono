@@ -22,10 +22,10 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import org.jboss.logging.Logger;
-import org.trd.app.teknichrono.model.Beacon;
-import org.trd.app.teknichrono.model.Pilot;
-import org.trd.app.teknichrono.model.Ping;
-import org.trd.app.teknichrono.rest.dto.BeaconDTO;
+import org.trd.app.teknichrono.model.jpa.Beacon;
+import org.trd.app.teknichrono.model.jpa.Pilot;
+import org.trd.app.teknichrono.model.jpa.Ping;
+import org.trd.app.teknichrono.model.dto.BeaconDTO;
 import org.trd.app.teknichrono.util.DurationLogger;
 
 /**

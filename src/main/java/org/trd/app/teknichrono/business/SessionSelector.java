@@ -2,11 +2,11 @@ package org.trd.app.teknichrono.business;
 
 import org.jboss.logging.Logger;
 
-import org.trd.app.teknichrono.model.Chronometer;
-import org.trd.app.teknichrono.model.Ping;
-import org.trd.app.teknichrono.model.Session;
-import org.trd.app.teknichrono.model.Pilot;
-import org.trd.app.teknichrono.model.LapTime;
+import org.trd.app.teknichrono.model.jpa.Chronometer;
+import org.trd.app.teknichrono.model.jpa.Ping;
+import org.trd.app.teknichrono.model.jpa.Session;
+import org.trd.app.teknichrono.model.jpa.Pilot;
+import org.trd.app.teknichrono.model.jpa.LapTime;
 
 import java.util.ArrayList;
 import java.util.List;

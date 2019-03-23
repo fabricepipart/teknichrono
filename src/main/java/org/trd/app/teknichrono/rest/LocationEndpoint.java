@@ -21,8 +21,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
-import org.trd.app.teknichrono.model.Location;
-import org.trd.app.teknichrono.model.Session;
+import org.trd.app.teknichrono.model.jpa.Location;
+import org.trd.app.teknichrono.model.jpa.Session;
 
 /**
  * 

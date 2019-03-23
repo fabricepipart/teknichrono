@@ -22,8 +22,8 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import org.jboss.logging.Logger;
-import org.trd.app.teknichrono.model.Event;
-import org.trd.app.teknichrono.model.Session;
+import org.trd.app.teknichrono.model.jpa.Event;
+import org.trd.app.teknichrono.model.jpa.Session;
 import org.trd.app.teknichrono.util.DurationLogger;
 
 /**

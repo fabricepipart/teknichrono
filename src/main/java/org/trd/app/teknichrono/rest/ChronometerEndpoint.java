@@ -22,11 +22,10 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import org.jboss.logging.Logger;
-import org.trd.app.teknichrono.model.Chronometer;
-import org.trd.app.teknichrono.model.Ping;
-import org.trd.app.teknichrono.model.Session;
-import org.trd.app.teknichrono.rest.dto.CategoryDTO;
-import org.trd.app.teknichrono.rest.dto.ChronometerDTO;
+import org.trd.app.teknichrono.model.jpa.Chronometer;
+import org.trd.app.teknichrono.model.jpa.Ping;
+import org.trd.app.teknichrono.model.jpa.Session;
+import org.trd.app.teknichrono.model.dto.ChronometerDTO;
 import org.trd.app.teknichrono.util.DurationLogger;
 
 /**

@@ -8,7 +8,7 @@ import com.opencsv.exceptions.CsvBadConverterException;
 import com.opencsv.exceptions.CsvConstraintViolationException;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
-import org.trd.app.teknichrono.rest.dto.LapTimeDTO;
+import org.trd.app.teknichrono.model.dto.LapTimeDTO;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -258,7 +258,7 @@ public class LapTimeMappingStrategy implements MappingStrategy<LapTimeDTO> {
    * @param bean The bean to be transmuted
    * @return The converted values of the bean fields in the correct order,
    * ready to be passed to a {@link CSVWriter}
-   * @throws CsvDataTypeMismatchException   If expected to convert an
+   * @throws CsvDataTypeMismatchException   If expected to manage an
    *                                        unsupported data type
    * @throws CsvRequiredFieldEmptyException If the field is marked as required,
    *                                        but is currently empty
