@@ -29,15 +29,14 @@ import javax.ws.rs.core.UriBuilder;
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.business.ChronoManager;
 import org.trd.app.teknichrono.business.SessionSelector;
-import org.trd.app.teknichrono.model.Beacon;
-import org.trd.app.teknichrono.model.Chronometer;
-import org.trd.app.teknichrono.model.Event;
-import org.trd.app.teknichrono.model.Location;
-import org.trd.app.teknichrono.model.Pilot;
-import org.trd.app.teknichrono.model.Ping;
-import org.trd.app.teknichrono.model.Session;
-import org.trd.app.teknichrono.model.SessionType;
-import org.trd.app.teknichrono.rest.dto.SessionDTO;
+import org.trd.app.teknichrono.model.jpa.Chronometer;
+import org.trd.app.teknichrono.model.jpa.Event;
+import org.trd.app.teknichrono.model.jpa.Location;
+import org.trd.app.teknichrono.model.jpa.Pilot;
+import org.trd.app.teknichrono.model.jpa.Ping;
+import org.trd.app.teknichrono.model.jpa.Session;
+import org.trd.app.teknichrono.model.jpa.SessionType;
+import org.trd.app.teknichrono.model.dto.SessionDTO;
 import org.trd.app.teknichrono.util.DurationLogger;
 
 /**

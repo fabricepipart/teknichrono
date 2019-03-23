@@ -21,11 +21,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
-import org.trd.app.teknichrono.model.Beacon;
-import org.trd.app.teknichrono.model.Category;
-import org.trd.app.teknichrono.model.Pilot;
-import org.trd.app.teknichrono.model.Session;
-import org.trd.app.teknichrono.rest.dto.PilotDTO;
+import org.trd.app.teknichrono.model.jpa.Beacon;
+import org.trd.app.teknichrono.model.jpa.Category;
+import org.trd.app.teknichrono.model.jpa.Pilot;
+import org.trd.app.teknichrono.model.jpa.Session;
+import org.trd.app.teknichrono.model.dto.PilotDTO;
 
 /**
  * 

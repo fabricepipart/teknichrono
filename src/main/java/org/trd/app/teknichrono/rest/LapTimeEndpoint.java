@@ -7,28 +7,46 @@ import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.business.LapTimeDisplay;
 import org.trd.app.teknichrono.business.LapTimeManager;
-import org.trd.app.teknichrono.model.*;
-import org.trd.app.teknichrono.rest.dto.LapTimeDTO;
-import org.trd.app.teknichrono.rest.dto.NestedPilotDTO;
-import org.trd.app.teknichrono.rest.sql.OrderByClauseBuilder;
-import org.trd.app.teknichrono.rest.sql.WhereClauseBuilder;
+import org.trd.app.teknichrono.model.dto.LapTimeDTO;
+import org.trd.app.teknichrono.model.dto.NestedPilotDTO;
+import org.trd.app.teknichrono.model.jpa.Category;
+import org.trd.app.teknichrono.model.jpa.Event;
+import org.trd.app.teknichrono.model.jpa.LapTime;
+import org.trd.app.teknichrono.model.jpa.Location;
+import org.trd.app.teknichrono.model.jpa.Pilot;
+import org.trd.app.teknichrono.model.jpa.Session;
+import org.trd.app.teknichrono.model.jpa.SessionType;
+import org.trd.app.teknichrono.model.manage.LapTimeConverter;
 import org.trd.app.teknichrono.util.InvalidArgumentException;
+import org.trd.app.teknichrono.util.sql.OrderByClauseBuilder;
+import org.trd.app.teknichrono.util.sql.WhereClauseBuilder;
 
 import javax.ejb.Stateless;
-import javax.persistence.*;
-import javax.ws.rs.*;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.OptimisticLockException;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 /**
- * 
+ *
  */
 @Stateless
 @Path("/laptimes")
@@ -38,6 +56,7 @@ public class LapTimeEndpoint {
 
   private Logger logger = Logger.getLogger(LapTimeEndpoint.class);
   private LapTimeManager lapTimeManager = new LapTimeManager();
+  private LapTimeConverter lapTimeConverter = new LapTimeConverter();
 
   @POST
   @Consumes("application/json")
@@ -84,9 +103,9 @@ public class LapTimeEndpoint {
   @Path("/csv/best")
   @Produces("text/csv")
   public String bestToCsv(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
-                             @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
-                             @QueryParam("categoryId") Integer categoryId) {
-    List<LapTimeDTO> results =  best(pilotId,sessionId,locationId,  eventId,categoryId, null, null);
+                          @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
+                          @QueryParam("categoryId") Integer categoryId) {
+    List<LapTimeDTO> results = best(pilotId, sessionId, locationId, eventId, categoryId, null, null);
     return convertToCsv(results);
   }
 
@@ -94,9 +113,9 @@ public class LapTimeEndpoint {
   @Path("/best")
   @Produces("application/json")
   public List<LapTimeDTO> best(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
-      @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
-      @QueryParam("categoryId") Integer categoryId, @QueryParam("start") Integer startPosition,
-      @QueryParam("max") Integer maxResult) {
+                               @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
+                               @QueryParam("categoryId") Integer categoryId, @QueryParam("start") Integer startPosition,
+                               @QueryParam("max") Integer maxResult) {
     if (sessionId == null && locationId == null && eventId == null) {
       logger.error("Please define a sessiondId, locationId or eventId to get best laps.");
       throw new InvalidArgumentException();
@@ -116,16 +135,16 @@ public class LapTimeEndpoint {
   @Path("/csv/results")
   @Produces("text/csv")
   public String resultsToCsv(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
-                                  @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
-                                  @QueryParam("categoryId") Integer categoryId) {
+                             @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
+                             @QueryParam("categoryId") Integer categoryId) {
 
-    List<LapTimeDTO> results =  results(pilotId,sessionId,locationId,  eventId,categoryId, null, null);
+    List<LapTimeDTO> results = results(pilotId, sessionId, locationId, eventId, categoryId, null, null);
     return convertToCsv(results);
   }
 
   private String convertToCsv(List<LapTimeDTO> results) {
     String csvResult = null;
-        StringWriter writer = new StringWriter();
+    StringWriter writer = new StringWriter();
     // TODO StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder<LapTimeDTO>(writer).withMappingStrategy(new LapTimeMappingStrategy()).build();
     StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder<LapTimeDTO>(writer).build();
     try {
@@ -142,9 +161,9 @@ public class LapTimeEndpoint {
   @Path("/results")
   @Produces("application/json")
   public List<LapTimeDTO> results(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
-      @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
-      @QueryParam("categoryId") Integer categoryId, @QueryParam("start") Integer startPosition,
-      @QueryParam("max") Integer maxResult) {
+                                  @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
+                                  @QueryParam("categoryId") Integer categoryId, @QueryParam("start") Integer startPosition,
+                                  @QueryParam("max") Integer maxResult) {
     if (sessionId == null) {
       logger.error("Please define a sessiondId to get race laps.");
       throw new InvalidArgumentException();
@@ -184,16 +203,16 @@ public class LapTimeEndpoint {
   public String listAllToCsv(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
                              @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
                              @QueryParam("categoryId") Integer categoryId) {
-    List<LapTimeDTO> results =  listAll(pilotId,sessionId,locationId,  eventId,categoryId, null, null);
+    List<LapTimeDTO> results = listAll(pilotId, sessionId, locationId, eventId, categoryId, null, null);
     return convertToCsv(results);
   }
 
   @GET
   @Produces("application/json")
   public List<LapTimeDTO> listAll(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
-      @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
-      @QueryParam("categoryId") Integer categoryId, @QueryParam("start") Integer startPosition,
-      @QueryParam("max") Integer maxResult) {
+                                  @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
+                                  @QueryParam("categoryId") Integer categoryId, @QueryParam("start") Integer startPosition,
+                                  @QueryParam("max") Integer maxResult) {
     if (sessionId == null && locationId == null && eventId == null) {
       logger.error("Please define a sessiondId, locationId or eventId to get laps.");
       throw new InvalidArgumentException();
@@ -208,18 +227,18 @@ public class LapTimeEndpoint {
   }
 
   private List<LapTimeDTO> getAllLapsDTOOrderedByStartDate(Integer pilotId, Integer sessionId, Integer locationId,
-      Integer eventId, Integer categoryId, Integer startPosition, Integer maxResult) {
+                                                           Integer eventId, Integer categoryId, Integer startPosition, Integer maxResult) {
     final List<LapTime> searchResults = getAllLapsOrderedByStartDate(pilotId, sessionId, locationId, eventId,
         categoryId, startPosition, maxResult);
-    final List<LapTimeDTO> results = lapTimeManager.convert(searchResults);
+    final List<LapTimeDTO> results = lapTimeConverter.convert(searchResults);
     return results;
   }
 
   private List<LapTime> getAllLapsOrderedByStartDate(Integer pilotId, Integer sessionId, Integer locationId,
-      Integer eventId, Integer categoryId, Integer startPosition, Integer maxResult) {
+                                                     Integer eventId, Integer categoryId, Integer startPosition, Integer maxResult) {
     WhereClauseBuilder whereClauseBuilder = buildWhereClause(pilotId, sessionId, locationId, eventId, categoryId);
     OrderByClauseBuilder orderByClauseBuilder = new OrderByClauseBuilder();
-    // Necessary to have the lapTimeManager.convert working
+    // Necessary to have the lapTimeManager.manage working
     orderByClauseBuilder.add("l.startDate");
 
     TypedQuery<LapTime> findAllQuery = em.createQuery("SELECT DISTINCT l FROM LapTime l"
@@ -237,7 +256,7 @@ public class LapTimeEndpoint {
   }
 
   private WhereClauseBuilder buildWhereClause(Integer pilotId, Integer sessionId, Integer locationId, Integer eventId,
-      Integer categoryId) {
+                                              Integer categoryId) {
     WhereClauseBuilder whereClauseBuilder = new WhereClauseBuilder();
     if (pilotId != null) {
       whereClauseBuilder.addEqualsClause("l.pilot.id", "pilotId", pilotId);

@@ -21,9 +21,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
-import org.trd.app.teknichrono.model.Category;
-import org.trd.app.teknichrono.model.Pilot;
-import org.trd.app.teknichrono.rest.dto.CategoryDTO;
+import org.trd.app.teknichrono.model.jpa.Category;
+import org.trd.app.teknichrono.model.jpa.Pilot;
+import org.trd.app.teknichrono.model.dto.CategoryDTO;
 
 /**
  * 
