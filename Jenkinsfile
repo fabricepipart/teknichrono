@@ -1,51 +1,58 @@
 timeout(60) {
 
-  def version = "1.1." + (env.BRANCH_NAME.equals("master") ? '' : "0-${env.BRANCH_NAME}.") + env.BUILD_NUMBER
-  currentBuild.description = version
+  String STAGING_HOST = "teknichrono-teknichrono-staging.router.default.svc.cluster.local"
 
+  podTemplate(label:'teknichrono' , cloud: 'openshift') {
+    node('teknichrono') {
+      try {
 
-  String label = "teknichrono-${version}"
-  /*
-  podTemplate(label:label , cloud: 'openshift', serviceAccount:'jenkins', containers: [
-    containerTemplate(name: 'jnlp', image: 'docker.io/openshift/jenkins-slave-base-centos7:v3.11',
-      args: '${computer.jnlpmac} ${computer.name}', workingDir: '/home/jenkins/'),
-    containerTemplate(name: 'mvn', image: 'docker.io/openshift/jenkins-agent-maven-35-centos7:v3.11', ttyEnabled: true, command: 'cat'),
-    containerTemplate(name: 'python', image: 'docker.io/python:3.6-slim', ttyEnabled: true, command: 'cat')]) {
-*/
-  podTemplate(label:label , cloud: 'openshift', serviceAccount:'jenkins', containers: [
-    containerTemplate(name: 'jnlp', image: 'docker.io/openshift/jenkins-agent-maven-35-centos7:v3.11', args: '${computer.jnlpmac} ${computer.name}', workingDir: '/home/jenkins/'),
-    containerTemplate(name: 'python', image: 'docker.io/python:3.6-slim', ttyEnabled: true, command: 'cat')]) {
-    node(label) {
+        checkout scm
       
-      checkout scm
-    
-      stage('Build') {
-        sh "mvn -B -U versions:set -DnewVersion=${version}"
-        sh "mvn -B -U clean -e install -P openshift"
-      }
+        container('maven') {
+          stage('Version') {
+            def version = "1.1." + (env.BRANCH_NAME.equals("master") ? '' : "0-${env.BRANCH_NAME}.") + env.BUILD_NUMBER
+            currentBuild.description = version
+            sh "mvn -B -U versions:set -DnewVersion=${version}"
+          }
 
-      stage('Start staging'){
-        sh "mvn -B thorntail:start"
-      }
+          stage('Build') {
+            sh "mvn -B -U clean install -Popenshift"
+          }
 
-      stage('End to End tests'){
+          stage('Start staging'){
+            sh "mvn -B fabric8:undeploy -Popenshift -Dfabric8.namespace=teknichrono-staging"
+            sh "mvn -B fabric8:apply -Popenshift -Dfabric8.namespace=teknichrono-staging"
+            sh "while ! curl -fs http://${STAGING_HOST} > /dev/null; do echo 'Not started yet ...'; sleep 5; done"
+          }
+        }
+
         container('python') {
-          sh "python -m pip install --user --no-cache-dir -r requirements.txt"
-          sh "./src/test/scripts/bash/all_tests.sh localhost:8080"
+          stage('End to End tests'){
+            sh "python -m pip install --user --no-cache-dir -r requirements.txt"
+            sh "./src/test/scripts/bash/all_tests.sh ${STAGING_HOST}"
+          }
+        }
+        
+        container('maven') {
+          
+          stage('Promote to Production'){
+            parallel Cleanup: {
+              sh "mvn -B fabric8:undeploy -Popenshift -Dfabric8.namespace=teknichrono-staging"
+            },
+            Deploy: {
+              if(env.BRANCH_NAME.equals("master")){
+                echo "Deploying to production"
+              }
+              sh "mvn -B fabric8:apply -Popenshift -Dfabric8.namespace=teknichrono"
+            }
+          }
         }
       }
-      
-      stage('Stop staging'){
-        sh "mvn -B thorntail:stop"
+      catch (e) {
+          echo 'Pipeline failed : ' + e
+          sleep 10
+          throw e
       }
-    
-      stage('Deploy Production'){
-        if(env.BRANCH_NAME.equals("master")){
-          echo "Deploying to production"
-        }
-        sh "mvn -B fabric8:apply -P openshift -D fabric8.namespace=teknichrono"
-      }
-
     }
   }
 

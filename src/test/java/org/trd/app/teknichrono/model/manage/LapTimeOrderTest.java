@@ -1,5 +1,6 @@
 package org.trd.app.teknichrono.model.manage;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.trd.app.teknichrono.model.dto.LapTimeDTO;
@@ -163,5 +164,53 @@ public class LapTimeOrderTest {
     org.junit.Assert.assertEquals(52, result.get(4).getId());
   }
 
+  @Test
+  public void ordersByDurationOrStartDate() {
+    List<LapTimeDTO> laps = dtoCreator.createLaps();
+    LapTimeOrder testMe = new LapTimeOrder();
+    testMe.orderByDuration(laps);
+    long previousDuration = -1;
+    long previousStart = -1;
+    for (LapTimeDTO l : laps) {
 
+      if (l.getDuration() > 0) {
+        Assert.assertTrue(l.getDuration() >= previousDuration);
+        previousDuration = l.getDuration();
+      } else {
+        // None order by duration anymore
+        previousDuration = Long.MAX_VALUE;
+        if (l.getStartDate() != null) {
+          // Is it the first that did not end
+          if (previousStart >= 0) {
+            Assert.assertTrue(l.getStartDate().getTime() >= previousStart);
+          }
+          previousStart = l.getStartDate().getTime();
+        } else {
+          // None order by start date anymore
+          previousStart = Long.MAX_VALUE;
+        }
+      }
+    }
+  }
+
+  @Test
+  public void fillGapsInfoWhenOrderedByDuration() {
+    LapTimeOrder order = new LapTimeOrder();
+    List<LapTimeDTO> laps = dtoCreator.createLaps();
+    order.orderByDuration(laps);
+    long previousGap = -1;
+
+    for (LapTimeDTO l : laps) {
+      if (previousGap == -1) {
+        Assert.assertEquals(0, l.getGapWithBest());
+      }
+      if (l.getDuration() > 0) {
+        Assert.assertTrue(l.getGapWithBest() >= previousGap);
+      } else {
+        // No more gaps
+        previousGap = Long.MAX_VALUE;
+      }
+      previousGap = l.getGapWithBest();
+    }
+  }
 }
