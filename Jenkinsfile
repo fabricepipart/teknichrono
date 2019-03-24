@@ -19,13 +19,13 @@ timeout(60) {
       
       checkout scm
     
-      stage('Build and Deploy') {
+      stage('Build') {
         sh "mvn -B -U versions:set -DnewVersion=${version}"
-        sh "mvn clean -B -e -U install -P openshift"
+        sh "mvn -B -U clean -e install -P openshift"
       }
-      
+
       stage('Start staging'){
-        sh "mvn thorntail:start"
+        sh "mvn -B thorntail:start"
       }
 
       stage('End to End tests'){
@@ -36,57 +36,17 @@ timeout(60) {
       }
       
       stage('Stop staging'){
-        sh "mvn thorntail:stop"
+        sh "mvn -B thorntail:stop"
       }
     
       stage('Deploy Production'){
-        echo "Not yet"
-      }
-
-    }
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-  String label = "teknichrono-${version}"
-  String buildLabel = label+"-build"
-  podTemplate(label:buildLabel , cloud: 'openshift', serviceAccount:'jenkins', containers: [
-    containerTemplate(
-        name: 'jnlp', image: 'docker.io/openshift/jenkins-agent-maven-35-centos7:v3.11',
-        workingDir: '/tmp')]) {
-    node(buildLabel) {
-
-    }
-  }
-
-
-  String testLabel = label+"-test"
-  podTemplate(label:testLabel , cloud: 'openshift', serviceAccount:'jenkins', containers: [
-    containerTemplate(name: 'jnlp', image: 'docker.io/jenkinsci/jnlp-slave:2.62',
-      args: '${computer.jnlpmac} ${computer.name}', workingDir: '/home/jenkins/'),
-    containerTemplate(name: 'python', image: 'docker.io/python:3.6-slim', workingDir: '/tmp/',
-      ttyEnabled: true, command: 'cat')]) {
-    node(testLabel) {
-      container('python') {
-      checkout scm
-        stage('End to End tests'){
-          sh "python -m pip install --user --no-cache-dir -r requirements.txt"
-          sh "./src/test/scripts/bash/all_tests.sh teknichrono-teknichrono.193b.starter-ca-central-1.openshiftapps.com"
+        if(env.BRANCH_NAME.equals("master")){
+          echo "Deploying to production"
         }
+        sh "mvn -B fabric8:apply -P openshift -D fabric8.namespace=teknichrono"
       }
+
     }
   }
-*/
+
 }
