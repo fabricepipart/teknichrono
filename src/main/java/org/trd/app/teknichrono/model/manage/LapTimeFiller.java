@@ -1,6 +1,5 @@
 package org.trd.app.teknichrono.model.manage;
 
-import org.trd.app.teknichrono.model.compare.LapTimeDTORaceComparator;
 import org.trd.app.teknichrono.model.dto.LapTimeDTO;
 import org.trd.app.teknichrono.model.dto.NestedPilotDTO;
 
@@ -12,41 +11,6 @@ import java.util.Set;
 
 public class LapTimeFiller {
 
-  public void fillGaps(List<LapTimeDTO> results) {
-    long best = -1;
-    long previous = -1;
-    for (LapTimeDTO lapTimeDTO : results) {
-      if (best == -1) {
-        best = lapTimeDTO.getDuration();
-        previous = lapTimeDTO.getDuration();
-        lapTimeDTO.setGapWithBest(0);
-        lapTimeDTO.setGapWithPrevious(0);
-      } else {
-        long lapDuration = lapTimeDTO.getDuration();
-        lapTimeDTO.setGapWithBest(lapDuration - best);
-        lapTimeDTO.setGapWithPrevious(lapDuration - previous);
-        previous = lapDuration;
-      }
-    }
-  }
-
-  public void fillRaceGaps(List<LapTimeDTO> results) {
-    LapTimeDTORaceComparator comparator = new LapTimeDTORaceComparator();
-    LapTimeDTO best = null;
-    LapTimeDTO previous = null;
-    for (LapTimeDTO lapTimeDTO : results) {
-      if (best == null) {
-        best = lapTimeDTO;
-        previous = lapTimeDTO;
-        lapTimeDTO.setGapWithBest(0);
-        lapTimeDTO.setGapWithPrevious(0);
-      } else {
-        lapTimeDTO.setGapWithBest(comparator.distance(best, lapTimeDTO));
-        lapTimeDTO.setGapWithPrevious(comparator.distance(previous, lapTimeDTO));
-        previous = lapTimeDTO;
-      }
-    }
-  }
 
   public void fillLapsNumber(List<LapTimeDTO> results) {
     Map<Integer, List<LapTimeDTO>> lapsPerPilot = new HashMap<Integer, List<LapTimeDTO>>();

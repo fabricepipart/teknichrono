@@ -37,9 +37,22 @@ The testing part of the project is based on JUnits (very few) and Python end to 
 ### How to run on OpenShift
 
 * ```oc login https://api.starter-us-east-2a.openshift.com --token=******```
-* ```mvn clean install -P openshift```
-* ```mvn -B fabric8:apply -P openshift```
+* ```mvn clean install -P openshift -Dimage.namespace=teknichrono-staging```
+* ```mvn -B fabric8:apply -P openshift -Dimage.namespace=teknichrono-staging```
 
+## CI Build
+
+### Kubernetes build images
+The project relies on the Kubernetes plugin to run its CI in Jenkins.
+The podTemplate referenced here has the following settings:
+```
+  podTemplate(label:label , cloud: 'openshift', serviceAccount:'jenkins', containers: [	
+    containerTemplate(name: 'maven', image: 'maven:3.6-jdk-8-alpine',	ttyEnabled: true, command: 'cat'),	
+    containerTemplate(name: 'python', image: 'docker.io/python:3.6-slim',	ttyEnabled: true, command: 'cat')]) {
+      ...
+  }
+```
+I did not provide the configuration inline because, I integrated a Nexus proxy to speed up the builds in my case. It requires providing a custom build image in order to customize the ```settings.xml``` .
 
 ### Interact with Raspberry
 

@@ -37,14 +37,12 @@ public class LapTimeManager {
           break;
         case ORDER_FOR_RACE:
           order.orderForRace(results);
-          filler.fillRaceGaps(results);
           break;
         case KEEP_BEST:
           filter.keepOnlyBest(results);
           break;
         case ORDER_BY_DURATION:
           order.orderByDuration(results);
-          filler.fillGaps(results);
           break;
         case ORDER_BY_DATE:
           order.orderByDate(results);

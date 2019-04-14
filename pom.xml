@@ -3,12 +3,11 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <name>Teknichrono Mobile Web Application</name>
-  <description>This project contains pre-requisites for demonstrating the use of JBoss Forge. The end-user will be instructed on how to scaffold a new application based on a pre-existing JPA entity. Refer to the embedded Eclipse cheatsheet for additional details.</description>
-  <parent>
-    <groupId>io.openshift</groupId>
-    <artifactId>booster-parent</artifactId>
-    <version>23</version>
-  </parent>
+  <description>This project contains pre-requisites for demonstrating the use of JBoss Forge. The end-user will be
+        instructed on how to scaffold a new application based on a pre-existing JPA entity. Refer to the embedded
+        Eclipse cheatsheet for additional details.
+  </description>
+
   <groupId>org.trd.app.teknichrono</groupId>
   <artifactId>teknichrono</artifactId>
   <version>1.0-SNAPSHOT</version>
@@ -20,6 +19,9 @@
     <version.thorntail>2.2.1.Final</version.thorntail>
     <version.h2>1.4.187</version.h2>
     <version.mysql>5.1.38</version.mysql>
+    <fabric8.openshift.imageChangeTrigger>false</fabric8.openshift.imageChangeTrigger>
+    <fabric8.openshift.enableAutomaticTrigger>true</fabric8.openshift.enableAutomaticTrigger>
+    <image.namespace>ci</image.namespace>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -55,9 +57,9 @@
       <artifactId>microprofile-health</artifactId>
     </dependency>
     <!--dependency>
-      <groupId>org.wildfly.swarm</groupId>
-      <artifactId>monitor</artifactId>
-    </dependency-->
+          <groupId>org.wildfly.swarm</groupId>
+          <artifactId>monitor</artifactId>
+        </dependency-->
     <dependency>
       <groupId>io.thorntail</groupId>
       <artifactId>jpa</artifactId>
@@ -122,6 +124,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-war-plugin</artifactId>
+        <version>3.2.2</version>
         <configuration>
           <failOnMissingWebXml>false</failOnMissingWebXml>
         </configuration>
@@ -179,7 +182,7 @@
               </generator>
               <images>
                 <image>
-                  <name>${project.artifactId}:${project.version}</name>
+                  <name>${image.namespace}/${project.artifactId}:${project.version}</name>
                   <alias>teknichrono</alias>
                   <build>
                     <from>fabric8/s2i-java:3.0-java8</from>
