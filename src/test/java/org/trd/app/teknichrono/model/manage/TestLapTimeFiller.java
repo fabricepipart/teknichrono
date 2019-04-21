@@ -3,6 +3,7 @@ package org.trd.app.teknichrono.model.manage;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.trd.app.teknichrono.business.view.LapTimeFiller;
 import org.trd.app.teknichrono.model.dto.LapTimeDTO;
 import org.trd.app.teknichrono.model.dto.NestedPilotDTO;
 import org.trd.app.teknichrono.model.dto.TestLapTimeDTOCreator;
@@ -11,7 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class LapTimeFillerTest {
+public class TestLapTimeFiller {
   private TestLapTimeDTOCreator creator;
   private LapTimeFiller filler;
 

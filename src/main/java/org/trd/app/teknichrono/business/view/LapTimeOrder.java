@@ -1,7 +1,7 @@
-package org.trd.app.teknichrono.model.manage;
+package org.trd.app.teknichrono.business.view;
 
 import org.trd.app.teknichrono.model.compare.LapTimeDTOComparator;
-import org.trd.app.teknichrono.model.compare.LapTimeDTODateComparator;
+import org.trd.app.teknichrono.model.compare.LapTimeDTOLastSeenComparator;
 import org.trd.app.teknichrono.model.compare.LapTimeDTORaceComparator;
 import org.trd.app.teknichrono.model.dto.LapTimeDTO;
 
@@ -39,12 +39,12 @@ public class LapTimeOrder {
   }
 
   public void orderForRace(List<LapTimeDTO> results) {
-    results.sort(new LapTimeDTORaceComparator());
-    fillRaceGaps(results);
+    LapTimeDTORaceComparator comparator = new LapTimeDTORaceComparator();
+    results.sort(comparator);
+    fillRaceGaps(results, comparator);
   }
 
-  void fillRaceGaps(List<LapTimeDTO> results) {
-    LapTimeDTORaceComparator comparator = new LapTimeDTORaceComparator();
+  void fillRaceGaps(List<LapTimeDTO> results, LapTimeDTORaceComparator comparator) {
     LapTimeDTO best = null;
     LapTimeDTO previous = null;
     for (LapTimeDTO lapTimeDTO : results) {
@@ -61,8 +61,8 @@ public class LapTimeOrder {
     }
   }
 
-  public void orderByDate(List<LapTimeDTO> results) {
-    results.sort(new LapTimeDTODateComparator());
+  public void orderbyLastSeen(List<LapTimeDTO> results) {
+    results.sort(new LapTimeDTOLastSeenComparator());
   }
 
 }

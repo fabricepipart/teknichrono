@@ -1,9 +1,4 @@
-package org.trd.app.teknichrono.business;
-
-import java.util.Arrays;
-import java.util.List;
-
-import javax.persistence.EntityManager;
+package org.trd.app.teknichrono.business.client;
 
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.jpa.Beacon;
@@ -13,13 +8,18 @@ import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.model.jpa.Ping;
 import org.trd.app.teknichrono.model.jpa.Session;
 
-public class ChronoManager {
+import javax.persistence.EntityManager;
+import java.util.Arrays;
+import java.util.List;
 
-  private Logger logger = Logger.getLogger(ChronoManager.class);
+public class PingManager {
+
+  private Logger logger = Logger.getLogger(PingManager.class);
 
   private EntityManager em;
+  private SessionSelector selector = new SessionSelector();
 
-  public ChronoManager(EntityManager em) {
+  public PingManager(EntityManager em) {
     this.em = em;
   }
 
@@ -45,7 +45,6 @@ public class ChronoManager {
       return;
     }
 
-    SessionSelector selector = new SessionSelector();
     Session session = selector.pickMostRelevant(ping);
     if (session == null) {
       logger.error("No Session associated to Chrono " + chronometer.getId() + ", cannot updates laptimes");
@@ -56,6 +55,11 @@ public class ChronoManager {
 
   public void addPing(Ping ping, Pilot pilot, Chronometer chronometer, Session session) {
     int chronoIndex = session.getChronoIndex(chronometer);
+    if (chronoIndex < 0) {
+      logger.error("Ping error since from a chronometer '" + chronometer.getName() +
+          "' that is not part of the Session " + session.getId());
+      return;
+    }
 
     long inactivity = session.getInactivity();
     if (inactivity > 0) {
@@ -77,11 +81,7 @@ public class ChronoManager {
       LapTime lapTimeOfPingAfter = null;
       Ping pingAfter = null;
       for (LapTime lapTime : previousLaptimes) {
-        // System.out.println("Lap #" + lapTime.getId());
         for (Ping lapTimePing : lapTime.getIntermediates()) {
-          // System.out.println("\t\tIntermediate #" + lapTimePing.getId() + " @
-          // " + lapTimePing.getDateTime() + " ("
-          // + lapTimePing.getChrono().getChronoIndex() + ") ");
           if (lapTimePing.getDateTime().getTime() < ping.getDateTime().getTime()) {
             lapTimeOfPingBefore = lapTime;
             pingBefore = lapTimePing;
@@ -153,23 +153,8 @@ public class ChronoManager {
           // We ll insert it in the lap of the ping after
           if (chronoIndex < session.getChronoIndex(pingAfter.getChrono())) {
             int insertAtIdex = lapTimeOfPingAfter.getIntermediates().indexOf(pingAfter);
-            // Is this index taken by pingBefore ?
-            if (lapTimeOfPingBefore.getId() == lapTimeOfPingAfter.getId()
-                && chronoIndex <= session.getChronoIndex(pingBefore.getChrono())) {
-              // Split
-              List<Ping> toInsertInNewLap = lapTimeOfPingAfter.getIntermediates().subList(0, insertAtIdex);
-              LapTime lap = createLaptime(session, pilot, toInsertInNewLap, chronometer);
-              em.persist(lap);
-              toInsertInNewLap.clear();
-              lapTimeOfPingAfter.setStartDate();
-              // since toInsertInNewLap is backed by original list, this removes
-              // all sub-list items from the original list
-              lapTimeOfPingAfter.addIntermediates(0, ping);
-              em.persist(lapTimeOfPingAfter);
-            } else {
-              lapTimeOfPingAfter.addIntermediates(insertAtIdex, ping);
-              em.persist(lapTimeOfPingAfter);
-            }
+            lapTimeOfPingAfter.addIntermediates(insertAtIdex, ping);
+            em.persist(lapTimeOfPingAfter);
           } else {
             LapTime lap = createLaptime(session, pilot, ping, chronometer);
             em.persist(lap);

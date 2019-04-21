@@ -1,10 +1,7 @@
-package org.trd.app.teknichrono.business;
+package org.trd.app.teknichrono.business.view;
 
 import org.trd.app.teknichrono.model.dto.LapTimeDTO;
 import org.trd.app.teknichrono.model.dto.NestedPilotDTO;
-import org.trd.app.teknichrono.model.manage.LapTimeFiller;
-import org.trd.app.teknichrono.model.manage.LapTimeFilter;
-import org.trd.app.teknichrono.model.manage.LapTimeOrder;
 
 import java.util.List;
 import java.util.Set;
@@ -44,8 +41,8 @@ public class LapTimeManager {
         case ORDER_BY_DURATION:
           order.orderByDuration(results);
           break;
-        case ORDER_BY_DATE:
-          order.orderByDate(results);
+        case ORDER_BY_LAST_SEEN:
+          order.orderbyLastSeen(results);
         default:
           break;
       }

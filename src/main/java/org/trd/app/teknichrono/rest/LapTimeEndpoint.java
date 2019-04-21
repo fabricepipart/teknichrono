@@ -5,8 +5,9 @@ import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import org.jboss.logging.Logger;
-import org.trd.app.teknichrono.business.LapTimeDisplay;
-import org.trd.app.teknichrono.business.LapTimeManager;
+import org.trd.app.teknichrono.business.view.LapTimeConverter;
+import org.trd.app.teknichrono.business.view.LapTimeDisplay;
+import org.trd.app.teknichrono.business.view.LapTimeManager;
 import org.trd.app.teknichrono.model.dto.LapTimeDTO;
 import org.trd.app.teknichrono.model.dto.NestedPilotDTO;
 import org.trd.app.teknichrono.model.jpa.Category;
@@ -16,7 +17,6 @@ import org.trd.app.teknichrono.model.jpa.Location;
 import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.model.jpa.Session;
 import org.trd.app.teknichrono.model.jpa.SessionType;
-import org.trd.app.teknichrono.model.manage.LapTimeConverter;
 import org.trd.app.teknichrono.util.InvalidArgumentException;
 import org.trd.app.teknichrono.util.sql.OrderByClauseBuilder;
 import org.trd.app.teknichrono.util.sql.WhereClauseBuilder;
@@ -221,7 +221,7 @@ public class LapTimeEndpoint {
     final List<LapTimeDTO> results = getAllLapsDTOOrderedByStartDate(pilotId, sessionId, locationId, eventId,
         categoryId, startPosition, maxResult);
     // TODO Remove LapTimeDisplay.KEEP_COMPLETE if session is ongoing
-    lapTimeManager.arrangeDisplay(results, LapTimeDisplay.KEEP_COMPLETE, LapTimeDisplay.ORDER_BY_DATE);
+    lapTimeManager.arrangeDisplay(results, LapTimeDisplay.KEEP_COMPLETE, LapTimeDisplay.ORDER_BY_LAST_SEEN);
 
     return results;
   }

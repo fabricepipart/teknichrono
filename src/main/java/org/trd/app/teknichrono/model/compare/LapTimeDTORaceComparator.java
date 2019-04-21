@@ -1,23 +1,22 @@
 package org.trd.app.teknichrono.model.compare;
 
+import org.trd.app.teknichrono.model.dto.LapTimeDTO;
+import org.trd.app.teknichrono.model.dto.SectorDTO;
+
 import java.sql.Timestamp;
 import java.util.Comparator;
 import java.util.List;
 
-import org.trd.app.teknichrono.model.dto.LapTimeDTO;
-import org.trd.app.teknichrono.model.dto.SectorDTO;
-
 /**
  * In case of race, order by nb laps and then last lap start
- * 
- * @author fabricepipart
  *
+ * @author fabricepipart
  */
 public class LapTimeDTORaceComparator implements Comparator<LapTimeDTO> {
 
   @Override
   public int compare(LapTimeDTO l1, LapTimeDTO l2) {
-    int lapNumberComparison = Integer.valueOf(l2.getLapNumber()).compareTo(l1.getLapNumber());
+    int lapNumberComparison = Integer.valueOf(l2.getLapIndex()).compareTo(l1.getLapIndex());
     if (lapNumberComparison == 0) {
       Timestamp l1EndDate = l1.getEndDate();
       Timestamp l2EndDate = l2.getEndDate();
@@ -26,7 +25,7 @@ public class LapTimeDTORaceComparator implements Comparator<LapTimeDTO> {
         // Compare sectors
         int sectorsComparison = compareSectors(l1.getIntermediates(), l2.getIntermediates());
         if (sectorsComparison == 0) {
-          return Long.valueOf(l1.getStartDate().getTime()).compareTo(l2.getStartDate().getTime());
+          return compareDates(l1.getStartDate(), l2.getStartDate());
         }
         return sectorsComparison;
       }
@@ -75,7 +74,6 @@ public class LapTimeDTORaceComparator implements Comparator<LapTimeDTO> {
   }
 
   /**
-   * 
    * @param l1
    * @param l2
    * @return the distance between the two laps (>0 is l2 is after l1)
@@ -90,7 +88,7 @@ public class LapTimeDTORaceComparator implements Comparator<LapTimeDTO> {
         List<SectorDTO> sectors2 = l2.getIntermediates();
         if ((sectors2 == null || sectors2.isEmpty()) && (sectors1 == null || sectors1.isEmpty())) {
           // Compare start dates
-          return l2.getStartDate().getTime() - l1.getStartDate().getTime();
+          return distance(l1.getStartDate(), l2.getStartDate());
         }
         if (sectors2 != null && !sectors2.isEmpty() && sectors1 != null && !sectors1.isEmpty()) {
           // Compare sectors dates
@@ -103,8 +101,26 @@ public class LapTimeDTORaceComparator implements Comparator<LapTimeDTO> {
       }
       if (l1EndDate != null && l2EndDate != null) {
         // Compare end dates
-        return l2EndDate.getTime() - l1EndDate.getTime();
+        return distance(l1EndDate, l2EndDate);
       }
+    }
+    return 0;
+  }
+
+  /**
+   * @param d1
+   * @param d2
+   * @return the distance between the two laps (>0 is l2 is after l1)
+   */
+  private long distance(Timestamp d1, Timestamp d2) {
+    if (d1 != null) {
+      if (d2 != null) {
+        return d2.getTime() - d1.getTime();
+      }
+      return -d1.getTime();
+    }
+    if (d2 != null) {
+      return d2.getTime();
     }
     return 0;
   }

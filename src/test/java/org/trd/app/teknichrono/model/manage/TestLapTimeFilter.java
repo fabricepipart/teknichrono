@@ -2,6 +2,8 @@ package org.trd.app.teknichrono.model.manage;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.trd.app.teknichrono.business.view.LapTimeConverter;
+import org.trd.app.teknichrono.business.view.LapTimeFilter;
 import org.trd.app.teknichrono.model.dto.LapTimeDTO;
 import org.trd.app.teknichrono.model.dto.NestedLocationDTO;
 import org.trd.app.teknichrono.model.dto.NestedSessionDTO;
@@ -12,7 +14,7 @@ import org.trd.app.teknichrono.model.jpa.TestLapTimeCreator;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LapTimeFilterTest {
+public class TestLapTimeFilter {
 
 
   private TestLapTimeDTOCreator creator;
@@ -29,12 +31,16 @@ public class LapTimeFilterTest {
     LapTimeFilter testMe = new LapTimeFilter();
     long time = System.currentTimeMillis();
     List<LapTimeDTO> result = new ArrayList<>();
-    result.add(creator.createDTOLapTime(1, 1, time, time + 100000, 1));
-    result.add(creator.createDTOLapTime(2, 1, time, time + 100, 2));
-    result.add(creator.createDTOLapTime(3, 1, time, time + 1, 3));
-    result.add(creator.createDTOLapTime(4, 2, time, time + 200, 1));
-    result.add(creator.createDTOLapTime(5, 3, time, time + 0, 1));
-    result.add(creator.createDTOLapTime(6, 4, time, time + 400, 1));
+    creator.nextPilot();
+    result.add(creator.createDTOLapTime(time, time + 100000, 1));
+    result.add(creator.createDTOLapTime(time, time + 100, 2));
+    result.add(creator.createDTOLapTime(time, time + 1, 3));
+    creator.nextPilot();
+    result.add(creator.createDTOLapTime(time, time + 200, 1));
+    creator.nextPilot();
+    result.add(creator.createDTOLapTime(time, time + 0, 1));
+    creator.nextPilot();
+    result.add(creator.createDTOLapTime(time, time + 400, 1));
     testMe.filterNoDuration(result);
     org.junit.Assert.assertEquals(5, result.size());
     for (LapTimeDTO r : result) {
@@ -52,17 +58,22 @@ public class LapTimeFilterTest {
     NestedSessionDTO session = new NestedSessionDTO();
     NestedLocationDTO location = new NestedLocationDTO();
     session.setLocation(location);
-    result.add(creator.createDTOLapTimeWithSession(1, 1, time, time + 100, 1, session));
-    result.add(creator.createDTOLapTimeWithSession(2, 1, time, time + 100, 2, session));
-    result.add(creator.createDTOLapTimeWithSession(3, 1, time, time + 100, 3, session));
-    result.add(creator.createDTOLapTimeWithSession(4, 2, time, time + 200, 1, session));
-    result.add(creator.createDTOLapTimeWithSession(5, 3, time, time + 300, 1, session));
-    result.add(creator.createDTOLapTimeWithSession(6, 4, time, time + 400, 1, session));
+    creator.nextPilot();
+    result.add(creator.createDTOLapTimeWithSession(time, time + 100, 1, session));
+    result.add(creator.createDTOLapTimeWithSession(time, time + 100, 2, session));
+    result.add(creator.createDTOLapTimeWithSession(time, time + 100, 3, session));
+    creator.nextPilot();
+    result.add(creator.createDTOLapTimeWithSession(time, time + 200, 1, session));
+    creator.nextPilot();
+    result.add(creator.createDTOLapTimeWithSession(time, time + 300, 1, session));
+    creator.nextPilot();
+    result.add(creator.createDTOLapTimeWithSession(time, time + 400, 1, session));
     // Average should be 200
     testMe.filterExtreme(result);
     org.junit.Assert.assertEquals(6, result.size());
     for (int i = 7; i < 100; i++) {
-      result.add(creator.createDTOLapTimeWithSession(i, i, time, 0, 1, session));
+      creator.nextPilot();
+      result.add(creator.createDTOLapTimeWithSession(time, 0, 1, session));
     }
     testMe.filterExtreme(result);
     org.junit.Assert.assertEquals(99, result.size());
@@ -141,45 +152,50 @@ public class LapTimeFilterTest {
     // Laps of pilot 1 - has more laps
     long start = startForAll;
     long end = start + 111;
-    LapTimeDTO l11 = creator.createDTOLapTime(11, 1, start, end, 3);
+    creator.nextPilot();
+    LapTimeDTO l11 = creator.createDTOLapTime(start, end, 3);
     start = end;
     end = start + 111;
-    LapTimeDTO l12 = creator.createDTOLapTime(12, 1, start, end, 3);
+    LapTimeDTO l12 = creator.createDTOLapTime(start, end, 3);
     start = end;
     end = start + 111;
-    LapTimeDTO l13 = creator.createDTOLapTime(13, 1, start, end, 3);
+    LapTimeDTO l13 = creator.createDTOLapTime(start, end, 3);
 
     // Laps of pilot 2 - has first lap end
     start = startForAll;
     end = start + 112;
-    LapTimeDTO l21 = creator.createDTOLapTime(21, 2, start, end, 2);
+    creator.nextPilot();
+    LapTimeDTO l21 = creator.createDTOLapTime(start, end, 2);
     start = end;
     end = start + 112;
-    LapTimeDTO l22 = creator.createDTOLapTime(22, 2, start, end, 2);
+    LapTimeDTO l22 = creator.createDTOLapTime(start, end, 2);
 
     // Laps of pilot 3 -
     start = startForAll;
     end = start + 113;
-    LapTimeDTO l31 = creator.createDTOLapTime(31, 3, start, end, 2);
+    creator.nextPilot();
+    LapTimeDTO l31 = creator.createDTOLapTime(start, end, 2);
     start = end;
     end = start + 113;
-    LapTimeDTO l32 = creator.createDTOLapTime(32, 3, start, end, 2);
+    LapTimeDTO l32 = creator.createDTOLapTime(start, end, 2);
 
     // Laps of pilot 4 - has first lap start
     start = startForAll;
     end = start + 114;
-    LapTimeDTO l41 = creator.createDTOLapTime(41, 4, start, -1, 2);
+    creator.nextPilot();
+    LapTimeDTO l41 = creator.createDTOLapTime(start, -1, 2);
     start = end;
     end = start + 114;
-    LapTimeDTO l42 = creator.createDTOLapTime(42, 4, start, -1, 2);
+    LapTimeDTO l42 = creator.createDTOLapTime(start, -1, 2);
 
     // Laps of pilot 5 -
     start = startForAll;
     end = start + 115;
-    LapTimeDTO l51 = creator.createDTOLapTime(51, 5, start, -1, 2);
+    creator.nextPilot();
+    LapTimeDTO l51 = creator.createDTOLapTime(start, -1, 2);
     start = end;
     end = start + 115;
-    LapTimeDTO l52 = creator.createDTOLapTime(52, 5, start, -1, 2);
+    LapTimeDTO l52 = creator.createDTOLapTime(start, -1, 2);
 
     List<LapTimeDTO> result = new ArrayList<>();
 

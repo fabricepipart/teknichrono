@@ -1,12 +1,11 @@
-package org.trd.app.teknichrono.business;
+package org.trd.app.teknichrono.business.client;
 
 import org.jboss.logging.Logger;
-
 import org.trd.app.teknichrono.model.jpa.Chronometer;
+import org.trd.app.teknichrono.model.jpa.LapTime;
+import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.model.jpa.Ping;
 import org.trd.app.teknichrono.model.jpa.Session;
-import org.trd.app.teknichrono.model.jpa.Pilot;
-import org.trd.app.teknichrono.model.jpa.LapTime;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,14 +31,14 @@ public class SessionSelector {
     // Only consider sessions that contain chronometer
     List<Session> candidateSessions = new ArrayList<>(ping.getChrono().getSessions());
     // Same day
-    candidateSessions.removeIf(s -> distanceBetween(s, time) >  ONE_DAY);
-    if(candidateSessions.isEmpty()){
+    candidateSessions.removeIf(s -> distanceBetween(s, time) > ONE_DAY);
+    if (candidateSessions.isEmpty()) {
       return null;
     }
     // Admin has the option to declare pilots of sessions. If he does, that's considered in priority
     List<Session> pilotSessions = new ArrayList<>(candidateSessions);
     pilotSessions.removeIf(s -> !containsPilot(s, ping.getBeacon().getPilot()));
-    if(!pilotSessions.isEmpty()){
+    if (!pilotSessions.isEmpty()) {
       logger.debug("Pilot was part of sessions " + pilotSessions);
       candidateSessions = pilotSessions;
     }
@@ -47,16 +46,16 @@ public class SessionSelector {
     // Check if one or more are started
     List<Session> startedSessions = new ArrayList<>(candidateSessions);
     startedSessions.removeIf(s -> !s.isCurrent());
-    if(!startedSessions.isEmpty()) {
+    if (!startedSessions.isEmpty()) {
       logger.debug("Current sessions " + startedSessions);
       candidateSessions = startedSessions;
     }
 
     // Check if we have unfinished business for ex aequo (use case : 2 starts 1 end)
-    List<Session> sessionsWithShortestDistance =  sessionsWithShortestDistance(candidateSessions, time);
-    if(!sessionsWithShortestDistance.isEmpty()) {
+    List<Session> sessionsWithShortestDistance = sessionsWithShortestDistance(candidateSessions, time);
+    if (!sessionsWithShortestDistance.isEmpty()) {
       logger.debug("Closest sessions " + sessionsWithShortestDistance);
-      if(sessionsWithShortestDistance.size() > 1) {
+      if (sessionsWithShortestDistance.size() > 1) {
         // Pilot may have a session with an ongoing lap that miss the ping from that chrono. Pick that.
         Session unfinishedSession = getUnfinishedSession(ping.getBeacon().getPilot(), sessionsWithShortestDistance, ping.getChrono());
         if (unfinishedSession != null) {
@@ -76,15 +75,15 @@ public class SessionSelector {
       Session pilotLapSession = pilotLap.getSession();
       // Intersect with chronoSessions
       for (Session chronoSession : chronoSessions) {
-        if(chronoSession.getId() == pilotLapSession.getId()){
+        if (chronoSession.getId() == pilotLapSession.getId()) {
           // This is a lap of a session that contains this chronometer
           boolean containsAnIntermediateForChrono = false;
           for (Ping intermediate : pilotLap.getIntermediates()) {
-            if(intermediate.getChrono().getId() == chrono.getId()){
+            if (intermediate.getChrono().getId() == chrono.getId()) {
               containsAnIntermediateForChrono = true;
             }
           }
-          if(!containsAnIntermediateForChrono){
+          if (!containsAnIntermediateForChrono) {
             return pilotLapSession;
           }
         }
@@ -94,9 +93,9 @@ public class SessionSelector {
   }
 
   private boolean containsPilot(Session s, Pilot pilot) {
-    if(s.getPilots() != null){
+    if (s.getPilots() != null) {
       for (Pilot p : s.getPilots()) {
-        if(p.getId() == pilot.getId()){
+        if (p.getId() == pilot.getId()) {
           return true;
         }
       }
@@ -122,7 +121,7 @@ public class SessionSelector {
 
   private Session pickMostRelevantByDistance(List<Session> sessions, long pingTime) {
     List<Session> sessionsWithShortestDistance = sessionsWithShortestDistance(sessions, pingTime);
-    if(!sessionsWithShortestDistance.isEmpty()){
+    if (!sessionsWithShortestDistance.isEmpty()) {
       return sessionsWithShortestDistance.get(0);
     }
     return null;
