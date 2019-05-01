@@ -1,6 +1,8 @@
 package org.trd.app.teknichrono.rest;
 
-import java.util.List;
+import org.trd.app.teknichrono.model.dto.CategoryDTO;
+import org.trd.app.teknichrono.model.jpa.Category;
+import org.trd.app.teknichrono.model.jpa.Pilot;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -20,13 +22,11 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
-
-import org.trd.app.teknichrono.model.jpa.Category;
-import org.trd.app.teknichrono.model.jpa.Pilot;
-import org.trd.app.teknichrono.model.dto.CategoryDTO;
+import java.util.List;
+import java.util.Set;
 
 /**
- * 
+ *
  */
 @Stateless
 @Path("/categories")
@@ -48,6 +48,13 @@ public class CategoryEndpoint {
     Category entity = em.find(Category.class, id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
+    }
+    Set<Pilot> pilots = entity.getPilots();
+    if (pilots != null) {
+      for (Pilot pilot : pilots) {
+        pilot.setCategory(null);
+        em.persist(pilot);
+      }
     }
     em.remove(entity);
     return Response.noContent().build();
