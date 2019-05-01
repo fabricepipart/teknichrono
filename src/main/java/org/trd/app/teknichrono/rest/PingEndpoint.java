@@ -1,6 +1,11 @@
 package org.trd.app.teknichrono.rest;
 
-import java.util.List;
+import org.jboss.logging.Logger;
+import org.trd.app.teknichrono.business.client.PingManager;
+import org.trd.app.teknichrono.model.jpa.Beacon;
+import org.trd.app.teknichrono.model.jpa.Chronometer;
+import org.trd.app.teknichrono.model.jpa.Ping;
+import org.trd.app.teknichrono.util.DurationLogger;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -20,16 +25,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
-
-import org.jboss.logging.Logger;
-import org.trd.app.teknichrono.business.ChronoManager;
-import org.trd.app.teknichrono.model.jpa.Beacon;
-import org.trd.app.teknichrono.model.jpa.Chronometer;
-import org.trd.app.teknichrono.model.jpa.Ping;
-import org.trd.app.teknichrono.util.DurationLogger;
+import java.util.List;
 
 /**
- * 
+ *
  */
 @Stateless
 @Path("/pings")
@@ -42,7 +41,7 @@ public class PingEndpoint {
   @Path("/create")
   @Consumes("application/json")
   public Response create(Ping entity, @QueryParam("chronoId") int chronoId, @QueryParam("beaconId") int beaconId) {
-    try(DurationLogger dl = new DurationLogger(logger, "Ping for chronometer ID=" + chronoId + " and beacon ID=" + beaconId)) {
+    try (DurationLogger dl = new DurationLogger(logger, "Ping for chronometer ID=" + chronoId + " and beacon ID=" + beaconId)) {
       Chronometer chrono = em.find(Chronometer.class, chronoId);
       if (chrono == null) {
         return Response.status(Status.NOT_FOUND).build();
@@ -55,7 +54,7 @@ public class PingEndpoint {
       entity.setBeacon(beacon);
       em.persist(entity);
       // TODO Check if relevant to create it each time...
-      ChronoManager manager = new ChronoManager(em);
+      PingManager manager = new PingManager(em);
       manager.addPing(entity);
       return Response.created(UriBuilder.fromResource(PingEndpoint.class).path(String.valueOf(entity.getId())).build())
           .build();

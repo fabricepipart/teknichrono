@@ -1,11 +1,17 @@
 package org.trd.app.teknichrono.rest;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import org.jboss.logging.Logger;
+import org.trd.app.teknichrono.business.client.SessionSelector;
+import org.trd.app.teknichrono.business.client.PingManager;
+import org.trd.app.teknichrono.model.dto.SessionDTO;
+import org.trd.app.teknichrono.model.jpa.Chronometer;
+import org.trd.app.teknichrono.model.jpa.Event;
+import org.trd.app.teknichrono.model.jpa.Location;
+import org.trd.app.teknichrono.model.jpa.Pilot;
+import org.trd.app.teknichrono.model.jpa.Ping;
+import org.trd.app.teknichrono.model.jpa.Session;
+import org.trd.app.teknichrono.model.jpa.SessionType;
+import org.trd.app.teknichrono.util.DurationLogger;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -25,22 +31,15 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
-
-import org.jboss.logging.Logger;
-import org.trd.app.teknichrono.business.ChronoManager;
-import org.trd.app.teknichrono.business.SessionSelector;
-import org.trd.app.teknichrono.model.jpa.Chronometer;
-import org.trd.app.teknichrono.model.jpa.Event;
-import org.trd.app.teknichrono.model.jpa.Location;
-import org.trd.app.teknichrono.model.jpa.Pilot;
-import org.trd.app.teknichrono.model.jpa.Ping;
-import org.trd.app.teknichrono.model.jpa.Session;
-import org.trd.app.teknichrono.model.jpa.SessionType;
-import org.trd.app.teknichrono.model.dto.SessionDTO;
-import org.trd.app.teknichrono.util.DurationLogger;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
- * 
+ *
  */
 @Stateless
 @Path("/sessions")
@@ -174,7 +173,7 @@ public class SessionEndpoint {
   @Path("{sessionId:[0-9][0-9]*}/addChronometer")
   @Produces("application/json")
   public Response addChronometer(@PathParam("sessionId") int sessionId, @QueryParam("chronoId") Integer chronoId,
-      @QueryParam("index") Integer index) {
+                                 @QueryParam("index") Integer index) {
     DurationLogger perf = DurationLogger.get(logger).start("Add chrono " + chronoId + " to session " + sessionId);
     Session session = em.find(Session.class, sessionId);
     if (session == null) {
@@ -278,10 +277,10 @@ public class SessionEndpoint {
   }
 
   private boolean intersect(Session otherSession, Session session) {
-    if((otherSession.getStart().getTime() >= session.getStart().getTime()) && (otherSession.getStart().getTime() <= otherSession.getEnd().getTime())){
+    if ((otherSession.getStart().getTime() >= session.getStart().getTime()) && (otherSession.getStart().getTime() <= otherSession.getEnd().getTime())) {
       return true;
     }
-    if(otherSession.getEnd().getTime() >= otherSession.getStart().getTime() && otherSession.getEnd().getTime() <= otherSession.getEnd().getTime()){
+    if (otherSession.getEnd().getTime() >= otherSession.getStart().getTime() && otherSession.getEnd().getTime() <= otherSession.getEnd().getTime()) {
       return true;
     }
     return false;
@@ -299,7 +298,7 @@ public class SessionEndpoint {
   private void startRace(Session session, Timestamp timestamp) {
     Chronometer chronometer = session.getChronometers().get(0);
     Set<Pilot> pilots = session.getPilots();
-    ChronoManager cm = new ChronoManager(em);
+    PingManager cm = new PingManager(em);
     for (Pilot pilot : pilots) {
       Ping ping = new Ping();
       ping.setDateTime(timestamp);

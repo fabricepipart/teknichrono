@@ -1,6 +1,11 @@
 package org.trd.app.teknichrono.rest;
 
-import java.util.List;
+import org.jboss.logging.Logger;
+import org.trd.app.teknichrono.model.dto.BeaconDTO;
+import org.trd.app.teknichrono.model.jpa.Beacon;
+import org.trd.app.teknichrono.model.jpa.Pilot;
+import org.trd.app.teknichrono.model.jpa.Ping;
+import org.trd.app.teknichrono.util.DurationLogger;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -20,16 +25,11 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
-
-import org.jboss.logging.Logger;
-import org.trd.app.teknichrono.model.jpa.Beacon;
-import org.trd.app.teknichrono.model.jpa.Pilot;
-import org.trd.app.teknichrono.model.jpa.Ping;
-import org.trd.app.teknichrono.model.dto.BeaconDTO;
-import org.trd.app.teknichrono.util.DurationLogger;
+import java.net.URI;
+import java.util.List;
 
 /**
- * 
+ *
  */
 @Stateless(name = "beacons")
 @Path("/beacons")
@@ -49,8 +49,8 @@ public class BeaconEndpoint {
       entity.setPilot(pilot);
     }
     em.persist(entity);
-    Response toReturn = Response
-        .created(UriBuilder.fromResource(BeaconEndpoint.class).path(String.valueOf(entity.getId())).build()).build();
+    URI location = UriBuilder.fromResource(BeaconEndpoint.class).path(String.valueOf(entity.getId())).build();
+    Response toReturn = Response.created(location).build();
     perf.end();
     return toReturn;
   }

@@ -1,4 +1,4 @@
-package org.trd.app.teknichrono.model.manage;
+package org.trd.app.teknichrono.business.view;
 
 import org.trd.app.teknichrono.model.dto.LapTimeDTO;
 import org.trd.app.teknichrono.model.dto.NestedPilotDTO;

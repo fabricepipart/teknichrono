@@ -30,6 +30,7 @@ public class LapTimeDTO implements Serializable {
   private Timestamp startDate;
   // Either the last intermediate ping or the first ping of the next lap
   private Timestamp endDate;
+  private Timestamp lastSeenDate;
   // In milliseconds
   private long duration;
   private long gapWithPrevious;
@@ -62,10 +63,17 @@ public class LapTimeDTO implements Serializable {
             this.setStartDate(element);
           }
         }
+        if (lastSeenDate == null) {
+          lastSeenDate = element.getDateTime();
+        } else {
+          if (element.getDateTime() != null && element.getDateTime().getTime() > lastSeenDate.getTime()) {
+            lastSeenDate = element.getDateTime();
+          }
+        }
         previous = element;
       }
       boolean loop = session.isLoopTrack();
-      if (!loop && entity.getSession().getChronoIndex(previous.getChrono()) == (session.getChronometersCount() - 1)) {
+      if (!loop && previous != null && entity.getSession().getChronoIndex(previous.getChrono()) == (session.getChronometersCount() - 1)) {
         this.setEndDate(previous);
       }
     }
@@ -74,11 +82,17 @@ public class LapTimeDTO implements Serializable {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("[id=" + getId());
-    sb.append(",pilot=" + (pilot != null ? pilot.getId() : "-"));
-    sb.append(",session=" + (session != null ? session.getId() : "-"));
-    sb.append(",startDate=" + startDate);
-    sb.append(",duration=" + duration + "]");
+    sb.append("#").append(getId());
+    sb.append(" (").append(getLapIndex()).append("/").append(getLapNumber()).append(")");
+    sb.append(" P=").append((pilot != null ? pilot.getId() : "-"));
+    sb.append(" S=").append((session != null ? session.getId() : "-"));
+    sb.append(" (").append((startDate != null ? startDate : "?"));
+    sb.append(" -> ").append((endDate != null ? endDate : "?"));
+    sb.append(") ").append(duration).append("ms (");
+    for (SectorDTO s : sectors) {
+      sb.append(" ").append(s.getFromChronoId()).append("->").append(s.getToChronoId()).append("=").append(s.getDuration()).append("ms");
+    }
+    sb.append(") lastseen=").append(lastSeenDate);
     return sb.toString();
   }
 
@@ -179,7 +193,6 @@ public class LapTimeDTO implements Serializable {
     if (duration < 0) {
       throw new InvalidArgumentException();
     }
-    // System.out.println("Setting duration " + duration);
     this.duration = duration;
   }
 
@@ -195,12 +208,8 @@ public class LapTimeDTO implements Serializable {
       SectorDTO previousLast = this.sectors.get(sectors.size() - 1);
       long previousLastStart = previousLast.getStart();
       long previousLastEnd = previousLastStart + previousLast.getDuration();
-      // System.out.println("Last sector : " + previousLastEnd + " during " +
-      // (endDate.getTime() - previousLastEnd));
-      this.sectors
-          .add(new SectorDTO(previousLastEnd, previousLast.getToChronoId(), endDate.getTime() - previousLastEnd));
-    } else {
-      this.sectors.add(new SectorDTO(startDate.getTime(), 0, endDate.getTime() - startDate.getTime()));
+      long previousLastChronoId = previousLast.getToChronoId();
+      this.sectors.add(new SectorDTO(previousLastEnd, previousLastChronoId, endDate.getTime() - previousLastEnd));
     }
     setEndDate(endDate);
   }
@@ -235,5 +244,13 @@ public class LapTimeDTO implements Serializable {
 
   public void setGapWithBest(long gapWithBest) {
     this.gapWithBest = gapWithBest;
+  }
+
+  public Timestamp getLastSeenDate() {
+    return lastSeenDate;
+  }
+
+  public void setLastSeenDate(Timestamp lastSeenDate) {
+    this.lastSeenDate = lastSeenDate;
   }
 }

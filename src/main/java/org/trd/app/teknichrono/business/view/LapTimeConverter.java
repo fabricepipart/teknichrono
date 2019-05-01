@@ -1,4 +1,4 @@
-package org.trd.app.teknichrono.model.manage;
+package org.trd.app.teknichrono.business.view;
 
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.compare.LapTimeStartComparator;

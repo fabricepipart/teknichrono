@@ -10,7 +10,7 @@ timeout(60) {
       
         container('maven') {
           stage('Version') {
-            def version = "1.1." + (env.BRANCH_NAME.equals("master") ? '' : "0-${env.BRANCH_NAME}.") + env.BUILD_NUMBER
+            def version = "1.1." + (env.BRANCH_NAME.equals("master") ? '' : "0-${env.BRANCH_NAME.replaceAll('[^A-Za-z0-9]+', '-')}.") + env.BUILD_NUMBER
             currentBuild.description = version
             sh "mvn -B -U versions:set -DnewVersion=${version}"
           }

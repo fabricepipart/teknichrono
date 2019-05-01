@@ -1,15 +1,19 @@
 package org.trd.app.teknichrono.model.manage;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.trd.app.teknichrono.business.view.LapTimeConverter;
 import org.trd.app.teknichrono.model.dto.LapTimeDTO;
+import org.trd.app.teknichrono.model.dto.SectorDTO;
+import org.trd.app.teknichrono.model.dto.TestLapTimeDTOCreator;
 import org.trd.app.teknichrono.model.jpa.LapTime;
 import org.trd.app.teknichrono.model.jpa.TestLapTimeCreator;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class LapTimeConverterTest {
+public class TestLapTimeConverter {
 
   private TestLapTimeCreator creator;
 
@@ -23,6 +27,24 @@ public class LapTimeConverterTest {
     LapTimeConverter testMe = new LapTimeConverter();
     List<LapTimeDTO> result = testMe.convert(new ArrayList<LapTime>());
     org.junit.Assert.assertTrue(result.isEmpty());
+  }
+
+  @Test
+  public void noneCreatedWithNegativeDuration() {
+    TestLapTimeDTOCreator creator = new TestLapTimeDTOCreator();
+    List<LapTimeDTO> lapsWithIntermediates = creator.createLapsWithIntermediates();
+    for (LapTimeDTO lap : lapsWithIntermediates) {
+      checkNoNegativeDuration(lap);
+    }
+  }
+
+  private void checkNoNegativeDuration(LapTimeDTO lap) {
+    Assert.assertTrue(lap.getDuration() >= 0);
+    Assert.assertTrue(lap.getGapWithBest() >= 0);
+    for (SectorDTO s : lap.getIntermediates()) {
+      Assert.assertTrue(s.getStart() >= 0);
+      Assert.assertTrue("This intermediate duration is negative", s.getDuration() >= 0);
+    }
   }
 
   @Test
