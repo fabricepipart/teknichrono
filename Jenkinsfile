@@ -19,6 +19,13 @@ timeout(60) {
             sh "mvn -B -U clean install -Popenshift"
           }
 
+          stage('CodeCov') {
+            withCredentials([string(credentialsId: 'CODECOV_TOKEN', variable: 'CODECOV_TOKEN')]) {
+              sh "curl -s https://codecov.io/bash > codecov.sh"
+              sh "bash codecov.sh -t 0f351c95-4bb6-47d8-a521-c3f8f9580ffa"
+            }
+          }
+
           stage('Start staging'){
             sh "mvn -B fabric8:undeploy -Popenshift -Dfabric8.namespace=teknichrono-staging"
             sh "mvn -B fabric8:apply -Popenshift -Dfabric8.namespace=teknichrono-staging"

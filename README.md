@@ -1,5 +1,7 @@
 # Teknichrono
 
+[![codecov](https://codecov.io/gh/fabricepipart/teknichrono/branch/master/graph/badge.svg)](https://codecov.io/gh/fabricepipart/teknichrono)
+
 * [Project home](https://github.com/fabricepipart/teknichrono)
 * [Alternative home](https://bitbucket.org/trdteam/teknichrono/overview)
 * [Staging](http://teknichrono-fabrice-pipart-stage.b542.starter-us-east-2a.openshiftapps.com/)
