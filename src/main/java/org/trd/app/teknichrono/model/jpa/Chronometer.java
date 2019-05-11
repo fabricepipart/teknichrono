@@ -14,13 +14,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 @Entity
 @XmlRootElement
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Chronometer implements Serializable {
 
   /* =========================== Entity stuff =========================== */
@@ -43,11 +38,9 @@ public class Chronometer implements Serializable {
 
   // Can be null if after event, items are reassociated
   @OneToMany(mappedBy = "chrono")
-  @JsonBackReference(value = "ping-chronometer")
   private List<Ping> pings = new ArrayList<Ping>();
 
   @ManyToMany(mappedBy = "chronometers")
-  @JsonBackReference(value = "session-chronometer")
   private List<Session> sessions = new ArrayList<Session>();
 
   /* ===================== Getters and setters ======================== */

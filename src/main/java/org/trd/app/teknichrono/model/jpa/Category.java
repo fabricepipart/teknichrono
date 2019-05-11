@@ -14,13 +14,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 @Entity
 @XmlRootElement
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Category implements java.io.Serializable {
 
   /**
@@ -39,7 +34,6 @@ public class Category implements java.io.Serializable {
 
   @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true)
   @JoinColumn(name = "categoryId")
-  @JsonBackReference(value = "pilot-category")
   private Set<Pilot> pilots = new HashSet<>();
 
   @Column(nullable = false)

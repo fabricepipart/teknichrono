@@ -4,11 +4,12 @@ target
 .settings
 .DS_Store
 .faces-config.xml.jsfdia
+.vscode
+.idea
 bin
 MANIFEST.MF
 *.swp
 *.iml
-*.idea
 local-stage
 *.pyc
 

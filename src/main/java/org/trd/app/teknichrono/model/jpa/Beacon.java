@@ -15,13 +15,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 @Entity
 @XmlRootElement
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Beacon implements java.io.Serializable {
 
   /* =========================== Entity stuff =========================== */
@@ -48,12 +43,10 @@ public class Beacon implements java.io.Serializable {
   // Mapped by denotes that Pilot is the owner of the relationship
   // http://meri-stuff.blogspot.fr/2012/03/jpa-tutorial.html#RelationshipsBidirectionalOneToManyManyToOneConsistency
   @OneToOne(optional = true, mappedBy = "currentBeacon", cascade = CascadeType.MERGE)
-  @JsonBackReference(value = "pilot-beacon")
   private Pilot pilot;
 
   // Can be null if after event, items are reassociated
   @OneToMany(mappedBy = "beacon")
-  @JsonBackReference(value = "ping-beacon")
   private List<Ping> pings = new ArrayList<Ping>();
 
   /* ===================== Getters and setters ======================== */

@@ -2,11 +2,10 @@ package org.trd.app.teknichrono.rest;
 
 import java.util.List;
 
-import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.OptimisticLockException;
-import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -29,12 +28,15 @@ import org.trd.app.teknichrono.util.DurationLogger;
 /**
  * 
  */
-@Stateless
 @Path("/events")
 public class EventEndpoint {
-  @PersistenceContext(unitName = "teknichrono-persistence-unit")
-  private EntityManager em;
 
+  EntityManager em;
+
+  @Inject
+  public EventEndpoint(EntityManager em) {
+    this.em = em;
+  }
 
   private Logger logger = Logger.getLogger(EventEndpoint.class);
 

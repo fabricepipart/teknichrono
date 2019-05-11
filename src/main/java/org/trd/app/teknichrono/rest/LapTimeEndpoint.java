@@ -21,11 +21,10 @@ import org.trd.app.teknichrono.util.InvalidArgumentException;
 import org.trd.app.teknichrono.util.sql.OrderByClauseBuilder;
 import org.trd.app.teknichrono.util.sql.WhereClauseBuilder;
 
-import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.OptimisticLockException;
-import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -48,11 +47,15 @@ import java.util.Set;
 /**
  *
  */
-@Stateless
 @Path("/laptimes")
 public class LapTimeEndpoint {
-  @PersistenceContext(unitName = "teknichrono-persistence-unit")
-  private EntityManager em;
+
+  EntityManager em;
+
+  @Inject
+  public LapTimeEndpoint(EntityManager em) {
+    this.em = em;
+  }
 
   private Logger logger = Logger.getLogger(LapTimeEndpoint.class);
   private LapTimeManager lapTimeManager = new LapTimeManager();

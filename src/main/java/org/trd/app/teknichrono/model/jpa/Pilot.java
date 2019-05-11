@@ -22,13 +22,8 @@ import javax.persistence.OrderBy;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 @Entity
 @XmlRootElement
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Pilot implements Serializable {
 
   /* =========================== Entity stuff =========================== */
@@ -61,7 +56,6 @@ public class Pilot implements Serializable {
   @OneToMany(cascade = CascadeType.REMOVE)
   @OrderBy(value = "startDate")
   @JoinColumn(name = "pilotId")
-  @JsonBackReference(value = "laptime-pilot")
   private List<LapTime> laps = new ArrayList<LapTime>();
 
   @ManyToOne(fetch = FetchType.EAGER, optional = true, cascade = CascadeType.MERGE)
@@ -69,7 +63,6 @@ public class Pilot implements Serializable {
   private Category category;
 
   @ManyToMany(mappedBy = "pilots")
-  @JsonBackReference(value = "session-pilot")
   private Set<Session> sessions = new HashSet<Session>();
 
   /* ===================== Getters and setters ======================== */

@@ -7,11 +7,10 @@ import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.model.jpa.Ping;
 import org.trd.app.teknichrono.util.DurationLogger;
 
-import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.OptimisticLockException;
-import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -31,14 +30,17 @@ import java.util.List;
 /**
  *
  */
-@Stateless(name = "beacons")
 @Path("/beacons")
 public class BeaconEndpoint {
 
   private Logger logger = Logger.getLogger(BeaconEndpoint.class);
 
-  @PersistenceContext(unitName = "teknichrono-persistence-unit")
-  private EntityManager em;
+  EntityManager em;
+
+  @Inject
+  public BeaconEndpoint(EntityManager em) {
+    this.em = em;
+  }
 
   @POST
   @Consumes("application/json")
