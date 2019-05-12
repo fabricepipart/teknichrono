@@ -6,11 +6,11 @@ import java.util.List;
 
 public class TestLapTimeCreator {
 
-  private int lapId = 0;
-  private int pilotId = 0;
+  private long lapId = 0L;
+  private long pilotId = 0L;
   private long now = System.currentTimeMillis();
-  private int sessionId = 0;
-  private int locationId = 0;
+  private long sessionId = 0L;
+  private long locationId = 0L;
   private boolean locationLoops = false;
 
   public void nextSession() {
@@ -28,40 +28,40 @@ public class TestLapTimeCreator {
   }
 
   public void setPilot(Pilot p) {
-    pilotId = p.getId();
+    pilotId = p.id;
   }
 
   public void setSession(Session s) {
-    sessionId = s.getId();
+    sessionId = s.id;
   }
 
 
   public LapTime createLapTimeWithIntermediates(long i1, long i2, long i3, long i4) {
     LapTime entity = new LapTime();
-    entity.setId(++lapId);
+    entity.id = ++lapId;
     Pilot pilot = new Pilot();
-    pilot.setId(pilotId);
+    pilot.id = pilotId;
     Beacon b = new Beacon();
-    b.setId(pilotId);
+    b.id = pilotId;
     pilot.setCurrentBeacon(b);
     entity.setPilot(pilot);
     Session s = new Session();
     Location l = new Location();
-    l.setId(locationId);
+    l.id = locationId;
     l.setLoopTrack(locationLoops);
     s.setLocation(l);
     s.setId(sessionId);
     Chronometer c0 = new Chronometer();
-    c0.setId(0);
+    c0.id = 0L;
     s.addChronometer(c0);
     Chronometer c1 = new Chronometer();
-    c1.setId(1);
+    c1.id = 1L;
     s.addChronometer(c1);
     Chronometer c2 = new Chronometer();
-    c2.setId(2);
+    c2.id = 2L;
     s.addChronometer(c2);
     Chronometer c3 = new Chronometer();
-    c3.setId(3);
+    c3.id = 3L;
     s.addChronometer(c3);
     entity.setSession(s);
     if (i1 >= 0) {
@@ -303,9 +303,9 @@ public class TestLapTimeCreator {
 
   }
 
-  public LapTime createLapTimeWithNoIntermediate(int i, boolean loop, long startDate) {
+  public LapTime createLapTimeWithNoIntermediate(long i, boolean loop, long startDate) {
     LapTime laptime = new LapTime();
-    laptime.setId(i);
+    laptime.id = i;
     Timestamp time = new Timestamp(startDate);
     laptime.setStartDate(time);
     Ping ping = new Ping();
@@ -314,7 +314,7 @@ public class TestLapTimeCreator {
     ping.setDateTime(time);
     laptime.addIntermediates(ping);
     Pilot p = new Pilot();
-    p.setId(1);
+    p.id = 1L;
     laptime.setPilot(p);
 
     Session session = new Session();
@@ -326,9 +326,9 @@ public class TestLapTimeCreator {
     return laptime;
   }
 
-  public LapTime createLapTimeWithIntermediates(int i, boolean loop) {
+  public LapTime createLapTimeWithIntermediates(long i, boolean loop) {
     LapTime laptime = new LapTime();
-    laptime.setId(i);
+    laptime.id = i;
     Timestamp time = new Timestamp(System.currentTimeMillis() + (i * 60 * 60 * 1000));
     laptime.setStartDate(time);
     Session session = new Session();
@@ -347,13 +347,13 @@ public class TestLapTimeCreator {
     return laptime;
   }
 
-  private LapTime createLapTimeWithPilot(int i, boolean loop, long startDate) {
+  private LapTime createLapTimeWithPilot(long i, boolean loop, long startDate) {
     return createLapTimeWithPilot(i, i, loop, startDate);
   }
 
-  public LapTime createLapTimeWithPilot(int i, int pilotId, boolean loop, long startDate) {
+  public LapTime createLapTimeWithPilot(long i, long pilotId, boolean loop, long startDate) {
     LapTime laptime = new LapTime();
-    laptime.setId(i);
+    laptime.id = i;
     Timestamp time = new Timestamp(startDate);
     laptime.setStartDate(time);
     Ping ping = new Ping();
@@ -362,7 +362,7 @@ public class TestLapTimeCreator {
     ping.setDateTime(time);
     laptime.addIntermediates(ping);
     Pilot p = new Pilot();
-    p.setId(pilotId);
+    p.id = pilotId;
     laptime.setPilot(p);
     Session session = new Session();
     session.addChronometer(chrono);

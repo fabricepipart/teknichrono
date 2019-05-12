@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.TypedQuery;
+import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -16,6 +17,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
@@ -42,19 +44,20 @@ public class ChronometerEndpoint {
   }
 
   @POST
-  @Consumes("application/json")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Transactional
   public Response create(Chronometer entity) {
     try(DurationLogger dl = new DurationLogger(logger, "Create chronometer " + entity.getName())) {
         em.persist(entity);
         return Response
-            .created(UriBuilder.fromResource(ChronometerEndpoint.class).path(String.valueOf(entity.getId())).build())
+            .created(UriBuilder.fromResource(ChronometerEndpoint.class).path(String.valueOf(entity.id)).build())
             .build();
     }
   }
 
   @DELETE
   @Path("/{id:[0-9][0-9]*}")
-  public Response deleteById(@PathParam("id") int id) {
+  public Response deleteById(@PathParam("id") long id) {
     try(DurationLogger dl = new DurationLogger(logger, "Delete chronometer ID=" + id)) {
       Chronometer entity = em.find(Chronometer.class, id);
       if (entity == null) {
@@ -77,8 +80,8 @@ public class ChronometerEndpoint {
 
   @GET
   @Path("/{id:[0-9][0-9]*}")
-  @Produces("application/json")
-  public Response findById(@PathParam("id") int id) {
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response findById(@PathParam("id") long id) {
     try(DurationLogger dl = new DurationLogger(logger, "Find chronometer ID=" + id)) {
       TypedQuery<Chronometer> findByIdQuery = em
           .createQuery("SELECT DISTINCT c FROM Chronometer c LEFT JOIN FETCH c.pings WHERE c.id = :entityId ORDER BY c.id", Chronometer.class);
@@ -99,7 +102,7 @@ public class ChronometerEndpoint {
 
   @GET
   @Path("/name")
-  @Produces("application/json")
+  @Produces(MediaType.APPLICATION_JSON)
   public Response findChronometerByName(@QueryParam("name") String name) {
     try(DurationLogger dl = new DurationLogger(logger, "Find chronometer " + name)) {
       TypedQuery<Chronometer> findByNameQuery = em
@@ -120,7 +123,7 @@ public class ChronometerEndpoint {
   }
 
   @GET
-  @Produces("application/json")
+  @Produces(MediaType.APPLICATION_JSON)
   public List<ChronometerDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
     try(DurationLogger dl = new DurationLogger(logger, "Get all chronometers")) {
       TypedQuery<Chronometer> findAllQuery = em.createQuery("SELECT DISTINCT c FROM Chronometer c ORDER BY c.id",
@@ -139,13 +142,13 @@ public class ChronometerEndpoint {
 
   @PUT
   @Path("/{id:[0-9][0-9]*}")
-  @Consumes("application/json")
-  public Response update(@PathParam("id") int id, Chronometer entity) {
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response update(@PathParam("id") long id, Chronometer entity) {
     try(DurationLogger dl = new DurationLogger(logger, "Update chronometer ID=" + id)) {
       if (entity == null) {
         return Response.status(Status.BAD_REQUEST).build();
       }
-      if (id != entity.getId()) {
+      if (id != entity.id) {
         return Response.status(Status.CONFLICT).entity(entity).build();
       }
       if (em.find(Chronometer.class, id) == null) {

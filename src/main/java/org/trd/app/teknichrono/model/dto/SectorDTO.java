@@ -20,8 +20,8 @@ public class SectorDTO implements Serializable {
     if (from != null && to != null) {
       this.start = from.getDateTime().getTime();
       this.duration = to.getDateTime().getTime() - this.start;
-      this.fromChronoId = from.getChrono().getId();
-      this.toChronoId = to.getChrono().getId();
+      this.fromChronoId = from.getChrono().id;
+      this.toChronoId = to.getChrono().id;
     }
   }
 

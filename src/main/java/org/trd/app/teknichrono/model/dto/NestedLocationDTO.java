@@ -14,7 +14,7 @@ public class NestedLocationDTO implements Serializable {
    */
   private static final long serialVersionUID = -1377429742860544608L;
 
-  private int id;
+  private Long id;
   private int version;
   private String name;
 
@@ -23,7 +23,7 @@ public class NestedLocationDTO implements Serializable {
 
   public NestedLocationDTO(final Location entity) {
     if (entity != null) {
-      this.id = entity.getId();
+      this.id = entity.id;
       this.version = entity.getVersion();
       this.name = entity.getName();
     }
@@ -33,7 +33,7 @@ public class NestedLocationDTO implements Serializable {
     if (entity == null) {
       entity = new Location();
     }
-    if (((Integer) this.id) != null) {
+    if (id != null) {
       TypedQuery<Location> findByIdQuery = em.createQuery("SELECT DISTINCT e FROM Location e WHERE e.id = :entityId",
           Location.class);
       findByIdQuery.setParameter("entityId", this.id);
@@ -50,11 +50,11 @@ public class NestedLocationDTO implements Serializable {
     return entity;
   }
 
-  public int getId() {
+  public long getId() {
     return this.id;
   }
 
-  public void setId(final int id) {
+  public void setId(final long id) {
     this.id = id;
   }
 

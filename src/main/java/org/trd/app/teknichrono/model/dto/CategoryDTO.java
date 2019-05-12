@@ -14,7 +14,7 @@ import org.trd.app.teknichrono.model.jpa.Pilot;
 @XmlRootElement
 public class CategoryDTO {
 
-  private int id;
+  private long id;
 
   private int version;
   private String name;
@@ -25,7 +25,7 @@ public class CategoryDTO {
 
   public CategoryDTO(final Category entity) {
     if (entity != null) {
-      this.id = entity.getId();
+      this.id = entity.id;
       this.version = entity.getVersion();
       this.name = entity.getName();
       this.pilots = new HashSet<>();
@@ -62,11 +62,11 @@ public class CategoryDTO {
     return entity;
   }
 
-  public int getId() {
+  public long getId() {
     return id;
   }
 
-  public void setId(int id) {
+  public void setId(long id) {
     this.id = id;
   }
 

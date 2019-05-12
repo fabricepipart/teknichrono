@@ -26,6 +26,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.TypedQuery;
+import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -35,6 +36,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
@@ -62,17 +64,19 @@ public class LapTimeEndpoint {
   private LapTimeConverter lapTimeConverter = new LapTimeConverter();
 
   @POST
-  @Consumes("application/json")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Transactional
   public Response create(LapTimeDTO dto) {
     LapTime entity = dto.fromDTO(null, em);
     em.persist(entity);
-    return Response.created(UriBuilder.fromResource(LapTimeEndpoint.class).path(String.valueOf(entity.getId())).build())
+    return Response.created(UriBuilder.fromResource(LapTimeEndpoint.class).path(String.valueOf(entity.id)).build())
         .build();
   }
 
   @DELETE
   @Path("/{id:[0-9][0-9]*}")
-  public Response deleteById(@PathParam("id") int id) {
+  @Transactional
+  public Response deleteById(@PathParam("id") long id) {
     LapTime entity = em.find(LapTime.class, id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
@@ -83,8 +87,9 @@ public class LapTimeEndpoint {
 
   @GET
   @Path("/{id:[0-9][0-9]*}")
-  @Produces("application/json")
-  public Response findById(@PathParam("id") int id) {
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response findById(@PathParam("id") long id) {
     TypedQuery<LapTime> findByIdQuery = em.createQuery("SELECT DISTINCT l FROM LapTime"
         + " l LEFT JOIN FETCH l.pilot LEFT JOIN FETCH l.session LEFT JOIN FETCH l.intermediates"
         + " WHERE l.id = :entityId ORDER BY l.id", LapTime.class);
@@ -105,19 +110,21 @@ public class LapTimeEndpoint {
   @GET
   @Path("/csv/best")
   @Produces("text/csv")
-  public String bestToCsv(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
-                          @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
-                          @QueryParam("categoryId") Integer categoryId) {
+  @Transactional
+  public String bestToCsv(@QueryParam("pilotId") Long pilotId, @QueryParam("sessionId") Long sessionId,
+                          @QueryParam("locationId") Long locationId, @QueryParam("eventId") Long eventId,
+                          @QueryParam("categoryId") Long categoryId) {
     List<LapTimeDTO> results = best(pilotId, sessionId, locationId, eventId, categoryId, null, null);
     return convertToCsv(results);
   }
 
   @GET
   @Path("/best")
-  @Produces("application/json")
-  public List<LapTimeDTO> best(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
-                               @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
-                               @QueryParam("categoryId") Integer categoryId, @QueryParam("start") Integer startPosition,
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public List<LapTimeDTO> best(@QueryParam("pilotId") Long pilotId, @QueryParam("sessionId") Long sessionId,
+                               @QueryParam("locationId") Long locationId, @QueryParam("eventId") Long eventId,
+                               @QueryParam("categoryId") Long categoryId, @QueryParam("start") Integer startPosition,
                                @QueryParam("max") Integer maxResult) {
     if (sessionId == null && locationId == null && eventId == null) {
       logger.error("Please define a sessiondId, locationId or eventId to get best laps.");
@@ -137,9 +144,10 @@ public class LapTimeEndpoint {
   @GET
   @Path("/csv/results")
   @Produces("text/csv")
-  public String resultsToCsv(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
-                             @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
-                             @QueryParam("categoryId") Integer categoryId) {
+  @Transactional
+  public String resultsToCsv(@QueryParam("pilotId") Long pilotId, @QueryParam("sessionId") Long sessionId,
+                             @QueryParam("locationId") Long locationId, @QueryParam("eventId") Long eventId,
+                             @QueryParam("categoryId") Long categoryId) {
 
     List<LapTimeDTO> results = results(pilotId, sessionId, locationId, eventId, categoryId, null, null);
     return convertToCsv(results);
@@ -162,10 +170,11 @@ public class LapTimeEndpoint {
 
   @GET
   @Path("/results")
-  @Produces("application/json")
-  public List<LapTimeDTO> results(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
-                                  @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
-                                  @QueryParam("categoryId") Integer categoryId, @QueryParam("start") Integer startPosition,
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public List<LapTimeDTO> results(@QueryParam("pilotId") Long pilotId, @QueryParam("sessionId") Long sessionId,
+                                  @QueryParam("locationId") Long locationId, @QueryParam("eventId") Long eventId,
+                                  @QueryParam("categoryId") Long categoryId, @QueryParam("start") Integer startPosition,
                                   @QueryParam("max") Integer maxResult) {
     if (sessionId == null) {
       logger.error("Please define a sessiondId to get race laps.");
@@ -203,18 +212,20 @@ public class LapTimeEndpoint {
   @GET
   @Path("/csv")
   @Produces("text/csv")
-  public String listAllToCsv(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
-                             @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
-                             @QueryParam("categoryId") Integer categoryId) {
+  @Transactional
+  public String listAllToCsv(@QueryParam("pilotId") Long pilotId, @QueryParam("sessionId") Long sessionId,
+                             @QueryParam("locationId") Long locationId, @QueryParam("eventId") Long eventId,
+                             @QueryParam("categoryId") Long categoryId) {
     List<LapTimeDTO> results = listAll(pilotId, sessionId, locationId, eventId, categoryId, null, null);
     return convertToCsv(results);
   }
 
   @GET
-  @Produces("application/json")
-  public List<LapTimeDTO> listAll(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
-                                  @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
-                                  @QueryParam("categoryId") Integer categoryId, @QueryParam("start") Integer startPosition,
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public List<LapTimeDTO> listAll(@QueryParam("pilotId") Long pilotId, @QueryParam("sessionId") Long sessionId,
+                                  @QueryParam("locationId") Long locationId, @QueryParam("eventId") Long eventId,
+                                  @QueryParam("categoryId") Long categoryId, @QueryParam("start") Integer startPosition,
                                   @QueryParam("max") Integer maxResult) {
     if (sessionId == null && locationId == null && eventId == null) {
       logger.error("Please define a sessiondId, locationId or eventId to get laps.");
@@ -229,16 +240,16 @@ public class LapTimeEndpoint {
     return results;
   }
 
-  private List<LapTimeDTO> getAllLapsDTOOrderedByStartDate(Integer pilotId, Integer sessionId, Integer locationId,
-                                                           Integer eventId, Integer categoryId, Integer startPosition, Integer maxResult) {
+  private List<LapTimeDTO> getAllLapsDTOOrderedByStartDate(Long pilotId, Long sessionId, Long locationId,
+                                                           Long eventId, Long categoryId, Integer startPosition, Integer maxResult) {
     final List<LapTime> searchResults = getAllLapsOrderedByStartDate(pilotId, sessionId, locationId, eventId,
         categoryId, startPosition, maxResult);
     final List<LapTimeDTO> results = lapTimeConverter.convert(searchResults);
     return results;
   }
 
-  private List<LapTime> getAllLapsOrderedByStartDate(Integer pilotId, Integer sessionId, Integer locationId,
-                                                     Integer eventId, Integer categoryId, Integer startPosition, Integer maxResult) {
+  private List<LapTime> getAllLapsOrderedByStartDate(Long pilotId, Long sessionId, Long locationId,
+                                                     Long eventId, Long categoryId, Integer startPosition, Integer maxResult) {
     WhereClauseBuilder whereClauseBuilder = buildWhereClause(pilotId, sessionId, locationId, eventId, categoryId);
     OrderByClauseBuilder orderByClauseBuilder = new OrderByClauseBuilder();
     // Necessary to have the lapTimeManager.manage working
@@ -258,8 +269,8 @@ public class LapTimeEndpoint {
     return searchResults;
   }
 
-  private WhereClauseBuilder buildWhereClause(Integer pilotId, Integer sessionId, Integer locationId, Integer eventId,
-                                              Integer categoryId) {
+  private WhereClauseBuilder buildWhereClause(Long pilotId, Long sessionId, Long locationId, Long eventId,
+                                              Long categoryId) {
     WhereClauseBuilder whereClauseBuilder = new WhereClauseBuilder();
     if (pilotId != null) {
       whereClauseBuilder.addEqualsClause("l.pilot.id", "pilotId", pilotId);
@@ -267,9 +278,9 @@ public class LapTimeEndpoint {
       if (categoryId != null) {
         Category category = em.find(Category.class, categoryId);
         if (category != null) {
-          List<Integer> categoryPilotsIds = new ArrayList<>();
+          List<Long> categoryPilotsIds = new ArrayList<>();
           for (Pilot p : category.getPilots()) {
-            categoryPilotsIds.add(p.getId());
+            categoryPilotsIds.add(p.id);
           }
           whereClauseBuilder.addInClause("l.pilot.id", "categoryPilotsIds", categoryPilotsIds);
         }
@@ -281,9 +292,9 @@ public class LapTimeEndpoint {
       if (eventId != null) {
         Event event = em.find(Event.class, eventId);
         if (event != null) {
-          List<Integer> eventSessionIds = new ArrayList<>();
+          List<Long> eventSessionIds = new ArrayList<>();
           for (Session s : event.getSessions()) {
-            eventSessionIds.add(s.getId());
+            eventSessionIds.add(s.id);
           }
           whereClauseBuilder.addInClause("l.session.id", "eventSessionIds", eventSessionIds);
         }
@@ -291,9 +302,9 @@ public class LapTimeEndpoint {
       if (locationId != null) {
         Location location = em.find(Location.class, locationId);
         if (location != null) {
-          List<Integer> locationSessionIds = new ArrayList<>();
+          List<Long> locationSessionIds = new ArrayList<>();
           for (Session s : location.getSessions()) {
-            locationSessionIds.add(s.getId());
+            locationSessionIds.add(s.id);
           }
           whereClauseBuilder.addInClause("l.session.id", "locationSessionIds", locationSessionIds);
         }
@@ -304,8 +315,9 @@ public class LapTimeEndpoint {
 
   @PUT
   @Path("/{id:[0-9][0-9]*}")
-  @Consumes("application/json")
-  public Response update(@PathParam("id") int id, LapTimeDTO dto) {
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response update(@PathParam("id") long id, LapTimeDTO dto) {
     if (dto == null) {
       return Response.status(Status.BAD_REQUEST).build();
     }

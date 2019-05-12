@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class LapTimeFilter {
 
-  private static final int ACCEPTANCE_FACTOR = 5;
+  private static final long ACCEPTANCE_FACTOR = 5;
 
   private Logger logger = Logger.getLogger(LapTimeFilter.class);
 
@@ -21,7 +21,7 @@ public class LapTimeFilter {
 
   public void filterExtreme(List<LapTimeDTO> results) {
     // Needs to be done here since we did not have all info before
-    Map<Integer, List<LapTimeDTO>> lapsPerLocation = new HashMap<Integer, List<LapTimeDTO>>();
+    Map<Long, List<LapTimeDTO>> lapsPerLocation = new HashMap<>();
     for (LapTimeDTO dto : results) {
       if (dto.getDuration() > 0) {
         NestedLocationDTO location = dto.getSession().getLocation();
@@ -34,9 +34,9 @@ public class LapTimeFilter {
         }
       }
     }
-    Map<Integer, Long> averagePerLocation = new HashMap<Integer, Long>();
-    for (Map.Entry<Integer, List<LapTimeDTO>> entry : lapsPerLocation.entrySet()) {
-      Integer locationId = entry.getKey();
+    Map<Long, Long> averagePerLocation = new HashMap<>();
+    for (Map.Entry<Long, List<LapTimeDTO>> entry : lapsPerLocation.entrySet()) {
+      Long locationId = entry.getKey();
       List<LapTimeDTO> laps = entry.getValue();
       long sum = laps.stream().mapToLong(LapTimeDTO::getDuration).sum();
       averagePerLocation.put(locationId, sum / laps.size());
@@ -65,14 +65,14 @@ public class LapTimeFilter {
   }
 
   public void keepOnlyBest(List<LapTimeDTO> results) {
-    Map<Integer, LapTimeDTO> bests = new HashMap<>();
+    Map<Long, LapTimeDTO> bests = new HashMap<>();
     List<LapTimeDTO> toRemove = new ArrayList<>();
     for (LapTimeDTO lapTimeDTO : results) {
       if (lapTimeDTO.getDuration() <= 0) {
         toRemove.add(lapTimeDTO);
         continue;
       }
-      int pilotId = lapTimeDTO.getPilot().getId();
+      long pilotId = lapTimeDTO.getPilot().getId();
       LapTimeDTO pilotBest = bests.get(pilotId);
       if (pilotBest == null) {
         bests.put(pilotId, lapTimeDTO);
@@ -89,10 +89,10 @@ public class LapTimeFilter {
   }
 
   public void keepOnlyLast(List<LapTimeDTO> results) {
-    Map<Integer, LapTimeDTO> lasts = new HashMap<>();
+    Map<Long, LapTimeDTO> lasts = new HashMap<>();
     List<LapTimeDTO> toRemove = new ArrayList<>();
     for (LapTimeDTO lapTimeDTO : results) {
-      int pilotId = lapTimeDTO.getPilot().getId();
+      long pilotId = lapTimeDTO.getPilot().getId();
       LapTimeDTO pilotLast = lasts.get(pilotId);
       if (pilotLast != null) {
         toRemove.add(pilotLast);

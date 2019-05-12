@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.TypedQuery;
+import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -16,6 +17,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
@@ -40,20 +42,22 @@ public class PilotEndpoint {
   }
 
   @POST
-  @Consumes("application/json")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Transactional
   public Response create(Pilot entity) {
-    if (entity.getCurrentBeacon() != null && entity.getCurrentBeacon().getId() > 0) {
-      Beacon beacon = em.find(Beacon.class, entity.getCurrentBeacon().getId());
+    if (entity.getCurrentBeacon() != null && entity.getCurrentBeacon().id > 0) {
+      Beacon beacon = em.find(Beacon.class, entity.getCurrentBeacon().id);
       entity.setCurrentBeacon(beacon);
     }
     em.persist(entity);
-    return Response.created(UriBuilder.fromResource(PilotEndpoint.class).path(String.valueOf(entity.getId())).build())
+    return Response.created(UriBuilder.fromResource(PilotEndpoint.class).path(String.valueOf(entity.id)).build())
         .build();
   }
 
   @DELETE
   @Path("/{id:[0-9][0-9]*}")
-  public Response deleteById(@PathParam("id") int id) {
+  @Transactional
+  public Response deleteById(@PathParam("id") long id) {
     Pilot entity = em.find(Pilot.class, id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
@@ -67,8 +71,9 @@ public class PilotEndpoint {
 
   @GET
   @Path("/{id:[0-9][0-9]*}")
-  @Produces("application/json")
-  public Response findById(@PathParam("id") int id) {
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response findById(@PathParam("id") long id) {
     TypedQuery<Pilot> findByIdQuery = em.createQuery(
         "SELECT DISTINCT p FROM Pilot p LEFT JOIN FETCH p.currentBeacon WHERE p.id = :entityId ORDER BY p.id",
         Pilot.class);
@@ -88,7 +93,8 @@ public class PilotEndpoint {
 
   @GET
   @Path("/name")
-  @Produces("application/json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
   public Response findByName(@QueryParam("firstname") String firstname, @QueryParam("lastname") String lastname) {
     TypedQuery<Pilot> findByIdQuery = em
         .createQuery("SELECT DISTINCT p FROM Pilot p LEFT JOIN FETCH p.currentBeacon WHERE"
@@ -109,7 +115,8 @@ public class PilotEndpoint {
   }
 
   @GET
-  @Produces("application/json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
   public List<PilotDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
     TypedQuery<Pilot> findAllQuery = em
         .createQuery("SELECT DISTINCT p FROM Pilot p LEFT JOIN FETCH p.currentBeacon ORDER BY p.id", Pilot.class);
@@ -126,8 +133,9 @@ public class PilotEndpoint {
 
   @POST
   @Path("{pilotId:[0-9][0-9]*}/setBeacon")
-  @Produces("application/json")
-  public Response associateBeacon(@PathParam("pilotId") int pilotId, @QueryParam("beaconId") int beaconId) {
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response associateBeacon(@PathParam("pilotId") long pilotId, @QueryParam("beaconId") long beaconId) {
     Pilot pilot = em.find(Pilot.class, pilotId);
     if (pilot == null) {
       return Response.status(Status.NOT_FOUND).build();
@@ -145,12 +153,13 @@ public class PilotEndpoint {
 
   @PUT
   @Path("/{id:[0-9][0-9]*}")
-  @Consumes("application/json")
-  public Response update(@PathParam("id") int id, Pilot entity) {
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response update(@PathParam("id") long id, Pilot entity) {
     if (entity == null) {
       return Response.status(Status.BAD_REQUEST).build();
     }
-    if (id != entity.getId()) {
+    if (id != entity.id) {
       return Response.status(Status.CONFLICT).entity(entity).build();
     }
     Pilot pilot = em.find(Pilot.class, id);
@@ -158,13 +167,13 @@ public class PilotEndpoint {
       return Response.status(Status.NOT_FOUND).build();
     }
     // Update of category
-    if (entity.getCategory() != null && entity.getCategory().getId() > 0) {
-      Category category = em.find(Category.class, entity.getCategory().getId());
+    if (entity.getCategory() != null && entity.getCategory().id > 0) {
+      Category category = em.find(Category.class, entity.getCategory().id);
       pilot.setCategory(category);
     }
     // Update of beacon
-    if (entity.getCurrentBeacon() != null && entity.getCurrentBeacon().getId() > 0) {
-      Beacon beacon = em.find(Beacon.class, entity.getCurrentBeacon().getId());
+    if (entity.getCurrentBeacon() != null && entity.getCurrentBeacon().id > 0) {
+      Beacon beacon = em.find(Beacon.class, entity.getCurrentBeacon().id);
       pilot.setCurrentBeacon(beacon);
     }
     pilot.setFirstName(entity.getFirstName());

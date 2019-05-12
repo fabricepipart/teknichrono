@@ -11,6 +11,7 @@ import org.trd.app.teknichrono.model.jpa.Pilot;
 @XmlRootElement
 public class PilotDTO {
 
+  private long id;
   private int version;
   private String firstName;
   private String lastName;
@@ -22,7 +23,7 @@ public class PilotDTO {
 
   public PilotDTO(final Pilot entity) {
     if (entity != null) {
-      this.id = entity.getId();
+      this.id = entity.id;
       this.version = entity.getVersion();
       this.firstName = entity.getFirstName();
       this.lastName = entity.getLastName();
@@ -62,13 +63,11 @@ public class PilotDTO {
     return entity;
   }
 
-  private int id;
-
-  public int getId() {
+  public long getId() {
     return id;
   }
 
-  public void setId(int id) {
+  public void setId(long id) {
     this.id = id;
   }
 

@@ -8,7 +8,7 @@ import org.trd.app.teknichrono.model.jpa.Event;
 @XmlRootElement
 public class NestedEventDTO {
 
-  private int id;
+  private long id;
   private int version;
 
   private String name;
@@ -18,7 +18,7 @@ public class NestedEventDTO {
 
   public NestedEventDTO(final Event entity) {
     if (entity != null) {
-      this.id = entity.getId();
+      this.id = entity.id;
       this.version = entity.getVersion();
       this.name = entity.getName();
     }
@@ -43,11 +43,11 @@ public class NestedEventDTO {
     return entity;
   }
 
-  public int getId() {
+  public long getId() {
     return id;
   }
 
-  public void setId(int id) {
+  public void setId(long id) {
     this.id = id;
   }
 

@@ -35,7 +35,7 @@ public class PingManager {
 
     Pilot pilot = ping.getBeacon().getPilot();
     if (pilot == null) {
-      logger.error("Pilot is not associated to Beacon " + beacon.getId() + ", cannot updates laptimes");
+      logger.error("Pilot is not associated to Beacon " + beacon.id + ", cannot updates laptimes");
       return;
     }
 
@@ -47,17 +47,17 @@ public class PingManager {
 
     Session session = selector.pickMostRelevant(ping);
     if (session == null) {
-      logger.error("No Session associated to Chrono " + chronometer.getId() + ", cannot updates laptimes");
+      logger.error("No Session associated to Chrono " + chronometer.id + ", cannot updates laptimes");
       return;
     }
     addPing(ping, pilot, chronometer, session);
   }
 
   public void addPing(Ping ping, Pilot pilot, Chronometer chronometer, Session session) {
-    int chronoIndex = session.getChronoIndex(chronometer);
+    long chronoIndex = session.getChronoIndex(chronometer);
     if (chronoIndex < 0) {
       logger.error("Ping error since from a chronometer '" + chronometer.getName() +
-          "' that is not part of the Session " + session.getId());
+          "' that is not part of the Session " + session.id);
       return;
     }
 
@@ -67,7 +67,7 @@ public class PingManager {
       long start = session.getStart().getTime();
       long inactivityEnd = start + inactivity;
       if (pingTime > start && pingTime < inactivityEnd) {
-        logger.info("Ping ignored since Session " + session.getId() + " is during its inactivity period.");
+        logger.info("Ping ignored since Session " + session.id + " is during its inactivity period.");
         return;
       }
     }
@@ -131,7 +131,7 @@ public class PingManager {
           // We ll insert it in the lap of the ping before
           int insertAtIndex = lapTimeOfPingBefore.getIntermediates().indexOf(pingBefore) + 1;
           // Is this index taken by pingAfter ?
-          if (lapTimeOfPingBefore.getId() == lapTimeOfPingAfter.getId()
+          if (lapTimeOfPingBefore.id == lapTimeOfPingAfter.id
               && chronoIndex >= session.getChronoIndex(pingAfter.getChrono())) {
             // Split
             List<Ping> toInsertInNewLap = lapTimeOfPingBefore.getIntermediates().subList(insertAtIndex,

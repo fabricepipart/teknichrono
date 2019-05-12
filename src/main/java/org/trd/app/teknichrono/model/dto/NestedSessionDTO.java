@@ -14,13 +14,13 @@ public class NestedSessionDTO implements Serializable {
    * 
    */
   private static final long serialVersionUID = 4519531688362345387L;
-  private int id;
+  private Long id;
   private int version;
   private Timestamp start;
   private Timestamp end;
   private String name;
   private boolean loopTrack;
-  private int chronometersCount;
+  private long chronometersCount;
   private NestedLocationDTO location;
 
   public NestedSessionDTO() {
@@ -28,7 +28,7 @@ public class NestedSessionDTO implements Serializable {
 
   public NestedSessionDTO(final Session entity) {
     if (entity != null) {
-      this.id = entity.getId();
+      this.id = entity.id;
       this.version = entity.getVersion();
       this.start = entity.getStart();
       this.end = entity.getEnd();
@@ -49,7 +49,7 @@ public class NestedSessionDTO implements Serializable {
     if (entity == null) {
       entity = new Session();
     }
-    if (((Integer) this.id) != null) {
+    if (id != null) {
       TypedQuery<Session> findByIdQuery = em.createQuery("SELECT DISTINCT e FROM Session e WHERE e.id = :entityId",
           Session.class);
       findByIdQuery.setParameter("entityId", this.id);
@@ -69,11 +69,11 @@ public class NestedSessionDTO implements Serializable {
     return entity;
   }
 
-  public int getId() {
+  public long getId() {
     return this.id;
   }
 
-  public void setId(final int id) {
+  public void setId(final long id) {
     this.id = id;
   }
 
@@ -117,11 +117,11 @@ public class NestedSessionDTO implements Serializable {
     this.loopTrack = loopTrack;
   }
 
-  public int getChronometersCount() {
+  public long getChronometersCount() {
     return chronometersCount;
   }
 
-  public void setChronometersCount(int chronometersCount) {
+  public void setChronometersCount(long chronometersCount) {
     this.chronometersCount = chronometersCount;
   }
 

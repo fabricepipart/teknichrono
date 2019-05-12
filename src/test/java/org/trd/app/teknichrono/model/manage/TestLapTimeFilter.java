@@ -139,8 +139,8 @@ public class TestLapTimeFilter {
     testMe.keepOnlyBest(result);
 
     org.junit.Assert.assertEquals(2, result.size());
-    org.junit.Assert.assertEquals(l1.getId(), result.get(0).getId());
-    org.junit.Assert.assertEquals(l4.getId(), result.get(1).getId());
+    org.junit.Assert.assertEquals(l1.id.longValue(), result.get(0).getId());
+    org.junit.Assert.assertEquals(l4.id.longValue(), result.get(1).getId());
   }
 
 

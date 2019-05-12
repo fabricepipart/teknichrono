@@ -1,6 +1,7 @@
 package org.trd.app.teknichrono.model.jpa;
 
-import java.io.Serializable;
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+
 import java.sql.Timestamp;
 
 import javax.persistence.Column;
@@ -11,25 +12,12 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Version;
-import javax.xml.bind.annotation.XmlRootElement;
 
 
 @Entity
-@XmlRootElement
-public class Ping implements Serializable {
+public class Ping extends PanacheEntity {
 
-  /* =========================== Entity stuff =========================== */
-  /**
-   * 
-   */
-  private static final long serialVersionUID = -7022575222961829989L;
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "id", updatable = false, nullable = false)
-  private int id;
-
-  @Version
+   @Version
   @Column(name = "version")
   private int version;
 
@@ -44,7 +32,7 @@ public class Ping implements Serializable {
   private Beacon beacon;
 
   @Column
-  private int power;
+  private long power;
 
   // Can be null if after event, items are reassociated
   @ManyToOne(optional = true)
@@ -52,14 +40,6 @@ public class Ping implements Serializable {
   private Chronometer chrono;
 
   /* ===================== Getters and setters ======================== */
-
-  public int getId() {
-    return this.id;
-  }
-
-  public void setId(final int id) {
-    this.id = id;
-  }
 
   public int getVersion() {
     return this.version;
@@ -77,11 +57,11 @@ public class Ping implements Serializable {
     this.dateTime = dateTime;
   }
 
-  public int getPower() {
+  public long getPower() {
     return power;
   }
 
-  public void setPower(int power) {
+  public void setPower(long power) {
     this.power = power;
   }
 

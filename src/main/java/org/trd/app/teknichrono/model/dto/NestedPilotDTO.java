@@ -15,17 +15,17 @@ public class NestedPilotDTO implements Serializable {
    *
    */
   private static final long serialVersionUID = -6351473312188582718L;
-  private int id;
+  private Long id;
   private String firstName;
   private String lastName;
-  private int beaconNumber;
+  private long beaconNumber;
 
   public NestedPilotDTO() {
   }
 
   public NestedPilotDTO(final Pilot entity) {
     if (entity != null) {
-      this.id = entity.getId();
+      this.id = entity.id;
       this.firstName = entity.getFirstName();
       this.lastName = entity.getLastName();
       if (entity.getCurrentBeacon() != null) {
@@ -53,7 +53,7 @@ public class NestedPilotDTO implements Serializable {
     if (entity == null) {
       entity = new Pilot();
     }
-    if (((Integer) this.id) != null) {
+    if (id != null) {
       TypedQuery<Pilot> findByIdQuery = em.createQuery("SELECT DISTINCT p FROM Pilot p WHERE p.id = :entityId",
           Pilot.class);
       findByIdQuery.setParameter("entityId", this.id);
@@ -70,11 +70,11 @@ public class NestedPilotDTO implements Serializable {
     return entity;
   }
 
-  public int getId() {
+  public long getId() {
     return this.id;
   }
 
-  public void setId(final int id) {
+  public void setId(final long id) {
     this.id = id;
   }
 
@@ -94,11 +94,11 @@ public class NestedPilotDTO implements Serializable {
     this.lastName = lastName;
   }
 
-  public int getBeaconNumber() {
+  public long getBeaconNumber() {
     return beaconNumber;
   }
 
-  public void setBeaconNumber(int beaconNumber) {
+  public void setBeaconNumber(long beaconNumber) {
     this.beaconNumber = beaconNumber;
   }
 }

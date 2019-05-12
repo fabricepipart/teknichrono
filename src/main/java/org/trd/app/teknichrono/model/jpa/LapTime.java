@@ -1,6 +1,8 @@
 package org.trd.app.teknichrono.model.jpa;
 // Generated 5 mai 2016 11:08:49 by Hibernate Tools 4.3.1.Final
 
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,22 +18,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.Version;
-import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
-@XmlRootElement
-public class LapTime implements java.io.Serializable {
-
-  /* =========================== Entity stuff =========================== */
-  /**
-   * 
-   */
-  private static final long serialVersionUID = -2438563507266191424L;
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "id", updatable = false, nullable = false)
-  private int id;
+public class LapTime extends PanacheEntity  {
 
   @Version
   @Column(name = "version")
@@ -55,14 +44,6 @@ public class LapTime implements java.io.Serializable {
   private List<Ping> intermediates = new ArrayList<Ping>();
 
   /* ===================== Getters and setters ======================== */
-
-  public int getId() {
-    return this.id;
-  }
-
-  public void setId(int id) {
-    this.id = id;
-  }
 
   public int getVersion() {
     return this.version;

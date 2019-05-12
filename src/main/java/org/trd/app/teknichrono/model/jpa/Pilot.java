@@ -1,6 +1,7 @@
 package org.trd.app.teknichrono.model.jpa;
 
-import java.io.Serializable;
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -10,9 +11,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -20,23 +18,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 import javax.persistence.Version;
-import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
-@XmlRootElement
-public class Pilot implements Serializable {
-
-  /* =========================== Entity stuff =========================== */
-
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 5594553167060540038L;
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "id", updatable = false, nullable = false)
-  private int id;
+public class Pilot extends PanacheEntity {
 
   @Version
   @Column(name = "version")
@@ -81,14 +65,6 @@ public class Pilot implements Serializable {
 
   public void setCategory(Category category) {
     this.category = category;
-  }
-
-  public int getId() {
-    return this.id;
-  }
-
-  public void setId(final int id) {
-    this.id = id;
   }
 
   public int getVersion() {

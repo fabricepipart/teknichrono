@@ -11,8 +11,8 @@ import java.util.List;
 
 public class TestLapTimeDTOCreator {
 
-  private int lapId = 0;
-  private int pilotId = 0;
+  private long lapId = 0;
+  private long pilotId = 0;
   private long now = System.currentTimeMillis();
 
   public void nextPilot() {
@@ -20,13 +20,13 @@ public class TestLapTimeDTOCreator {
   }
 
 
-  public LapTimeDTO createDTOLapTimeWithSession(long startDate, long endDate, int lapNb, NestedSessionDTO session) {
+  public LapTimeDTO createDTOLapTimeWithSession(long startDate, long endDate, long lapNb, NestedSessionDTO session) {
     LapTimeDTO lap = createDTOLapTime(startDate, endDate, lapNb);
     lap.setSession(session);
     return lap;
   }
 
-  public LapTimeDTO createDTOLapTime(long startDate, long endDate, int lapNb) {
+  public LapTimeDTO createDTOLapTime(long startDate, long endDate, long lapNb) {
     LapTimeDTO laptime = new LapTimeDTO();
     laptime.setId(++lapId);
     NestedPilotDTO p = new NestedPilotDTO();

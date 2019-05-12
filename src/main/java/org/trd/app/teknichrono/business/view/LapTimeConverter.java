@@ -28,7 +28,7 @@ public class LapTimeConverter {
 
     // Check if we are in a loop session
     // Keep a map of last pilot laps to set new laptime when next lap is reached
-    Map<Integer, List<LapTimeDTO>> lapsPerPilot = new HashMap<Integer, List<LapTimeDTO>>();
+    Map<Long, List<LapTimeDTO>> lapsPerPilot = new HashMap<>();
     final List<LapTimeDTO> results = new ArrayList<LapTimeDTO>();
     for (LapTime searchResult : lapTimes) {
       LapTimeDTO dto = new LapTimeDTO(searchResult);

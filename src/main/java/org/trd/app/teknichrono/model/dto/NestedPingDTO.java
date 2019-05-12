@@ -12,11 +12,11 @@ public class NestedPingDTO implements Serializable{
 
   private Logger logger = Logger.getLogger(LapTimeDTO.class);
 
-  private int id;
+  private long id;
   private int version;
   private NestedBeaconDTO beacon;
   private Timestamp dateTime;
-  private int power;
+  private long power;
 
 
   public NestedPingDTO() {
@@ -24,7 +24,7 @@ public class NestedPingDTO implements Serializable{
 
   public NestedPingDTO(final Ping entity) {
     if (entity != null) {
-      this.id = entity.getId();
+      this.id = entity.id;
       this.version = entity.getVersion();
       if (entity.getBeacon() != null) {
         this.beacon = new NestedBeaconDTO(entity.getBeacon());
@@ -44,11 +44,11 @@ public class NestedPingDTO implements Serializable{
     return sb.toString();
   }
 
-  public int getId() {
+  public long getId() {
     return id;
   }
 
-  public void setId(int id) {
+  public void setId(long id) {
     this.id = id;
   }
 
@@ -76,11 +76,11 @@ public class NestedPingDTO implements Serializable{
     this.dateTime = dateTime;
   }
 
-  public int getPower() {
+  public long getPower() {
     return power;
   }
 
-  public void setPower(int power) {
+  public void setPower(long power) {
     this.power = power;
   }
 

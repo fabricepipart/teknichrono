@@ -1,5 +1,7 @@
 package org.trd.app.teknichrono.model.jpa;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,29 +11,14 @@ import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.Version;
-import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
-@XmlRootElement
-public class Session implements java.io.Serializable {
-
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 8436060292277716599L;
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "id", unique = true, nullable = false)
-  private int id;
+public class Session extends PanacheEntity  {
 
   @Version
   @Column(name = "version")
@@ -100,11 +87,7 @@ public class Session implements java.io.Serializable {
     this.location = location;
   }
 
-  public int getId() {
-    return this.id;
-  }
-
-  public void setId(int id) {
+  public void setId(long id) {
     this.id = id;
   }
 
@@ -140,11 +123,11 @@ public class Session implements java.io.Serializable {
     this.chronometers = chronometers;
   }
 
-  public int getChronoIndex(Chronometer chronometer) {
+  public long getChronoIndex(Chronometer chronometer) {
     if (getChronometers() != null) {
-      int index = 0;
+      long index = 0;
       for (Chronometer c : getChronometers()) {
-        if (c.getId() == chronometer.getId()) {
+        if (c.id == chronometer.id) {
           return index;
         }
         index++;
@@ -153,7 +136,7 @@ public class Session implements java.io.Serializable {
     return -1;
   }
 
-  public void addChronometer(Chronometer chronometer, Integer insertAtIndex) {
+  public void addChronometer(Chronometer chronometer, int insertAtIndex) {
     this.chronometers.add(insertAtIndex, chronometer);
   }
 

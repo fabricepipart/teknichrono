@@ -17,7 +17,7 @@ import java.util.List;
 public class TestSessionSelector {
 
   private final long HOUR = 60 * 60 * 1000L;
-  private int id = 1;
+  private long id = 1;
   private long now = System.currentTimeMillis();
 
   SessionSelector selector = new SessionSelector();
@@ -29,13 +29,13 @@ public class TestSessionSelector {
 
   @Before
   public void prepare() {
-    chrono.setId(id++);
+    chrono.id++;
     ping.setChrono(chrono);
-    ping.setId(id++);
+    ping.id++;
     ping.setDateTime(new Timestamp(now));
-    pilot.setId(id++);
+    pilot.id++;
     beacon.setPilot(pilot);
-    beacon.setId(id++);
+    beacon.id++;
     ping.setBeacon(beacon);
   }
 
@@ -55,7 +55,7 @@ public class TestSessionSelector {
     sessions.add(s1);
     sessions.add(s2);
     Session session = selector.pickMostRelevantCurrent(sessions);
-    Assert.assertEquals(s0.getId(), session.getId());
+    Assert.assertEquals(s0.id, session.id);
   }
 
   @Test
@@ -79,7 +79,7 @@ public class TestSessionSelector {
     Session s1 = addSession(2 * HOUR, 4 * HOUR);
     Session s2 = addSession(-4 * HOUR, -2 * HOUR);
     Session session = selector.pickMostRelevant(ping);
-    Assert.assertEquals(s0.getId(), session.getId());
+    Assert.assertEquals(s0.id, session.id);
   }
 
   @Test
@@ -89,7 +89,7 @@ public class TestSessionSelector {
     Session s2 = addSession(10 * HOUR, 12 * HOUR);
     Session s3 = addSession(22 * HOUR, 24 * HOUR);
     Session session = selector.pickMostRelevant(ping);
-    Assert.assertEquals(s1.getId(), session.getId());
+    Assert.assertEquals(s1.id, session.id);
   }
 
   @Test
@@ -98,7 +98,7 @@ public class TestSessionSelector {
     Session s1 = addSession(2 * HOUR, 4 * HOUR);
     Session s2 = addSession(10 * HOUR, 20 * HOUR);
     Session session = selector.pickMostRelevant(ping);
-    Assert.assertTrue(s0.getId() == session.getId() || s1.getId() == session.getId());
+    Assert.assertTrue(s0.id == session.id || s1.id == session.id);
   }
 
   @Test
@@ -118,7 +118,7 @@ public class TestSessionSelector {
     s0.getPilots().add(pilot);
     s3.getPilots().add(pilot);
     Session session = selector.pickMostRelevant(ping);
-    Assert.assertEquals(s3.getId(), session.getId());
+    Assert.assertEquals(s3.id, session.id);
   }
 
   @Test
@@ -134,7 +134,7 @@ public class TestSessionSelector {
     s0.getPilots().addAll(otherPilots);
     s1.getPilots().addAll(otherPilots);
     Session session = selector.pickMostRelevant(ping);
-    Assert.assertEquals(s1.getId(), session.getId());
+    Assert.assertEquals(s1.id, session.id);
   }
 
   @Test
@@ -153,7 +153,7 @@ public class TestSessionSelector {
     s5.setCurrent(true);
     s6.setCurrent(true);
     Session session = selector.pickMostRelevant(ping);
-    Assert.assertEquals(s6.getId(), session.getId());
+    Assert.assertEquals(s6.id, session.id);
   }
 
   @Test
@@ -176,7 +176,7 @@ public class TestSessionSelector {
     s7.setCurrent(true);
 
     Session session = selector.pickMostRelevant(ping);
-    Assert.assertEquals(s5.getId(), session.getId());
+    Assert.assertEquals(s5.id, session.id);
   }
 
   @Test
@@ -214,7 +214,7 @@ public class TestSessionSelector {
     pilot.getLaps().add(creator.createLapTimeWithIntermediates(410000, 420000, 430000, 440000));
 
     Session session = selector.pickMostRelevant(ping);
-    Assert.assertEquals(s6.getId(), session.getId());
+    Assert.assertEquals(s6.id, session.id);
   }
 
 }

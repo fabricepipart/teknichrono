@@ -1,35 +1,20 @@
 package org.trd.app.teknichrono.model.jpa;
 // Generated 5 mai 2016 11:08:49 by Hibernate Tools 4.3.1.Final
 
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Version;
-import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
-@XmlRootElement
-public class Beacon implements java.io.Serializable {
-
-  /* =========================== Entity stuff =========================== */
-
-  /**
-   * 
-   */
-  private static final long serialVersionUID = -2438563507266191424L;
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "id", updatable = false, nullable = false)
-  private int id;
+public class Beacon extends PanacheEntity {
 
   @Version
   @Column(name = "version")
@@ -38,7 +23,7 @@ public class Beacon implements java.io.Serializable {
   /* =============================== Fields =============================== */
 
   @Column(nullable = false, unique = true)
-  private int number;
+  private long number;
 
   // Mapped by denotes that Pilot is the owner of the relationship
   // http://meri-stuff.blogspot.fr/2012/03/jpa-tutorial.html#RelationshipsBidirectionalOneToManyManyToOneConsistency
@@ -85,14 +70,6 @@ public class Beacon implements java.io.Serializable {
     this.pings = pings;
   }
 
-  public int getId() {
-    return this.id;
-  }
-
-  public void setId(int id) {
-    this.id = id;
-  }
-
   public int getVersion() {
     return this.version;
   }
@@ -101,11 +78,11 @@ public class Beacon implements java.io.Serializable {
     this.version = version;
   }
 
-  public int getNumber() {
+  public long getNumber() {
     return this.number;
   }
 
-  public void setNumber(int number) {
+  public void setNumber(long number) {
     this.number = number;
   }
 
@@ -116,4 +93,8 @@ public class Beacon implements java.io.Serializable {
     return result;
   }
 
+
+  public static Beacon findByNumber(long number) {
+    return find("number", number).firstResult();
+  }
 }

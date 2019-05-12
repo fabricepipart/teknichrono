@@ -12,6 +12,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.TypedQuery;
+import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -21,6 +22,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
@@ -32,18 +34,20 @@ import java.util.List;
 @Path("/pings")
 public class PingEndpoint {
 
+  private Logger logger = Logger.getLogger(LapTimeEndpoint.class);
+
   EntityManager em;
 
   @Inject
   public PingEndpoint(EntityManager em) {
     this.em = em;
   }
-  private Logger logger = Logger.getLogger(LapTimeEndpoint.class);
 
   @POST
   @Path("/create")
-  @Consumes("application/json")
-  public Response create(Ping entity, @QueryParam("chronoId") int chronoId, @QueryParam("beaconId") int beaconId) {
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response create(Ping entity, @QueryParam("chronoId") long chronoId, @QueryParam("beaconId") long beaconId) {
     try (DurationLogger dl = new DurationLogger(logger, "Ping for chronometer ID=" + chronoId + " and beacon ID=" + beaconId)) {
       Chronometer chrono = em.find(Chronometer.class, chronoId);
       if (chrono == null) {
@@ -59,14 +63,15 @@ public class PingEndpoint {
       // TODO Check if relevant to create it each time...
       PingManager manager = new PingManager(em);
       manager.addPing(entity);
-      return Response.created(UriBuilder.fromResource(PingEndpoint.class).path(String.valueOf(entity.getId())).build())
+      return Response.created(UriBuilder.fromResource(PingEndpoint.class).path(String.valueOf(entity.id)).build())
           .build();
     }
   }
 
   @DELETE
   @Path("/{id:[0-9][0-9]*}")
-  public Response deleteById(@PathParam("id") int id) {
+  @Transactional
+  public Response deleteById(@PathParam("id") long id) {
     Ping entity = em.find(Ping.class, id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
@@ -77,8 +82,9 @@ public class PingEndpoint {
 
   @GET
   @Path("/{id:[0-9][0-9]*}")
-  @Produces("application/json")
-  public Response findById(@PathParam("id") int id) {
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response findById(@PathParam("id") long id) {
     TypedQuery<Ping> findByIdQuery = em
         .createQuery("SELECT DISTINCT p FROM Ping p WHERE p.id = :entityId ORDER BY p.id", Ping.class);
     findByIdQuery.setParameter("entityId", id);
@@ -95,7 +101,8 @@ public class PingEndpoint {
   }
 
   @GET
-  @Produces("application/json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
   public List<Ping> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
     TypedQuery<Ping> findAllQuery = em.createQuery("SELECT DISTINCT p FROM Ping p ORDER BY p.id", Ping.class);
     if (startPosition != null) {
@@ -110,12 +117,13 @@ public class PingEndpoint {
 
   @PUT
   @Path("/{id:[0-9][0-9]*}")
-  @Consumes("application/json")
-  public Response update(@PathParam("id") int id, Ping entity) {
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response update(@PathParam("id") long id, Ping entity) {
     if (entity == null) {
       return Response.status(Status.BAD_REQUEST).build();
     }
-    if (id != entity.getId()) {
+    if (id != entity.id) {
       return Response.status(Status.CONFLICT).entity(entity).build();
     }
     if (em.find(Ping.class, id) == null) {

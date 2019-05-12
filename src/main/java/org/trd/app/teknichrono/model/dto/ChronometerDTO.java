@@ -10,7 +10,7 @@ import java.util.List;
 public class ChronometerDTO {
 
 
-  private int id;
+  private long id;
   private int version;
   private String name;
   private NestedPingDTO lastSeen;
@@ -20,7 +20,7 @@ public class ChronometerDTO {
 
   public ChronometerDTO(final Chronometer entity) {
     if (entity != null) {
-      this.id = entity.getId();
+      this.id = entity.id;
       this.version = entity.getVersion();
       this.name = entity.getName();
       if (entity.getPings() != null) {
@@ -67,11 +67,11 @@ public class ChronometerDTO {
   }
 
   /* ===================== Getters and setters ======================== */
-  public int getId() {
+  public long getId() {
     return this.id;
   }
 
-  public void setId(final int id) {
+  public void setId(final long id) {
     this.id = id;
   }
 

@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class TestPingManager {
 
-  private int laptimeIndex = 1;
+  private long laptimeIndex = 1L;
 
   private final Pilot pilot = new Pilot();
   private long start = System.currentTimeMillis();
@@ -59,10 +59,10 @@ public class TestPingManager {
   public void prepare() {
     beacon.setPilot(pilot);
     session.setStart(new Timestamp(start));
-    c0.setId(10);
-    c1.setId(11);
-    c2.setId(12);
-    c3.setId(13);
+    c0.id = 10L;
+    c1.id = 11L;
+    c2.id = 12L;
+    c3.id = 13L;
     session.getChronometers().add(c0);
     session.getChronometers().add(c1);
     session.getChronometers().add(c2);
@@ -75,13 +75,13 @@ public class TestPingManager {
     p.setDateTime(new Timestamp(start + timeFromStart));
     p.setBeacon(beacon);
     p.setChrono(c);
-    p.setId(c.getId() + (int) timeFromStart);
+    p.id = c.id + (int) timeFromStart;
     return p;
   }
 
   private void pilotHasLapWith(long l0, long l1, long l2, long l3) {
     LapTime l = new LapTime();
-    l.setId(laptimeIndex++);
+    l.id = laptimeIndex++;
     l.setPilot(pilot);
     l.setSession(session);
     if (l0 >= 0) {
@@ -156,7 +156,7 @@ public class TestPingManager {
   @Test
   public void pingMustReferChronometerThatIsPartOfSession() {
     Chronometer c = new Chronometer();
-    c.setId(666);
+    c.id = 666L;
     Ping p = createPing(0, c);
     testMe.addPing(p);
     verifyZeroInteractions(em);

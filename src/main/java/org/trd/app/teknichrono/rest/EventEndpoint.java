@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.TypedQuery;
+import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -16,6 +17,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
@@ -41,16 +43,18 @@ public class EventEndpoint {
   private Logger logger = Logger.getLogger(EventEndpoint.class);
 
   @POST
-  @Consumes("application/json")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Transactional
   public Response create(Event entity) {
     em.persist(entity);
-    return Response.created(UriBuilder.fromResource(EventEndpoint.class).path(String.valueOf(entity.getId())).build())
+    return Response.created(UriBuilder.fromResource(EventEndpoint.class).path(String.valueOf(entity.id)).build())
         .build();
   }
 
   @DELETE
   @Path("/{id:[0-9][0-9]*}")
-  public Response deleteById(@PathParam("id") int id) {
+  @Transactional
+  public Response deleteById(@PathParam("id") long id) {
     Event entity = em.find(Event.class, id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
@@ -61,8 +65,9 @@ public class EventEndpoint {
 
   @GET
   @Path("/{id:[0-9][0-9]*}")
-  @Produces("application/json")
-  public Response findById(@PathParam("id") int id) {
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response findById(@PathParam("id") long id) {
     TypedQuery<Event> findByIdQuery = em.createQuery(
         "SELECT DISTINCT e FROM Event e LEFT JOIN FETCH e.sessions WHERE e.id = :entityId ORDER BY e.id", Event.class);
     findByIdQuery.setParameter("entityId", id);
@@ -80,7 +85,7 @@ public class EventEndpoint {
 
   @GET
   @Path("/name")
-  @Produces("application/json")
+  @Produces(MediaType.APPLICATION_JSON)
   public Event findEventByName(@QueryParam("name") String name) {
     TypedQuery<Event> findByNameQuery = em.createQuery(
         "SELECT DISTINCT e FROM Event e LEFT JOIN FETCH e.sessions WHERE e.name = :name ORDER BY e.id", Event.class);
@@ -95,7 +100,8 @@ public class EventEndpoint {
   }
 
   @GET
-  @Produces("application/json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
   public List<Event> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
     TypedQuery<Event> findAllQuery = em
         .createQuery("SELECT DISTINCT e FROM Event e LEFT JOIN FETCH e.sessions ORDER BY e.id", Event.class);
@@ -111,8 +117,9 @@ public class EventEndpoint {
 
   @POST
   @Path("{eventId:[0-9][0-9]*}/addSession")
-  @Produces("application/json")
-  public Response addSession(@PathParam("eventId") int eventId, @QueryParam("sessionId") Integer sessionId) {
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response addSession(@PathParam("eventId") long eventId, @QueryParam("sessionId") Long sessionId) {
     try(DurationLogger dl = new DurationLogger(logger, "Add session session ID=" + sessionId + " to event ID=" + eventId)) {
       Event event = em.find(Event.class, eventId);
       if (event == null) {
@@ -133,12 +140,13 @@ public class EventEndpoint {
 
   @PUT
   @Path("/{id:[0-9][0-9]*}")
-  @Consumes("application/json")
-  public Response update(@PathParam("id") int id, Event entity) {
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response update(@PathParam("id") long id, Event entity) {
     if (entity == null) {
       return Response.status(Status.BAD_REQUEST).build();
     }
-    if (id != entity.getId()) {
+    if (id != entity.id) {
       return Response.status(Status.CONFLICT).entity(entity).build();
     }
     if (em.find(Event.class, id) == null) {

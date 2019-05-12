@@ -16,7 +16,7 @@ import org.trd.app.teknichrono.model.jpa.Session;
 @XmlRootElement
 public class SessionDTO {
 
-  private int id;
+  private long id;
   private int version;
   private Timestamp start;
   private long inactivity = 60000L;
@@ -34,7 +34,7 @@ public class SessionDTO {
 
   public SessionDTO(final Session entity) {
     if (entity != null) {
-      this.id = entity.getId();
+      this.id = entity.id;
       this.version = entity.getVersion();
       this.start = entity.getStart();
       this.inactivity = entity.getInactivity();
@@ -116,11 +116,11 @@ public class SessionDTO {
     return converted;
   }
 
-  public int getId() {
+  public long getId() {
     return id;
   }
 
-  public void setId(int id) {
+  public void setId(long id) {
     this.id = id;
   }
 

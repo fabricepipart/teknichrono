@@ -8,17 +8,17 @@ import org.trd.app.teknichrono.model.jpa.Beacon;
 @XmlRootElement
 public class NestedBeaconDTO {
 
-  private int id;
+  private long id;
   private int version;
 
-  private int number;
+  private long number;
 
   public NestedBeaconDTO() {
   }
 
   public NestedBeaconDTO(final Beacon entity) {
     if (entity != null) {
-      this.id = entity.getId();
+      this.id = entity.id;
       this.version = entity.getVersion();
       this.number = entity.getNumber();
     }
@@ -43,11 +43,11 @@ public class NestedBeaconDTO {
     return entity;
   }
 
-  public int getId() {
+  public long getId() {
     return id;
   }
 
-  public void setId(int id) {
+  public void setId(long id) {
     this.id = id;
   }
 
@@ -59,11 +59,11 @@ public class NestedBeaconDTO {
     this.version = version;
   }
 
-  public int getNumber() {
+  public long getNumber() {
     return number;
   }
 
-  public void setNumber(int number) {
+  public void setNumber(long number) {
     this.number = number;
   }
 

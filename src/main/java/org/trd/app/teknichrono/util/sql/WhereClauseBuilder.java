@@ -25,7 +25,7 @@ public class WhereClauseBuilder {
     }
   }
 
-  public void addInClause(String toMatch, String parameterName, List<Integer> parameterValue) {
+  public void addInClause(String toMatch, String parameterName, List<Long> parameterValue) {
     if (parameterValue != null && !parameterValue.isEmpty()) {
       whereInMap.put(parameterName, toMatch);
       parametersList.put(parameterName, parameterValue);

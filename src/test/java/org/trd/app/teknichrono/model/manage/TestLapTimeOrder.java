@@ -83,7 +83,7 @@ public class TestLapTimeOrder {
   public void ordersByStartDateOrEndDateWithIncompleteLaps() {
     LapTimeOrder testMe = new LapTimeOrder();
     List<LapTimeDTO> lapsWithIntermediates = dtoCreator.createLapsWithIntermediates();
-    int nbLapsBefore = lapsWithIntermediates.size();
+    long nbLapsBefore = lapsWithIntermediates.size();
     testMe.orderbyLastSeen(lapsWithIntermediates);
 
     org.junit.Assert.assertEquals(nbLapsBefore, lapsWithIntermediates.size());
@@ -140,12 +140,12 @@ public class TestLapTimeOrder {
     testMe.orderByDuration(result);
 
     org.junit.Assert.assertEquals(6, result.size());
-    org.junit.Assert.assertEquals(l1.getId(), result.get(0).getId());
-    org.junit.Assert.assertEquals(l4.getId(), result.get(1).getId());
-    org.junit.Assert.assertEquals(l3.getId(), result.get(2).getId());
-    org.junit.Assert.assertEquals(l5.getId(), result.get(3).getId());
-    org.junit.Assert.assertEquals(l2.getId(), result.get(4).getId());
-    org.junit.Assert.assertEquals(l6.getId(), result.get(5).getId());
+    org.junit.Assert.assertEquals(l1.id.longValue(), result.get(0).getId());
+    org.junit.Assert.assertEquals(l4.id.longValue(), result.get(1).getId());
+    org.junit.Assert.assertEquals(l3.id.longValue(), result.get(2).getId());
+    org.junit.Assert.assertEquals(l5.id.longValue(), result.get(3).getId());
+    org.junit.Assert.assertEquals(l2.id.longValue(), result.get(4).getId());
+    org.junit.Assert.assertEquals(l6.id.longValue(), result.get(5).getId());
   }
 
   @Test
@@ -235,7 +235,7 @@ public class TestLapTimeOrder {
   }
 
   public void checkRaceLapsOrder(List<LapTimeDTO> raceLapsWithIntermediates) {
-    int lastLapIndex = Integer.MAX_VALUE;
+    long lastLapIndex = Long.MAX_VALUE;
     for (LapTimeDTO l : raceLapsWithIntermediates) {
       Assert.assertTrue("Lap " + l + " has a lap index inferior to previous lap : " + lastLapIndex, l.getLapIndex() <= lastLapIndex);
       lastLapIndex = l.getLapIndex();

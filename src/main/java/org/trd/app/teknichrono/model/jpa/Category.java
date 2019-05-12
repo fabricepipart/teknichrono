@@ -1,32 +1,19 @@
 package org.trd.app.teknichrono.model.jpa;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
-import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
-@XmlRootElement
-public class Category implements java.io.Serializable {
-
-  /**
-   * 
-   */
-  private static final long serialVersionUID = -1694655875930305512L;
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "id", unique = true, nullable = false)
-  private int id;
+public class Category extends PanacheEntity {
 
   @Version
   @Column(name = "version")
@@ -38,14 +25,6 @@ public class Category implements java.io.Serializable {
 
   @Column(nullable = false)
   private String name;
-
-  public int getId() {
-    return this.id;
-  }
-
-  public void setId(int id) {
-    this.id = id;
-  }
 
   public int getVersion() {
     return this.version;

@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class TestBeaconEndpoint {
 
-  private int id = 1;
+  private long id = 1;
 
   @Mock
   private RuntimeDelegate runtimeDelegate;
@@ -83,20 +83,20 @@ public class TestBeaconEndpoint {
     verify(em).persist(entity);
   }
 
-  public Beacon newBeacon(int number, int pilotId) {
+  public Beacon newBeacon(long number, long pilotId) {
     Beacon beacon = new Beacon();
-    beacon.setId(id++);
+    beacon.id = id++;
     beacon.setNumber(number);
     if (pilotId >= 0) {
       Pilot p = new Pilot();
-      p.setId(pilotId);
+      p.id = pilotId;
       beacon.setPilot(p);
       p.setFirstName("First");
       p.setLastName("Last");
     }
     for (int i = 0; i < 10; i++) {
       Ping p = new Ping();
-      p.setId(id++);
+      p.id = id++;
       p.setBeacon(beacon);
       beacon.getPings().add(p);
     }
@@ -106,16 +106,16 @@ public class TestBeaconEndpoint {
   @Test
   public void deleteById() {
     Beacon entity = newBeacon(999, 9);
-    when(em.find(Beacon.class, entity.getId())).thenReturn(entity);
-    Response r = endpoint.deleteById(entity.getId());
+    when(em.find(Beacon.class, entity.id)).thenReturn(entity);
+    Response r = endpoint.deleteById(entity.id);
     verify(em).remove(entity);
   }
 
   @Test
   public void deleteByIdRemovesBeaconFromPilot() {
     Beacon entity = newBeacon(999, 9);
-    when(em.find(Beacon.class, entity.getId())).thenReturn(entity);
-    Response r = endpoint.deleteById(entity.getId());
+    when(em.find(Beacon.class, entity.id)).thenReturn(entity);
+    Response r = endpoint.deleteById(entity.id);
     verify(em).remove(entity);
     ArgumentCaptor<Pilot> captor = ArgumentCaptor.forClass(Pilot.class);
     verify(em, atLeastOnce()).persist(captor.capture());
@@ -130,8 +130,8 @@ public class TestBeaconEndpoint {
   @Test
   public void deleteByIdRemovesBeaconFromPings() {
     Beacon entity = newBeacon(999, 9);
-    when(em.find(Beacon.class, entity.getId())).thenReturn(entity);
-    Response r = endpoint.deleteById(entity.getId());
+    when(em.find(Beacon.class, entity.id)).thenReturn(entity);
+    Response r = endpoint.deleteById(entity.id);
     verify(em).remove(entity);
     ArgumentCaptor captor = ArgumentCaptor.forClass(Ping.class);
     verify(em, atLeastOnce()).persist(captor.capture());
@@ -147,7 +147,7 @@ public class TestBeaconEndpoint {
   @Test
   public void deleteByIdReturnsErrorIfBeaconDoesNotExist() {
     Beacon entity = newBeacon(999, 9);
-    Response r = endpoint.deleteById(entity.getId());
+    Response r = endpoint.deleteById(entity.id);
     verify(em, never()).remove(any());
   }
 

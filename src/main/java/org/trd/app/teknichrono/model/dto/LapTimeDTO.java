@@ -23,7 +23,7 @@ public class LapTimeDTO implements Serializable {
 
   private Logger logger = Logger.getLogger(LapTimeDTO.class);
 
-  private int id;
+  private long id;
   private int version;
   private NestedPilotDTO pilot;
   private NestedSessionDTO session;
@@ -36,15 +36,15 @@ public class LapTimeDTO implements Serializable {
   private long gapWithPrevious;
   private long gapWithBest;
   private List<SectorDTO> sectors = new ArrayList<SectorDTO>();
-  private int lapIndex;
-  private int lapNumber;
+  private long lapIndex;
+  private long lapNumber;
 
   public LapTimeDTO() {
   }
 
   public LapTimeDTO(final LapTime entity) {
     if (entity != null) {
-      this.id = entity.getId();
+      this.id = entity.id;
       this.version = entity.getVersion();
       if (entity.getPilot() != null) {
         this.pilot = new NestedPilotDTO(entity.getPilot());
@@ -115,11 +115,11 @@ public class LapTimeDTO implements Serializable {
     return entity;
   }
 
-  public int getId() {
+  public long getId() {
     return this.id;
   }
 
-  public void setId(final int id) {
+  public void setId(final long id) {
     this.id = id;
   }
 
@@ -214,19 +214,19 @@ public class LapTimeDTO implements Serializable {
     setEndDate(endDate);
   }
 
-  public int getLapIndex() {
+  public long getLapIndex() {
     return lapIndex;
   }
 
-  public void setLapIndex(int lapIndex) {
+  public void setLapIndex(long lapIndex) {
     this.lapIndex = lapIndex;
   }
 
-  public int getLapNumber() {
+  public long getLapNumber() {
     return lapNumber;
   }
 
-  public void setLapNumber(int lapNumber) {
+  public void setLapNumber(long lapNumber) {
     this.lapNumber = lapNumber;
   }
 

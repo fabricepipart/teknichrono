@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.TypedQuery;
+import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -16,6 +17,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
@@ -38,16 +40,18 @@ public class CategoryEndpoint {
   }
 
   @POST
-  @Consumes("application/json")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Transactional
   public Response create(Category entity) {
     em.persist(entity);
     return Response
-        .created(UriBuilder.fromResource(CategoryEndpoint.class).path(String.valueOf(entity.getId())).build()).build();
+        .created(UriBuilder.fromResource(CategoryEndpoint.class).path(String.valueOf(entity.id)).build()).build();
   }
 
   @DELETE
   @Path("/{id:[0-9][0-9]*}")
-  public Response deleteById(@PathParam("id") int id) {
+  @Transactional
+  public Response deleteById(@PathParam("id") long id) {
     Category entity = em.find(Category.class, id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
@@ -58,8 +62,9 @@ public class CategoryEndpoint {
 
   @GET
   @Path("/{id:[0-9][0-9]*}")
-  @Produces("application/json")
-  public Response findById(@PathParam("id") int id) {
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response findById(@PathParam("id") long id) {
     TypedQuery<Category> findByIdQuery = em.createQuery(
         "SELECT DISTINCT e FROM Category e LEFT JOIN FETCH e.pilots WHERE e.id = :entityId ORDER BY e.id",
         Category.class);
@@ -79,7 +84,8 @@ public class CategoryEndpoint {
 
   @GET
   @Path("/name")
-  @Produces("application/json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
   public CategoryDTO findCategoryByName(@QueryParam("name") String name) {
     TypedQuery<Category> findByNameQuery = em.createQuery(
         "SELECT DISTINCT e FROM Category e LEFT JOIN FETCH e.pilots WHERE e.name = :name ORDER BY e.id",
@@ -96,7 +102,8 @@ public class CategoryEndpoint {
   }
 
   @GET
-  @Produces("application/json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
   public List<CategoryDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
     TypedQuery<Category> findAllQuery = em
         .createQuery("SELECT DISTINCT e FROM Category e LEFT JOIN FETCH e.pilots ORDER BY e.id", Category.class);
@@ -113,8 +120,9 @@ public class CategoryEndpoint {
 
   @POST
   @Path("{categoryId:[0-9][0-9]*}/addPilot")
-  @Produces("application/json")
-  public Response addPilot(@PathParam("categoryId") int categoryId, @QueryParam("pilotId") Integer pilotId) {
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response addPilot(@PathParam("categoryId") long categoryId, @QueryParam("pilotId") Long pilotId) {
     Category category = em.find(Category.class, categoryId);
     if (category == null) {
       return Response.status(Status.NOT_FOUND).build();
@@ -135,8 +143,9 @@ public class CategoryEndpoint {
 
   @PUT
   @Path("/{id:[0-9][0-9]*}")
-  @Consumes("application/json")
-  public Response update(@PathParam("id") int id, CategoryDTO entity) {
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response update(@PathParam("id") long id, CategoryDTO entity) {
     if (entity == null) {
       return Response.status(Status.BAD_REQUEST).build();
     }

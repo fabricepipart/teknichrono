@@ -1,5 +1,7 @@
 package org.trd.app.teknichrono.rest;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.dto.BeaconDTO;
 import org.trd.app.teknichrono.model.jpa.Beacon;
@@ -7,20 +9,10 @@ import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.model.jpa.Ping;
 import org.trd.app.teknichrono.util.DurationLogger;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.OptimisticLockException;
-import javax.persistence.TypedQuery;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.transaction.Transactional;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
@@ -33,25 +25,19 @@ import java.util.List;
 @Path("/beacons")
 public class BeaconEndpoint {
 
-  private Logger logger = Logger.getLogger(BeaconEndpoint.class);
-
-  EntityManager em;
-
-  @Inject
-  public BeaconEndpoint(EntityManager em) {
-    this.em = em;
-  }
+  private static final Logger LOGGER = Logger.getLogger(BeaconEndpoint.class);
 
   @POST
-  @Consumes("application/json")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Transactional
   public Response create(Beacon entity) {
-    DurationLogger perf = DurationLogger.get(logger).start("Create beacon " + entity.getNumber());
-    if (entity.getPilot() != null && entity.getPilot().getId() > 0) {
-      Pilot pilot = em.find(Pilot.class, entity.getPilot().getId());
+    DurationLogger perf = DurationLogger.get(LOGGER).start("Create beacon " + entity.getNumber());
+    if (entity.getPilot() != null && entity.getPilot().id > 0) {
+      Pilot pilot = Pilot.findById(entity.getPilot().id);
       entity.setPilot(pilot);
     }
-    em.persist(entity);
-    URI location = UriBuilder.fromResource(BeaconEndpoint.class).path(String.valueOf(entity.getId())).build();
+    Beacon.persist(entity);
+    URI location = UriBuilder.fromResource(BeaconEndpoint.class).path(String.valueOf(entity.id)).build();
     Response toReturn = Response.created(location).build();
     perf.end();
     return toReturn;
@@ -59,35 +45,37 @@ public class BeaconEndpoint {
 
   @DELETE
   @Path("/{id:[0-9][0-9]*}")
-  public Response deleteById(@PathParam("id") int id) {
-    DurationLogger perf = DurationLogger.get(logger).start("Delete beacon id=" + id);
-    Beacon entity = em.find(Beacon.class, id);
+  @Transactional
+  public Response deleteById(@PathParam("id") long id) {
+    DurationLogger perf = DurationLogger.get(LOGGER).start("Delete beacon id=" + id);
+    Beacon entity = Beacon.findById(id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
     Pilot associatedPilot = entity.getPilot();
     if (associatedPilot != null) {
       associatedPilot.setCurrentBeacon(null);
-      em.persist(associatedPilot);
+      entity.persist(associatedPilot);
     }
     List<Ping> pings = entity.getPings();
     if (pings != null) {
       for (Ping ping : pings) {
         ping.setBeacon(null);
-        em.persist(ping);
+        entity.persist(ping);
       }
     }
-    em.remove(entity);
+    entity.delete();
     perf.end();
     return Response.noContent().build();
   }
 
   @GET
   @Path("/{id:[0-9][0-9]*}")
-  @Produces("application/json")
-  public Response findById(@PathParam("id") int id) {
-    DurationLogger perf = DurationLogger.get(logger).start("Find beacon id=" + id);
-    BeaconDTO entity = findBeacon(id);
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response findById(@PathParam("id") long id) {
+    DurationLogger perf = DurationLogger.get(LOGGER).start("Find beacon id=" + id);
+    BeaconDTO entity = findBeaconById(id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -95,83 +83,75 @@ public class BeaconEndpoint {
     return Response.ok(entity).build();
   }
 
-  public BeaconDTO findBeacon(int id) {
-    TypedQuery<Beacon> findByIdQuery = em
-        .createQuery("SELECT DISTINCT b FROM Beacon b WHERE b.id = :entityId ORDER BY b.id", Beacon.class);
-    findByIdQuery.setParameter("entityId", id);
-    BeaconDTO dto = null;
-    try {
-      Beacon entity = findByIdQuery.getSingleResult();
-      dto = new BeaconDTO(entity);
-    } catch (NoResultException nre) {
-      logger.warn("Beacon ID=" + id + " not found");
+  public BeaconDTO findBeaconById(long id) {
+    Beacon entity = Beacon.findById(id);
+    if (entity != null) {
+      return new BeaconDTO(entity);
     }
-    return dto;
+    LOGGER.warn("Beacon ID=" + id + " not found");
+    return null;
   }
 
   @GET
   @Path("/number/{number:[0-9][0-9]*}")
-  @Produces("application/json")
-  public Response findBeaconNumber(@PathParam("number") int number) {
-    DurationLogger perf = DurationLogger.get(logger).start("Find beacon number " + number);
-    TypedQuery<Beacon> findByIdQuery = em
-        .createQuery("SELECT DISTINCT b FROM Beacon b WHERE b.number = :entityId ORDER BY b.number", Beacon.class);
-    findByIdQuery.setParameter("entityId", number);
-    BeaconDTO dto = null;
-    try {
-      Beacon entity = findByIdQuery.getSingleResult();
-      dto = new BeaconDTO(entity);
-    } catch (NoResultException nre) {
-      logger.warn("Beacon Number=" + number + " not found");
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response findBeaconNumber(@PathParam("number") long number) {
+    DurationLogger perf = DurationLogger.get(LOGGER).start("Find beacon number " + number);
+    Beacon entity = Beacon.findByNumber(number);
+    if (entity == null) {
+      LOGGER.warn("Beacon Number=" + number + " not found");
       return Response.status(Status.NOT_FOUND).build();
     }
+    BeaconDTO dto = new BeaconDTO(entity);
     perf.end();
     return Response.ok(dto).build();
   }
 
   @GET
-  @Produces("application/json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
   public List<BeaconDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
-    DurationLogger perf = DurationLogger.get(logger).start("Find all beacons");
-    TypedQuery<Beacon> findAllQuery = em.createQuery("SELECT DISTINCT b FROM Beacon b ORDER BY b.id", Beacon.class);
-    if (startPosition != null) {
-      findAllQuery.setFirstResult(startPosition);
+    DurationLogger perf = DurationLogger.get(LOGGER).start("Find all beacons");
+    PanacheQuery<PanacheEntityBase> query = Beacon.findAll();
+    if (startPosition != null && maxResult != null) {
+      int pageIndex = startPosition / maxResult;
+      int pageSize = maxResult;
+      query = query.page(pageIndex, pageSize);
     }
-    if (maxResult != null) {
-      findAllQuery.setMaxResults(maxResult);
-    }
-    final List<Beacon> results = findAllQuery.getResultList();
-    final List<BeaconDTO> converted = BeaconDTO.convert(results);
+    List<Beacon> results = query.list();
+    List<BeaconDTO> converted = BeaconDTO.convert(results);
     perf.end();
     return converted;
   }
 
   @PUT
   @Path("/{id:[0-9][0-9]*}")
-  @Consumes("application/json")
-  public Response update(@PathParam("id") int id, Beacon entity) {
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response update(@PathParam("id") long id, Beacon entity) {
     if (entity == null) {
       return Response.status(Status.BAD_REQUEST).build();
     }
-    DurationLogger perf = DurationLogger.get(logger).start("Update beacon number " + entity.getNumber());
-    if (id != entity.getId()) {
+    DurationLogger perf = DurationLogger.get(LOGGER).start("Update beacon number " + entity.getNumber());
+    if (id != entity.id) {
       perf.end();
       return Response.status(Status.CONFLICT).entity(entity).build();
     }
-    Beacon beacon = em.find(Beacon.class, id);
+    Beacon beacon = Beacon.findById(id);
     if (beacon == null) {
       perf.end();
       return Response.status(Status.NOT_FOUND).build();
     }
 
     // Update of pilot
-    if (entity.getPilot() != null && entity.getPilot().getId() > 0) {
-      Pilot pilot = em.find(Pilot.class, entity.getPilot().getId());
+    if (entity.getPilot() != null && entity.getPilot().id > 0) {
+      Pilot pilot = Pilot.findById(entity.getPilot().id);
       beacon.setPilot(pilot);
     }
     beacon.setNumber(entity.getNumber());
     try {
-      em.persist(beacon);
+      beacon.persist();
     } catch (OptimisticLockException e) {
       return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
     }
