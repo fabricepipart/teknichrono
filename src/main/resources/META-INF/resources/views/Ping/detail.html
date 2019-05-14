@@ -5,11 +5,11 @@
 <form id="PingForm" name="PingForm" class="form-horizontal" role="form">
     
 
-    <div class="form-group" ng-class="{'has-error': PingForm.dateTime.$invalid}">
-        <label for="dateTime" class="col-sm-2 control-label">Date Time</label>
+    <div class="form-group" ng-class="{'has-error': PingForm.instant.$invalid}">
+        <label for="instant" class="col-sm-2 control-label">Date Time</label>
         <div id="dateTimeControls" class="col-sm-10">
-            <input id="dateTime" name="dateTime" type="text" required class="form-control" ng-model="ping.dateTime" placeholder="Enter the Ping Date Time"></input>
-            <span class="help-block error" ng-show="PingForm.dateTime.$error.required">required</span> 
+            <input id="instant" name="instant" type="text" required class="form-control" ng-model="ping.instant" placeholder="Enter the Ping Date Time"></input>
+            <span class="help-block error" ng-show="PingForm.instant.$error.required">required</span>
         </div>
     </div>
 

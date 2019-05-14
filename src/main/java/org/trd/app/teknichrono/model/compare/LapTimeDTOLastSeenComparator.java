@@ -2,6 +2,7 @@ package org.trd.app.teknichrono.model.compare;
 
 import org.trd.app.teknichrono.model.dto.LapTimeDTO;
 
+import java.time.Duration;
 import java.util.Comparator;
 
 /**
@@ -20,7 +21,7 @@ public class LapTimeDTOLastSeenComparator implements Comparator<LapTimeDTO> {
     } else if (l2.getLastSeenDate() == null) {
       return 1;
     } else {
-      return Long.valueOf(l1.getLastSeenDate().getTime()).compareTo(l2.getLastSeenDate().getTime());
+      return l1.getLastSeenDate().compareTo(l2.getLastSeenDate());
     }
   }
 

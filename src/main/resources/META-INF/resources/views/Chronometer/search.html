@@ -53,7 +53,7 @@
                         <a href="#/Chronometers/edit/{{result.id}}">{{result.name}}</a>
                     </td>
                     <td>
-                        <a>#{{result.lastSeen.beacon.number}} @ {{result.lastSeen.dateTime | date : 'yyyy-MM-dd HH:mm:ss.sss' }} ({{result.lastSeen.power}} dB)</a>
+                        <a>#{{result.lastSeen.beacon.number}} @ {{result.lastSeen.instant | date : 'yyyy-MM-dd HH:mm:ss.sss' }} ({{result.lastSeen.power}} dB)</a>
                     </td>
                 </tr>
             </tbody>

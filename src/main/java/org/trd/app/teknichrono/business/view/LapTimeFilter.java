@@ -4,6 +4,7 @@ import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.dto.LapTimeDTO;
 import org.trd.app.teknichrono.model.dto.NestedLocationDTO;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,14 +17,14 @@ public class LapTimeFilter {
   private Logger logger = Logger.getLogger(LapTimeFilter.class);
 
   public void filterNoDuration(List<LapTimeDTO> results) {
-    results.removeIf(r -> r.getDuration() <= 0);
+    results.removeIf(r -> r.getDuration().compareTo(Duration.ZERO) <= 0);
   }
 
   public void filterExtreme(List<LapTimeDTO> results) {
     // Needs to be done here since we did not have all info before
     Map<Long, List<LapTimeDTO>> lapsPerLocation = new HashMap<>();
     for (LapTimeDTO dto : results) {
-      if (dto.getDuration() > 0) {
+      if (dto.getDuration().compareTo(Duration.ZERO) > 0) {
         NestedLocationDTO location = dto.getSession().getLocation();
         if (lapsPerLocation.containsKey(location.getId())) {
           lapsPerLocation.get(location.getId()).add(dto);
@@ -34,28 +35,28 @@ public class LapTimeFilter {
         }
       }
     }
-    Map<Long, Long> averagePerLocation = new HashMap<>();
+    Map<Long, Duration> averagePerLocation = new HashMap<>();
     for (Map.Entry<Long, List<LapTimeDTO>> entry : lapsPerLocation.entrySet()) {
       Long locationId = entry.getKey();
       List<LapTimeDTO> laps = entry.getValue();
-      long sum = laps.stream().mapToLong(LapTimeDTO::getDuration).sum();
-      averagePerLocation.put(locationId, sum / laps.size());
+      Duration sum = laps.stream().map(LapTimeDTO::getDuration).reduce(Duration.ZERO, Duration::plus);
+      averagePerLocation.put(locationId, sum.dividedBy(laps.size()));
     }
 
     List<LapTimeDTO> toRemove = new ArrayList<>();
     for (LapTimeDTO lapTimeDTO : results) {
       NestedLocationDTO location = lapTimeDTO.getSession().getLocation();
-      Long averageOfLocation = averagePerLocation.get(location.getId());
-      if (averageOfLocation != null && lapTimeDTO.getDuration() > 0) {
-        if (lapTimeDTO.getDuration() > (averageOfLocation.longValue() * ACCEPTANCE_FACTOR)) {
+      Duration averageOfLocation = averagePerLocation.get(location.getId());
+      if (averageOfLocation != null && lapTimeDTO.getDuration().compareTo(Duration.ZERO) > 0) {
+        if (lapTimeDTO.getDuration().compareTo(averageOfLocation.multipliedBy(ACCEPTANCE_FACTOR)) > 0) {
           logger.info("Discarding lap ID " + lapTimeDTO.getId()
               + " since it is too long (" + lapTimeDTO.getDuration() +
-              ") compared to the average for this location : " + averageOfLocation.longValue());
+              ") compared to the average for this location : " + averageOfLocation);
           toRemove.add(lapTimeDTO);
-        } else if (lapTimeDTO.getDuration() < (averageOfLocation.longValue() / ACCEPTANCE_FACTOR)) {
+        } else if (lapTimeDTO.getDuration().compareTo(averageOfLocation.dividedBy(ACCEPTANCE_FACTOR)) < 0) {
           logger.info("Discarding lap ID " + lapTimeDTO.getId()
               + " since it is too short (" + lapTimeDTO.getDuration() +
-              ") compared to the average for this location : " + averageOfLocation.longValue());
+              ") compared to the average for this location : " + averageOfLocation);
           toRemove.add(lapTimeDTO);
         }
       }
@@ -68,7 +69,7 @@ public class LapTimeFilter {
     Map<Long, LapTimeDTO> bests = new HashMap<>();
     List<LapTimeDTO> toRemove = new ArrayList<>();
     for (LapTimeDTO lapTimeDTO : results) {
-      if (lapTimeDTO.getDuration() <= 0) {
+      if (lapTimeDTO.getDuration().compareTo(Duration.ZERO) <= 0) {
         toRemove.add(lapTimeDTO);
         continue;
       }
@@ -77,7 +78,7 @@ public class LapTimeFilter {
       if (pilotBest == null) {
         bests.put(pilotId, lapTimeDTO);
       } else {
-        if (lapTimeDTO.getDuration() < pilotBest.getDuration()) {
+        if (lapTimeDTO.getDuration().compareTo(pilotBest.getDuration()) < 0) {
           bests.put(pilotId, lapTimeDTO);
           toRemove.add(pilotBest);
         } else {

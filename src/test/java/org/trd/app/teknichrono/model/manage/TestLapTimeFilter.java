@@ -11,6 +11,8 @@ import org.trd.app.teknichrono.model.dto.TestLapTimeDTOCreator;
 import org.trd.app.teknichrono.model.jpa.LapTime;
 import org.trd.app.teknichrono.model.jpa.TestLapTimeCreator;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +46,7 @@ public class TestLapTimeFilter {
     testMe.filterNoDuration(result);
     org.junit.Assert.assertEquals(5, result.size());
     for (LapTimeDTO r : result) {
-      org.junit.Assert.assertTrue(r.getDuration() > 0);
+      org.junit.Assert.assertTrue(r.getDuration().compareTo(Duration.ZERO) > 0);
 
     }
 
@@ -114,18 +116,18 @@ public class TestLapTimeFilter {
   public void keepsOnlyBestForEachPilot() {
     LapTimeFilter testMe = new LapTimeFilter();
     ArrayList<LapTime> searchResults = new ArrayList<LapTime>();
-    long time = System.currentTimeMillis();
+    Instant time = Instant.now();
 
     LapTime l1 = laptimeCreator.createLapTimeWithPilot(1, 1, true, time);
-    time = time + 111;
+    time = time.plus(Duration.ofMillis(111));
     LapTime l3 = laptimeCreator.createLapTimeWithPilot(3, 1, true, time);
-    time = time + 133;
+    time = time.plus(Duration.ofMillis(133));
     LapTime l5 = laptimeCreator.createLapTimeWithPilot(5, 1, true, time);
-    time = time + 155;
+    time = time.plus(Duration.ofMillis(155));
     LapTime l2 = laptimeCreator.createLapTimeWithPilot(2, 2, true, time);
-    time = time + 162;
+    time = time.plus(Duration.ofMillis(162));
     LapTime l4 = laptimeCreator.createLapTimeWithPilot(4, 2, true, time);
-    time = time + 124;
+    time = time.plus(Duration.ofMillis(124));
     LapTime l6 = laptimeCreator.createLapTimeWithPilot(6, 2, true, time);
     // l6 does not end
 

@@ -1,6 +1,6 @@
 package org.trd.app.teknichrono.model.dto;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -18,9 +18,9 @@ public class SessionDTO {
 
   private long id;
   private int version;
-  private Timestamp start;
+  private Instant start;
   private long inactivity = 60000L;
-  private Timestamp end;
+  private Instant end;
   private String type;
   private boolean current = false;
   private List<NestedChronometerDTO> chronometers = new ArrayList<NestedChronometerDTO>();
@@ -132,11 +132,11 @@ public class SessionDTO {
     this.version = version;
   }
 
-  public Timestamp getStart() {
+  public Instant getStart() {
     return start;
   }
 
-  public void setStart(Timestamp start) {
+  public void setStart(Instant start) {
     this.start = start;
   }
 
@@ -148,11 +148,11 @@ public class SessionDTO {
     this.inactivity = inactivity;
   }
 
-  public Timestamp getEnd() {
+  public Instant getEnd() {
     return end;
   }
 
-  public void setEnd(Timestamp end) {
+  public void setEnd(Instant end) {
     this.end = end;
   }
 

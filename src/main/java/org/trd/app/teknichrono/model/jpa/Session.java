@@ -2,7 +2,7 @@ package org.trd.app.teknichrono.model.jpa;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -25,13 +25,13 @@ public class Session extends PanacheEntity  {
   private int version;
 
   @Column(columnDefinition="TIMESTAMP(3)", nullable = false)
-  private Timestamp start;
+  private Instant start;
 
   @Column
   private long inactivity = 0L;
 
   @Column(columnDefinition="TIMESTAMP(3)", nullable = false)
-  private Timestamp end;
+  private Instant end;
 
   @Column(nullable = false)
   private String type;
@@ -99,19 +99,19 @@ public class Session extends PanacheEntity  {
     this.version = version;
   }
 
-  public Timestamp getStart() {
+  public Instant getStart() {
     return start;
   }
 
-  public void setStart(Timestamp beginning) {
+  public void setStart(Instant beginning) {
     this.start = beginning;
   }
 
-  public Timestamp getEnd() {
+  public Instant getEnd() {
     return end;
   }
 
-  public void setEnd(Timestamp end) {
+  public void setEnd(Instant end) {
     this.end = end;
   }
 

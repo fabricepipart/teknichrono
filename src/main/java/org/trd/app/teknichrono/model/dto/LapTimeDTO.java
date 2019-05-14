@@ -3,12 +3,12 @@ package org.trd.app.teknichrono.model.dto;
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.jpa.LapTime;
 import org.trd.app.teknichrono.model.jpa.Ping;
-import org.trd.app.teknichrono.util.InvalidArgumentException;
 
 import javax.persistence.EntityManager;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -27,14 +27,14 @@ public class LapTimeDTO implements Serializable {
   private int version;
   private NestedPilotDTO pilot;
   private NestedSessionDTO session;
-  private Timestamp startDate;
+  private Instant startDate;
   // Either the last intermediate ping or the first ping of the next lap
-  private Timestamp endDate;
-  private Timestamp lastSeenDate;
+  private Instant endDate;
+  private Instant lastSeenDate;
   // In milliseconds
-  private long duration;
-  private long gapWithPrevious;
-  private long gapWithBest;
+  private Duration duration;
+  private Duration gapWithPrevious;
+  private Duration gapWithBest;
   private List<SectorDTO> sectors = new ArrayList<SectorDTO>();
   private long lapIndex;
   private long lapNumber;
@@ -64,10 +64,10 @@ public class LapTimeDTO implements Serializable {
           }
         }
         if (lastSeenDate == null) {
-          lastSeenDate = element.getDateTime();
+          lastSeenDate = element.getInstant();
         } else {
-          if (element.getDateTime() != null && element.getDateTime().getTime() > lastSeenDate.getTime()) {
-            lastSeenDate = element.getDateTime();
+          if (element.getInstant() != null && element.getInstant().isAfter(lastSeenDate)) {
+            lastSeenDate = element.getInstant();
           }
         }
         previous = element;
@@ -155,44 +155,41 @@ public class LapTimeDTO implements Serializable {
     this.sectors = intermediates;
   }
 
-  public Timestamp getStartDate() {
+  public Instant getStartDate() {
     return startDate;
   }
 
-  public void setStartDate(Timestamp startDate) {
+  public void setStartDate(Instant startDate) {
     this.startDate = startDate;
     if (endDate != null) {
-      setDuration(endDate.getTime() - startDate.getTime());
+      setDuration(Duration.between(startDate, endDate));
     }
   }
 
   public void setStartDate(Ping start) {
-    setStartDate(start.getDateTime());
+    setStartDate(start.getInstant());
   }
 
-  public Timestamp getEndDate() {
+  public Instant getEndDate() {
     return endDate;
   }
 
-  public void setEndDate(Timestamp endDate) {
+  public void setEndDate(Instant endDate) {
     this.endDate = endDate;
     if (startDate != null) {
-      setDuration(endDate.getTime() - startDate.getTime());
+      setDuration(Duration.between(startDate, endDate));
     }
   }
 
   public void setEndDate(Ping end) {
-    setEndDate(end.getDateTime());
+    setEndDate(end.getInstant());
   }
 
-  public long getDuration() {
+  public Duration getDuration() {
     return duration;
   }
 
-  public void setDuration(long duration) {
-    if (duration < 0) {
-      throw new InvalidArgumentException();
-    }
+  public void setDuration(Duration duration) {
     this.duration = duration;
   }
 
@@ -202,14 +199,14 @@ public class LapTimeDTO implements Serializable {
    *
    * @param endDate
    */
-  public void addLastSector(Timestamp endDate) {
+  public void addLastSector(Instant endDate) {
     // If we have a proper sector, we use it
     if (sectors.size() > 0) {
       SectorDTO previousLast = this.sectors.get(sectors.size() - 1);
-      long previousLastStart = previousLast.getStart();
-      long previousLastEnd = previousLastStart + previousLast.getDuration();
+      Instant previousLastStart = previousLast.getStart();
+      Instant previousLastEnd = previousLastStart.plus(previousLast.getDuration());
       long previousLastChronoId = previousLast.getToChronoId();
-      this.sectors.add(new SectorDTO(previousLastEnd, previousLastChronoId, endDate.getTime() - previousLastEnd));
+      this.sectors.add(new SectorDTO(previousLastEnd, previousLastChronoId, Duration.between(previousLastEnd, endDate)));
     }
     setEndDate(endDate);
   }
@@ -230,27 +227,27 @@ public class LapTimeDTO implements Serializable {
     this.lapNumber = lapNumber;
   }
 
-  public long getGapWithPrevious() {
+  public Duration getGapWithPrevious() {
     return gapWithPrevious;
   }
 
-  public void setGapWithPrevious(long gapWithPrevious) {
+  public void setGapWithPrevious(Duration gapWithPrevious) {
     this.gapWithPrevious = gapWithPrevious;
   }
 
-  public long getGapWithBest() {
+  public Duration getGapWithBest() {
     return gapWithBest;
   }
 
-  public void setGapWithBest(long gapWithBest) {
+  public void setGapWithBest(Duration gapWithBest) {
     this.gapWithBest = gapWithBest;
   }
 
-  public Timestamp getLastSeenDate() {
+  public Instant getLastSeenDate() {
     return lastSeenDate;
   }
 
-  public void setLastSeenDate(Timestamp lastSeenDate) {
+  public void setLastSeenDate(Instant lastSeenDate) {
     this.lastSeenDate = lastSeenDate;
   }
 }

@@ -14,7 +14,7 @@
     <properties>
         <version.mysql>5.1.38</version.mysql>
         <fabric8.openshift.imageChangeTrigger>false</fabric8.openshift.imageChangeTrigger>
-        <version.quarkus>0.14.0</version.quarkus>
+        <version.quarkus>0.15.0</version.quarkus>
         <fabric8.openshift.enableAutomaticTrigger>true</fabric8.openshift.enableAutomaticTrigger>
         <version.thorntail>2.2.1.Final</version.thorntail>
         <maven.compiler.target>1.8</maven.compiler.target>

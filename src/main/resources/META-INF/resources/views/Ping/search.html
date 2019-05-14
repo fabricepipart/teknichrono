@@ -13,9 +13,9 @@
         
 
     <div class="form-group">
-        <label for="dateTime" class="col-sm-2 control-label">Date Time</label>
+        <label for="instant" class="col-sm-2 control-label">Date Time</label>
         <div class="col-sm-10">
-            <input id="dateTime" name="dateTime" class="form-control" type="text" ng-model="search.dateTime" placeholder="Enter the Ping Date Time"></input>
+            <input id="instant" name="instant" class="form-control" type="text" ng-model="search.instant" placeholder="Enter the Ping Date Time"></input>
         </div>
     </div>
 
@@ -65,7 +65,7 @@
             </thead>
             <tbody id="search-results-body">
                 <tr ng-repeat="result in filteredResults | startFrom:currentPage*pageSize | limitTo:pageSize">
-                    <td><a href="#/Pings/edit/{{result.id}}">{{result.dateTime}}</a></td>
+                    <td><a href="#/Pings/edit/{{result.id}}">{{result.instant}}</a></td>
                     <td><a href="#/Pings/edit/{{result.id}}">{{result.power}}</a></td>
                         <td><a href="#/Pings/edit/{{result.id}}">{{result.beacon.id}}</a></td>
                         <td><a href="#/Pings/edit/{{result.id}}">{{result.chrono.id}}</a></td>

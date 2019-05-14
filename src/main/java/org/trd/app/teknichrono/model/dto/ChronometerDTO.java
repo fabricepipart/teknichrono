@@ -25,8 +25,8 @@ public class ChronometerDTO {
       this.name = entity.getName();
       if (entity.getPings() != null) {
         for (Ping p : entity.getPings()){
-          if(p.getDateTime() != null){
-            boolean moreRecent = this.lastSeen != null && this.lastSeen.getDateTime().getTime() < p.getDateTime().getTime();
+          if(p.getInstant() != null){
+            boolean moreRecent = this.lastSeen != null && this.lastSeen.getInstant().isBefore(p.getInstant());
             boolean isFirst = this.lastSeen == null;
             if(moreRecent || isFirst){
               this.lastSeen = new NestedPingDTO(p);

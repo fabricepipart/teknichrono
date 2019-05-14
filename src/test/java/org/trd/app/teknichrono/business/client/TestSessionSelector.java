@@ -10,7 +10,8 @@ import org.trd.app.teknichrono.model.jpa.Ping;
 import org.trd.app.teknichrono.model.jpa.Session;
 import org.trd.app.teknichrono.model.jpa.TestLapTimeCreator;
 
-import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class TestSessionSelector {
 
   private final long HOUR = 60 * 60 * 1000L;
   private long id = 1;
-  private long now = System.currentTimeMillis();
+  private Instant now = Instant.now();
 
   SessionSelector selector = new SessionSelector();
 
@@ -32,7 +33,7 @@ public class TestSessionSelector {
     chrono.id++;
     ping.setChrono(chrono);
     ping.id++;
-    ping.setDateTime(new Timestamp(now));
+    ping.setDateTime(now);
     pilot.id++;
     beacon.setPilot(pilot);
     beacon.id++;
@@ -68,8 +69,8 @@ public class TestSessionSelector {
   private Session createSession(long start, long end) {
     Session s = new Session();
     s.setId(id++);
-    s.setStart(new Timestamp(now + start));
-    s.setEnd(new Timestamp(now + end));
+    s.setStart(now.plus(Duration.ofMillis(start)));
+    s.setEnd(now.plus(Duration.ofMillis(end)));
     return s;
   }
 

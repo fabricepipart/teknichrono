@@ -1,6 +1,7 @@
 package org.trd.app.teknichrono.model.jpa;
 
-import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,14 +9,14 @@ public class TestLapTimeCreator {
 
   private long lapId = 0L;
   private long pilotId = 0L;
-  private long now = System.currentTimeMillis();
+  private Instant now = Instant.now();
   private long sessionId = 0L;
   private long locationId = 0L;
   private boolean locationLoops = false;
 
   public void nextSession() {
     sessionId++;
-    now = now + (24 * 60 * 60 * 1000L);
+    now = now.plus(Duration.ofDays(1));
   }
 
   public void nextLocation(boolean loop) {
@@ -66,28 +67,28 @@ public class TestLapTimeCreator {
     entity.setSession(s);
     if (i1 >= 0) {
       Ping p = new Ping();
-      p.setDateTime(new Timestamp(now + i1));
+      p.setDateTime(now.plus(Duration.ofMillis(i1)));
       p.setChrono(c0);
       p.setBeacon(b);
       entity.addIntermediates(p);
     }
     if (i2 >= 0) {
       Ping p = new Ping();
-      p.setDateTime(new Timestamp(now + i2));
+      p.setDateTime(now.plus(Duration.ofMillis(i2)));
       p.setChrono(c1);
       p.setBeacon(b);
       entity.addIntermediates(p);
     }
     if (i3 >= 0) {
       Ping p = new Ping();
-      p.setDateTime(new Timestamp(now + i3));
+      p.setDateTime(now.plus(Duration.ofMillis(i3)));
       p.setChrono(c2);
       p.setBeacon(b);
       entity.addIntermediates(p);
     }
     if (i4 >= 0) {
       Ping p = new Ping();
-      p.setDateTime(new Timestamp(now + i4));
+      p.setDateTime(now.plus(Duration.ofMillis(i4)));
       p.setChrono(c3);
       p.setBeacon(b);
       entity.addIntermediates(p);
@@ -303,10 +304,14 @@ public class TestLapTimeCreator {
 
   }
 
-  public LapTime createLapTimeWithNoIntermediate(long i, boolean loop, long startDate) {
+    public LapTime createLapTimeWithNoIntermediate(long i, boolean loop, long startDate) {
+        return createLapTimeWithNoIntermediate(i, loop, Instant.ofEpochMilli(startDate));
+    }
+
+    public LapTime createLapTimeWithNoIntermediate(long i, boolean loop, Instant startDate) {
     LapTime laptime = new LapTime();
     laptime.id = i;
-    Timestamp time = new Timestamp(startDate);
+    Instant time = startDate;
     laptime.setStartDate(time);
     Ping ping = new Ping();
     Chronometer chrono = new Chronometer();
@@ -329,7 +334,7 @@ public class TestLapTimeCreator {
   public LapTime createLapTimeWithIntermediates(long i, boolean loop) {
     LapTime laptime = new LapTime();
     laptime.id = i;
-    Timestamp time = new Timestamp(System.currentTimeMillis() + (i * 60 * 60 * 1000));
+    Instant time = Instant.now().plus(Duration.ofHours(i));
     laptime.setStartDate(time);
     Session session = new Session();
     Location location = new Location();
@@ -340,21 +345,21 @@ public class TestLapTimeCreator {
       Ping ping = new Ping();
       Chronometer chrono = new Chronometer();
       ping.setChrono(chrono);
-      ping.setDateTime(new Timestamp(time.getTime() + (j * 10 * 60 * 1000)));
+      ping.setDateTime(time.plus(Duration.ofMinutes(j * 10L)));
       laptime.addIntermediates(ping);
     }
 
     return laptime;
   }
 
-  private LapTime createLapTimeWithPilot(long i, boolean loop, long startDate) {
+  private LapTime createLapTimeWithPilot(long i, boolean loop, Instant startDate) {
     return createLapTimeWithPilot(i, i, loop, startDate);
   }
 
-  public LapTime createLapTimeWithPilot(long i, long pilotId, boolean loop, long startDate) {
+  public LapTime createLapTimeWithPilot(long i, long pilotId, boolean loop, Instant startDate) {
     LapTime laptime = new LapTime();
     laptime.id = i;
-    Timestamp time = new Timestamp(startDate);
+    Instant time = startDate;
     laptime.setStartDate(time);
     Ping ping = new Ping();
     Chronometer chrono = new Chronometer();

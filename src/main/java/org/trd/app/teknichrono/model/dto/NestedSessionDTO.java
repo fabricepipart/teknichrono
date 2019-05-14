@@ -1,7 +1,7 @@
 package org.trd.app.teknichrono.model.dto;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.time.Instant;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -16,8 +16,8 @@ public class NestedSessionDTO implements Serializable {
   private static final long serialVersionUID = 4519531688362345387L;
   private Long id;
   private int version;
-  private Timestamp start;
-  private Timestamp end;
+  private Instant start;
+  private Instant end;
   private String name;
   private boolean loopTrack;
   private long chronometersCount;
@@ -85,19 +85,19 @@ public class NestedSessionDTO implements Serializable {
     this.version = version;
   }
 
-  public Timestamp getStart() {
+  public Instant getStart() {
     return this.start;
   }
 
-  public void setStart(final Timestamp start) {
+  public void setStart(final Instant start) {
     this.start = start;
   }
 
-  public Timestamp getEnd() {
+  public Instant getEnd() {
     return this.end;
   }
 
-  public void setEnd(final Timestamp end) {
+  public void setEnd(final Instant end) {
     this.end = end;
   }
 

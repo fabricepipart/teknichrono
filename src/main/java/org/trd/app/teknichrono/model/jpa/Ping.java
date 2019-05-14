@@ -2,7 +2,7 @@ package org.trd.app.teknichrono.model.jpa;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,14 +17,14 @@ import javax.persistence.Version;
 @Entity
 public class Ping extends PanacheEntity {
 
-   @Version
+  @Version
   @Column(name = "version")
   private int version;
 
   /* =============================== Fields =============================== */
 
   @Column(columnDefinition="TIMESTAMP(3)", nullable = false)
-  private Timestamp dateTime;
+  private Instant dateTime;
 
   // Can be null if after event, items are reassociated
   @ManyToOne(optional = true)
@@ -49,11 +49,11 @@ public class Ping extends PanacheEntity {
     this.version = version;
   }
 
-  public Timestamp getDateTime() {
+  public Instant getInstant() {
     return dateTime;
   }
 
-  public void setDateTime(Timestamp dateTime) {
+  public void setDateTime(Instant dateTime) {
     this.dateTime = dateTime;
   }
 

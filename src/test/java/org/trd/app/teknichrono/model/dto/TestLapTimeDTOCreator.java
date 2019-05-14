@@ -5,7 +5,7 @@ import org.trd.app.teknichrono.business.view.LapTimeFiller;
 import org.trd.app.teknichrono.model.jpa.LapTime;
 import org.trd.app.teknichrono.model.jpa.TestLapTimeCreator;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,11 +32,11 @@ public class TestLapTimeDTOCreator {
     NestedPilotDTO p = new NestedPilotDTO();
     p.setId(pilotId);
     laptime.setPilot(p);
-    laptime.setStartDate(new Timestamp(startDate));
+    laptime.setStartDate(Instant.ofEpochMilli(startDate));
     if (endDate > 0) {
-      laptime.setEndDate(new Timestamp(endDate));
+      laptime.setEndDate(Instant.ofEpochMilli(endDate));
     }
-    laptime.setLastSeenDate(new Timestamp(Math.max(startDate, endDate)));
+    laptime.setLastSeenDate(Instant.ofEpochMilli(Math.max(startDate, endDate)));
     if (lapNb > 0) {
       laptime.setLapNumber(lapNb);
     }

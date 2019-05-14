@@ -7,17 +7,19 @@ import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.model.jpa.Ping;
 import org.trd.app.teknichrono.model.jpa.Session;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SessionSelector {
 
-  private final long ONE_DAY = 1 * 24 * 60 * 60 * 1000L;
+  private final Duration ONE_DAY = Duration.ofDays(1);
 
   private Logger logger = Logger.getLogger(SessionSelector.class);
 
   public Session pickMostRelevantCurrent(List<Session> allSessions) {
-    return pickMostRelevantByDistance(allSessions, System.currentTimeMillis());
+    return pickMostRelevantByDistance(allSessions, Instant.now());
   }
 
   /**
@@ -26,12 +28,12 @@ public class SessionSelector {
    */
   public Session pickMostRelevant(Ping ping) {
 
-    long time = ping.getDateTime().getTime();
+    Instant time = ping.getInstant();
 
     // Only consider sessions that contain chronometer
     List<Session> candidateSessions = new ArrayList<>(ping.getChrono().getSessions());
     // Same day
-    candidateSessions.removeIf(s -> distanceBetween(s, time) > ONE_DAY);
+    candidateSessions.removeIf(s -> duration(s, time).compareTo(ONE_DAY) > 0);
     if (candidateSessions.isEmpty()) {
       return null;
     }
@@ -103,14 +105,14 @@ public class SessionSelector {
     return false;
   }
 
-  private List<Session> sessionsWithShortestDistance(List<Session> sessions, long pingTime) {
+  private List<Session> sessionsWithShortestDistance(List<Session> sessions, Instant pingTime) {
     List<Session> sessionsWithShortestDistance = new ArrayList<>();
-    long mostRelevantDistance = Long.MAX_VALUE;
+    Duration mostRelevantDistance = Duration.ofMillis(Long.MAX_VALUE);
     for (Session session : sessions) {
-      long distance = distanceBetween(session, pingTime);
-      if (distance == mostRelevantDistance) {
+      Duration distance = duration(session, pingTime);
+      if (distance.equals(mostRelevantDistance)) {
         sessionsWithShortestDistance.add(session);
-      } else if (distance < mostRelevantDistance) {
+      } else if (distance.compareTo(mostRelevantDistance) < 0) {
         sessionsWithShortestDistance.clear();
         sessionsWithShortestDistance.add(session);
         mostRelevantDistance = distance;
@@ -119,7 +121,7 @@ public class SessionSelector {
     return sessionsWithShortestDistance;
   }
 
-  private Session pickMostRelevantByDistance(List<Session> sessions, long pingTime) {
+  private Session pickMostRelevantByDistance(List<Session> sessions, Instant pingTime) {
     List<Session> sessionsWithShortestDistance = sessionsWithShortestDistance(sessions, pingTime);
     if (!sessionsWithShortestDistance.isEmpty()) {
       return sessionsWithShortestDistance.get(0);
@@ -127,15 +129,15 @@ public class SessionSelector {
     return null;
   }
 
-  private long distanceBetween(Session session, long pingTime) {
-    long start = session.getStart().getTime();
-    long end = session.getEnd().getTime();
-    if (pingTime > end) {
-      return (pingTime - end);
-    } else if (pingTime < start) {
-      return (start - pingTime);
+  private Duration duration(Session session, Instant pingTime) {
+    Instant start = session.getStart();
+    Instant end = session.getEnd();
+    if (pingTime.isAfter(end)) {
+      return Duration.between(end, pingTime);
+    } else if (pingTime.isBefore(start)) {
+      return Duration.between(pingTime, start);
     }
-    return 0;
+    return Duration.ZERO;
   }
 
 }

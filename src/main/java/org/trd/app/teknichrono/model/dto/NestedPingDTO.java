@@ -1,21 +1,18 @@
 package org.trd.app.teknichrono.model.dto;
 
-import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.jpa.Ping;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.time.Instant;
 
 @XmlRootElement
 public class NestedPingDTO implements Serializable{
 
-  private Logger logger = Logger.getLogger(LapTimeDTO.class);
-
   private long id;
   private int version;
   private NestedBeaconDTO beacon;
-  private Timestamp dateTime;
+  private Instant instant;
   private long power;
 
 
@@ -29,7 +26,7 @@ public class NestedPingDTO implements Serializable{
       if (entity.getBeacon() != null) {
         this.beacon = new NestedBeaconDTO(entity.getBeacon());
       }
-      this.dateTime = entity.getDateTime();
+      this.instant = entity.getInstant();
       this.power = entity.getPower();
     }
   }
@@ -39,7 +36,7 @@ public class NestedPingDTO implements Serializable{
     StringBuilder sb = new StringBuilder();
     sb.append("[id=" + getId());
     sb.append(",beacon=" + beacon.getNumber());
-    sb.append(",dateTime=" + dateTime);
+    sb.append(",instant=" + instant);
     sb.append(",power=" + power + "]");
     return sb.toString();
   }
@@ -68,12 +65,12 @@ public class NestedPingDTO implements Serializable{
     this.beacon = beacon;
   }
 
-  public Timestamp getDateTime() {
-    return dateTime;
+  public Instant getInstant() {
+    return instant;
   }
 
-  public void setDateTime(Timestamp dateTime) {
-    this.dateTime = dateTime;
+  public void setInstant(Instant instant) {
+    this.instant = instant;
   }
 
   public long getPower() {

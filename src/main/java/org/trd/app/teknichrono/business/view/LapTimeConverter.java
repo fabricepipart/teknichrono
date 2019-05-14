@@ -7,7 +7,7 @@ import org.trd.app.teknichrono.model.dto.NestedPilotDTO;
 import org.trd.app.teknichrono.model.dto.NestedSessionDTO;
 import org.trd.app.teknichrono.model.jpa.LapTime;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,8 +44,8 @@ public class LapTimeConverter {
           lapsPerPilot.put(pilot.getId(), lapsOfPilot);
         }
         if (session.isLoopTrack() && lastPilotLap != null && lastPilotLap.getSession().getId() == session.getId()) {
-          Timestamp startDate = dto.getStartDate();
-          if (startDate != null && startDate.getTime() > 0) {
+          Instant startDate = dto.getStartDate();
+          if (startDate != null) {
             logger.debug("Add last sector to lap " + lastPilotLap + " because we now found " + dto);
             lastPilotLap.addLastSector(startDate);
           }

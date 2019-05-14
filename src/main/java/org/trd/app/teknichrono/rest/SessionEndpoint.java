@@ -32,7 +32,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -243,9 +243,9 @@ public class SessionEndpoint {
     }
 
     if (!session.isCurrent()) {
-      startSession(session, start.getDateTime());
+      startSession(session, start.getInstant());
       if (session.getSessionType() == SessionType.RACE) {
-        startRace(session, start.getDateTime());
+        startRace(session, start.getInstant());
       }
     }
 
@@ -260,19 +260,19 @@ public class SessionEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public Response end(Ping end, @PathParam("sessionId") long sessionId) {
-    DurationLogger perf = DurationLogger.get(logger).start("End session " + sessionId + " @ " + end.getDateTime());
+    DurationLogger perf = DurationLogger.get(logger).start("End session " + sessionId + " @ " + end.getInstant());
     Session session = em.find(Session.class, sessionId);
     if (session == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    endSession(session, end.getDateTime());
+    endSession(session, end.getInstant());
     SessionDTO dto = new SessionDTO(session);
     perf.end();
 
     return Response.ok(dto).build();
   }
 
-  private void startSession(Session session, Timestamp timestamp) {
+  private void startSession(Session session, Instant timestamp) {
     // Stop all other sessions of the event that are not concurrent
     Event event = session.getEvent();
     if (event != null) {
@@ -283,7 +283,7 @@ public class SessionEndpoint {
       }
     }
     // Start this one
-    if (session.getStart().getTime() > timestamp.getTime()) {
+    if (session.getStart().isAfter(timestamp)) {
       session.setStart(timestamp);
     }
     session.setCurrent(true);
@@ -291,17 +291,17 @@ public class SessionEndpoint {
   }
 
   private boolean intersect(Session otherSession, Session session) {
-    if ((otherSession.getStart().getTime() >= session.getStart().getTime()) && (otherSession.getStart().getTime() <= otherSession.getEnd().getTime())) {
+    if (otherSession.getStart().compareTo(session.getStart()) >= 0 && otherSession.getStart().compareTo(otherSession.getEnd()) <= 0) {
       return true;
     }
-    if (otherSession.getEnd().getTime() >= otherSession.getStart().getTime() && otherSession.getEnd().getTime() <= otherSession.getEnd().getTime()) {
+    if (otherSession.getEnd().compareTo(otherSession.getStart()) >= 0 && otherSession.getEnd().compareTo(otherSession.getEnd()) <= 0) {
       return true;
     }
     return false;
   }
 
-  private void endSession(Session session, Timestamp end) {
-    if (session.getEnd().getTime() < end.getTime()) {
+  private void endSession(Session session, Instant end) {
+    if (session.getEnd().isBefore(end)) {
       logger.warn("Session ID=" + session.id + " has been stopped after expected end");
     }
     session.setEnd(end);
@@ -309,7 +309,7 @@ public class SessionEndpoint {
     em.persist(session);
   }
 
-  private void startRace(Session session, Timestamp timestamp) {
+  private void startRace(Session session, Instant timestamp) {
     Chronometer chronometer = session.getChronometers().get(0);
     Set<Pilot> pilots = session.getPilots();
     PingManager cm = new PingManager(em);

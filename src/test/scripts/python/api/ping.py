@@ -8,13 +8,13 @@ pingsUrl = '/rest/pings'
 
 
 # ----------------------------------------------------------------------
-def ping(dateTime, pilotBeaconId, power, chronoId):
+def ping(instant, pilotBeaconId, power, chronoId):
   "This adds a Ping"
-  data = '{"dateTime":"' + formatDatetime(dateTime) + '", "power":"' + str(power) + '"}'
+  data = '{"instant":"' + formatDatetime(instant) + '", "power":"' + str(power) + '"}'
   url = pingsUrl + '/create?chronoId=' + str(chronoId) + '&beaconId=' + str(pilotBeaconId)
   #pingResponse = post(data, url)
   post(data, url)
-  #print("Ping " + formatDatetime(dateTime) + " added " + data)
+  #print("Ping " + formatDatetime(instant) + " added " + data)
   return
 
 

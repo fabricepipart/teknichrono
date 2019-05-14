@@ -9,6 +9,8 @@ import org.trd.app.teknichrono.model.jpa.Ping;
 import org.trd.app.teknichrono.model.jpa.Session;
 
 import javax.persistence.EntityManager;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
@@ -29,7 +31,7 @@ public class PingManager {
   public void addPing(Ping ping) {
     Beacon beacon = ping.getBeacon();
     if (beacon == null) {
-      logger.error("Beacon is not in the DB, cannot updates laptimes for Ping @ " + ping.getDateTime());
+      logger.error("Beacon is not in the DB, cannot updates laptimes for Ping @ " + ping.getInstant());
       return;
     }
 
@@ -41,7 +43,7 @@ public class PingManager {
 
     Chronometer chronometer = ping.getChrono();
     if (chronometer == null) {
-      logger.error("Chrono is not in the DB, cannot updates laptimes for Ping @ " + ping.getDateTime());
+      logger.error("Chrono is not in the DB, cannot updates laptimes for Ping @ " + ping.getInstant());
       return;
     }
 
@@ -63,10 +65,10 @@ public class PingManager {
 
     long inactivity = session.getInactivity();
     if (inactivity > 0) {
-      long pingTime = ping.getDateTime().getTime();
-      long start = session.getStart().getTime();
-      long inactivityEnd = start + inactivity;
-      if (pingTime > start && pingTime < inactivityEnd) {
+      Instant pingTime = ping.getInstant();
+      Instant start = session.getStart();
+      Instant inactivityEnd = start.plus(Duration.ofMillis(inactivity));
+      if (pingTime.isAfter(start) && pingTime.isBefore(inactivityEnd)) {
         logger.info("Ping ignored since Session " + session.id + " is during its inactivity period.");
         return;
       }
@@ -82,13 +84,13 @@ public class PingManager {
       Ping pingAfter = null;
       for (LapTime lapTime : previousLaptimes) {
         for (Ping lapTimePing : lapTime.getIntermediates()) {
-          if (lapTimePing.getDateTime().getTime() < ping.getDateTime().getTime()) {
+          if (lapTimePing.getInstant().isBefore(ping.getInstant())) {
             lapTimeOfPingBefore = lapTime;
             pingBefore = lapTimePing;
-          } else if (lapTimePing.getDateTime().getTime() == ping.getDateTime().getTime()) {
-            logger.error("Trying to store a ping that was already in DB " + ping.getDateTime());
-          } else if (lapTimePing.getDateTime().getTime() > ping.getDateTime().getTime()
-              && (pingAfter == null || lapTimePing.getDateTime().getTime() < pingAfter.getDateTime().getTime())) {
+          } else if (lapTimePing.getInstant().equals(ping.getInstant())) {
+            logger.error("Trying to store a ping that was already in DB " + ping.getInstant());
+          } else if (lapTimePing.getInstant().isAfter(ping.getInstant())
+              && (pingAfter == null || lapTimePing.getInstant().isBefore(pingAfter.getInstant()))) {
             lapTimeOfPingAfter = lapTime;
             pingAfter = lapTimePing;
           }

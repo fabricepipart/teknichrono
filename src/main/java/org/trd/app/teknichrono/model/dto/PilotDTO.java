@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.trd.app.teknichrono.model.jpa.Pilot;
 
-@XmlRootElement
+@XmlRootElement // TODO remove all @XmlRootElement
 public class PilotDTO {
 
   private long id;
