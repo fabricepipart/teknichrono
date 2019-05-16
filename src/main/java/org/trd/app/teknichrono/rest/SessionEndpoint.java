@@ -1,8 +1,8 @@
 package org.trd.app.teknichrono.rest;
 
 import org.jboss.logging.Logger;
-import org.trd.app.teknichrono.business.client.SessionSelector;
 import org.trd.app.teknichrono.business.client.PingManager;
+import org.trd.app.teknichrono.business.client.SessionSelector;
 import org.trd.app.teknichrono.model.dto.SessionDTO;
 import org.trd.app.teknichrono.model.jpa.Chronometer;
 import org.trd.app.teknichrono.model.jpa.Event;
@@ -206,7 +206,8 @@ public class SessionEndpoint {
     }
     perf.end();
 
-    return Response.ok(session).build();
+    SessionDTO dto = new SessionDTO(session);
+    return Response.ok(dto).build();
   }
 
   @POST

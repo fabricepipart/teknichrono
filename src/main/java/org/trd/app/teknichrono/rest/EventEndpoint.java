@@ -1,6 +1,10 @@
 package org.trd.app.teknichrono.rest;
 
-import java.util.List;
+import org.jboss.logging.Logger;
+import org.trd.app.teknichrono.model.dto.EventDTO;
+import org.trd.app.teknichrono.model.jpa.Event;
+import org.trd.app.teknichrono.model.jpa.Session;
+import org.trd.app.teknichrono.util.DurationLogger;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -21,14 +25,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
-
-import org.jboss.logging.Logger;
-import org.trd.app.teknichrono.model.jpa.Event;
-import org.trd.app.teknichrono.model.jpa.Session;
-import org.trd.app.teknichrono.util.DurationLogger;
+import java.util.List;
 
 /**
- * 
+ *
  */
 @Path("/events")
 public class EventEndpoint {
@@ -120,7 +120,7 @@ public class EventEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public Response addSession(@PathParam("eventId") long eventId, @QueryParam("sessionId") Long sessionId) {
-    try(DurationLogger dl = new DurationLogger(logger, "Add session session ID=" + sessionId + " to event ID=" + eventId)) {
+    try (DurationLogger dl = new DurationLogger(logger, "Add session session ID=" + sessionId + " to event ID=" + eventId)) {
       Event event = em.find(Event.class, eventId);
       if (event == null) {
         return Response.status(Status.NOT_FOUND).build();
@@ -134,7 +134,8 @@ public class EventEndpoint {
       em.persist(event);
       em.persist(session);
 
-      return Response.ok(event).build();
+      EventDTO dto = new EventDTO(event);
+      return Response.ok(dto).build();
     }
   }
 

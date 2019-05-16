@@ -1,6 +1,8 @@
 package org.trd.app.teknichrono.rest;
 
-import java.util.List;
+import org.trd.app.teknichrono.model.dto.LocationDTO;
+import org.trd.app.teknichrono.model.jpa.Location;
+import org.trd.app.teknichrono.model.jpa.Session;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -21,12 +23,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
-
-import org.trd.app.teknichrono.model.jpa.Location;
-import org.trd.app.teknichrono.model.jpa.Session;
+import java.util.List;
 
 /**
- * 
+ *
  */
 @Path("/locations")
 public class LocationEndpoint {
@@ -132,7 +132,8 @@ public class LocationEndpoint {
     em.persist(location);
     em.persist(session);
 
-    return Response.ok(location).build();
+    LocationDTO dto = new LocationDTO(location);
+    return Response.ok(dto).build();
   }
 
   @PUT
