@@ -25,6 +25,11 @@ The testing part of the project is based on JUnits (very few) and Python end to 
 
 ## How to use
 
+### Requirements
+
+* Java 8
+* Maven 3.6
+
 ### How to run locally
 
 * You may need to adapt ```src/main/resources/project-defaults.yaml```
