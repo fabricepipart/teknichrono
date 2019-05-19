@@ -20,10 +20,18 @@ public class Event extends PanacheEntity {
 
   @OneToMany(orphanRemoval = true)
   @JoinColumn(name = "eventId")
-  private List<Session> sessions = new ArrayList<Session>();
+  private List<Session> sessions = new ArrayList<>();
 
   @Column(nullable = false)
   private String name;
+
+  public Long getId() {
+    return this.id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
 
   public int getVersion() {
     return this.version;

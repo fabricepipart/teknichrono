@@ -33,23 +33,30 @@ public class Pilot extends PanacheEntity {
   @Column(nullable = false)
   private String lastName;
 
-  @OneToOne(fetch = FetchType.EAGER, optional = true, cascade = CascadeType.MERGE)
+  @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
   @JoinColumn(name = "currentBeaconId")
   private Beacon currentBeacon;
 
   @OneToMany(cascade = CascadeType.REMOVE)
   @OrderBy(value = "startDate")
   @JoinColumn(name = "pilotId")
-  private List<LapTime> laps = new ArrayList<LapTime>();
+  private List<LapTime> laps = new ArrayList<>();
 
-  @ManyToOne(fetch = FetchType.EAGER, optional = true, cascade = CascadeType.MERGE)
+  @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
   @JoinColumn(name = "categoryId")
   private Category category;
 
   @ManyToMany(mappedBy = "pilots")
-  private Set<Session> sessions = new HashSet<Session>();
+  private Set<Session> sessions = new HashSet<>();
 
   /* ===================== Getters and setters ======================== */
+  public Long getId() {
+    return this.id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
 
   public Set<Session> getSessions() {
     return sessions;

@@ -25,12 +25,20 @@ public class Chronometer extends PanacheEntity  {
 
   // Can be null if after event, items are reassociated
   @OneToMany(mappedBy = "chrono")
-  private List<Ping> pings = new ArrayList<Ping>();
+  private List<Ping> pings = new ArrayList<>();
 
   @ManyToMany(mappedBy = "chronometers")
-  private List<Session> sessions = new ArrayList<Session>();
+  private List<Session> sessions = new ArrayList<>();
 
   /* ===================== Getters and setters ======================== */
+  public Long getId() {
+    return this.id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
   public int getVersion() {
     return this.version;
   }

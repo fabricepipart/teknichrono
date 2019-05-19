@@ -131,7 +131,6 @@ public class LocationEndpoint {
     location.getSessions().add(session);
     em.persist(location);
     em.persist(session);
-
     LocationDTO dto = new LocationDTO(location);
     return Response.ok(dto).build();
   }

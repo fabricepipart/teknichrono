@@ -38,6 +38,8 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
@@ -47,7 +49,7 @@ public class SessionEndpoint {
 
   private Logger logger = Logger.getLogger(SessionEndpoint.class);
 
-  EntityManager em;
+  private final EntityManager em;
 
   @Inject
   public SessionEndpoint(EntityManager em) {
@@ -115,7 +117,7 @@ public class SessionEndpoint {
       return Response.status(Status.NOT_FOUND).build();
     }
     perf.end();
-    SessionDTO dto = new SessionDTO(entity);
+    SessionDTO dto = SessionDTO.fromSession(entity);
     return Response.ok(dto).build();
   }
 
@@ -124,13 +126,14 @@ public class SessionEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public Response findCurrent() {
-    List<Session> allSessions = listAllSessions(null, null);
+    List<Session> allSessions = listAllSessions(null, null)
+            .collect(Collectors.toList());
     SessionSelector selector = new SessionSelector();
     Session session = selector.pickMostRelevantCurrent(allSessions);
     if (session == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    SessionDTO dto = new SessionDTO(session);
+    SessionDTO dto = SessionDTO.fromSession(session);
     return Response.ok(dto).build();
   }
 
@@ -151,7 +154,7 @@ public class SessionEndpoint {
       entity = null;
     }
     perf.end();
-    SessionDTO dto = new SessionDTO(entity);
+    SessionDTO dto = SessionDTO.fromSession(entity);
     return dto;
   }
 
@@ -160,13 +163,14 @@ public class SessionEndpoint {
   @Transactional
   public List<SessionDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
     DurationLogger perf = DurationLogger.get(logger).start("List sessions");
-    final List<Session> results = listAllSessions(startPosition, maxResult);
-    final List<SessionDTO> converted = SessionDTO.convert(results);
+    List<SessionDTO> sessions = listAllSessions(startPosition, maxResult)
+            .map(SessionDTO::fromSession)
+            .collect(Collectors.toList());
     perf.end();
-    return converted;
+    return sessions;
   }
 
-  private List<Session> listAllSessions(Integer startPosition, Integer maxResult) {
+  private Stream<Session> listAllSessions(Integer startPosition, Integer maxResult) {
     TypedQuery<Session> findAllQuery = em
         .createQuery("SELECT DISTINCT e FROM Session e LEFT JOIN FETCH e.chronometers ORDER BY e.id", Session.class);
     if (startPosition != null) {
@@ -175,8 +179,7 @@ public class SessionEndpoint {
     if (maxResult != null) {
       findAllQuery.setMaxResults(maxResult);
     }
-    final List<Session> results = findAllQuery.getResultList();
-    return results;
+    return findAllQuery.getResultStream();
   }
 
   @POST
@@ -206,7 +209,7 @@ public class SessionEndpoint {
     }
     perf.end();
 
-    SessionDTO dto = new SessionDTO(session);
+    SessionDTO dto = SessionDTO.fromSession(session);
     return Response.ok(dto).build();
   }
 
@@ -250,7 +253,7 @@ public class SessionEndpoint {
       }
     }
 
-    SessionDTO dto = new SessionDTO(session);
+    SessionDTO dto = SessionDTO.fromSession(session);
     perf.end();
 
     return Response.ok(dto).build();
@@ -267,7 +270,7 @@ public class SessionEndpoint {
       return Response.status(Status.NOT_FOUND).build();
     }
     endSession(session, end.getInstant());
-    SessionDTO dto = new SessionDTO(session);
+    SessionDTO dto = SessionDTO.fromSession(session);
     perf.end();
 
     return Response.ok(dto).build();
