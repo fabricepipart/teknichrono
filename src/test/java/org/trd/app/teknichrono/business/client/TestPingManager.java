@@ -73,7 +73,7 @@ public class TestPingManager {
 
   private Ping createPing(long timeFromStart, Chronometer c) {
     Ping p = new Ping();
-    p.setDateTime(start.plus(Duration.ofMillis(timeFromStart)));
+    p.setInstant(start.plus(Duration.ofMillis(timeFromStart)));
     p.setBeacon(beacon);
     p.setChrono(c);
     p.id = c.id + timeFromStart;

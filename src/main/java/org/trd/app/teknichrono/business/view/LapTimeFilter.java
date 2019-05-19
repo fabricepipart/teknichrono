@@ -17,14 +17,14 @@ public class LapTimeFilter {
   private Logger logger = Logger.getLogger(LapTimeFilter.class);
 
   public void filterNoDuration(List<LapTimeDTO> results) {
-    results.removeIf(r -> r.getDuration().compareTo(Duration.ZERO) <= 0);
+    results.removeIf(r -> r.getDuration() == null || r.getDuration().compareTo(Duration.ZERO) <= 0);
   }
 
   public void filterExtreme(List<LapTimeDTO> results) {
     // Needs to be done here since we did not have all info before
     Map<Long, List<LapTimeDTO>> lapsPerLocation = new HashMap<>();
     for (LapTimeDTO dto : results) {
-      if (dto.getDuration().compareTo(Duration.ZERO) > 0) {
+      if (dto.getDuration() != null && dto.getDuration().compareTo(dto.getDuration()) > 0) {
         NestedLocationDTO location = dto.getSession().getLocation();
         if (lapsPerLocation.containsKey(location.getId())) {
           lapsPerLocation.get(location.getId()).add(dto);

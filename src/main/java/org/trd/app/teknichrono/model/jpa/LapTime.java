@@ -3,10 +3,6 @@ package org.trd.app.teknichrono.model.jpa;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -15,9 +11,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.Version;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-public class LapTime extends PanacheEntity  {
+public class LapTime extends PanacheEntity {
 
   @Version
   @Column(name = "version")
@@ -30,7 +29,7 @@ public class LapTime extends PanacheEntity  {
   private Pilot pilot;
 
   // Used to order the laps for the pilot relationship
-  @Column(columnDefinition="TIMESTAMP(3)")
+  @Column(columnDefinition = "TIMESTAMP(3)")
   private Instant startDate;
 
   @ManyToOne(fetch = FetchType.LAZY)

@@ -2,16 +2,12 @@ package org.trd.app.teknichrono.model.jpa;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
-import java.time.Instant;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Version;
+import java.time.Instant;
 
 
 @Entity
@@ -22,9 +18,8 @@ public class Ping extends PanacheEntity {
   private int version;
 
   /* =============================== Fields =============================== */
-
-  @Column(columnDefinition="TIMESTAMP(3)", nullable = false)
-  private Instant dateTime;
+  @Column(columnDefinition = "TIMESTAMP(3)", nullable = false)
+  private Instant instant;
 
   // Can be null if after event, items are reassociated
   @ManyToOne(optional = true)
@@ -50,11 +45,11 @@ public class Ping extends PanacheEntity {
   }
 
   public Instant getInstant() {
-    return dateTime;
+    return instant;
   }
 
-  public void setDateTime(Instant dateTime) {
-    this.dateTime = dateTime;
+  public void setInstant(Instant instant) {
+    this.instant = instant;
   }
 
   public long getPower() {
@@ -84,7 +79,7 @@ public class Ping extends PanacheEntity {
   @Override
   public String toString() {
     String result = getClass().getSimpleName() + " ";
-    result += "time: " + dateTime;
+    result += "time: " + instant;
     result += ", beaconId: " + beacon;
     result += ", power: " + power;
     result += ", chronoId: " + chrono;

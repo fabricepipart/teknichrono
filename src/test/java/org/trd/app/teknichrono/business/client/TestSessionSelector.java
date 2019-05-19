@@ -33,7 +33,7 @@ public class TestSessionSelector {
     chrono.id++;
     ping.setChrono(chrono);
     ping.id++;
-    ping.setDateTime(now);
+    ping.setInstant(now);
     pilot.id++;
     beacon.setPilot(pilot);
     beacon.id++;

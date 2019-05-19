@@ -49,6 +49,8 @@ public class PingEndpoint {
   @Transactional
   public Response create(Ping entity, @QueryParam("chronoId") long chronoId, @QueryParam("beaconId") long beaconId) {
     try (DurationLogger dl = new DurationLogger(logger, "Ping for chronometer ID=" + chronoId + " and beacon ID=" + beaconId)) {
+      //Ping entity = new Ping();
+      entity.setInstant(entity.getInstant());
       Chronometer chrono = em.find(Chronometer.class, chronoId);
       if (chrono == null) {
         return Response.status(Status.NOT_FOUND).build();

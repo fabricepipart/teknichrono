@@ -1,14 +1,11 @@
 package org.trd.app.teknichrono.model.dto;
 
+import org.trd.app.teknichrono.model.jpa.Beacon;
+
+import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import org.trd.app.teknichrono.model.jpa.Beacon;
-
-@XmlRootElement
 public class BeaconDTO {
 
   private long id;

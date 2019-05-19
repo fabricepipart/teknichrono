@@ -2,12 +2,6 @@ package org.trd.app.teknichrono.model.jpa;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -16,21 +10,26 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.Version;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
-public class Session extends PanacheEntity  {
+public class Session extends PanacheEntity {
 
   @Version
   @Column(name = "version")
   private int version;
 
-  @Column(columnDefinition="TIMESTAMP(3)", nullable = false)
+  @Column(columnDefinition = "TIMESTAMP(3)", nullable = false)
   private Instant start;
 
   @Column
   private long inactivity = 0L;
 
-  @Column(columnDefinition="TIMESTAMP(3)", nullable = false)
+  @Column(columnDefinition = "TIMESTAMP(3)", nullable = false)
   private Instant end;
 
   @Column(nullable = false)

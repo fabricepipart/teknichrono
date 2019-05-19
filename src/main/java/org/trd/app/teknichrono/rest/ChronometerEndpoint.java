@@ -1,6 +1,11 @@
 package org.trd.app.teknichrono.rest;
 
-import java.util.List;
+import org.jboss.logging.Logger;
+import org.trd.app.teknichrono.model.dto.ChronometerDTO;
+import org.trd.app.teknichrono.model.jpa.Chronometer;
+import org.trd.app.teknichrono.model.jpa.Ping;
+import org.trd.app.teknichrono.model.jpa.Session;
+import org.trd.app.teknichrono.util.DurationLogger;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -21,16 +26,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
-
-import org.jboss.logging.Logger;
-import org.trd.app.teknichrono.model.jpa.Chronometer;
-import org.trd.app.teknichrono.model.jpa.Ping;
-import org.trd.app.teknichrono.model.jpa.Session;
-import org.trd.app.teknichrono.model.dto.ChronometerDTO;
-import org.trd.app.teknichrono.util.DurationLogger;
+import java.util.List;
 
 /**
- * 
+ *
  */
 @Path("/chronometers")
 public class ChronometerEndpoint {
@@ -47,18 +46,18 @@ public class ChronometerEndpoint {
   @Consumes(MediaType.APPLICATION_JSON)
   @Transactional
   public Response create(Chronometer entity) {
-    try(DurationLogger dl = new DurationLogger(logger, "Create chronometer " + entity.getName())) {
-        em.persist(entity);
-        return Response
-            .created(UriBuilder.fromResource(ChronometerEndpoint.class).path(String.valueOf(entity.id)).build())
-            .build();
+    try (DurationLogger dl = new DurationLogger(logger, "Create chronometer " + entity.getName())) {
+      em.persist(entity);
+      return Response
+          .created(UriBuilder.fromResource(ChronometerEndpoint.class).path(String.valueOf(entity.id)).build())
+          .build();
     }
   }
 
   @DELETE
   @Path("/{id:[0-9][0-9]*}")
   public Response deleteById(@PathParam("id") long id) {
-    try(DurationLogger dl = new DurationLogger(logger, "Delete chronometer ID=" + id)) {
+    try (DurationLogger dl = new DurationLogger(logger, "Delete chronometer ID=" + id)) {
       Chronometer entity = em.find(Chronometer.class, id);
       if (entity == null) {
         return Response.status(Status.NOT_FOUND).build();
@@ -82,7 +81,7 @@ public class ChronometerEndpoint {
   @Path("/{id:[0-9][0-9]*}")
   @Produces(MediaType.APPLICATION_JSON)
   public Response findById(@PathParam("id") long id) {
-    try(DurationLogger dl = new DurationLogger(logger, "Find chronometer ID=" + id)) {
+    try (DurationLogger dl = new DurationLogger(logger, "Find chronometer ID=" + id)) {
       TypedQuery<Chronometer> findByIdQuery = em
           .createQuery("SELECT DISTINCT c FROM Chronometer c LEFT JOIN FETCH c.pings WHERE c.id = :entityId ORDER BY c.id", Chronometer.class);
       findByIdQuery.setParameter("entityId", id);
@@ -104,7 +103,7 @@ public class ChronometerEndpoint {
   @Path("/name")
   @Produces(MediaType.APPLICATION_JSON)
   public Response findChronometerByName(@QueryParam("name") String name) {
-    try(DurationLogger dl = new DurationLogger(logger, "Find chronometer " + name)) {
+    try (DurationLogger dl = new DurationLogger(logger, "Find chronometer " + name)) {
       TypedQuery<Chronometer> findByNameQuery = em
           .createQuery("SELECT DISTINCT c FROM Chronometer c WHERE c.name = :name ORDER BY c.id", Chronometer.class);
       findByNameQuery.setParameter("name", name);
@@ -125,7 +124,7 @@ public class ChronometerEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   public List<ChronometerDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
-    try(DurationLogger dl = new DurationLogger(logger, "Get all chronometers")) {
+    try (DurationLogger dl = new DurationLogger(logger, "Get all chronometers")) {
       TypedQuery<Chronometer> findAllQuery = em.createQuery("SELECT DISTINCT c FROM Chronometer c ORDER BY c.id",
           Chronometer.class);
       if (startPosition != null) {
@@ -144,7 +143,7 @@ public class ChronometerEndpoint {
   @Path("/{id:[0-9][0-9]*}")
   @Consumes(MediaType.APPLICATION_JSON)
   public Response update(@PathParam("id") long id, Chronometer entity) {
-    try(DurationLogger dl = new DurationLogger(logger, "Update chronometer ID=" + id)) {
+    try (DurationLogger dl = new DurationLogger(logger, "Update chronometer ID=" + id)) {
       if (entity == null) {
         return Response.status(Status.BAD_REQUEST).build();
       }

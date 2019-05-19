@@ -1,14 +1,10 @@
 package org.trd.app.teknichrono.model.dto;
 
 import org.trd.app.teknichrono.model.jpa.Location;
-import org.trd.app.teknichrono.model.jpa.Session;
 
-import javax.persistence.EntityManager;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
 
-@XmlRootElement
 public class LocationDTO {
 
   private long id;
@@ -16,9 +12,6 @@ public class LocationDTO {
   private String name;
   private boolean loopTrack;
   private List<NestedSessionDTO> sessions = new ArrayList<NestedSessionDTO>();
-
-  public LocationDTO() {
-  }
 
   public LocationDTO(final Location entity) {
     if (entity != null) {
@@ -28,9 +21,7 @@ public class LocationDTO {
       this.name = entity.getName();
       this.sessions = new ArrayList<>();
       if (entity.getSessions() != null) {
-        for (Session s : entity.getSessions()) {
-          sessions.add(new NestedSessionDTO(s));
-        }
+        entity.getSessions().forEach(s -> sessions.add(new NestedSessionDTO(s)));
       }
     }
   }
@@ -41,24 +32,6 @@ public class LocationDTO {
     sb.append("[id=" + getId());
     sb.append(",name=" + name + "]");
     return sb.toString();
-  }
-
-  //
-  public Location fromDTO(Location entity, EntityManager em) {
-    if (entity == null) {
-      entity = new Location();
-    }
-    entity.setVersion(this.version);
-    entity.setName(this.name);
-    entity.setLoopTrack(this.isLoopTrack());
-    entity.getSessions().clear();
-    if (this.sessions != null) {
-      for (NestedSessionDTO s : sessions) {
-        entity.getSessions().add(s.fromDTO(new Session(), em));
-      }
-    }
-    entity = em.merge(entity);
-    return entity;
   }
 
   public long getId() {
@@ -85,11 +58,11 @@ public class LocationDTO {
     this.name = name;
   }
 
-  public List<NestedSessionDTO> getsessions() {
+  public List<NestedSessionDTO> getSessions() {
     return sessions;
   }
 
-  public void setsessions(List<NestedSessionDTO> sessions) {
+  public void setSessions(List<NestedSessionDTO> sessions) {
     this.sessions = sessions;
   }
 
