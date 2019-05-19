@@ -1,17 +1,16 @@
 package org.trd.app.teknichrono.model.dto;
 
-import java.io.Serializable;
-import java.time.Instant;
+import org.trd.app.teknichrono.model.jpa.Session;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-
-import org.trd.app.teknichrono.model.jpa.Session;
+import java.io.Serializable;
+import java.time.Instant;
 
 public class NestedSessionDTO implements Serializable {
 
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 4519531688362345387L;
   private Long id;
@@ -69,11 +68,11 @@ public class NestedSessionDTO implements Serializable {
     return entity;
   }
 
-  public long getId() {
+  public Long getId() {
     return this.id;
   }
 
-  public void setId(final long id) {
+  public void setId(final Long id) {
     this.id = id;
   }
 

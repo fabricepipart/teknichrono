@@ -5,6 +5,7 @@ import requests
 import json
 from datetime import date, datetime, timedelta
 import datetime as dt
+import isodate
 
 headers = {'Content-type': 'application/json'}
 debug = True
@@ -96,3 +97,10 @@ def pretty_time_delta(milliseconds):
     return '%d.%03d' % (seconds, milliseconds)
   else:
     return ''
+
+
+def pretty_time_delta_iso(time_iso):
+  timedeltaObject = isodate.parse_duration(time_iso)
+  milliseconds = (timedeltaObject / timedelta(microseconds=1000))
+  return pretty_time_delta(milliseconds)
+    

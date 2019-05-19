@@ -1,16 +1,15 @@
 package org.trd.app.teknichrono.model.dto;
 
-import java.io.Serializable;
+import org.trd.app.teknichrono.model.jpa.Location;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-
-import org.trd.app.teknichrono.model.jpa.Location;
+import java.io.Serializable;
 
 public class NestedLocationDTO implements Serializable {
 
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = -1377429742860544608L;
 
@@ -50,11 +49,11 @@ public class NestedLocationDTO implements Serializable {
     return entity;
   }
 
-  public long getId() {
+  public Long getId() {
     return this.id;
   }
 
-  public void setId(final long id) {
+  public void setId(final Long id) {
     this.id = id;
   }
 
