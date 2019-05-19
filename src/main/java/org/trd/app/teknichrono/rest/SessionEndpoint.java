@@ -316,7 +316,7 @@ public class SessionEndpoint {
     PingManager cm = new PingManager(em);
     for (Pilot pilot : pilots) {
       Ping ping = new Ping();
-      ping.setDateTime(timestamp);
+      ping.setInstant(timestamp);
       ping.setBeacon(pilot.getCurrentBeacon());
       ping.setChrono(chronometer);
       em.persist(ping);

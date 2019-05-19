@@ -1,11 +1,9 @@
 package org.trd.app.teknichrono.model.dto;
 
-import javax.persistence.EntityManager;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.trd.app.teknichrono.model.jpa.Category;
 
-@XmlRootElement
+import javax.persistence.EntityManager;
+
 public class NestedCategoryDTO {
 
   private long id;

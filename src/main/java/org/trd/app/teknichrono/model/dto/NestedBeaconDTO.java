@@ -1,11 +1,9 @@
 package org.trd.app.teknichrono.model.dto;
 
-import javax.persistence.EntityManager;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.trd.app.teknichrono.model.jpa.Beacon;
 
-@XmlRootElement
+import javax.persistence.EntityManager;
+
 public class NestedBeaconDTO {
 
   private long id;

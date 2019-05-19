@@ -1,19 +1,16 @@
 package org.trd.app.teknichrono.model.dto;
 
+import org.trd.app.teknichrono.model.jpa.Chronometer;
+import org.trd.app.teknichrono.model.jpa.Pilot;
+import org.trd.app.teknichrono.model.jpa.Session;
+
+import javax.persistence.EntityManager;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.EntityManager;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import org.trd.app.teknichrono.model.jpa.Chronometer;
-import org.trd.app.teknichrono.model.jpa.Pilot;
-import org.trd.app.teknichrono.model.jpa.Session;
-
-@XmlRootElement
 public class SessionDTO {
 
   private long id;

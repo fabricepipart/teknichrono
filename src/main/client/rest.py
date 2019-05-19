@@ -23,7 +23,7 @@ def post(data, url, params=[]):
   response = requests.post(url, data=dataString, params=params, headers=HEADERS, timeout=2.0)
   if (not response.ok):
     LOGGER.error("Request returned an invalid status. Text output : " + response.text)
-    LOGGER.error("To reproduce : curl -X POST " + url + " --data '" + dataString + "' --header \"Content-Type:application/json\" with params " + str(params))
+    LOGGER.error("To reproduce : curl -X POST '" + url + "' --data '" + dataString + "' --header \"Content-Type:application/json\" with params " + str(params))
     response.raise_for_status()
   return response
 

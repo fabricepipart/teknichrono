@@ -5,7 +5,6 @@ import org.trd.app.teknichrono.model.jpa.LapTime;
 import org.trd.app.teknichrono.model.jpa.Ping;
 
 import javax.persistence.EntityManager;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
@@ -13,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-@XmlRootElement
 public class LapTimeDTO implements Serializable {
 
   /**

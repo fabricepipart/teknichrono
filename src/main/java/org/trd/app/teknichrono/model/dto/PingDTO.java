@@ -2,42 +2,46 @@ package org.trd.app.teknichrono.model.dto;
 
 import org.trd.app.teknichrono.model.jpa.Ping;
 
-import java.io.Serializable;
 import java.time.Instant;
 
-public class NestedPingDTO implements Serializable {
+public class PingDTO {
+
 
   private long id;
   private int version;
-  private NestedBeaconDTO beacon;
+
+
+  /* =============================== Fields =============================== */
   private Instant instant;
+  private NestedBeaconDTO beacon;
   private long power;
+  private NestedChronometerDTO chrono;
 
 
-  public NestedPingDTO() {
-  }
-
-  public NestedPingDTO(final Ping entity) {
+  public PingDTO(final Ping entity) {
     if (entity != null) {
       this.id = entity.id;
       this.version = entity.getVersion();
       if (entity.getBeacon() != null) {
         this.beacon = new NestedBeaconDTO(entity.getBeacon());
       }
-      this.instant = entity.getInstant();
+      if (entity.getChrono() != null) {
+        this.chrono = new NestedChronometerDTO(entity.getChrono());
+      }
       this.power = entity.getPower();
     }
   }
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("[id=" + getId());
-    sb.append(",beacon=" + beacon.getNumber());
-    sb.append(",instant=" + instant);
-    sb.append(",power=" + power + "]");
-    return sb.toString();
+    String result = getClass().getSimpleName() + " ";
+    result += "time: " + instant;
+    result += ", beaconId: " + beacon;
+    result += ", power: " + power;
+    result += ", chronoId: " + chrono;
+    return result;
   }
+
 
   public long getId() {
     return id;
@@ -55,14 +59,6 @@ public class NestedPingDTO implements Serializable {
     this.version = version;
   }
 
-  public NestedBeaconDTO getBeacon() {
-    return beacon;
-  }
-
-  public void setBeacon(NestedBeaconDTO beacon) {
-    this.beacon = beacon;
-  }
-
   public Instant getInstant() {
     return instant;
   }
@@ -71,12 +67,28 @@ public class NestedPingDTO implements Serializable {
     this.instant = instant;
   }
 
+  public NestedBeaconDTO getBeacon() {
+    return beacon;
+  }
+
+  public void setBeacon(NestedBeaconDTO beacon) {
+    this.beacon = beacon;
+  }
+
   public long getPower() {
     return power;
   }
 
   public void setPower(long power) {
     this.power = power;
+  }
+
+  public NestedChronometerDTO getChrono() {
+    return chrono;
+  }
+
+  public void setChrono(NestedChronometerDTO chrono) {
+    this.chrono = chrono;
   }
 
 }

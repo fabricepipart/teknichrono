@@ -67,28 +67,28 @@ public class TestLapTimeCreator {
     entity.setSession(s);
     if (i1 >= 0) {
       Ping p = new Ping();
-      p.setDateTime(now.plus(Duration.ofMillis(i1)));
+      p.setInstant(now.plus(Duration.ofMillis(i1)));
       p.setChrono(c0);
       p.setBeacon(b);
       entity.addIntermediates(p);
     }
     if (i2 >= 0) {
       Ping p = new Ping();
-      p.setDateTime(now.plus(Duration.ofMillis(i2)));
+      p.setInstant(now.plus(Duration.ofMillis(i2)));
       p.setChrono(c1);
       p.setBeacon(b);
       entity.addIntermediates(p);
     }
     if (i3 >= 0) {
       Ping p = new Ping();
-      p.setDateTime(now.plus(Duration.ofMillis(i3)));
+      p.setInstant(now.plus(Duration.ofMillis(i3)));
       p.setChrono(c2);
       p.setBeacon(b);
       entity.addIntermediates(p);
     }
     if (i4 >= 0) {
       Ping p = new Ping();
-      p.setDateTime(now.plus(Duration.ofMillis(i4)));
+      p.setInstant(now.plus(Duration.ofMillis(i4)));
       p.setChrono(c3);
       p.setBeacon(b);
       entity.addIntermediates(p);
@@ -304,11 +304,11 @@ public class TestLapTimeCreator {
 
   }
 
-    public LapTime createLapTimeWithNoIntermediate(long i, boolean loop, long startDate) {
-        return createLapTimeWithNoIntermediate(i, loop, Instant.ofEpochMilli(startDate));
-    }
+  public LapTime createLapTimeWithNoIntermediate(long i, boolean loop, long startDate) {
+    return createLapTimeWithNoIntermediate(i, loop, Instant.ofEpochMilli(startDate));
+  }
 
-    public LapTime createLapTimeWithNoIntermediate(long i, boolean loop, Instant startDate) {
+  public LapTime createLapTimeWithNoIntermediate(long i, boolean loop, Instant startDate) {
     LapTime laptime = new LapTime();
     laptime.id = i;
     Instant time = startDate;
@@ -316,7 +316,7 @@ public class TestLapTimeCreator {
     Ping ping = new Ping();
     Chronometer chrono = new Chronometer();
     ping.setChrono(chrono);
-    ping.setDateTime(time);
+    ping.setInstant(time);
     laptime.addIntermediates(ping);
     Pilot p = new Pilot();
     p.id = 1L;
@@ -345,7 +345,7 @@ public class TestLapTimeCreator {
       Ping ping = new Ping();
       Chronometer chrono = new Chronometer();
       ping.setChrono(chrono);
-      ping.setDateTime(time.plus(Duration.ofMinutes(j * 10L)));
+      ping.setInstant(time.plus(Duration.ofMinutes(j * 10L)));
       laptime.addIntermediates(ping);
     }
 
@@ -364,7 +364,7 @@ public class TestLapTimeCreator {
     Ping ping = new Ping();
     Chronometer chrono = new Chronometer();
     ping.setChrono(chrono);
-    ping.setDateTime(time);
+    ping.setInstant(time);
     laptime.addIntermediates(ping);
     Pilot p = new Pilot();
     p.id = pilotId;

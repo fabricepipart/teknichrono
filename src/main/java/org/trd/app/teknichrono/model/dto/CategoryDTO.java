@@ -1,17 +1,14 @@
 package org.trd.app.teknichrono.model.dto;
 
+import org.trd.app.teknichrono.model.jpa.Category;
+import org.trd.app.teknichrono.model.jpa.Pilot;
+
+import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.EntityManager;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import org.trd.app.teknichrono.model.jpa.Category;
-import org.trd.app.teknichrono.model.jpa.Pilot;
-
-@XmlRootElement
 public class CategoryDTO {
 
   private long id;

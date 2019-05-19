@@ -1,14 +1,11 @@
 package org.trd.app.teknichrono.model.dto;
 
+import org.trd.app.teknichrono.model.jpa.Pilot;
+
+import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import org.trd.app.teknichrono.model.jpa.Pilot;
-
-@XmlRootElement // TODO remove all @XmlRootElement
 public class PilotDTO {
 
   private long id;
