@@ -24,7 +24,7 @@ public class LapTimeFilter {
     // Needs to be done here since we did not have all info before
     Map<Long, List<LapTimeDTO>> lapsPerLocation = new HashMap<>();
     for (LapTimeDTO dto : results) {
-      if (dto.getDuration() != null && dto.getDuration().compareTo(dto.getDuration()) > 0) {
+      if (dto.getDuration() != null && dto.getDuration().compareTo(Duration.ZERO) > 0) {
         NestedLocationDTO location = dto.getSession().getLocation();
         if (lapsPerLocation.containsKey(location.getId())) {
           lapsPerLocation.get(location.getId()).add(dto);
@@ -47,7 +47,7 @@ public class LapTimeFilter {
     for (LapTimeDTO lapTimeDTO : results) {
       NestedLocationDTO location = lapTimeDTO.getSession().getLocation();
       Duration averageOfLocation = averagePerLocation.get(location.getId());
-      if (averageOfLocation != null && lapTimeDTO.getDuration().compareTo(Duration.ZERO) > 0) {
+      if (averageOfLocation != null && lapTimeDTO.getDuration() != null && lapTimeDTO.getDuration().compareTo(Duration.ZERO) > 0) {
         if (lapTimeDTO.getDuration().compareTo(averageOfLocation.multipliedBy(ACCEPTANCE_FACTOR)) > 0) {
           logger.info("Discarding lap ID " + lapTimeDTO.getId()
               + " since it is too long (" + lapTimeDTO.getDuration() +
@@ -69,7 +69,7 @@ public class LapTimeFilter {
     Map<Long, LapTimeDTO> bests = new HashMap<>();
     List<LapTimeDTO> toRemove = new ArrayList<>();
     for (LapTimeDTO lapTimeDTO : results) {
-      if (lapTimeDTO.getDuration().compareTo(Duration.ZERO) <= 0) {
+      if (lapTimeDTO.getDuration() == null || lapTimeDTO.getDuration().compareTo(Duration.ZERO) <= 0) {
         toRemove.add(lapTimeDTO);
         continue;
       }

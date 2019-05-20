@@ -7,17 +7,19 @@ import java.util.Comparator;
 
 /**
  * Order by Duration then lap start
+ * <p>
+ * Laps with no duration are considered the greater (like infinite duration)
  */
 public class LapTimeDTOComparator implements Comparator<LapTimeDTO> {
 
   @Override
   public int compare(LapTimeDTO l1, LapTimeDTO l2) {
-    if (l1.getDuration().compareTo(Duration.ZERO) <= 0) {
-      if (l2.getDuration().compareTo(Duration.ZERO) <= 0) {
+    if (l1.getDuration() == null || l1.getDuration().compareTo(Duration.ZERO) <= 0) {
+      if (l2.getDuration() == null || l2.getDuration().compareTo(Duration.ZERO) <= 0) {
         return compareStartDate(l1, l2);
       }
       return 1;
-    } else if (l2.getDuration().compareTo(Duration.ZERO) <= 0) {
+    } else if (l2.getDuration() == null || l2.getDuration().compareTo(Duration.ZERO) <= 0) {
       return -1;
     } else {
       return l1.getDuration().compareTo(l2.getDuration());

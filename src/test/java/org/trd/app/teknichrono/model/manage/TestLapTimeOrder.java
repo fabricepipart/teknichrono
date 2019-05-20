@@ -16,6 +16,7 @@ import org.trd.app.teknichrono.model.jpa.TestLapTimeCreator;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class TestLapTimeOrder {
@@ -256,7 +257,7 @@ public class TestLapTimeOrder {
     Duration previousDuration = Duration.ZERO;
     Instant previousStart = Instant.MIN;
     for (LapTimeDTO l : laps) {
-      if (l.getDuration().compareTo(Duration.ZERO) > 0) {
+      if (l.getDuration() != null && l.getDuration().compareTo(Duration.ZERO) > 0) {
         Assert.assertTrue(l.getDuration().compareTo(previousDuration) >= 0);
         previousDuration = l.getDuration();
       } else {
@@ -287,16 +288,35 @@ public class TestLapTimeOrder {
     LapTimeOrder order = new LapTimeOrder();
     List<LapTimeDTO> laps = dtoCreator.createLaps();
     order.orderByDuration(laps);
+    laps.removeIf(l -> l.getDuration() == null);
     Duration previousGap = null;
 
     for (LapTimeDTO l : laps) {
       if (previousGap == null) {
         Assert.assertEquals(Duration.ZERO, l.getGapWithBest());
-      }
-      if (l.getDuration().compareTo(Duration.ZERO) > 0) {
+      } else if (l.getDuration() != null && l.getDuration().compareTo(Duration.ZERO) > 0) {
         Assert.assertTrue(l.getGapWithBest().compareTo(previousGap) >= 0);
       }
       previousGap = l.getGapWithBest();
+    }
+  }
+
+  @Test
+  public void lapsWithNoDurationAreLargest() {
+    LapTimeOrder order = new LapTimeOrder();
+    List<LapTimeDTO> laps = dtoCreator.createLaps();
+    order.orderByDuration(laps);
+    Collections.reverse(laps);
+    boolean firstWithNonNullDuration = false;
+
+    for (LapTimeDTO l : laps) {
+      if (firstWithNonNullDuration) {
+        Assert.assertNotNull(l.getDuration());
+      } else {
+        if (l.getDuration() != null) {
+          firstWithNonNullDuration = true;
+        }
+      }
     }
   }
 }

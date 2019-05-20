@@ -31,7 +31,7 @@ public class LapTimeOrder {
         lapTimeDTO.setGapWithPrevious(Duration.ZERO);
       } else {
         Duration lapDuration = lapTimeDTO.getDuration();
-        if (lapDuration.compareTo(Duration.ZERO) > 0) {
+        if (lapDuration != null && lapDuration.compareTo(Duration.ZERO) > 0) {
           lapTimeDTO.setGapWithBest(lapDuration.minus(best).abs());
           lapTimeDTO.setGapWithPrevious(lapDuration.minus(previous).abs());
         }

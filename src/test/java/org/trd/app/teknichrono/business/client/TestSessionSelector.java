@@ -30,13 +30,13 @@ public class TestSessionSelector {
 
   @Before
   public void prepare() {
-    chrono.id++;
+    chrono.id = id++;
     ping.setChrono(chrono);
-    ping.id++;
+    ping.id = id++;
     ping.setInstant(now);
-    pilot.id++;
+    pilot.id = id++;
     beacon.setPilot(pilot);
-    beacon.id++;
+    beacon.id = id++;
     ping.setBeacon(beacon);
   }
 
