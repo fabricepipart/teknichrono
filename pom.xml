@@ -21,7 +21,7 @@
         <fabric8.openshift.enableAutomaticTrigger>true</fabric8.openshift.enableAutomaticTrigger>
 
         <version.quarkus>0.15.0</version.quarkus>
-        <selma.version>1.0</selma.version>
+        <mapstruct.version>1.3.0.Final</mapstruct.version>
         <version.thorntail>2.2.1.Final</version.thorntail> <!-- TODO to remove -->
         <version.mysql>5.1.38</version.mysql>
         <version.h2>1.4.187</version.h2>
@@ -92,23 +92,22 @@
 
         <!-- Object mapping -->
         <dependency>
-            <groupId>fr.xebia.extras</groupId>
-            <artifactId>selma</artifactId>
-            <version>${selma.version}</version>
-        </dependency>
-        <!-- Selma annotation processor (compile time only) -->
-        <dependency>
-            <groupId>fr.xebia.extras</groupId>
-            <artifactId>selma-processor</artifactId>
-            <version>${selma.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.8</version>
             <!-- FIXME should be provided but then Intellij IDEA complains about the imports -->
             <!--            <scope>provided</scope>-->
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>${mapstruct.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -138,17 +137,6 @@
         </resources>
         <finalName>${project.artifactId}</finalName>
         <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <compilerArguments>
-                        <!-- Ensures Lombok annotation processor runs before Selma ones -->
-                        <processor>
-                            lombok.launch.AnnotationProcessorHider$AnnotationProcessor,fr.xebia.extras.selma.codegen.MapperProcessor
-                        </processor>
-                    </compilerArguments>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>io.quarkus</groupId>
                 <artifactId>quarkus-maven-plugin</artifactId>

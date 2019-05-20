@@ -1,8 +1,8 @@
 package org.trd.app.teknichrono.model.dto;
 
-import fr.xebia.extras.selma.Selma;
 import lombok.Data;
-import org.trd.app.teknichrono.model.dto.mapper.SessionMapper;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 import org.trd.app.teknichrono.model.jpa.Session;
 
 import java.time.Instant;
@@ -13,8 +13,6 @@ import java.util.Set;
 
 @Data
 public class SessionDTO {
-
-    private final static SessionMapper MAPPER = Selma.builder(SessionMapper.class).build();
 
     private Long id;
     private Instant start;
@@ -27,6 +25,13 @@ public class SessionDTO {
     private NestedLocationDTO location;
     private NestedEventDTO event = null;
     private Set<NestedPilotDTO> pilots = new HashSet<>();
+
+    @Mapper
+    interface ModelMapper {
+        SessionDTO asSessionDto(Session session);
+    }
+
+    private final static ModelMapper  MAPPER = Mappers.getMapper(ModelMapper.class);
 
     public static SessionDTO fromSession(Session session) {
         return MAPPER.asSessionDto(session);
