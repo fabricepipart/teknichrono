@@ -1,6 +1,5 @@
 package org.trd.app.teknichrono.rest;
 
-import org.jboss.logging.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,10 +9,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.trd.app.teknichrono.model.jpa.Beacon;
+import org.trd.app.teknichrono.model.jpa.BeaconRepository;
 import org.trd.app.teknichrono.model.jpa.Pilot;
+import org.trd.app.teknichrono.model.jpa.PilotRepository;
 import org.trd.app.teknichrono.model.jpa.Ping;
+import org.trd.app.teknichrono.model.jpa.PingRepository;
 
-import javax.persistence.EntityManager;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.RuntimeDelegate;
@@ -30,7 +31,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class TestBeaconEndpoint {
 
-  private long id = 1;
+  private long id = 1L;
 
   @Mock
   private RuntimeDelegate runtimeDelegate;
@@ -42,20 +43,21 @@ public class TestBeaconEndpoint {
   @Mock
   private UriBuilder uriBuilder;
 
-  private URI uri;
+  @Mock
+  private BeaconRepository beaconRepository;
 
   @Mock
-  private Logger logger;
+  private PilotRepository pilotRepository;
 
   @Mock
-  private EntityManager em;
+  private PingRepository pingRepository;
 
   @InjectMocks
   private BeaconEndpoint endpoint;
 
   @Before
   public void setUp() throws Exception {
-    uri = new URI("");
+    URI uri = new URI("");
     RuntimeDelegate.setInstance(runtimeDelegate);
     when(runtimeDelegate.createUriBuilder()).thenReturn(uriBuilder);
     when(uriBuilder.path(any(Class.class))).thenReturn(uriBuilder);
@@ -71,16 +73,16 @@ public class TestBeaconEndpoint {
   public void createsBeacon() {
     Beacon entity = newBeacon(999, -1);
     Response r = endpoint.create(entity);
-    verify(em).persist(entity);
+    verify(beaconRepository).persist(entity);
     Assert.assertEquals(response, r);
   }
 
   @Test
   public void createsBeaconWithCompletePilotIfIdProvided() {
     Beacon entity = newBeacon(999, 9);
-    Response r = endpoint.create(entity);
-    verify(em).find(Pilot.class, 9);
-    verify(em).persist(entity);
+    endpoint.create(entity);
+    verify(pilotRepository).findById(9L);
+    verify(beaconRepository).persist(entity);
   }
 
   public Beacon newBeacon(long number, long pilotId) {
@@ -106,23 +108,21 @@ public class TestBeaconEndpoint {
   @Test
   public void deleteById() {
     Beacon entity = newBeacon(999, 9);
-    when(em.find(Beacon.class, entity.id)).thenReturn(entity);
-    Response r = endpoint.deleteById(entity.id);
-    verify(em).remove(entity);
+    when(beaconRepository.findById(entity.id)).thenReturn(entity);
+    endpoint.deleteById(entity.id);
+    verify(beaconRepository).delete(entity);
   }
 
   @Test
   public void deleteByIdRemovesBeaconFromPilot() {
     Beacon entity = newBeacon(999, 9);
-    when(em.find(Beacon.class, entity.id)).thenReturn(entity);
-    Response r = endpoint.deleteById(entity.id);
-    verify(em).remove(entity);
+    when(beaconRepository.findById(entity.id)).thenReturn(entity);
+    endpoint.deleteById(entity.id);
+    verify(beaconRepository).delete(entity);
     ArgumentCaptor<Pilot> captor = ArgumentCaptor.forClass(Pilot.class);
-    verify(em, atLeastOnce()).persist(captor.capture());
-    List values = captor.getAllValues();
-    values.removeIf(e -> !(e instanceof Pilot));
-    List<Pilot> pilotValues = (List<Pilot>) values;
-    for (Pilot p : pilotValues) {
+    verify(pilotRepository, atLeastOnce()).persist(captor.capture());
+    List<Pilot> pilots = captor.getAllValues();
+    for (Pilot p : pilots) {
       Assert.assertNull(p.getCurrentBeacon());
     }
   }
@@ -130,16 +130,14 @@ public class TestBeaconEndpoint {
   @Test
   public void deleteByIdRemovesBeaconFromPings() {
     Beacon entity = newBeacon(999, 9);
-    when(em.find(Beacon.class, entity.id)).thenReturn(entity);
-    Response r = endpoint.deleteById(entity.id);
-    verify(em).remove(entity);
-    ArgumentCaptor captor = ArgumentCaptor.forClass(Ping.class);
-    verify(em, atLeastOnce()).persist(captor.capture());
-    List values = captor.getAllValues();
-    values.removeIf(e -> !(e instanceof Ping));
-    List<Ping> pingValues = (List<Ping>) values;
-    Assert.assertEquals(entity.getPings().size(), pingValues.size());
-    for (Ping p : pingValues) {
+    when(beaconRepository.findById(entity.id)).thenReturn(entity);
+    endpoint.deleteById(entity.id);
+    verify(beaconRepository).delete(entity);
+    ArgumentCaptor<Ping> captor = ArgumentCaptor.forClass(Ping.class);
+    verify(pingRepository, atLeastOnce()).persist(captor.capture());
+    List<Ping> pings = captor.getAllValues();
+    Assert.assertEquals(entity.getPings().size(), pings.size());
+    for (Ping p : pings) {
       Assert.assertNull(p.getBeacon());
     }
   }
@@ -147,8 +145,8 @@ public class TestBeaconEndpoint {
   @Test
   public void deleteByIdReturnsErrorIfBeaconDoesNotExist() {
     Beacon entity = newBeacon(999, 9);
-    Response r = endpoint.deleteById(entity.id);
-    verify(em, never()).remove(any());
+    endpoint.deleteById(entity.id);
+    verify(beaconRepository, never()).delete(any());
   }
 
   @Test

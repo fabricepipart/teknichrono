@@ -92,9 +92,4 @@ public class Beacon extends PanacheEntity {
     result += "number: " + number;
     return result;
   }
-
-
-  public static Beacon findByNumber(long number) {
-    return find("number", number).firstResult();
-  }
 }

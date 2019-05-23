@@ -1,17 +1,28 @@
 package org.trd.app.teknichrono.rest;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.dto.BeaconDTO;
 import org.trd.app.teknichrono.model.jpa.Beacon;
+import org.trd.app.teknichrono.model.jpa.BeaconRepository;
 import org.trd.app.teknichrono.model.jpa.Pilot;
+import org.trd.app.teknichrono.model.jpa.PilotRepository;
 import org.trd.app.teknichrono.model.jpa.Ping;
+import org.trd.app.teknichrono.model.jpa.PingRepository;
 import org.trd.app.teknichrono.util.DurationLogger;
 
+import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
 import javax.transaction.Transactional;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -27,16 +38,35 @@ public class BeaconEndpoint {
 
   private static final Logger LOGGER = Logger.getLogger(BeaconEndpoint.class);
 
+  private final BeaconRepository beaconRepository;
+
+  private final PilotRepository pilotRepository;
+
+  private final PingRepository pingRepository;
+
+  public BeaconEndpoint() {
+    // needed by CDI
+    this(null, null, null);
+  }
+
+  @Inject
+  BeaconEndpoint(BeaconRepository beaconRepository, PilotRepository pilotRepository, PingRepository pingRepository) {
+    this.beaconRepository = beaconRepository;
+    this.pilotRepository = pilotRepository;
+    this.pingRepository = pingRepository;
+  }
+
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Transactional
   public Response create(Beacon entity) {
     DurationLogger perf = DurationLogger.get(LOGGER).start("Create beacon " + entity.getNumber());
     if (entity.getPilot() != null && entity.getPilot().id > 0) {
-      Pilot pilot = Pilot.findById(entity.getPilot().id);
+      Pilot pilot = pilotRepository.findById(entity.getPilot().id);
       entity.setPilot(pilot);
+      pilotRepository.persist(pilot);
     }
-    Beacon.persist(entity);
+    beaconRepository.persist(entity);
     URI location = UriBuilder.fromResource(BeaconEndpoint.class).path(String.valueOf(entity.id)).build();
     Response toReturn = Response.created(location).build();
     perf.end();
@@ -48,23 +78,23 @@ public class BeaconEndpoint {
   @Transactional
   public Response deleteById(@PathParam("id") long id) {
     DurationLogger perf = DurationLogger.get(LOGGER).start("Delete beacon id=" + id);
-    Beacon entity = Beacon.findById(id);
+    Beacon entity = beaconRepository.findById(id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
     Pilot associatedPilot = entity.getPilot();
     if (associatedPilot != null) {
       associatedPilot.setCurrentBeacon(null);
-      entity.persist(associatedPilot);
+      pilotRepository.persist(associatedPilot);
     }
     List<Ping> pings = entity.getPings();
     if (pings != null) {
       for (Ping ping : pings) {
         ping.setBeacon(null);
-        entity.persist(ping);
+        pingRepository.persist(ping);
       }
     }
-    entity.delete();
+    beaconRepository.delete(entity);
     perf.end();
     return Response.noContent().build();
   }
@@ -83,8 +113,8 @@ public class BeaconEndpoint {
     return Response.ok(entity).build();
   }
 
-  public BeaconDTO findBeaconById(long id) {
-    Beacon entity = Beacon.findById(id);
+  private BeaconDTO findBeaconById(long id) {
+    Beacon entity = beaconRepository.findById(id);
     if (entity != null) {
       return new BeaconDTO(entity);
     }
@@ -98,7 +128,7 @@ public class BeaconEndpoint {
   @Transactional
   public Response findBeaconNumber(@PathParam("number") long number) {
     DurationLogger perf = DurationLogger.get(LOGGER).start("Find beacon number " + number);
-    Beacon entity = Beacon.findByNumber(number);
+    Beacon entity = beaconRepository.findByNumber(number);
     if (entity == null) {
       LOGGER.warn("Beacon Number=" + number + " not found");
       return Response.status(Status.NOT_FOUND).build();
@@ -113,7 +143,7 @@ public class BeaconEndpoint {
   @Transactional
   public List<BeaconDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
     DurationLogger perf = DurationLogger.get(LOGGER).start("Find all beacons");
-    PanacheQuery<PanacheEntityBase> query = Beacon.findAll();
+    PanacheQuery<Beacon> query = beaconRepository.findAll();
     if (startPosition != null && maxResult != null) {
       int pageIndex = startPosition / maxResult;
       int pageSize = maxResult;
@@ -138,7 +168,7 @@ public class BeaconEndpoint {
       perf.end();
       return Response.status(Status.CONFLICT).entity(entity).build();
     }
-    Beacon beacon = Beacon.findById(id);
+    Beacon beacon = beaconRepository.findById(id);
     if (beacon == null) {
       perf.end();
       return Response.status(Status.NOT_FOUND).build();
@@ -146,7 +176,7 @@ public class BeaconEndpoint {
 
     // Update of pilot
     if (entity.getPilot() != null && entity.getPilot().id > 0) {
-      Pilot pilot = Pilot.findById(entity.getPilot().id);
+      Pilot pilot = pilotRepository.findById(entity.getPilot().id);
       beacon.setPilot(pilot);
     }
     beacon.setNumber(entity.getNumber());
