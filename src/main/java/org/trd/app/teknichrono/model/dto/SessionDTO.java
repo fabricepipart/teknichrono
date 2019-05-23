@@ -2,7 +2,9 @@ package org.trd.app.teknichrono.model.dto;
 
 import lombok.Data;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.model.jpa.Session;
 
 import java.time.Instant;
@@ -29,6 +31,9 @@ public class SessionDTO {
     @Mapper
     interface ModelMapper {
         SessionDTO asSessionDto(Session session);
+
+        @Mapping(source = "currentBeacon.number", target = "beaconNumber")
+        NestedPilotDTO asNestedPilotDto(Pilot pilot);
     }
 
     private final static ModelMapper  MAPPER = Mappers.getMapper(ModelMapper.class);
