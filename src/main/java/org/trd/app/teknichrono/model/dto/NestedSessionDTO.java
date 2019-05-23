@@ -34,7 +34,7 @@ public class NestedSessionDTO implements Serializable {
       this.name = entity.getName();
       this.loopTrack = entity.getLocation().isLoopTrack();
       this.chronometersCount = entity.getChronometers().size();
-      this.location = new NestedLocationDTO(entity.getLocation());
+      this.location = NestedLocationDTO.fromLocation(entity.getLocation());
     }
   }
 

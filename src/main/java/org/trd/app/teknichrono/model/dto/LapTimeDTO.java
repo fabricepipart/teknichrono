@@ -45,7 +45,7 @@ public class LapTimeDTO implements Serializable {
       this.id = entity.id;
       this.version = entity.getVersion();
       if (entity.getPilot() != null) {
-        this.pilot = new NestedPilotDTO(entity.getPilot());
+        this.pilot = NestedPilotDTO.fromPilot(entity.getPilot());
       }
       if (entity.getSession() != null) {
         this.session = new NestedSessionDTO(entity.getSession());

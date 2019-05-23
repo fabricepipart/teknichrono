@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -116,7 +117,7 @@ public class BeaconEndpoint {
   private BeaconDTO findBeaconById(long id) {
     Beacon entity = beaconRepository.findById(id);
     if (entity != null) {
-      return new BeaconDTO(entity);
+      return BeaconDTO.fromBeacon(entity);
     }
     LOGGER.warn("Beacon ID=" + id + " not found");
     return null;
@@ -133,7 +134,7 @@ public class BeaconEndpoint {
       LOGGER.warn("Beacon Number=" + number + " not found");
       return Response.status(Status.NOT_FOUND).build();
     }
-    BeaconDTO dto = new BeaconDTO(entity);
+    BeaconDTO dto = BeaconDTO.fromBeacon(entity);
     perf.end();
     return Response.ok(dto).build();
   }
@@ -149,10 +150,9 @@ public class BeaconEndpoint {
       int pageSize = maxResult;
       query = query.page(pageIndex, pageSize);
     }
-    List<Beacon> results = query.list();
-    List<BeaconDTO> converted = BeaconDTO.convert(results);
+    List<BeaconDTO> results = query.stream().map(BeaconDTO::fromBeacon).collect(Collectors.toList());
     perf.end();
-    return converted;
+    return results;
   }
 
   @PUT

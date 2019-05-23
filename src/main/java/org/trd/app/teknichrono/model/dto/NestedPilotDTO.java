@@ -1,52 +1,21 @@
 package org.trd.app.teknichrono.model.dto;
 
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import lombok.Data;
+import org.trd.app.teknichrono.model.jpa.Pilot;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import org.trd.app.teknichrono.model.jpa.Pilot;
+@Data
+public class NestedPilotDTO {
 
-public class NestedPilotDTO implements Serializable {
-
-  /**
-   *
-   */
-  private static final long serialVersionUID = -6351473312188582718L;
   private Long id;
   private String firstName;
   private String lastName;
   private long beaconNumber;
 
-  public NestedPilotDTO() {
-  }
-
-  public NestedPilotDTO(final Pilot entity) {
-    if (entity != null) {
-      this.id = entity.id;
-      this.firstName = entity.getFirstName();
-      this.lastName = entity.getLastName();
-      if (entity.getCurrentBeacon() != null) {
-        this.beaconNumber = entity.getCurrentBeacon().getNumber();
-      }
-    }
-  }
-
-  @Override
-  public String toString() {
-    return this.firstName + ' ' + this.lastName;
-  }
-
-  public static Set<NestedPilotDTO> fromPilots(Set<Pilot> pilots) {
-    Set<NestedPilotDTO> toReturn = new HashSet<NestedPilotDTO>();
-    if (pilots != null) {
-      for (Pilot p : pilots) {
-        toReturn.add(new NestedPilotDTO(p));
-      }
-    }
-    return toReturn;
+  public static NestedPilotDTO fromPilot(Pilot pilot) {
+    return DtoMapper.INSTANCE.asNestedPilotDto(pilot);
   }
 
   public Pilot fromDTO(Pilot entity, EntityManager em) {
@@ -68,37 +37,5 @@ public class NestedPilotDTO implements Serializable {
     entity.setLastName(this.lastName);
     entity = em.merge(entity);
     return entity;
-  }
-
-  public long getId() {
-    return this.id;
-  }
-
-  public void setId(final long id) {
-    this.id = id;
-  }
-
-  public String getFirstName() {
-    return this.firstName;
-  }
-
-  public void setFirstName(final String firstName) {
-    this.firstName = firstName;
-  }
-
-  public String getLastName() {
-    return this.lastName;
-  }
-
-  public void setLastName(final String lastName) {
-    this.lastName = lastName;
-  }
-
-  public long getBeaconNumber() {
-    return beaconNumber;
-  }
-
-  public void setBeaconNumber(long beaconNumber) {
-    this.beaconNumber = beaconNumber;
   }
 }

@@ -27,6 +27,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -94,7 +95,7 @@ public class ChronometerEndpoint {
       if (entity == null) {
         return Response.status(Status.NOT_FOUND).build();
       }
-      ChronometerDTO dto = new ChronometerDTO(entity);
+      ChronometerDTO dto = ChronometerDTO.fromChronometer(entity);
       return Response.ok(dto).build();
     }
   }
@@ -116,7 +117,7 @@ public class ChronometerEndpoint {
       if (entity == null) {
         return Response.status(Status.NOT_FOUND).build();
       }
-      ChronometerDTO dto = new ChronometerDTO(entity);
+      ChronometerDTO dto = ChronometerDTO.fromChronometer(entity);
       return Response.ok(dto).build();
     }
   }
@@ -133,9 +134,9 @@ public class ChronometerEndpoint {
       if (maxResult != null) {
         findAllQuery.setMaxResults(maxResult);
       }
-      final List<Chronometer> results = findAllQuery.getResultList();
-      final List<ChronometerDTO> converted = ChronometerDTO.convert(results);
-      return converted;
+      return findAllQuery.getResultStream()
+              .map(ChronometerDTO::fromChronometer)
+              .collect(Collectors.toList());
     }
   }
 

@@ -45,6 +45,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -185,7 +186,7 @@ public class LapTimeEndpoint {
     final List<LapTimeDTO> results = getAllLapsDTOOrderedByStartDate(pilotId, sessionId, locationId, eventId,
         categoryId, startPosition, maxResult);
 
-    Set<NestedPilotDTO> pilots = NestedPilotDTO.fromPilots(session.getPilots());
+    Set<NestedPilotDTO> pilots = session.getPilots().stream().map(NestedPilotDTO::fromPilot).collect(Collectors.toSet());
     if (session.getSessionType() == SessionType.RACE) {
       if (pilotId != null) {
         lapTimeManager.arrangeDisplay(results, LapTimeDisplay.KEEP_COMPLETE);

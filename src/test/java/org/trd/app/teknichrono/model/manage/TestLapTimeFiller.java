@@ -127,11 +127,11 @@ public class TestLapTimeFiller {
     List<LapTimeDTO> laps = creator.createLaps();
     Set<NestedPilotDTO> pilots = new HashSet<>();
     NestedPilotDTO pilot = new NestedPilotDTO();
-    pilot.setId(999);
+    pilot.setId(999L);
     pilots.add(pilot);
     filler.ensureAllPilotsPresent(laps, pilots);
     Assert.assertEquals(31, laps.size());
-    laps.removeIf(l -> l.getPilot().getId() != 999);
+    laps.removeIf(l -> l.getPilot().getId() != 999L);
     Assert.assertEquals(1, laps.size());
   }
 

@@ -1,76 +1,16 @@
 package org.trd.app.teknichrono.model.dto;
 
+import lombok.Data;
 import org.trd.app.teknichrono.model.jpa.Location;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import java.io.Serializable;
-
-public class NestedLocationDTO implements Serializable {
-
-  /**
-   *
-   */
-  private static final long serialVersionUID = -1377429742860544608L;
+@Data
+public class NestedLocationDTO {
 
   private Long id;
   private int version;
   private String name;
 
-  public NestedLocationDTO() {
+  public static NestedLocationDTO fromLocation(Location location) {
+    return DtoMapper.INSTANCE.asNestedLocationDto(location);
   }
-
-  public NestedLocationDTO(final Location entity) {
-    if (entity != null) {
-      this.id = entity.id;
-      this.version = entity.getVersion();
-      this.name = entity.getName();
-    }
-  }
-
-  public Location fromDTO(Location entity, EntityManager em) {
-    if (entity == null) {
-      entity = new Location();
-    }
-    if (id != null) {
-      TypedQuery<Location> findByIdQuery = em.createQuery("SELECT DISTINCT e FROM Location e WHERE e.id = :entityId",
-          Location.class);
-      findByIdQuery.setParameter("entityId", this.id);
-      try {
-        entity = findByIdQuery.getSingleResult();
-      } catch (javax.persistence.NoResultException nre) {
-        entity = null;
-      }
-      return entity;
-    }
-    entity.setVersion(this.version);
-    entity.setName(name);
-    entity = em.merge(entity);
-    return entity;
-  }
-
-  public Long getId() {
-    return this.id;
-  }
-
-  public void setId(final Long id) {
-    this.id = id;
-  }
-
-  public int getVersion() {
-    return this.version;
-  }
-
-  public void setVersion(final int version) {
-    this.version = version;
-  }
-
-  public String getName() {
-    return this.name;
-  }
-
-  public void setName(final String name) {
-    this.name = name;
-  }
-
 }
