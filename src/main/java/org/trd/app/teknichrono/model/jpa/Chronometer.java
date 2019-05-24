@@ -71,6 +71,23 @@ public class Chronometer extends PanacheEntity  {
     this.sessions = sessions;
   }
 
+  public Ping getLastestPing() {
+    if (pings != null) {
+      return null;
+    }
+    Ping lastestPing = null;
+    for (Ping p : pings){
+      if(p.getInstant() != null){
+        boolean moreRecent = lastestPing != null && lastestPing.getInstant().isBefore(p.getInstant());
+        boolean isFirst = lastestPing == null;
+        if(moreRecent || isFirst){
+          lastestPing = p;
+        }
+      }
+    }
+    return lastestPing;
+  }
+
   /* ===================== Other ======================== */
   @Override
   public boolean equals(Object obj) {

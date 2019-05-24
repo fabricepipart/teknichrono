@@ -8,6 +8,7 @@ import org.trd.app.teknichrono.model.jpa.TestLapTimeCreator;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TestLapTimeDTOCreator {
 
@@ -43,17 +44,9 @@ public class TestLapTimeDTOCreator {
     return laptime;
   }
 
-  public List<LapTimeDTO> convertList(List<LapTime> laps) {
-    List<LapTimeDTO> toReturn = new ArrayList<>();
-    for (LapTime l : laps) {
-      toReturn.add(new LapTimeDTO(l));
-    }
-    return toReturn;
-  }
-
 
   public List<LapTimeDTO> createLaps() {
-    List<LapTimeDTO> laps = new ArrayList();
+    List<LapTimeDTO> laps = new ArrayList<>();
     // Pilots with 1 lap or several
     // Pilots with laps in order and not in order
     // Pilots with laps contiguous and not contiguous
@@ -123,20 +116,17 @@ public class TestLapTimeDTOCreator {
   }
 
   public List<LapTimeDTO> createLapsWithIntermediates() {
-    List laps = (new TestLapTimeCreator()).createLapsWithIntermediates();
-    return convertList(laps);
+    List<LapTime> laps = new TestLapTimeCreator().createLapsWithIntermediates();
+    return laps.stream().map(LapTimeDTO::fromLapTime).collect(Collectors.toList());
   }
-
 
   public List<LapTimeDTO> createRaceLapsWithIntermediates() {
     TestLapTimeCreator testLapTimeCreator = new TestLapTimeCreator();
     testLapTimeCreator.nextLocation(true);
-    List laps = testLapTimeCreator.createLapsWithIntermediates();
+    List<LapTime> laps = testLapTimeCreator.createLapsWithIntermediates();
     LapTimeConverter converter = new LapTimeConverter();
-    List toReturn = converter.convert(laps);
-    (new LapTimeFiller()).fillLapsNumber(toReturn);
+    List<LapTimeDTO> toReturn = converter.convert(laps);
+    new LapTimeFiller().fillLapsNumber(toReturn);
     return toReturn;
   }
-
-
 }

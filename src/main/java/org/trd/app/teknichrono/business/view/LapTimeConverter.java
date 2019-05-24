@@ -31,7 +31,7 @@ public class LapTimeConverter {
     Map<Long, List<LapTimeDTO>> lapsPerPilot = new HashMap<>();
     final List<LapTimeDTO> results = new ArrayList<LapTimeDTO>();
     for (LapTime searchResult : lapTimes) {
-      LapTimeDTO dto = new LapTimeDTO(searchResult);
+      LapTimeDTO dto = LapTimeDTO.fromLapTime(searchResult);
       NestedSessionDTO session = dto.getSession();
       NestedPilotDTO pilot = dto.getPilot();
       if (pilot != null) {

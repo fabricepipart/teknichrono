@@ -21,7 +21,7 @@ public class LocationDTO {
       this.name = entity.getName();
       this.sessions = new ArrayList<>();
       if (entity.getSessions() != null) {
-        entity.getSessions().forEach(s -> sessions.add(new NestedSessionDTO(s)));
+        entity.getSessions().forEach(s -> sessions.add(NestedSessionDTO.fromSession(s)));
       }
     }
   }

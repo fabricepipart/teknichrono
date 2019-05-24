@@ -104,7 +104,7 @@ public class LapTimeEndpoint {
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    LapTimeDTO dto = new LapTimeDTO(entity);
+    LapTimeDTO dto = LapTimeDTO.fromLapTime(entity);
     return Response.ok(dto).build();
   }
 

@@ -134,7 +134,7 @@ public class EventEndpoint {
       em.persist(event);
       em.persist(session);
 
-      EventDTO dto = new EventDTO(event);
+      EventDTO dto = EventDTO.fromEvent(event);
       return Response.ok(dto).build();
     }
   }

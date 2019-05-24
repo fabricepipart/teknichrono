@@ -42,7 +42,7 @@ public class TestLapTimeConverter {
   private void checkNoNegativeDuration(LapTimeDTO lap) {
     Assert.assertTrue(lap.getDuration() == null || lap.getDuration().compareTo(Duration.ZERO) > 0);
     Assert.assertTrue(lap.getGapWithBest() == null || lap.getGapWithBest().compareTo(Duration.ZERO) >= 0);
-    for (SectorDTO s : lap.getIntermediates()) {
+    for (SectorDTO s : lap.getSectors()) {
 //      Assert.assertTrue(s.getStart() >= 0); // FIXME
       Assert.assertTrue("This intermediate duration is negative", s.getDuration().compareTo(Duration.ZERO) >= 0);
     }

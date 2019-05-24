@@ -97,7 +97,7 @@ public class TestLapTimeCreator {
   }
 
   public List<LapTime> createLapsWithIntermediates() {
-    List laps = new ArrayList();
+    List<LapTime> laps = new ArrayList<>();
     // Pilots with 1 lap
     // Pilots with lap before does not end
     // Pilots with lap after does not start
