@@ -14,6 +14,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class TestSessionSelector {
 
@@ -21,7 +22,7 @@ public class TestSessionSelector {
   private long id = 1;
   private Instant now = Instant.now();
 
-  SessionSelector selector = new SessionSelector();
+  private final SessionSelector selector = new SessionSelector();
 
   private Ping ping = new Ping();
   private Chronometer chrono = new Chronometer();
@@ -63,7 +64,7 @@ public class TestSessionSelector {
   public void picksNullIfNoSession() {
     List<Session> sessions = new ArrayList<>();
     Session session = selector.pickMostRelevantCurrent(sessions);
-    Assert.assertEquals(null, session);
+    Assert.assertNull(session);
   }
 
   private Session createSession(long start, long end) {
@@ -99,7 +100,7 @@ public class TestSessionSelector {
     Session s1 = addSession(2 * HOUR, 4 * HOUR);
     Session s2 = addSession(10 * HOUR, 20 * HOUR);
     Session session = selector.pickMostRelevant(ping);
-    Assert.assertTrue(s0.id == session.id || s1.id == session.id);
+    Assert.assertTrue(Objects.equals(s0.id, session.id) || Objects.equals(s1.id, session.id));
   }
 
   @Test
@@ -124,7 +125,7 @@ public class TestSessionSelector {
 
   @Test
   public void picksClosestIfPilotPartOfNoSession() {
-    List otherPilots = new ArrayList();
+    List<Pilot> otherPilots = new ArrayList<>();
     otherPilots.add(new Pilot());
     otherPilots.add(new Pilot());
     otherPilots.add(new Pilot());

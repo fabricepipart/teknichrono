@@ -53,7 +53,7 @@ import java.util.stream.Collectors;
 @Path("/laptimes")
 public class LapTimeEndpoint {
 
-  EntityManager em;
+  private final EntityManager em;
 
   @Inject
   public LapTimeEndpoint(EntityManager em) {
@@ -158,7 +158,7 @@ public class LapTimeEndpoint {
     String csvResult = null;
     StringWriter writer = new StringWriter();
     // TODO StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder<LapTimeDTO>(writer).withMappingStrategy(new LapTimeMappingStrategy()).build();
-    StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder<LapTimeDTO>(writer).build();
+    StatefulBeanToCsv<LapTimeDTO> beanToCsv = new StatefulBeanToCsvBuilder<LapTimeDTO>(writer).build();
     try {
       beanToCsv.write(results);
       csvResult = writer.toString();
@@ -245,8 +245,7 @@ public class LapTimeEndpoint {
                                                            Long eventId, Long categoryId, Integer startPosition, Integer maxResult) {
     final List<LapTime> searchResults = getAllLapsOrderedByStartDate(pilotId, sessionId, locationId, eventId,
         categoryId, startPosition, maxResult);
-    final List<LapTimeDTO> results = lapTimeConverter.convert(searchResults);
-    return results;
+    return lapTimeConverter.convert(searchResults);
   }
 
   private List<LapTime> getAllLapsOrderedByStartDate(Long pilotId, Long sessionId, Long locationId,
@@ -266,8 +265,7 @@ public class LapTimeEndpoint {
       findAllQuery.setMaxResults(maxResult);
     }
     whereClauseBuilder.applyClauses(findAllQuery);
-    final List<LapTime> searchResults = findAllQuery.getResultList();
-    return searchResults;
+    return findAllQuery.getResultList();
   }
 
   private WhereClauseBuilder buildWhereClause(Long pilotId, Long sessionId, Long locationId, Long eventId,
@@ -331,7 +329,7 @@ public class LapTimeEndpoint {
     }
     entity = dto.fromDTO(entity, em);
     try {
-      entity = em.merge(entity);
+      em.merge(entity);
     } catch (OptimisticLockException e) {
       return Response.status(Status.CONFLICT).entity(e.getEntity()).build();
     }

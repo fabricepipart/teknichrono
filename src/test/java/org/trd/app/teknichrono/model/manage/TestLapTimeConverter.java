@@ -1,6 +1,5 @@
 package org.trd.app.teknichrono.model.manage;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.trd.app.teknichrono.business.view.LapTimeConverter;
@@ -13,6 +12,8 @@ import org.trd.app.teknichrono.model.jpa.TestLapTimeCreator;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestLapTimeConverter {
 
@@ -40,11 +41,17 @@ public class TestLapTimeConverter {
   }
 
   private void checkNoNegativeDuration(LapTimeDTO lap) {
-    Assert.assertTrue(lap.getDuration() == null || lap.getDuration().compareTo(Duration.ZERO) > 0);
-    Assert.assertTrue(lap.getGapWithBest() == null || lap.getGapWithBest().compareTo(Duration.ZERO) >= 0);
+    if (lap.getDuration() != null) {
+      assertThat(lap.getDuration()).isGreaterThan(Duration.ZERO);
+    }
+    if (lap.getGapWithBest() != null) {
+      assertThat(lap.getGapWithBest()).isGreaterThanOrEqualTo(Duration.ZERO);
+    }
     for (SectorDTO s : lap.getSectors()) {
+      if (s.getDuration() != null) {
 //      Assert.assertTrue(s.getStart() >= 0); // FIXME
-      Assert.assertTrue("This intermediate duration is negative", s.getDuration().compareTo(Duration.ZERO) >= 0);
+        assertThat(s.getDuration()).isGreaterThanOrEqualTo(Duration.ZERO);
+      }
     }
   }
 
