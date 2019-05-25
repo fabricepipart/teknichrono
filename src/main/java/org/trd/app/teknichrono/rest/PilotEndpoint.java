@@ -1,6 +1,7 @@
 package org.trd.app.teknichrono.rest;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -87,7 +88,7 @@ public class PilotEndpoint {
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    PilotDTO dto = new PilotDTO(entity);
+    PilotDTO dto = PilotDTO.fromPilot(entity);
     return Response.ok(dto).build();
   }
 
@@ -110,7 +111,7 @@ public class PilotEndpoint {
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    PilotDTO dto = new PilotDTO(entity);
+    PilotDTO dto = PilotDTO.fromPilot(entity);
     return Response.ok(dto).build();
   }
 
@@ -126,9 +127,7 @@ public class PilotEndpoint {
     if (maxResult != null) {
       findAllQuery.setMaxResults(maxResult);
     }
-    final List<Pilot> results = findAllQuery.getResultList();
-    final List<PilotDTO> converted = PilotDTO.convert(results);
-    return converted;
+    return findAllQuery.getResultStream().map(PilotDTO::fromPilot).collect(Collectors.toList());
   }
 
   @POST
@@ -147,7 +146,7 @@ public class PilotEndpoint {
     pilot.setCurrentBeacon(beacon);
     em.persist(pilot);
     em.persist(beacon);
-    PilotDTO dto = new PilotDTO(pilot);
+    PilotDTO dto = PilotDTO.fromPilot(pilot);
     return Response.ok(dto).build();
   }
 

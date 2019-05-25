@@ -18,7 +18,7 @@ public class NestedPilotDTO {
     return DtoMapper.INSTANCE.asNestedPilotDto(pilot);
   }
 
-  public Pilot fromDTO(Pilot entity, EntityManager em) {
+  Pilot fromDTO(Pilot entity, EntityManager em) {
     if (entity == null) {
       entity = new Pilot();
     }

@@ -34,5 +34,4 @@ public class CategoryDTO {
     entity = em.merge(entity);
     return entity;
   }
-
 }

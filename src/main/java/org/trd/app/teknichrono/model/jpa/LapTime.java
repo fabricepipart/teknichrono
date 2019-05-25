@@ -10,6 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
+import javax.persistence.Transient;
 import javax.persistence.Version;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -32,20 +33,29 @@ public class LapTime extends PanacheEntity {
   @Column(columnDefinition = "TIMESTAMP(3)")
   private Instant startDate;
 
+  @Transient
+  private Instant startChronoInstant;
+
+  @Transient
+  private Instant endChronoInstant;
+
+  @Transient
+  private Instant lastChronoInstant;
+
   @ManyToOne(fetch = FetchType.LAZY)
   private Session session;
 
   @OneToMany
   @OrderColumn(name = "dateTime")
-  private List<Ping> intermediates = new ArrayList<Ping>();
+  private List<Ping> intermediates = new ArrayList<>();
 
   /* ===================== Getters and setters ======================== */
 
   public int getVersion() {
-    return this.version;
+    return version;
   }
 
-  public void setVersion(final int version) {
+  public void setVersion(int version) {
     this.version = version;
   }
 
@@ -58,19 +68,87 @@ public class LapTime extends PanacheEntity {
   }
 
   public Instant getStartDate() {
+    if (startDate == null && intermediates != null) {
+      recomputeDates();
+    }
     return startDate;
   }
 
   public void setStartDate(Instant captureDate) {
-    this.startDate = captureDate;
+    startDate = captureDate;
+  }
+
+  public Instant getStartChronoInstant() {
+    if (startChronoInstant == null && intermediates != null) {
+      recomputeDates();
+    }
+    return startChronoInstant;
+  }
+
+  public Instant getEndChronoInstant() {
+    if (endChronoInstant == null && intermediates != null) {
+      recomputeDates();
+    }
+    return endChronoInstant;
+  }
+
+  public Instant getLastChronoInstant() {
+    if (lastChronoInstant == null && intermediates != null) {
+      recomputeDates();
+    }
+    return lastChronoInstant;
+  }
+
+  public void recomputeDates() {
+    startDate = null;
+    intermediates.forEach(this::updateDates);
+  }
+
+  private void updateDates(Ping p) {
+    if (startDate == null || p.getInstant().isBefore(startDate)) {
+      startDate = p.getInstant();
+    }
+    if (session != null) {
+      long currentChronoIndex = session.getChronoIndex(p.getChrono());
+      if (startChronoInstant == null && currentChronoIndex == 0) {
+        startChronoInstant = p.getInstant();
+      }
+      if (endChronoInstant == null && !isLoopTrack() && currentChronoIndex == (session.getChronometers().size() - 1)) {
+        endChronoInstant = p.getInstant();
+      }
+    }
+    if (lastChronoInstant == null || p.getInstant().isAfter(lastChronoInstant)) {
+      lastChronoInstant = p.getInstant();
+    }
+  }
+
+  private boolean isLoopTrack() {
+    return session.getLocation() != null && session.getLocation().isLoopTrack();
   }
 
   public Session getSession() {
-    return this.session;
+    return session;
   }
 
-  public void setSession(final Session session) {
+  public void setSession(Session session) {
     this.session = session;
+  }
+
+  public List<Ping> getIntermediates() {
+    return intermediates;
+  }
+
+  public void setIntermediates(List<Ping> intermediates) {
+    this.intermediates = intermediates;
+  }
+
+  public void addIntermediates(Ping p) {
+    addIntermediates(intermediates.size(), p);
+  }
+
+  public void addIntermediates(int index, Ping p) {
+    updateDates(p);
+    intermediates.add(index, p);
   }
 
   @Override
@@ -80,35 +158,4 @@ public class LapTime extends PanacheEntity {
     result += "start: " + startDate;
     return result;
   }
-
-  public List<Ping> getIntermediates() {
-    return this.intermediates;
-  }
-
-  public void setIntermediates(final List<Ping> intermediates) {
-    this.intermediates = intermediates;
-  }
-
-  public void addIntermediates(Ping p) {
-    addIntermediates(this.intermediates.size(), p);
-  }
-
-  public void addIntermediates(int index, Ping p) {
-    updateStartDate(p);
-    this.intermediates.add(index, p);
-  }
-
-  private void updateStartDate(Ping p) {
-    if (startDate == null || startDate.isAfter(p.getInstant())) {
-      startDate = p.getInstant();
-    }
-  }
-
-  public void setStartDate() {
-    startDate = null;
-    for (Ping ping : intermediates) {
-      updateStartDate(ping);
-    }
-  }
-
 }

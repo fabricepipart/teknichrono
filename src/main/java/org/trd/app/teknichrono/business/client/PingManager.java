@@ -141,7 +141,7 @@ public class PingManager {
             LapTime lap = createLaptime(session, pilot, toInsertInNewLap, chronometer);
             em.persist(lap);
             toInsertInNewLap.clear();
-            lapTimeOfPingBefore.setStartDate();
+            lapTimeOfPingBefore.recomputeDates();
             // since toInsertInNewLap is backed by original list,
             // this removes all sub-list items from the original list
             lapTimeOfPingBefore.addIntermediates(insertAtIndex, ping);

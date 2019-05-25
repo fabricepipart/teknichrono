@@ -19,11 +19,7 @@ public class NestedSessionDTO {
   private long chronometersCount;
   private NestedLocationDTO location;
 
-  public static NestedSessionDTO fromSession(Session session) {
-    return DtoMapper.INSTANCE.asNestedSessionDto(session);
-  }
-
-  public Session fromDTO(Session entity, EntityManager em) {
+  Session fromDTO(Session entity, EntityManager em) {
     if (entity == null) {
       entity = new Session();
     }

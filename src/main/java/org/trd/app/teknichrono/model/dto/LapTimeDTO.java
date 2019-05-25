@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 public class LapTimeDTO {
 
-  private Logger logger = Logger.getLogger(LapTimeDTO.class);
+  private static final Logger LOGGER = Logger.getLogger(LapTimeDTO.class);
 
   private long id;
   private int version;
@@ -47,7 +47,7 @@ public class LapTimeDTO {
       entity.setSession(this.session.fromDTO(entity.getSession(), em));
     }
     if (!this.sectors.isEmpty()) {
-      logger.error("Sorry I cannot rebuild a LapTime from a LapTimeDTO. Leaving list empty.");
+      LOGGER.error("Sorry I cannot rebuild a LapTime from a LapTimeDTO. Leaving list empty.");
     }
     entity = em.merge(entity);
     return entity;
@@ -55,9 +55,7 @@ public class LapTimeDTO {
 
   public void setStartDate(Instant startDate) {
     this.startDate = startDate;
-    if (endDate != null) {
-      duration = Duration.between(startDate, endDate);
-    }
+    duration = computeDuration(startDate, endDate);
   }
 
   public void setStartDate(Ping start) {
@@ -66,13 +64,18 @@ public class LapTimeDTO {
 
   public void setEndDate(Instant endDate) {
     this.endDate = endDate;
-    if (startDate != null) {
-      duration = Duration.between(startDate, endDate);
-    }
+    duration = computeDuration(startDate, endDate);
   }
 
   public void setEndDate(Ping end) {
     setEndDate(end.getInstant());
+  }
+
+  private Duration computeDuration(Instant startDate, Instant endDate) {
+    if (startDate != null && endDate != null) {
+      return Duration.between(startDate, endDate);
+    }
+    return null;
   }
 
   /**

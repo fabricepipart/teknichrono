@@ -2,6 +2,7 @@ package org.trd.app.teknichrono.model.dto;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 import org.trd.app.teknichrono.model.jpa.Beacon;
 import org.trd.app.teknichrono.model.jpa.Category;
@@ -13,11 +14,10 @@ import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.model.jpa.Ping;
 import org.trd.app.teknichrono.model.jpa.Session;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR)
 interface DtoMapper {
 
     DtoMapper INSTANCE = Mappers.getMapper(DtoMapper.class);
@@ -26,56 +26,56 @@ interface DtoMapper {
 
     CategoryDTO asCategoryDto(Category category);
 
-    @Mapping(source = "lastestPing", target = "lastSeen")
+    @Mapping(target = "lastSeen", source = "lastestPing")
     ChronometerDTO asChronometerDto(Chronometer chronometer);
 
     EventDTO asEventDto(Event event);
 
-    default LapTimeDTO asLapTimeDTO(LapTime lapTime) {
-        if (lapTime == null) {
-            return null;
-        }
-        LapTimeDTO dto = new LapTimeDTO();
-        dto.setId(lapTime.id);
-        dto.setVersion(lapTime.getVersion());
-        dto.setPilot(asNestedPilotDto(lapTime.getPilot()));
-        NestedSessionDTO session = asNestedSessionDto(lapTime.getSession());
-        dto.setSession(session);
+    @Mapping(target = "duration", ignore = true)
+    @Mapping(target = "gapWithPrevious", ignore = true)
+    @Mapping(target = "gapWithBest", ignore = true)
+    @Mapping(target = "lapIndex", ignore = true)
+    @Mapping(target = "lapNumber", ignore = true)
+    @Mapping(target = "startDate", source = "startChronoInstant")
+    @Mapping(target = "endDate", source = "endChronoInstant")
+    @Mapping(target = "lastSeenDate", source = "lastChronoInstant")
+    @Mapping(target = "sectors", source = "intermediates")
+    LapTimeDTO asLapTimeDTO(LapTime lapTime);
+
+    default List<SectorDTO> asSectorsDTO(List<Ping> pings) {
         List<SectorDTO> sectors = new ArrayList<>();
         Ping previous = null;
-        Instant lastSeenDate = null;
-        for (Ping ping : lapTime.getIntermediates()) {
+        for (Ping ping : pings) {
             if (previous != null) {
                 sectors.add(new SectorDTO(previous, ping));
-            } else if (lapTime.getSession().getChronoIndex(ping.getChrono()) == 0) {
-                dto.setStartDate(ping);
-            }
-            if (lastSeenDate == null) {
-                lastSeenDate = ping.getInstant();
-            } else  if (ping.getInstant() != null && ping.getInstant().isAfter(lastSeenDate)) {
-                lastSeenDate = ping.getInstant();
             }
             previous = ping;
         }
-        dto.setSectors(sectors);
-        dto.setLastSeenDate(lastSeenDate);
-        boolean loop = dto.getSession().isLoopTrack();
-        if (!loop && previous != null && lapTime.getSession().getChronoIndex(previous.getChrono()) == (session.getChronometersCount() - 1)) {
-            dto.setEndDate(previous);
-        }
-        return dto;
+        return sectors;
     }
+
+    LocationDTO asLocationDto(Location location);
+
+    NestedBeaconDTO asNestedBeaconDto(Beacon beacon);
+
+    NestedCategoryDTO asNestedCategoryDto(Category category);
+
+    NestedChronometerDTO asNestedChronometerDto(Chronometer chronometer);
+
+    NestedEventDTO asNestedEventDto(Event event);
 
     NestedLocationDTO asNestedLocationDto(Location location);
 
-    @Mapping(source = "currentBeacon.number", target = "beaconNumber")
+    @Mapping(target = "beaconNumber", source = "currentBeacon.number")
     NestedPilotDTO asNestedPilotDto(Pilot pilot);
 
     NestedPingDTO asNestedPingDto(Ping ping);
 
-    @Mapping(source = "location.loopTrack", target = "loopTrack")
-    @Mapping(expression = "java(session.getChronometers().size())", target = "chronometersCount")
+    @Mapping(target = "loopTrack", source = "location.loopTrack")
+    @Mapping(target = "chronometersCount", expression = "java(session.getChronometers().size())")
     NestedSessionDTO asNestedSessionDto(Session session);
+
+    PilotDTO asPilotDto(Pilot pilot);
 
     SessionDTO asSessionDto(Session session);
 }
