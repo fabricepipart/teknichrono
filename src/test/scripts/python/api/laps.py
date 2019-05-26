@@ -111,15 +111,20 @@ def printLaps(laps, withDates=False):
       startDate = startDateValue
     else:
       startDate = ''
-    endDateValue = lap['endDate']
-    if endDateValue:
-      #endDate = pretty_hour(endDateValue)
-      endDate = endDateValue
-    else:
-      endDate = ''
+    
+    endDate = ''
+    if 'endDate' in lap:
+      endDateValue = lap['endDate']
+      if endDateValue:
+        #endDate = pretty_hour(endDateValue)
+        endDate = endDateValue
+
     pilot = str(lap['pilot']['firstName']) + ' ' + str(lap['pilot']['lastName'])
     lapIndex = str(lap['lapIndex']) + '/' + str(lap['lapNumber'])
-    lapTime = pretty_time_delta_iso(lap['duration'])
+    
+    lapTime = '-'
+    if 'duration' in lap:
+      lapTime = pretty_time_delta_iso(lap['duration'])
     lapRow = [str(rowIndex)]
     lapRow.append(str(lap['pilot']['beaconNumber']))
     if withDates:

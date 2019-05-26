@@ -20,62 +20,62 @@ import java.util.List;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR)
 interface DtoMapper {
 
-    DtoMapper INSTANCE = Mappers.getMapper(DtoMapper.class);
+  DtoMapper INSTANCE = Mappers.getMapper(DtoMapper.class);
 
-    BeaconDTO asBeaconDto(Beacon beacon);
+  BeaconDTO asBeaconDto(Beacon beacon);
 
-    CategoryDTO asCategoryDto(Category category);
+  CategoryDTO asCategoryDto(Category category);
 
-    @Mapping(target = "lastSeen", source = "lastestPing")
-    ChronometerDTO asChronometerDto(Chronometer chronometer);
+  @Mapping(target = "lastSeen", source = "lastestPing")
+  ChronometerDTO asChronometerDto(Chronometer chronometer);
 
-    EventDTO asEventDto(Event event);
+  EventDTO asEventDto(Event event);
 
-    @Mapping(target = "duration", ignore = true)
-    @Mapping(target = "gapWithPrevious", ignore = true)
-    @Mapping(target = "gapWithBest", ignore = true)
-    @Mapping(target = "lapIndex", ignore = true)
-    @Mapping(target = "lapNumber", ignore = true)
-    @Mapping(target = "startDate", source = "startChronoInstant")
-    @Mapping(target = "endDate", source = "endChronoInstant")
-    @Mapping(target = "lastSeenDate", source = "lastChronoInstant")
-    @Mapping(target = "sectors", source = "intermediates")
-    LapTimeDTO asLapTimeDTO(LapTime lapTime);
+  @Mapping(target = "duration", ignore = true)
+  @Mapping(target = "gapWithPrevious", ignore = true)
+  @Mapping(target = "gapWithBest", ignore = true)
+  @Mapping(target = "lapIndex", ignore = true)
+  @Mapping(target = "lapNumber", ignore = true)
+  @Mapping(target = "startDate", source = "startChronoInstant")
+  @Mapping(target = "endDate", source = "endChronoInstant")
+  @Mapping(target = "lastSeenDate", source = "lastChronoInstant")
+  @Mapping(target = "intermediates", source = "intermediates")
+  LapTimeDTO asLapTimeDTO(LapTime lapTime);
 
-    default List<SectorDTO> asSectorsDTO(List<Ping> pings) {
-        List<SectorDTO> sectors = new ArrayList<>();
-        Ping previous = null;
-        for (Ping ping : pings) {
-            if (previous != null) {
-                sectors.add(new SectorDTO(previous, ping));
-            }
-            previous = ping;
-        }
-        return sectors;
+  default List<SectorDTO> asSectorsDTO(List<Ping> pings) {
+    List<SectorDTO> sectors = new ArrayList<>();
+    Ping previous = null;
+    for (Ping ping : pings) {
+      if (previous != null) {
+        sectors.add(new SectorDTO(previous, ping));
+      }
+      previous = ping;
     }
+    return sectors;
+  }
 
-    LocationDTO asLocationDto(Location location);
+  LocationDTO asLocationDto(Location location);
 
-    NestedBeaconDTO asNestedBeaconDto(Beacon beacon);
+  NestedBeaconDTO asNestedBeaconDto(Beacon beacon);
 
-    NestedCategoryDTO asNestedCategoryDto(Category category);
+  NestedCategoryDTO asNestedCategoryDto(Category category);
 
-    NestedChronometerDTO asNestedChronometerDto(Chronometer chronometer);
+  NestedChronometerDTO asNestedChronometerDto(Chronometer chronometer);
 
-    NestedEventDTO asNestedEventDto(Event event);
+  NestedEventDTO asNestedEventDto(Event event);
 
-    NestedLocationDTO asNestedLocationDto(Location location);
+  NestedLocationDTO asNestedLocationDto(Location location);
 
-    @Mapping(target = "beaconNumber", source = "currentBeacon.number")
-    NestedPilotDTO asNestedPilotDto(Pilot pilot);
+  @Mapping(target = "beaconNumber", source = "currentBeacon.number")
+  NestedPilotDTO asNestedPilotDto(Pilot pilot);
 
-    NestedPingDTO asNestedPingDto(Ping ping);
+  NestedPingDTO asNestedPingDto(Ping ping);
 
-    @Mapping(target = "loopTrack", source = "location.loopTrack")
-    @Mapping(target = "chronometersCount", expression = "java(session.getChronometers().size())")
-    NestedSessionDTO asNestedSessionDto(Session session);
+  @Mapping(target = "loopTrack", source = "location.loopTrack")
+  @Mapping(target = "chronometersCount", expression = "java(session.getChronometers().size())")
+  NestedSessionDTO asNestedSessionDto(Session session);
 
-    PilotDTO asPilotDto(Pilot pilot);
+  PilotDTO asPilotDto(Pilot pilot);
 
-    SessionDTO asSessionDto(Session session);
+  SessionDTO asSessionDto(Session session);
 }
