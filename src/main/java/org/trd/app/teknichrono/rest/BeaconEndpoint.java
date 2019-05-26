@@ -27,6 +27,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -79,13 +80,11 @@ public class BeaconEndpoint {
       associatedPilot.setCurrentBeacon(null);
       pilotRepository.persist(associatedPilot);
     }
-    List<Ping> pings = entity.getPings();
-    if (pings != null) {
-      for (Ping ping : pings) {
-        ping.setBeacon(null);
-        pingRepository.persist(ping);
-      }
-    }
+//    List<Ping> pings = entity.getPings();
+//    if (pings != null) {
+//      new ArrayList<>(pings).forEach(p -> p.setBeacon(null));
+//      pingRepository.persist(pings);
+//    }
     beaconRepository.delete(entity);
     perf.end();
     return Response.noContent().build();

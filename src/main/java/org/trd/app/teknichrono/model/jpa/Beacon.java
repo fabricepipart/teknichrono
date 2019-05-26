@@ -30,8 +30,8 @@ public class Beacon extends PanacheEntity {
   private Pilot pilot;
 
   // Can be null if after event, items are reassociated
-  @OneToMany(mappedBy = "beacon")
-  private List<Ping> pings = new ArrayList<Ping>();
+  @OneToMany(mappedBy = "beacon", cascade = CascadeType.ALL, orphanRemoval=true)
+  private List<Ping> pings = new ArrayList<>();
 
   /* ===================== Getters and setters ======================== */
 

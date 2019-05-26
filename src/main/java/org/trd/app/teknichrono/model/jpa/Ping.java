@@ -2,10 +2,12 @@ package org.trd.app.teknichrono.model.jpa;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Version;
 import java.time.Instant;
 
@@ -24,6 +26,9 @@ public class Ping extends PanacheEntity {
   @ManyToOne(optional = true)
   @JoinColumn(name = "beaconId")
   private Beacon beacon;
+
+  @ManyToOne(cascade = CascadeType.REMOVE)
+  private LapTime lapTime;
 
   @Column
   private long power;
@@ -65,6 +70,14 @@ public class Ping extends PanacheEntity {
 
   public void setBeacon(Beacon beacon) {
     this.beacon = beacon;
+  }
+
+  public LapTime getLapTime() {
+    return lapTime;
+  }
+
+  public void setLapTime(LapTime lapTime) {
+    this.lapTime = lapTime;
   }
 
   public Chronometer getChrono() {
