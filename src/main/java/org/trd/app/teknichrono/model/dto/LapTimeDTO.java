@@ -27,7 +27,7 @@ public class LapTimeDTO {
   private Duration duration;
   private Duration gapWithPrevious;
   private Duration gapWithBest;
-  private List<SectorDTO> sectors = new ArrayList<>();
+  private List<SectorDTO> intermediates = new ArrayList<>();
   private long lapIndex;
   private long lapNumber;
 
@@ -46,7 +46,7 @@ public class LapTimeDTO {
     if (this.session != null) {
       entity.setSession(this.session.fromDTO(entity.getSession(), em));
     }
-    if (!this.sectors.isEmpty()) {
+    if (!this.intermediates.isEmpty()) {
       LOGGER.error("Sorry I cannot rebuild a LapTime from a LapTimeDTO. Leaving list empty.");
     }
     entity = em.merge(entity);
@@ -67,10 +67,6 @@ public class LapTimeDTO {
     duration = computeDuration(startDate, endDate);
   }
 
-  public void setEndDate(Ping end) {
-    setEndDate(end.getInstant());
-  }
-
   private Duration computeDuration(Instant startDate, Instant endDate) {
     if (startDate != null && endDate != null) {
       return Duration.between(startDate, endDate);
@@ -86,12 +82,12 @@ public class LapTimeDTO {
    */
   public void addLastSector(Instant endDate) {
     // If we have a proper sector, we use it
-    if (sectors.size() > 0) {
-      SectorDTO previousLast = this.sectors.get(sectors.size() - 1);
+    if (intermediates.size() > 0) {
+      SectorDTO previousLast = this.intermediates.get(intermediates.size() - 1);
       Instant previousLastStart = previousLast.getStart();
       Instant previousLastEnd = previousLastStart.plus(previousLast.getDuration());
       long previousLastChronoId = previousLast.getToChronoId();
-      this.sectors.add(new SectorDTO(previousLastEnd, previousLastChronoId, Duration.between(previousLastEnd, endDate)));
+      this.intermediates.add(new SectorDTO(previousLastEnd, previousLastChronoId, Duration.between(previousLastEnd, endDate)));
     }
     setEndDate(endDate);
   }

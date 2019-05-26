@@ -23,8 +23,8 @@ public class LapTimeDTORaceComparator implements Comparator<LapTimeDTO> {
       Instant l2EndDate = l2.getEndDate();
       int endDateComparison = compareDates(l1EndDate, l2EndDate);
       if (endDateComparison == 0) {
-        // Compare sectors
-        int sectorsComparison = compareSectors(l1.getSectors(), l2.getSectors());
+        // Compare intermediates
+        int sectorsComparison = compareSectors(l1.getIntermediates(), l2.getIntermediates());
         if (sectorsComparison == 0) {
           return compareDates(l1.getStartDate(), l2.getStartDate());
         }
@@ -84,15 +84,15 @@ public class LapTimeDTORaceComparator implements Comparator<LapTimeDTO> {
       Instant l1EndDate = l1.getEndDate();
       Instant l2EndDate = l2.getEndDate();
       if (l1EndDate == null && l2EndDate == null) {
-        // Compare sectors
-        List<SectorDTO> sectors1 = l1.getSectors();
-        List<SectorDTO> sectors2 = l2.getSectors();
+        // Compare intermediates
+        List<SectorDTO> sectors1 = l1.getIntermediates();
+        List<SectorDTO> sectors2 = l2.getIntermediates();
         if ((sectors2 == null || sectors2.isEmpty()) && (sectors1 == null || sectors1.isEmpty())) {
           // Compare start dates
           return distance(l1.getStartDate(), l2.getStartDate());
         }
         if (sectors2 != null && !sectors2.isEmpty() && sectors1 != null && !sectors1.isEmpty()) {
-          // Compare sectors dates
+          // Compare intermediates dates
           SectorDTO lastSector = sectors2.get(sectors2.size() - 1);
           SectorDTO correspondingSector = getCorrespondingSector(lastSector, sectors1);
           if (correspondingSector != null) {

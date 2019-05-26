@@ -47,7 +47,7 @@ public class TestLapTimeConverter {
     if (lap.getGapWithBest() != null) {
       assertThat(lap.getGapWithBest()).isGreaterThanOrEqualTo(Duration.ZERO);
     }
-    for (SectorDTO s : lap.getSectors()) {
+    for (SectorDTO s : lap.getIntermediates()) {
       if (s.getDuration() != null) {
 //      Assert.assertTrue(s.getStart() >= 0); // FIXME
         assertThat(s.getDuration()).isGreaterThanOrEqualTo(Duration.ZERO);
