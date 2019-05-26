@@ -28,7 +28,7 @@ public class Ping extends PanacheEntity {
   private Beacon beacon;
 
   @ManyToOne(cascade = CascadeType.REMOVE)
-  private LapTime lapTime;
+  private LapTime lapTime; // Necessary for removing pings from LapTime on a Ping deletion
 
   @Column
   private long power;
@@ -70,14 +70,6 @@ public class Ping extends PanacheEntity {
 
   public void setBeacon(Beacon beacon) {
     this.beacon = beacon;
-  }
-
-  public LapTime getLapTime() {
-    return lapTime;
-  }
-
-  public void setLapTime(LapTime lapTime) {
-    this.lapTime = lapTime;
   }
 
   public Chronometer getChrono() {
