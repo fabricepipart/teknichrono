@@ -2,13 +2,13 @@ package org.trd.app.teknichrono.rest;
 
 import org.trd.app.teknichrono.model.dto.LocationDTO;
 import org.trd.app.teknichrono.model.jpa.Location;
+import org.trd.app.teknichrono.model.jpa.LocationRepository;
 import org.trd.app.teknichrono.model.jpa.Session;
+import org.trd.app.teknichrono.model.jpa.SessionRepository;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.OptimisticLockException;
-import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -24,25 +24,28 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import java.util.List;
+import java.util.stream.Collectors;
 
-/**
- *
- */
 @Path("/locations")
 public class LocationEndpoint {
 
-  EntityManager em;
+  private final EntityManager em;
+
+  private final LocationRepository locationRepository;
+  private final SessionRepository sessionRepository;
 
   @Inject
-  public LocationEndpoint(EntityManager em) {
+  public LocationEndpoint(EntityManager em, LocationRepository locationRepository, SessionRepository sessionRepository) {
     this.em = em;
+    this.locationRepository = locationRepository;
+    this.sessionRepository = sessionRepository;
   }
 
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Transactional
   public Response create(Location entity) {
-    em.persist(entity);
+    locationRepository.persist(entity);
     return Response
         .created(UriBuilder.fromResource(LocationEndpoint.class).path(String.valueOf(entity.id)).build()).build();
   }
@@ -51,11 +54,11 @@ public class LocationEndpoint {
   @Path("/{id:[0-9][0-9]*}")
   @Transactional
   public Response deleteById(@PathParam("id") long id) {
-    Location entity = em.find(Location.class, id);
+    Location entity = locationRepository.findById(id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    em.remove(entity);
+    locationRepository.delete(entity);
     return Response.noContent().build();
   }
 
@@ -64,16 +67,7 @@ public class LocationEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public Response findById(@PathParam("id") long id) {
-    TypedQuery<Location> findByIdQuery = em.createQuery(
-        "SELECT DISTINCT e FROM Location e LEFT JOIN FETCH e.sessions WHERE e.id = :entityId ORDER BY e.id",
-        Location.class);
-    findByIdQuery.setParameter("entityId", id);
-    Location entity;
-    try {
-      entity = findByIdQuery.getSingleResult();
-    } catch (NoResultException nre) {
-      entity = null;
-    }
+    LocationDTO entity = LocationDTO.fromLocation(locationRepository.findById(id));
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -84,34 +78,23 @@ public class LocationEndpoint {
   @Path("/name")
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
-  public Location findLocationByName(@QueryParam("name") String name) {
-    TypedQuery<Location> findByNameQuery = em.createQuery(
-        "SELECT DISTINCT e FROM Location e LEFT JOIN FETCH e.sessions WHERE e.name = :name ORDER BY e.id",
-        Location.class);
-    findByNameQuery.setParameter("name", name);
-    Location entity;
-    try {
-      entity = findByNameQuery.getSingleResult();
-    } catch (NoResultException nre) {
-      entity = null;
+  public Response findLocationByName(@QueryParam("name") String name) {
+    LocationDTO entity = LocationDTO.fromLocation(locationRepository.findByName(name));
+    if (entity == null) {
+      return Response.status(Status.NOT_FOUND).build();
     }
-    return entity;
+    return Response.ok(entity).build();
   }
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
-  public List<Location> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
-    TypedQuery<Location> findAllQuery = em
-        .createQuery("SELECT DISTINCT e FROM Location e LEFT JOIN FETCH e.sessions ORDER BY e.id", Location.class);
-    if (startPosition != null) {
-      findAllQuery.setFirstResult(startPosition);
-    }
-    if (maxResult != null) {
-      findAllQuery.setMaxResults(maxResult);
-    }
-    final List<Location> results = findAllQuery.getResultList();
-    return results;
+  public List<LocationDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
+    return locationRepository.findAll()
+            .page(Paging.from(startPosition, maxResult))
+            .stream()
+            .map(LocationDTO::fromLocation)
+            .collect(Collectors.toList());
   }
 
   @POST
@@ -119,18 +102,18 @@ public class LocationEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public Response addSession(@PathParam("locationId") long locationId, @QueryParam("sessionId") Long sessionId) {
-    Location location = em.find(Location.class, locationId);
+    Location location = locationRepository.findById(locationId);
     if (location == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    Session session = em.find(Session.class, sessionId);
+    Session session = sessionRepository.findById(sessionId);
     if (session == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
     session.setLocation(location);
     location.getSessions().add(session);
-    em.persist(location);
-    em.persist(session);
+    locationRepository.persist(location);
+    sessionRepository.persist(session);
     LocationDTO dto = LocationDTO.fromLocation(location);
     return Response.ok(dto).build();
   }
@@ -146,15 +129,14 @@ public class LocationEndpoint {
     if (id != entity.id) {
       return Response.status(Status.CONFLICT).entity(entity).build();
     }
-    if (em.find(Location.class, id) == null) {
+    if (locationRepository.findById(id) == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
     try {
-      entity = em.merge(entity);
+      locationRepository.persist(entity);
     } catch (OptimisticLockException e) {
       return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
     }
-
     return Response.noContent().build();
   }
 }

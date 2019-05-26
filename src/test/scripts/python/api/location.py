@@ -18,9 +18,8 @@ def addLocation(name, loop=True):
 
 def getLocationByName(name):
   "This gets a Location by name and returns a json"
-  url = LocationsUrl + '/name'
-  params = {'name': name}
-  locationResponse = get(url, params)
+  url = LocationsUrl + '/name?name=' + name
+  locationResponse = get(url)
   return locationResponse
 
 

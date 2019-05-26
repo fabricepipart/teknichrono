@@ -6,6 +6,7 @@ target
 .faces-config.xml.jsfdia
 .vscode
 .idea
+.factorypath
 bin
 MANIFEST.MF
 *.swp

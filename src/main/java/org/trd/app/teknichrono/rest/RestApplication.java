@@ -1,13 +1,12 @@
 package org.trd.app.teknichrono.rest;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.transaction.Transactional;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
+import java.util.HashMap;
+import java.util.Map;
 
 @ApplicationPath("/rest")
 @Transactional

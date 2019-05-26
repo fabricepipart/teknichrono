@@ -1,6 +1,5 @@
 package org.trd.app.teknichrono.rest;
 
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.dto.BeaconDTO;
 import org.trd.app.teknichrono.model.jpa.Beacon;
@@ -45,13 +44,8 @@ public class BeaconEndpoint {
 
   private final PingRepository pingRepository;
 
-  public BeaconEndpoint() {
-    // needed by CDI
-    this(null, null, null);
-  }
-
   @Inject
-  BeaconEndpoint(BeaconRepository beaconRepository, PilotRepository pilotRepository, PingRepository pingRepository) {
+  public BeaconEndpoint(BeaconRepository beaconRepository, PilotRepository pilotRepository, PingRepository pingRepository) {
     this.beaconRepository = beaconRepository;
     this.pilotRepository = pilotRepository;
     this.pingRepository = pingRepository;
@@ -144,13 +138,11 @@ public class BeaconEndpoint {
   @Transactional
   public List<BeaconDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
     DurationLogger perf = DurationLogger.get(LOGGER).start("Find all beacons");
-    PanacheQuery<Beacon> query = beaconRepository.findAll();
-    if (startPosition != null && maxResult != null) {
-      int pageIndex = startPosition / maxResult;
-      int pageSize = maxResult;
-      query = query.page(pageIndex, pageSize);
-    }
-    List<BeaconDTO> results = query.stream().map(BeaconDTO::fromBeacon).collect(Collectors.toList());
+    List<BeaconDTO> results = beaconRepository.findAll()
+            .page(Paging.from(startPosition, maxResult))
+            .stream()
+            .map(BeaconDTO::fromBeacon)
+            .collect(Collectors.toList());
     perf.end();
     return results;
   }

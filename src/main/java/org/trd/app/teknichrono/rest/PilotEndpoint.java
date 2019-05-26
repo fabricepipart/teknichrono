@@ -1,7 +1,10 @@
 package org.trd.app.teknichrono.rest;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import org.trd.app.teknichrono.model.dto.PilotDTO;
+import org.trd.app.teknichrono.model.jpa.Beacon;
+import org.trd.app.teknichrono.model.jpa.Category;
+import org.trd.app.teknichrono.model.jpa.Pilot;
+import org.trd.app.teknichrono.model.jpa.Session;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -22,12 +25,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
-
-import org.trd.app.teknichrono.model.jpa.Beacon;
-import org.trd.app.teknichrono.model.jpa.Category;
-import org.trd.app.teknichrono.model.jpa.Pilot;
-import org.trd.app.teknichrono.model.jpa.Session;
-import org.trd.app.teknichrono.model.dto.PilotDTO;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 

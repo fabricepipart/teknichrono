@@ -2,13 +2,13 @@ package org.trd.app.teknichrono.rest;
 
 import org.trd.app.teknichrono.model.dto.CategoryDTO;
 import org.trd.app.teknichrono.model.jpa.Category;
+import org.trd.app.teknichrono.model.jpa.CategoryRepository;
 import org.trd.app.teknichrono.model.jpa.Pilot;
+import org.trd.app.teknichrono.model.jpa.PilotRepository;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.OptimisticLockException;
-import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -26,24 +26,28 @@ import javax.ws.rs.core.UriBuilder;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * 
- */
 @Path("/categories")
 public class CategoryEndpoint {
 
+  // TODO, get rid of the em (still needed for the fromDTO)
   private final EntityManager em;
 
+  private final CategoryRepository categoryRespository;
+
+  private final PilotRepository pilotRespository;
+
   @Inject
-  public CategoryEndpoint(EntityManager em) {
+  public CategoryEndpoint(EntityManager em, CategoryRepository categoryRespository, PilotRepository pilotRespository) {
     this.em = em;
+    this.categoryRespository = categoryRespository;
+    this.pilotRespository = pilotRespository;
   }
 
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Transactional
   public Response create(Category entity) {
-    em.persist(entity);
+    categoryRespository.persist(entity);
     return Response
         .created(UriBuilder.fromResource(CategoryEndpoint.class).path(String.valueOf(entity.id)).build()).build();
   }
@@ -52,11 +56,11 @@ public class CategoryEndpoint {
   @Path("/{id:[0-9][0-9]*}")
   @Transactional
   public Response deleteById(@PathParam("id") long id) {
-    Category entity = em.find(Category.class, id);
+    Category entity = categoryRespository.findById(id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    em.remove(entity);
+    categoryRespository.delete(entity);
     return Response.noContent().build();
   }
 
@@ -65,16 +69,7 @@ public class CategoryEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public Response findById(@PathParam("id") long id) {
-    TypedQuery<Category> findByIdQuery = em.createQuery(
-        "SELECT DISTINCT e FROM Category e LEFT JOIN FETCH e.pilots WHERE e.id = :entityId ORDER BY e.id",
-        Category.class);
-    findByIdQuery.setParameter("entityId", id);
-    Category entity;
-    try {
-      entity = findByIdQuery.getSingleResult();
-    } catch (NoResultException nre) {
-      entity = null;
-    }
+    Category entity = categoryRespository.findById(id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -86,33 +81,22 @@ public class CategoryEndpoint {
   @Path("/name")
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
-  public CategoryDTO findCategoryByName(@QueryParam("name") String name) {
-    TypedQuery<Category> findByNameQuery = em.createQuery(
-        "SELECT DISTINCT e FROM Category e LEFT JOIN FETCH e.pilots WHERE e.name = :name ORDER BY e.id",
-        Category.class);
-    findByNameQuery.setParameter("name", name);
-    Category entity;
-    try {
-      entity = findByNameQuery.getSingleResult();
-    } catch (NoResultException nre) {
-      entity = null;
+  public Response findCategoryByName(@QueryParam("name") String name) {
+    Category entity = categoryRespository.findByName(name);
+    if (entity == null) {
+      return Response.status(Status.NOT_FOUND).build();
     }
-    return CategoryDTO.fromCategory(entity);
+    CategoryDTO dto = CategoryDTO.fromCategory(entity);
+    return Response.ok(dto).build();
   }
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public List<CategoryDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
-    TypedQuery<Category> findAllQuery = em
-        .createQuery("SELECT DISTINCT e FROM Category e LEFT JOIN FETCH e.pilots ORDER BY e.id", Category.class);
-    if (startPosition != null) {
-      findAllQuery.setFirstResult(startPosition);
-    }
-    if (maxResult != null) {
-      findAllQuery.setMaxResults(maxResult);
-    }
-    return findAllQuery.getResultStream()
+    return categoryRespository.findAll()
+            .page(Paging.from(startPosition, maxResult))
+            .stream()
             .map(CategoryDTO::fromCategory)
             .collect(Collectors.toList());
   }
@@ -122,19 +106,19 @@ public class CategoryEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public Response addPilot(@PathParam("categoryId") long categoryId, @QueryParam("pilotId") Long pilotId) {
-    Category category = em.find(Category.class, categoryId);
+    Category category = categoryRespository.findById(categoryId);
     if (category == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    Pilot pilot = em.find(Pilot.class, pilotId);
+    Pilot pilot = pilotRespository.findById(pilotId);
     if (pilot == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
     pilot.setCategory(category);
     category.getPilots().add(pilot);
-    em.persist(category);
+    categoryRespository.persist(category);
     for (Pilot c : category.getPilots()) {
-      em.persist(c);
+      pilotRespository.persist(c);
     }
     CategoryDTO dto = CategoryDTO.fromCategory(category);
     return Response.ok(dto).build();
@@ -151,14 +135,14 @@ public class CategoryEndpoint {
     if (id != dto.getId()) {
       return Response.status(Status.CONFLICT).entity(dto).build();
     }
-    Category category = em.find(Category.class, id);
+    Category category = categoryRespository.findById(id);
     if (category == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
 
     category = dto.fromDTO(category, em);
     try {
-      em.merge(category);
+      categoryRespository.persist(category);
     } catch (OptimisticLockException e) {
       return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
     }
