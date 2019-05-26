@@ -4,20 +4,12 @@ import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.business.client.PingManager;
 import org.trd.app.teknichrono.business.client.SessionSelector;
 import org.trd.app.teknichrono.model.dto.SessionDTO;
-import org.trd.app.teknichrono.model.jpa.Chronometer;
-import org.trd.app.teknichrono.model.jpa.Event;
-import org.trd.app.teknichrono.model.jpa.Location;
-import org.trd.app.teknichrono.model.jpa.Pilot;
-import org.trd.app.teknichrono.model.jpa.Ping;
-import org.trd.app.teknichrono.model.jpa.Session;
-import org.trd.app.teknichrono.model.jpa.SessionType;
+import org.trd.app.teknichrono.model.jpa.*;
 import org.trd.app.teknichrono.util.DurationLogger;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.OptimisticLockException;
-import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -41,19 +33,37 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- *
- */
 @Path("/sessions")
 public class SessionEndpoint {
 
   private Logger logger = Logger.getLogger(SessionEndpoint.class);
 
+  // TODO get rid of this
   private final EntityManager em;
 
+  private final SessionRepository sessionRepository;
+
+  private final EventRepository eventRepository;
+
+  private final LocationRepository locationRepository;
+
+  private final ChronometerRepository chronometerRepository;
+
+  private final PilotRepository pilotRepository;
+
+  private final PingRepository pingRepository;
+
   @Inject
-  public SessionEndpoint(EntityManager em) {
+  public SessionEndpoint(EntityManager em, SessionRepository sessionRepository, EventRepository eventRepository,
+                         LocationRepository locationRepository, ChronometerRepository chronometerRepository,
+                         PilotRepository pilotRepository, PingRepository pingRepository) {
     this.em = em;
+    this.sessionRepository = sessionRepository;
+    this.eventRepository = eventRepository;
+    this.locationRepository = locationRepository;
+    this.chronometerRepository = chronometerRepository;
+    this.pilotRepository = pilotRepository;
+    this.pingRepository = pingRepository;
   }
 
   @POST
@@ -62,14 +72,14 @@ public class SessionEndpoint {
   public Response create(Session entity) {
     DurationLogger perf = DurationLogger.get(logger).start("Create session " + entity.getName());
     if (entity.getEvent() != null && entity.getEvent().id > 0) {
-      Event event = em.find(Event.class, entity.getEvent().id);
+      Event event = eventRepository.findById(entity.getEvent().id);
       entity.setEvent(event);
     }
     if (entity.getLocation() != null && entity.getLocation().id > 0) {
-      Location loc = em.find(Location.class, entity.getLocation().id);
+      Location loc = locationRepository.findById(entity.getLocation().id);
       entity.setLocation(loc);
     }
-    em.persist(entity);
+    sessionRepository.persist(entity);
     Response response = Response
         .created(UriBuilder.fromResource(SessionEndpoint.class).path(String.valueOf(entity.id)).build()).build();
     perf.end();
@@ -81,7 +91,7 @@ public class SessionEndpoint {
   @Transactional
   public Response deleteById(@PathParam("id") long id) {
     DurationLogger perf = DurationLogger.get(logger).start("Delete session " + id);
-    Session entity = em.find(Session.class, id);
+    Session entity = sessionRepository.findById(id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -92,7 +102,7 @@ public class SessionEndpoint {
     for (Pilot p : entity.getPilots()) {
       p.getSessions().remove(entity);
     }
-    em.remove(entity);
+    sessionRepository.delete(entity);
     perf.end();
     return Response.noContent().build();
   }
@@ -103,16 +113,7 @@ public class SessionEndpoint {
   @Transactional
   public Response findById(@PathParam("id") long id) {
     DurationLogger perf = DurationLogger.get(logger).start("Find session id " + id);
-    TypedQuery<Session> findByIdQuery = em.createQuery(
-        "SELECT DISTINCT e FROM Session e LEFT JOIN FETCH e.chronometers WHERE e.id = :entityId ORDER BY e.id",
-        Session.class);
-    findByIdQuery.setParameter("entityId", id);
-    Session entity;
-    try {
-      entity = findByIdQuery.getSingleResult();
-    } catch (NoResultException nre) {
-      entity = null;
-    }
+    Session entity = sessionRepository.findById(id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -141,21 +142,15 @@ public class SessionEndpoint {
   @Path("/name")
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
-  public SessionDTO findSessionByName(@QueryParam("name") String name) {
+  public Response findSessionByName(@QueryParam("name") String name) {
     DurationLogger perf = DurationLogger.get(logger).start("Find session named " + name);
-    TypedQuery<Session> findByNameQuery = em.createQuery(
-        "SELECT DISTINCT e FROM Session e LEFT JOIN FETCH e.chronometers WHERE e.name = :name ORDER BY e.id",
-        Session.class);
-    findByNameQuery.setParameter("name", name);
-    Session entity;
-    try {
-      entity = findByNameQuery.getSingleResult();
-    } catch (NoResultException nre) {
-      entity = null;
+    Session entity = sessionRepository.findByName(name);
+    if (entity == null) {
+      return Response.status(Status.NOT_FOUND).build();
     }
     perf.end();
     SessionDTO dto = SessionDTO.fromSession(entity);
-    return dto;
+    return Response.ok(dto).build();
   }
 
   @GET
@@ -171,15 +166,7 @@ public class SessionEndpoint {
   }
 
   private Stream<Session> listAllSessions(Integer startPosition, Integer maxResult) {
-    TypedQuery<Session> findAllQuery = em
-        .createQuery("SELECT DISTINCT e FROM Session e LEFT JOIN FETCH e.chronometers ORDER BY e.id", Session.class);
-    if (startPosition != null) {
-      findAllQuery.setFirstResult(startPosition);
-    }
-    if (maxResult != null) {
-      findAllQuery.setMaxResults(maxResult);
-    }
-    return findAllQuery.getResultStream();
+    return sessionRepository.findAll().page(Paging.from(startPosition, maxResult)).stream();
   }
 
   @POST
@@ -189,11 +176,11 @@ public class SessionEndpoint {
   public Response addChronometer(@PathParam("sessionId") long sessionId, @QueryParam("chronoId") Long chronoId,
                                  @QueryParam("index") Integer index) {
     DurationLogger perf = DurationLogger.get(logger).start("Add chrono " + chronoId + " to session " + sessionId);
-    Session session = em.find(Session.class, sessionId);
+    Session session = sessionRepository.findById(sessionId);
     if (session == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    Chronometer chronometer = em.find(Chronometer.class, chronoId);
+    Chronometer chronometer = chronometerRepository.findById(chronoId);
     if (chronometer == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -203,9 +190,9 @@ public class SessionEndpoint {
     } else {
       session.addChronometer(chronometer);
     }
-    em.persist(session);
+    sessionRepository.persist(session);
     for (Chronometer c : session.getChronometers()) {
-      em.persist(c);
+      chronometerRepository.persist(c);
     }
     perf.end();
 
@@ -219,18 +206,18 @@ public class SessionEndpoint {
   @Transactional
   public Response addPilot(@PathParam("sessionId") long sessionId, @QueryParam("pilotId") Long pilotId) {
     DurationLogger perf = DurationLogger.get(logger).start("Add pilot " + pilotId + " to session " + sessionId);
-    Session session = em.find(Session.class, sessionId);
+    Session session = sessionRepository.findById(sessionId);
     if (session == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    Pilot pilot = em.find(Pilot.class, pilotId);
+    Pilot pilot = pilotRepository.findById(pilotId);
     if (pilot == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
     session.getPilots().add(pilot);
     pilot.getSessions().add(session);
-    em.persist(session);
-    em.persist(pilot);
+    sessionRepository.persist(session);
+    pilotRepository.persist(pilot);
     perf.end();
     return Response.ok(session).build();
   }
@@ -241,7 +228,7 @@ public class SessionEndpoint {
   @Transactional
   public Response start(Ping start, @PathParam("sessionId") long sessionId) {
     DurationLogger perf = DurationLogger.get(logger).start("Start session " + sessionId);
-    Session session = em.find(Session.class, sessionId);
+    Session session = sessionRepository.findById(sessionId);
     if (session == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -265,7 +252,7 @@ public class SessionEndpoint {
   @Transactional
   public Response end(Ping end, @PathParam("sessionId") long sessionId) {
     DurationLogger perf = DurationLogger.get(logger).start("End session " + sessionId + " @ " + end.getInstant());
-    Session session = em.find(Session.class, sessionId);
+    Session session = sessionRepository.findById(sessionId);
     if (session == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -291,17 +278,15 @@ public class SessionEndpoint {
       session.setStart(timestamp);
     }
     session.setCurrent(true);
-    em.persist(session);
+    sessionRepository.persist(session);
   }
 
   private boolean intersect(Session otherSession, Session session) {
     if (otherSession.getStart().compareTo(session.getStart()) >= 0 && otherSession.getStart().compareTo(otherSession.getEnd()) <= 0) {
       return true;
     }
-    if (otherSession.getEnd().compareTo(otherSession.getStart()) >= 0 && otherSession.getEnd().compareTo(otherSession.getEnd()) <= 0) {
-      return true;
-    }
-    return false;
+    // FIXME otherSession.getEnd().compareTo(otherSession.getEnd()) :: one of the two sessions should be 'session'
+    return otherSession.getEnd().compareTo(otherSession.getStart()) >= 0 && otherSession.getEnd().compareTo(otherSession.getEnd()) <= 0;
   }
 
   private void endSession(Session session, Instant end) {
@@ -310,7 +295,7 @@ public class SessionEndpoint {
     }
     session.setEnd(end);
     session.setCurrent(false);
-    em.persist(session);
+    sessionRepository.persist(session);
   }
 
   private void startRace(Session session, Instant timestamp) {
@@ -322,7 +307,7 @@ public class SessionEndpoint {
       ping.setInstant(timestamp);
       ping.setBeacon(pilot.getCurrentBeacon());
       ping.setChrono(chronometer);
-      em.persist(ping);
+      pingRepository.persist(ping);
       cm.addPing(ping, pilot, chronometer, session);
     }
   }
@@ -340,25 +325,25 @@ public class SessionEndpoint {
       perf.end();
       return Response.status(Status.CONFLICT).entity(entity).build();
     }
-    Session session = em.find(Session.class, id);
+    Session session = sessionRepository.findById(id);
     if (session == null) {
       perf.end();
       return Response.status(Status.NOT_FOUND).build();
     }
 
     if (entity.getLocation() != null && entity.getLocation().id > 0) {
-      Location location = em.find(Location.class, entity.getLocation().id);
+      Location location = locationRepository.findById(entity.getLocation().id);
       session.setLocation(location);
     }
     if (entity.getEvent() != null && entity.getEvent().id > 0) {
-      Event event = em.find(Event.class, entity.getEvent().id);
+      Event event = eventRepository.findById(entity.getEvent().id);
       session.setEvent(event);
     }
     if (entity.getPilots() != null && entity.getPilots().size() > 0) {
       Set<Pilot> pilotsToSet = new HashSet<>();
       for (Pilot p : entity.getPilots()) {
         if (p != null && p.id > 0) {
-          Pilot pilot = em.find(Pilot.class, p.id);
+          Pilot pilot = pilotRepository.findById(p.id);
           pilotsToSet.add(pilot);
         }
       }
@@ -369,7 +354,7 @@ public class SessionEndpoint {
       List<Chronometer> chronosToSet = new ArrayList<>();
       for (Chronometer c : entity.getChronometers()) {
         if (c != null && c.id > 0) {
-          Chronometer chrono = em.find(Chronometer.class, c.id);
+          Chronometer chrono = chronometerRepository.findById(c.id);
           chronosToSet.add(chrono);
         }
       }
@@ -384,7 +369,7 @@ public class SessionEndpoint {
     session.setCurrent(entity.isCurrent());
 
     try {
-      em.persist(session);
+      sessionRepository.persist(session);
     } catch (OptimisticLockException e) {
       return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
     }

@@ -7,4 +7,7 @@ import javax.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class SessionRepository implements PanacheRepository<Session> {
 
+    public Session findByName(String name) {
+        return find("name", name).firstResult();
+    }
 }

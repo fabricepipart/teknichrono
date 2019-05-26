@@ -2,16 +2,18 @@ package org.trd.app.teknichrono.rest;
 
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.business.client.PingManager;
+import org.trd.app.teknichrono.model.dto.NestedPingDTO;
 import org.trd.app.teknichrono.model.jpa.Beacon;
+import org.trd.app.teknichrono.model.jpa.BeaconRepository;
 import org.trd.app.teknichrono.model.jpa.Chronometer;
+import org.trd.app.teknichrono.model.jpa.ChronometerRepository;
 import org.trd.app.teknichrono.model.jpa.Ping;
+import org.trd.app.teknichrono.model.jpa.PingRepository;
 import org.trd.app.teknichrono.util.DurationLogger;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.OptimisticLockException;
-import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -27,19 +29,28 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import java.util.List;
+import java.util.stream.Collectors;
 
-/**
- *
- */
 @Path("/pings")
 public class PingEndpoint {
 
   private Logger logger = Logger.getLogger(LapTimeEndpoint.class);
 
-  EntityManager em;
+  private final PingRepository pingRepository;
+
+  private final ChronometerRepository chronometerRepository;
+
+  private final BeaconRepository beaconRepository;
+
+  // TODO get rid of this
+  private final EntityManager em;
 
   @Inject
-  public PingEndpoint(EntityManager em) {
+  public PingEndpoint(PingRepository pingRepository, ChronometerRepository chronometerRepository,
+                      BeaconRepository beaconRepository, EntityManager em) {
+    this.pingRepository = pingRepository;
+    this.chronometerRepository = chronometerRepository;
+    this.beaconRepository = beaconRepository;
     this.em = em;
   }
 
@@ -51,17 +62,17 @@ public class PingEndpoint {
     try (DurationLogger dl = new DurationLogger(logger, "Ping for chronometer ID=" + chronoId + " and beacon ID=" + beaconId)) {
       //Ping entity = new Ping();
       entity.setInstant(entity.getInstant());
-      Chronometer chrono = em.find(Chronometer.class, chronoId);
+      Chronometer chrono = chronometerRepository.findById(chronoId);
       if (chrono == null) {
         return Response.status(Status.NOT_FOUND).build();
       }
       entity.setChrono(chrono);
-      Beacon beacon = em.find(Beacon.class, beaconId);
+      Beacon beacon = beaconRepository.findById(beaconId);
       if (beacon == null) {
         return Response.status(Status.NOT_FOUND).build();
       }
       entity.setBeacon(beacon);
-      em.persist(entity);
+      pingRepository.persist(entity);
       // TODO Check if relevant to create it each time...
       PingManager manager = new PingManager(em);
       manager.addPing(entity);
@@ -74,11 +85,11 @@ public class PingEndpoint {
   @Path("/{id:[0-9][0-9]*}")
   @Transactional
   public Response deleteById(@PathParam("id") long id) {
-    Ping entity = em.find(Ping.class, id);
+    Ping entity = pingRepository.findById(id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    em.remove(entity);
+    pingRepository.delete(entity);
     return Response.noContent().build();
   }
 
@@ -87,15 +98,7 @@ public class PingEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public Response findById(@PathParam("id") long id) {
-    TypedQuery<Ping> findByIdQuery = em
-        .createQuery("SELECT DISTINCT p FROM Ping p WHERE p.id = :entityId ORDER BY p.id", Ping.class);
-    findByIdQuery.setParameter("entityId", id);
-    Ping entity;
-    try {
-      entity = findByIdQuery.getSingleResult();
-    } catch (NoResultException nre) {
-      entity = null;
-    }
+    Ping entity = pingRepository.findById(id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -105,16 +108,12 @@ public class PingEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
-  public List<Ping> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
-    TypedQuery<Ping> findAllQuery = em.createQuery("SELECT DISTINCT p FROM Ping p ORDER BY p.id", Ping.class);
-    if (startPosition != null) {
-      findAllQuery.setFirstResult(startPosition);
-    }
-    if (maxResult != null) {
-      findAllQuery.setMaxResults(maxResult);
-    }
-    final List<Ping> results = findAllQuery.getResultList();
-    return results;
+  public List<NestedPingDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
+    return pingRepository.findAll()
+            .page(Paging.from(startPosition, maxResult))
+            .stream()
+            .map(NestedPingDTO::fromPing)
+            .collect(Collectors.toList());
   }
 
   @PUT
@@ -128,15 +127,14 @@ public class PingEndpoint {
     if (id != entity.id) {
       return Response.status(Status.CONFLICT).entity(entity).build();
     }
-    if (em.find(Ping.class, id) == null) {
+    if (pingRepository.findById(id) == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
     try {
-      entity = em.merge(entity);
+      pingRepository.persist(entity);
     } catch (OptimisticLockException e) {
       return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
     }
-
     return Response.noContent().build();
   }
 }

@@ -9,7 +9,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Version;
 import java.time.Instant;
 
-
 @Entity
 public class Ping extends PanacheEntity {
 

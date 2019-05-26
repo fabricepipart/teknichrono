@@ -7,7 +7,6 @@ import org.trd.app.teknichrono.model.jpa.Session;
 import org.trd.app.teknichrono.model.jpa.SessionRepository;
 
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
 import javax.persistence.OptimisticLockException;
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
@@ -29,14 +28,11 @@ import java.util.stream.Collectors;
 @Path("/locations")
 public class LocationEndpoint {
 
-  private final EntityManager em;
-
   private final LocationRepository locationRepository;
   private final SessionRepository sessionRepository;
 
   @Inject
-  public LocationEndpoint(EntityManager em, LocationRepository locationRepository, SessionRepository sessionRepository) {
-    this.em = em;
+  public LocationEndpoint(LocationRepository locationRepository, SessionRepository sessionRepository) {
     this.locationRepository = locationRepository;
     this.sessionRepository = sessionRepository;
   }

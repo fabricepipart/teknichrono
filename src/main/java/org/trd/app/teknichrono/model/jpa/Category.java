@@ -2,15 +2,14 @@ package org.trd.app.teknichrono.model.jpa;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Category extends PanacheEntity {

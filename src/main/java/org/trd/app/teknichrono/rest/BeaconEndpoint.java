@@ -30,9 +30,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- *
- */
 @Path("/beacons")
 public class BeaconEndpoint {
 
