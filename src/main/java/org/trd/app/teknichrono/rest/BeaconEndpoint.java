@@ -27,6 +27,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -79,7 +80,7 @@ public class BeaconEndpoint {
       associatedPilot.setCurrentBeacon(null);
       pilotRepository.persist(associatedPilot);
     }
-    List<Ping> pings = entity.getPings();
+    List<Ping> pings = new ArrayList<>(entity.getPings());
     if (pings != null) {
       for (Ping ping : pings) {
         ping.setBeacon(null);
@@ -136,10 +137,10 @@ public class BeaconEndpoint {
   public List<BeaconDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
     DurationLogger perf = DurationLogger.get(LOGGER).start("Find all beacons");
     List<BeaconDTO> results = beaconRepository.findAll()
-            .page(Paging.from(startPosition, maxResult))
-            .stream()
-            .map(BeaconDTO::fromBeacon)
-            .collect(Collectors.toList());
+        .page(Paging.from(startPosition, maxResult))
+        .stream()
+        .map(BeaconDTO::fromBeacon)
+        .collect(Collectors.toList());
     perf.end();
     return results;
   }

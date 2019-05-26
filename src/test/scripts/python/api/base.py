@@ -100,7 +100,10 @@ def pretty_time_delta(milliseconds):
 
 
 def pretty_time_delta_iso(time_iso):
+  return pretty_time_delta(iso_to_millis(time_iso))
+
+def iso_to_millis(time_iso):
   timedeltaObject = isodate.parse_duration(time_iso)
   milliseconds = (timedeltaObject / timedelta(microseconds=1000))
-  return pretty_time_delta(milliseconds)
+  return milliseconds
     
