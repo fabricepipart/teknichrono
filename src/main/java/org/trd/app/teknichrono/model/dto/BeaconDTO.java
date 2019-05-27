@@ -40,20 +40,6 @@ public class BeaconDTO {
     return sb.toString();
   }
 
-  //
-  public Beacon fromDTO(Beacon entity, EntityManager em) {
-    if (entity == null) {
-      entity = new Beacon();
-    }
-    entity.setVersion(this.version);
-    entity.setNumber(this.number);
-    if (this.pilot != null) {
-      entity.setPilot(this.pilot.fromDTO(entity.getPilot(), em));
-    }
-    entity = em.merge(entity);
-    return entity;
-  }
-
   public int getId() {
     return id;
   }

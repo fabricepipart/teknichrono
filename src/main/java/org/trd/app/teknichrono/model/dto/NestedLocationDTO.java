@@ -1,11 +1,10 @@
 package org.trd.app.teknichrono.model.dto;
 
-import java.io.Serializable;
+import org.trd.app.teknichrono.model.jpa.Location;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-
-import org.trd.app.teknichrono.model.jpa.Location;
+import java.io.Serializable;
 
 public class NestedLocationDTO implements Serializable {
 

@@ -151,9 +151,10 @@ public class CategoryEndpoint {
     if (category == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-
-    category = entity.fromDTO(category, em);
+    //TODO I dont like this code, merge is done twice (inside fromDTO too)
+    // It is hard to test, a manual update is probably better
     try {
+      category = entity.fromDTO(category, em);
       em.merge(category);
     } catch (OptimisticLockException e) {
       return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();

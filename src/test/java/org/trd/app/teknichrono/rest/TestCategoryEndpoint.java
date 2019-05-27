@@ -16,6 +16,7 @@ import org.trd.app.teknichrono.model.jpa.Pilot;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.OptimisticLockException;
 import javax.persistence.TypedQuery;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -28,6 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,6 +40,8 @@ public class TestCategoryEndpoint {
   private int id = 1;
   @Mock
   private TypedQuery<Category> query;
+  @Mock
+  private TypedQuery<Pilot> queryPilot;
   @Mock
   private RuntimeDelegate runtimeDelegate;
   @Mock
@@ -234,9 +238,132 @@ public class TestCategoryEndpoint {
 
   @Test
   public void addPilot() {
+    Pilot pilot = new Pilot();
+    pilot.setId(102);
+    Category entity = newCategory(9, 10, 11);
+    when(em.find(Category.class, entity.getId())).thenReturn(entity);
+    when(em.find(Pilot.class, 102)).thenReturn(pilot);
+
+    Response r =  endpoint.addPilot(entity.getId(), 102);
+    Assert.assertNotNull(r);
+
+    ArgumentCaptor<CategoryDTO> captor = ArgumentCaptor.forClass(CategoryDTO.class);
+    verify(responseBuilder).entity(captor.capture());
+    CategoryDTO modifiedCategory = captor.getValue();
+    Assert.assertEquals(entity.getId(), modifiedCategory.getId());
+    Assert.assertTrue(modifiedCategory.getPilots().stream().anyMatch(p-> p.getId() == 102));
+
+    ArgumentCaptor pilotCaptor = ArgumentCaptor.forClass(Pilot.class);
+    verify(em, atLeastOnce()).persist(pilotCaptor.capture());
+    List values = pilotCaptor.getAllValues();
+    values.removeIf(e -> !(e instanceof Pilot));
+    List<Pilot> pilotValues = (List<Pilot>) values;
+    pilotValues.removeIf(p-> p.getId() != 102);
+    Assert.assertEquals(1, pilotValues.size());
+    Assert.assertEquals(102, pilotValues.get(0).getId());
+
+
+    ArgumentCaptor categoryCaptor = ArgumentCaptor.forClass(Category.class);
+    verify(em, atLeastOnce()).persist(categoryCaptor.capture());
+    values = categoryCaptor.getAllValues();
+    values.removeIf(e -> !(e instanceof Category));
+    List<Category> categoryValues = (List<Category>) values;
+    Assert.assertEquals(1, categoryValues.size());
+    Assert.assertEquals(entity.getId(), categoryValues.get(0).getId());
   }
 
   @Test
-  public void update() {
+  public void addPilotReturnsNotFoundIfCategoryMissing() {
+    Pilot pilot = new Pilot();
+    pilot.setId(102);
+    Category entity = newCategory(9, 10, 11);
+
+    Response r =  endpoint.addPilot(entity.getId(), 102);
+    Assert.assertNotNull(r);
+
+    verify(em, never()).persist(any());
+    verify(responseBuilder).status((Response.StatusType) javax.ws.rs.core.Response.Status.NOT_FOUND);
   }
+
+  @Test
+  public void addPilotReturnsNotFoundIfPilotMissing() {
+    Pilot pilot = new Pilot();
+    pilot.setId(102);
+    Category entity = newCategory(9, 10, 11);
+    when(em.find(Category.class, entity.getId())).thenReturn(entity);
+
+    Response r =  endpoint.addPilot(entity.getId(), 102);
+    Assert.assertNotNull(r);
+
+    verify(em, never()).persist(any());
+    verify(responseBuilder).status((Response.StatusType) javax.ws.rs.core.Response.Status.NOT_FOUND);
+
+  }
+  @Test
+  public void update() {
+    Category before = newCategory(9, 10, 11);
+    Category entity = newCategory(9, 11, 12);
+    entity.setId(before.getId());
+    entity.setName("new");
+    CategoryDTO dto = new CategoryDTO(entity);
+    when(em.createQuery(anyString(), eq(Pilot.class))).thenReturn(queryPilot);
+
+
+    when(em.find(Category.class, before.getId())).thenReturn(before);
+    Response r = endpoint.update(before.getId(), dto);
+
+    Assert.assertNotNull(r);
+    ArgumentCaptor<Category> captor = ArgumentCaptor.forClass(Category.class);
+    verify(em, atLeastOnce()).merge(captor.capture());
+    Category c = captor.getAllValues().get(0);
+    Assert.assertEquals(entity.getName(), c.getName());
+
+  }
+
+
+  @Test
+  public void updateIsBadRequestIfNoEntityPassed() {
+    Category before = newCategory(9, 10, 11);
+    Response r = endpoint.update(before.getId(), null);
+
+    verify(responseBuilder).status((Response.StatusType) Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void updateIsConflictIfIdsDontMatch() {
+    Category before = newCategory(9, 10, 11);
+    Category after = newCategory(9, 11, 12);
+    after.setName("new");
+    CategoryDTO dto = new CategoryDTO(after);
+    Response r = endpoint.update(before.getId(), dto);
+    verify(responseBuilder).status((Response.StatusType) Response.Status.CONFLICT);
+  }
+
+  @Test
+  public void updateReturnsNullIfNotFound() {
+    Category before = newCategory(9, 10, 11);
+    Category after = newCategory(9, 11, 12);
+    after.setId(before.getId());
+    after.setName("new");
+    CategoryDTO dto = new CategoryDTO(after);
+    when(em.find(Category.class, before.getId())).thenReturn(null);
+    Response r = endpoint.update(before.getId(), dto);
+    Assert.assertNotNull(r);
+    verify(responseBuilder).status((Response.StatusType) javax.ws.rs.core.Response.Status.NOT_FOUND);
+  }
+
+  @Test
+  public void updateIsConflictIfOptimisticLockException() {
+    doThrow(new OptimisticLockException()).when(em).merge(any());
+    Category before = newCategory(9, 10, 11);
+    Category after = newCategory(9, 11, 12);
+    after.setId(before.getId());
+    after.setName("new");
+    CategoryDTO dto = new CategoryDTO(after);
+    when(em.createQuery(anyString(), eq(Pilot.class))).thenReturn(queryPilot);
+    when(em.find(Category.class, before.getId())).thenReturn(before);
+    Response r = endpoint.update(before.getId(), dto);
+    verify(responseBuilder).status((Response.StatusType) Response.Status.CONFLICT);
+  }
+
 }
