@@ -93,7 +93,7 @@ public class BeaconEndpoint {
     return Response.ok(entity).build();
   }
 
-  public BeaconDTO findBeacon(int id) {
+  private BeaconDTO findBeacon(int id) {
     TypedQuery<Beacon> findByIdQuery = em
         .createQuery("SELECT DISTINCT b FROM Beacon b WHERE b.id = :entityId ORDER BY b.id", Beacon.class);
     findByIdQuery.setParameter("entityId", id);
