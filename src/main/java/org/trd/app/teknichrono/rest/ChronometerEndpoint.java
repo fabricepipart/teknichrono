@@ -25,6 +25,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,7 +67,7 @@ public class ChronometerEndpoint {
       for (Session s : entity.getSessions()) {
         s.getChronometers().remove(entity);
       }
-      List<Ping> pings = entity.getPings();
+      List<Ping> pings = new ArrayList<>(entity.getPings());
       if (pings != null) {
         for (Ping ping : pings) {
           ping.setChrono(null);
@@ -111,10 +112,10 @@ public class ChronometerEndpoint {
   public List<ChronometerDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
     try (DurationLogger dl = new DurationLogger(LOGGER, "Get all chronometers")) {
       return chronometerRepository.findAll()
-              .page(Paging.from(startPosition, maxResult))
-              .stream()
-              .map(ChronometerDTO::fromChronometer)
-              .collect(Collectors.toList());
+          .page(Paging.from(startPosition, maxResult))
+          .stream()
+          .map(ChronometerDTO::fromChronometer)
+          .collect(Collectors.toList());
     }
   }
 

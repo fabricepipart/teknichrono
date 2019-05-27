@@ -3,7 +3,15 @@ package org.trd.app.teknichrono.model.jpa;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
+import javax.persistence.Transient;
+import javax.persistence.Version;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +45,7 @@ public class LapTime extends PanacheEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   private Session session;
 
-  @OneToMany(mappedBy = "lapTime", orphanRemoval = true)
+  @OneToMany
   @OrderColumn(name = "dateTime")
   private List<Ping> intermediates = new ArrayList<>();
 

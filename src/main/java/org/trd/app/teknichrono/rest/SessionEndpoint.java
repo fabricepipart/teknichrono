@@ -4,7 +4,19 @@ import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.business.client.PingManager;
 import org.trd.app.teknichrono.business.client.SessionSelector;
 import org.trd.app.teknichrono.model.dto.SessionDTO;
-import org.trd.app.teknichrono.model.jpa.*;
+import org.trd.app.teknichrono.model.jpa.Chronometer;
+import org.trd.app.teknichrono.model.jpa.ChronometerRepository;
+import org.trd.app.teknichrono.model.jpa.Event;
+import org.trd.app.teknichrono.model.jpa.EventRepository;
+import org.trd.app.teknichrono.model.jpa.Location;
+import org.trd.app.teknichrono.model.jpa.LocationRepository;
+import org.trd.app.teknichrono.model.jpa.Pilot;
+import org.trd.app.teknichrono.model.jpa.PilotRepository;
+import org.trd.app.teknichrono.model.jpa.Ping;
+import org.trd.app.teknichrono.model.jpa.PingRepository;
+import org.trd.app.teknichrono.model.jpa.Session;
+import org.trd.app.teknichrono.model.jpa.SessionRepository;
+import org.trd.app.teknichrono.model.jpa.SessionType;
 import org.trd.app.teknichrono.util.DurationLogger;
 
 import javax.inject.Inject;
@@ -128,7 +140,7 @@ public class SessionEndpoint {
   @Transactional
   public Response findCurrent() {
     List<Session> allSessions = listAllSessions(null, null)
-            .collect(Collectors.toList());
+        .collect(Collectors.toList());
     SessionSelector selector = new SessionSelector();
     Session session = selector.pickMostRelevantCurrent(allSessions);
     if (session == null) {
@@ -159,8 +171,8 @@ public class SessionEndpoint {
   public List<SessionDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
     DurationLogger perf = DurationLogger.get(logger).start("List sessions");
     List<SessionDTO> sessions = listAllSessions(startPosition, maxResult)
-            .map(SessionDTO::fromSession)
-            .collect(Collectors.toList());
+        .map(SessionDTO::fromSession)
+        .collect(Collectors.toList());
     perf.end();
     return sessions;
   }
@@ -219,7 +231,8 @@ public class SessionEndpoint {
     sessionRepository.persist(session);
     pilotRepository.persist(pilot);
     perf.end();
-    return Response.ok(session).build();
+    SessionDTO dto = SessionDTO.fromSession(session);
+    return Response.ok(dto).build();
   }
 
   @POST

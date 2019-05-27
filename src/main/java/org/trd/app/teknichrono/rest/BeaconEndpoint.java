@@ -80,11 +80,13 @@ public class BeaconEndpoint {
       associatedPilot.setCurrentBeacon(null);
       pilotRepository.persist(associatedPilot);
     }
-//    List<Ping> pings = entity.getPings();
-//    if (pings != null) {
-//      new ArrayList<>(pings).forEach(p -> p.setBeacon(null));
-//      pingRepository.persist(pings);
-//    }
+    List<Ping> pings = new ArrayList<>(entity.getPings());
+    if (pings != null) {
+      for (Ping ping : pings) {
+        ping.setBeacon(null);
+        pingRepository.persist(ping);
+      }
+    }
     beaconRepository.delete(entity);
     perf.end();
     return Response.noContent().build();
@@ -135,10 +137,10 @@ public class BeaconEndpoint {
   public List<BeaconDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
     DurationLogger perf = DurationLogger.get(LOGGER).start("Find all beacons");
     List<BeaconDTO> results = beaconRepository.findAll()
-            .page(Paging.from(startPosition, maxResult))
-            .stream()
-            .map(BeaconDTO::fromBeacon)
-            .collect(Collectors.toList());
+        .page(Paging.from(startPosition, maxResult))
+        .stream()
+        .map(BeaconDTO::fromBeacon)
+        .collect(Collectors.toList());
     perf.end();
     return results;
   }

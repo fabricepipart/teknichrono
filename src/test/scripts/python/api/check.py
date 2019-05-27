@@ -1,6 +1,6 @@
 #!python3
 
-from api.base import pretty_time_delta
+from api.base import pretty_time_delta, iso_to_millis, iso_date_to_millis
 
 # ----------------------------------------------------------------------
 
@@ -29,9 +29,9 @@ def checkLaptimeFilled(laps, lastsCanBeEmpty=False):
   atLeastOneBeforeWasEmpty = False
   for lap in laps:
     if not lastsCanBeEmpty:
-      assert lap['duration'] > 0
+      assert iso_to_millis(lap['duration']) > 0
     else:
-      if lap['duration'] == 0:
+      if not 'duration' in lap:
         atLeastOneBeforeWasEmpty = True
       else:
         assert not atLeastOneBeforeWasEmpty
@@ -40,8 +40,8 @@ def checkLaptimeFilled(laps, lastsCanBeEmpty=False):
 def checkLaptimeBetween(laps, fromMillis, toMillis):
   print('Checking that all laptimes are between ' + pretty_time_delta(fromMillis) + ' and ' + pretty_time_delta(toMillis))
   for lap in laps:
-    assert lap['duration'] <= toMillis, 'Lap duration ' + str(lap['duration']) + ' is not < to ' + str(toMillis)
-    assert lap['duration'] >= fromMillis, 'Lap duration ' + str(lap['duration']) + ' is not > to ' + str(fromMillis)
+    assert iso_to_millis(lap['duration']) <= toMillis, 'Lap duration ' + lap['duration'] + ' is not < to ' + str(toMillis)
+    assert iso_to_millis(lap['duration']) >= fromMillis, 'Lap duration ' + lap['duration'] + ' is not > to ' + str(fromMillis)
 
 
 def checkCountWithLapIndex(laps, index, count):
@@ -72,32 +72,33 @@ def checkDeltaBestInIncreasingOrder(laps, lastsCanBeEmpty=False):
   atLeastOneBeforeWasEmpty = False
   for lap in laps:
     if firstLapEvaluated:
-      gapWithBest = lap['gapWithBest']
-      duration = lap['duration']
       if not lastsCanBeEmpty:
+        gapWithBest = iso_to_millis(lap['gapWithBest'])
         if gapWithBest == maxFound:
-          assert lastLapDuration == lap['duration']
+          assert lastLapDuration == iso_to_millis(lap['duration'])
         else:
           assert gapWithBest > maxFound
       else:
-        if duration == 0:
+        if not 'duration' in lap:
           atLeastOneBeforeWasEmpty = True
         else:
+          gapWithBest = iso_to_millis(lap['gapWithBest'])
           if gapWithBest == maxFound:
-            assert lastLapDuration == lap['duration']
+            assert lastLapDuration == iso_to_millis(lap['duration'])
           else:
             assert gapWithBest > maxFound
             assert not atLeastOneBeforeWasEmpty
       maxFound = gapWithBest
     firstLapEvaluated = True
-    lastLapDuration = lap['duration']
+    if 'duration' in lap:
+      lastLapDuration = iso_to_millis(lap['duration'])
 
 
 def checkStartsOrdered(laps):
   print('Checking that all laps have increasing start dates')
   maxFound = 0
   for lap in laps:
-    start = lap['startDate']
+    start = iso_date_to_millis(lap['startDate'])
     assert start >= maxFound
     maxFound = start
 
@@ -106,7 +107,7 @@ def checkEndsOrdered(laps):
   print('Checking that all laps have increasing end dates')
   maxFound = 0
   for lap in laps:
-    start = lap['endDate']
+    start = iso_date_to_millis(lap['endDate'])
     assert start >= maxFound
     maxFound = start
 
@@ -119,18 +120,22 @@ def checkDeltaPreviousFilled(laps, lastsCanBeEmpty=False):
   for lap in laps:
     if firstLapEvaluated:
       if not lastsCanBeEmpty:
-        if lastLapDuration == lap['duration']:
-          assert lap['gapWithPrevious'] == 0
+        if lastLapDuration == iso_to_millis(lap['duration']):
+          assert iso_to_millis(lap['gapWithPrevious']) == 0
         else:
-          assert lap['gapWithPrevious'] > 0
+          assert iso_to_millis(lap['gapWithPrevious']) > 0
       else:
-        if lap['gapWithPrevious'] == 0:
-          if lastLapDuration != lap['duration']:
+        if not 'gapWithPrevious' in lap:
+          duration = 0
+          if 'duration' in lap:
+            duration = iso_to_millis(lap['duration'])
+          if lastLapDuration != duration:
             atLeastOneBeforeWasEmpty = True
         else:
           assert not atLeastOneBeforeWasEmpty
     firstLapEvaluated = True
-    lastLapDuration = lap['duration']
+    if 'duration' in lap:
+      lastLapDuration = iso_to_millis(lap['duration'])
 
 
 def checkLaps(laps, total, indexMap, numberMap, category=None, durationFrom=None, durationTo=None):

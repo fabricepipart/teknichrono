@@ -19,7 +19,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.RuntimeDelegate;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -134,6 +133,13 @@ public class TestBeaconEndpoint {
     when(beaconRepository.findById(entity.id)).thenReturn(entity);
     endpoint.deleteById(entity.id);
     verify(beaconRepository).delete(entity);
+    ArgumentCaptor<Ping> captor = ArgumentCaptor.forClass(Ping.class);
+    verify(pingRepository, atLeastOnce()).persist(captor.capture());
+    List<Ping> pings = captor.getAllValues();
+    Assert.assertEquals(entity.getPings().size(), pings.size());
+    for (Ping p : pings) {
+      Assert.assertNull(p.getBeacon());
+    }
   }
 
   @Test
