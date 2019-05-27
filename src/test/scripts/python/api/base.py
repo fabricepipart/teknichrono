@@ -106,4 +106,8 @@ def iso_to_millis(time_iso):
   timedeltaObject = isodate.parse_duration(time_iso)
   milliseconds = (timedeltaObject / timedelta(microseconds=1000))
   return milliseconds
+
+def iso_date_to_millis(time_iso):
+  dateTimeObject = isodate.parse_datetime(time_iso)
+  return int(dateTimeObject.timestamp() * 1000)
     

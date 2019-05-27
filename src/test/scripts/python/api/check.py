@@ -1,6 +1,6 @@
 #!python3
 
-from api.base import pretty_time_delta, iso_to_millis
+from api.base import pretty_time_delta, iso_to_millis, iso_date_to_millis
 
 # ----------------------------------------------------------------------
 
@@ -31,7 +31,7 @@ def checkLaptimeFilled(laps, lastsCanBeEmpty=False):
     if not lastsCanBeEmpty:
       assert iso_to_millis(lap['duration']) > 0
     else:
-      if iso_to_millis(lap['duration']) == 0:
+      if not 'duration' in lap:
         atLeastOneBeforeWasEmpty = True
       else:
         assert not atLeastOneBeforeWasEmpty
@@ -72,17 +72,17 @@ def checkDeltaBestInIncreasingOrder(laps, lastsCanBeEmpty=False):
   atLeastOneBeforeWasEmpty = False
   for lap in laps:
     if firstLapEvaluated:
-      gapWithBest = lap['gapWithBest']
-      duration = iso_to_millis(lap['duration'])
       if not lastsCanBeEmpty:
+        gapWithBest = iso_to_millis(lap['gapWithBest'])
         if gapWithBest == maxFound:
           assert lastLapDuration == iso_to_millis(lap['duration'])
         else:
           assert gapWithBest > maxFound
       else:
-        if duration == 0:
+        if not 'duration' in lap:
           atLeastOneBeforeWasEmpty = True
         else:
+          gapWithBest = iso_to_millis(lap['gapWithBest'])
           if gapWithBest == maxFound:
             assert lastLapDuration == iso_to_millis(lap['duration'])
           else:
@@ -90,14 +90,15 @@ def checkDeltaBestInIncreasingOrder(laps, lastsCanBeEmpty=False):
             assert not atLeastOneBeforeWasEmpty
       maxFound = gapWithBest
     firstLapEvaluated = True
-    lastLapDuration = iso_to_millis(lap['duration'])
+    if 'duration' in lap:
+      lastLapDuration = iso_to_millis(lap['duration'])
 
 
 def checkStartsOrdered(laps):
   print('Checking that all laps have increasing start dates')
   maxFound = 0
   for lap in laps:
-    start = lap['startDate']
+    start = iso_date_to_millis(lap['startDate'])
     assert start >= maxFound
     maxFound = start
 
@@ -106,7 +107,7 @@ def checkEndsOrdered(laps):
   print('Checking that all laps have increasing end dates')
   maxFound = 0
   for lap in laps:
-    start = lap['endDate']
+    start = iso_date_to_millis(lap['endDate'])
     assert start >= maxFound
     maxFound = start
 
@@ -120,17 +121,21 @@ def checkDeltaPreviousFilled(laps, lastsCanBeEmpty=False):
     if firstLapEvaluated:
       if not lastsCanBeEmpty:
         if lastLapDuration == iso_to_millis(lap['duration']):
-          assert lap['gapWithPrevious'] == 0
+          assert iso_to_millis(lap['gapWithPrevious']) == 0
         else:
-          assert lap['gapWithPrevious'] > 0
+          assert iso_to_millis(lap['gapWithPrevious']) > 0
       else:
-        if lap['gapWithPrevious'] == 0:
-          if lastLapDuration != iso_to_millis(lap['duration']):
+        if not 'gapWithPrevious' in lap:
+          duration = 0
+          if 'duration' in lap:
+            duration = iso_to_millis(lap['duration'])
+          if lastLapDuration != duration:
             atLeastOneBeforeWasEmpty = True
         else:
           assert not atLeastOneBeforeWasEmpty
     firstLapEvaluated = True
-    lastLapDuration = iso_to_millis(lap['duration'])
+    if 'duration' in lap:
+      lastLapDuration = iso_to_millis(lap['duration'])
 
 
 def checkLaps(laps, total, indexMap, numberMap, category=None, durationFrom=None, durationTo=None):

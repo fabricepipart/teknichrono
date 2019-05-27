@@ -105,18 +105,16 @@ def printLaps(laps, withDates=False):
   for lap in laps:
     #print("Raw Lap : " + str(lap))
     #lapId = str(lap['id'])
-    startDateValue = lap['startDate']
-    if startDateValue:
-      #startDate = pretty_hour(startDateValue)
-      startDate = startDateValue
-    else:
-      startDate = ''
+    startDate = ''
+    if 'startDate' in lap:
+      startDateValue = lap['startDate']
+      if startDateValue:
+        startDate = startDateValue
     
     endDate = ''
     if 'endDate' in lap:
       endDateValue = lap['endDate']
       if endDateValue:
-        #endDate = pretty_hour(endDateValue)
         endDate = endDateValue
 
     pilot = str(lap['pilot']['firstName']) + ' ' + str(lap['pilot']['lastName'])
