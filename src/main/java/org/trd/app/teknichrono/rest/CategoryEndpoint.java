@@ -1,6 +1,7 @@
 package org.trd.app.teknichrono.rest;
 
 import org.trd.app.teknichrono.model.dto.CategoryDTO;
+import org.trd.app.teknichrono.model.dto.NestedPilotDTO;
 import org.trd.app.teknichrono.model.jpa.Category;
 import org.trd.app.teknichrono.model.jpa.CategoryRepository;
 import org.trd.app.teknichrono.model.jpa.Pilot;
@@ -24,6 +25,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Path("/categories")
@@ -60,6 +62,13 @@ public class CategoryEndpoint {
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
+    Set<Pilot> pilots = entity.getPilots();
+    if (pilots != null) {
+      for (Pilot pilot : pilots) {
+        pilot.setCategory(null);
+        pilotRespository.persist(pilot);
+      }
+    }
     categoryRespository.delete(entity);
     return Response.noContent().build();
   }
@@ -95,10 +104,10 @@ public class CategoryEndpoint {
   @Transactional
   public List<CategoryDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
     return categoryRespository.findAll()
-            .page(Paging.from(startPosition, maxResult))
-            .stream()
-            .map(CategoryDTO::fromCategory)
-            .collect(Collectors.toList());
+        .page(Paging.from(startPosition, maxResult))
+        .stream()
+        .map(CategoryDTO::fromCategory)
+        .collect(Collectors.toList());
   }
 
   @POST
@@ -140,7 +149,14 @@ public class CategoryEndpoint {
       return Response.status(Status.NOT_FOUND).build();
     }
 
-    category = dto.fromDTO(category, em);
+    category.setName(dto.getName());
+    if (dto.getPilots() != null && dto.getPilots().size() > 0) {
+      for (NestedPilotDTO p : dto.getPilots()) {
+        Pilot pilot = pilotRespository.findById(p.getId());
+        category.getPilots().add(pilot);
+      }
+    }
+
     try {
       categoryRespository.persist(category);
     } catch (OptimisticLockException e) {

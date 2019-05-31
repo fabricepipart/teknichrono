@@ -171,7 +171,7 @@ public class BeaconEndpoint {
     }
     beacon.setNumber(entity.getNumber());
     try {
-      beacon.persist();
+      beaconRepository.persist(beacon);
     } catch (OptimisticLockException e) {
       return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
     }

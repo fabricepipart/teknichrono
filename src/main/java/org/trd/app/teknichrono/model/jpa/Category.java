@@ -33,6 +33,14 @@ public class Category extends PanacheEntity {
     this.version = version;
   }
 
+  public Long getId() {
+    return this.id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
   public Set<Pilot> getPilots() {
     return this.pilots;
   }
