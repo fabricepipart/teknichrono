@@ -7,7 +7,9 @@ import javax.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class BeaconRepository implements PanacheRepository<Beacon> {
 
-    public Beacon findByNumber(long number) {
-        return find("number", number).firstResult();
-    }
+
+  public Beacon findByNumber(long number) {
+    return find("number", number).firstResult();
+  }
+
 }

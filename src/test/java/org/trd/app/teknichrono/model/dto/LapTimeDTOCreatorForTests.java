@@ -3,14 +3,14 @@ package org.trd.app.teknichrono.model.dto;
 import org.trd.app.teknichrono.business.view.LapTimeConverter;
 import org.trd.app.teknichrono.business.view.LapTimeFiller;
 import org.trd.app.teknichrono.model.jpa.LapTime;
-import org.trd.app.teknichrono.model.jpa.TestLapTimeCreator;
+import org.trd.app.teknichrono.model.jpa.LapTimeCreatorForTests;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TestLapTimeDTOCreator {
+public class LapTimeDTOCreatorForTests {
 
   private long lapId = 0;
   private long pilotId = 0;
@@ -116,12 +116,12 @@ public class TestLapTimeDTOCreator {
   }
 
   public List<LapTimeDTO> createLapsWithIntermediates() {
-    List<LapTime> laps = new TestLapTimeCreator().createLapsWithIntermediates();
+    List<LapTime> laps = new LapTimeCreatorForTests().createLapsWithIntermediates();
     return laps.stream().map(LapTimeDTO::fromLapTime).collect(Collectors.toList());
   }
 
   public List<LapTimeDTO> createRaceLapsWithIntermediates() {
-    TestLapTimeCreator testLapTimeCreator = new TestLapTimeCreator();
+    LapTimeCreatorForTests testLapTimeCreator = new LapTimeCreatorForTests();
     testLapTimeCreator.nextLocation(true);
     List<LapTime> laps = testLapTimeCreator.createLapsWithIntermediates();
     LapTimeConverter converter = new LapTimeConverter();

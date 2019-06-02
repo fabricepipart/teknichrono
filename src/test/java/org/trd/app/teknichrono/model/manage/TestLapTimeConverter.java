@@ -1,39 +1,39 @@
 package org.trd.app.teknichrono.model.manage;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.trd.app.teknichrono.business.view.LapTimeConverter;
 import org.trd.app.teknichrono.model.dto.LapTimeDTO;
+import org.trd.app.teknichrono.model.dto.LapTimeDTOCreatorForTests;
 import org.trd.app.teknichrono.model.dto.SectorDTO;
-import org.trd.app.teknichrono.model.dto.TestLapTimeDTOCreator;
 import org.trd.app.teknichrono.model.jpa.LapTime;
-import org.trd.app.teknichrono.model.jpa.TestLapTimeCreator;
+import org.trd.app.teknichrono.model.jpa.LapTimeCreatorForTests;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 public class TestLapTimeConverter {
 
-  private TestLapTimeCreator creator;
+  private LapTimeCreatorForTests creator;
 
-  @Before
-  public void setUp() throws Exception {
-    creator = new TestLapTimeCreator();
+  @BeforeEach
+  public void setUp() {
+    creator = new LapTimeCreatorForTests();
   }
 
   @Test
   public void convertsEmptyListToEmptyList() {
     LapTimeConverter testMe = new LapTimeConverter();
     List<LapTimeDTO> result = testMe.convert(new ArrayList<LapTime>());
-    org.junit.Assert.assertTrue(result.isEmpty());
+    assertThat(result.isEmpty()).isTrue();
   }
 
   @Test
   public void noneCreatedWithNegativeDuration() {
-    TestLapTimeDTOCreator creator = new TestLapTimeDTOCreator();
+    LapTimeDTOCreatorForTests creator = new LapTimeDTOCreatorForTests();
     List<LapTimeDTO> lapsWithIntermediates = creator.createLapsWithIntermediates();
     for (LapTimeDTO lap : lapsWithIntermediates) {
       checkNoNegativeDuration(lap);
@@ -72,12 +72,12 @@ public class TestLapTimeConverter {
     searchResults.add(l2);
     searchResults.add(l3);
     List<LapTimeDTO> result = testMe.convert(searchResults);
-    org.junit.Assert.assertEquals(1, result.get(0).getId());
-    org.junit.Assert.assertEquals(2, result.get(1).getId());
-    org.junit.Assert.assertEquals(3, result.get(2).getId());
-    org.junit.Assert.assertEquals(4, result.get(3).getId());
-    org.junit.Assert.assertEquals(5, result.get(4).getId());
-    org.junit.Assert.assertEquals(6, result.get(5).getId());
+    assertThat(result.get(0).getId()).isEqualTo(1);
+    assertThat(result.get(1).getId()).isEqualTo(2);
+    assertThat(result.get(2).getId()).isEqualTo(3);
+    assertThat(result.get(3).getId()).isEqualTo(4);
+    assertThat(result.get(4).getId()).isEqualTo(5);
+    assertThat(result.get(5).getId()).isEqualTo(6);
   }
 
   @Test
@@ -97,12 +97,12 @@ public class TestLapTimeConverter {
     searchResults.add(l2);
     searchResults.add(l3);
     List<LapTimeDTO> result = testMe.convert(searchResults);
-    org.junit.Assert.assertEquals(1, result.get(0).getId());
-    org.junit.Assert.assertEquals(2, result.get(1).getId());
-    org.junit.Assert.assertEquals(3, result.get(2).getId());
-    org.junit.Assert.assertEquals(4, result.get(3).getId());
-    org.junit.Assert.assertEquals(5, result.get(4).getId());
-    org.junit.Assert.assertEquals(6, result.get(5).getId());
+    assertThat(result.get(0).getId()).isEqualTo(1);
+    assertThat(result.get(1).getId()).isEqualTo(2);
+    assertThat(result.get(2).getId()).isEqualTo(3);
+    assertThat(result.get(3).getId()).isEqualTo(4);
+    assertThat(result.get(4).getId()).isEqualTo(5);
+    assertThat(result.get(5).getId()).isEqualTo(6);
   }
 
 }

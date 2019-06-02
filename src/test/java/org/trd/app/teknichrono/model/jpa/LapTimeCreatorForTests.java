@@ -5,7 +5,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestLapTimeCreator {
+public class LapTimeCreatorForTests {
 
   private long lapId = 0L;
   private long pilotId = 0L;

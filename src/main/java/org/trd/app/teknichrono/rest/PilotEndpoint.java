@@ -38,7 +38,8 @@ public class PilotEndpoint {
   private final CategoryRepository categoryRepository;
 
   @Inject
-  public PilotEndpoint(PilotRepository pilotRepository, BeaconRepository beaconRepository, CategoryRepository categoryRepository) {
+  public PilotEndpoint(PilotRepository pilotRepository, BeaconRepository beaconRepository,
+                       CategoryRepository categoryRepository) {
     this.categoryRepository = categoryRepository;
     this.pilotRepository = pilotRepository;
     this.beaconRepository = beaconRepository;
@@ -102,11 +103,8 @@ public class PilotEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public List<PilotDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
-    return pilotRepository.findAll()
-            .page(Paging.from(startPosition, maxResult))
-            .stream()
-            .map(PilotDTO::fromPilot)
-            .collect(Collectors.toList());
+    return pilotRepository.findAll().page(Paging.from(startPosition, maxResult)).stream().map(PilotDTO::fromPilot)
+        .collect(Collectors.toList());
   }
 
   @POST
@@ -145,12 +143,15 @@ public class PilotEndpoint {
       return Response.status(Status.NOT_FOUND).build();
     }
     // Update of category
-    if (dto.getCategory() != null && dto.getCategory().id > 0) {
+    pilot.setCategory(null);
+    if (dto.getCategory() != null && dto.getCategory().getId() != null && dto.getCategory().getId() > 0) {
       Category category = categoryRepository.findById(dto.getCategory().id);
       pilot.setCategory(category);
     }
     // Update of beacon
-    if (dto.getCurrentBeacon() != null && dto.getCurrentBeacon().id > 0) {
+    pilot.setCurrentBeacon(null);
+    if (dto.getCurrentBeacon() != null && dto.getCurrentBeacon().getId() != null
+        && dto.getCurrentBeacon().getId() > 0) {
       Beacon beacon = beaconRepository.findById(dto.getCurrentBeacon().id);
       pilot.setCurrentBeacon(beacon);
     }

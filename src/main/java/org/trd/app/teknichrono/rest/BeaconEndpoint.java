@@ -3,11 +3,7 @@ package org.trd.app.teknichrono.rest;
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.dto.BeaconDTO;
 import org.trd.app.teknichrono.model.jpa.Beacon;
-import org.trd.app.teknichrono.model.jpa.BeaconRepository;
-import org.trd.app.teknichrono.model.jpa.Pilot;
-import org.trd.app.teknichrono.model.jpa.PilotRepository;
-import org.trd.app.teknichrono.model.jpa.Ping;
-import org.trd.app.teknichrono.model.jpa.PingRepository;
+import org.trd.app.teknichrono.service.BeaconService;
 import org.trd.app.teknichrono.util.DurationLogger;
 
 import javax.inject.Inject;
@@ -27,26 +23,19 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.NoSuchElementException;
 
 @Path("/beacons")
 public class BeaconEndpoint {
 
   private static final Logger LOGGER = Logger.getLogger(BeaconEndpoint.class);
 
-  private final BeaconRepository beaconRepository;
-
-  private final PilotRepository pilotRepository;
-
-  private final PingRepository pingRepository;
+  private final BeaconService beaconService;
 
   @Inject
-  public BeaconEndpoint(BeaconRepository beaconRepository, PilotRepository pilotRepository, PingRepository pingRepository) {
-    this.beaconRepository = beaconRepository;
-    this.pilotRepository = pilotRepository;
-    this.pingRepository = pingRepository;
+  public BeaconEndpoint(BeaconService beaconService) {
+    this.beaconService = beaconService;
   }
 
   @POST
@@ -54,12 +43,7 @@ public class BeaconEndpoint {
   @Transactional
   public Response create(Beacon entity) {
     DurationLogger perf = DurationLogger.get(LOGGER).start("Create beacon " + entity.getNumber());
-    if (entity.getPilot() != null && entity.getPilot().id > 0) {
-      Pilot pilot = pilotRepository.findById(entity.getPilot().id);
-      entity.setPilot(pilot);
-      pilotRepository.persist(pilot);
-    }
-    beaconRepository.persist(entity);
+    beaconService.create(entity);
     URI location = UriBuilder.fromResource(BeaconEndpoint.class).path(String.valueOf(entity.id)).build();
     Response toReturn = Response.created(location).build();
     perf.end();
@@ -71,24 +55,13 @@ public class BeaconEndpoint {
   @Transactional
   public Response deleteById(@PathParam("id") long id) {
     DurationLogger perf = DurationLogger.get(LOGGER).start("Delete beacon id=" + id);
-    Beacon entity = beaconRepository.findById(id);
-    if (entity == null) {
+    try {
+      beaconService.deleteById(id);
+    } catch (NoSuchElementException e) {
       return Response.status(Status.NOT_FOUND).build();
+    } finally {
+      perf.end();
     }
-    Pilot associatedPilot = entity.getPilot();
-    if (associatedPilot != null) {
-      associatedPilot.setCurrentBeacon(null);
-      pilotRepository.persist(associatedPilot);
-    }
-    List<Ping> pings = new ArrayList<>(entity.getPings());
-    if (pings != null) {
-      for (Ping ping : pings) {
-        ping.setBeacon(null);
-        pingRepository.persist(ping);
-      }
-    }
-    beaconRepository.delete(entity);
-    perf.end();
     return Response.noContent().build();
   }
 
@@ -107,7 +80,7 @@ public class BeaconEndpoint {
   }
 
   private BeaconDTO findBeaconById(long id) {
-    Beacon entity = beaconRepository.findById(id);
+    Beacon entity = beaconService.findById(id);
     if (entity != null) {
       return BeaconDTO.fromBeacon(entity);
     }
@@ -121,7 +94,7 @@ public class BeaconEndpoint {
   @Transactional
   public Response findBeaconNumber(@PathParam("number") long number) {
     DurationLogger perf = DurationLogger.get(LOGGER).start("Find beacon number " + number);
-    Beacon entity = beaconRepository.findByNumber(number);
+    Beacon entity = beaconService.findByNumber(number);
     if (entity == null) {
       LOGGER.warn("Beacon Number=" + number + " not found");
       return Response.status(Status.NOT_FOUND).build();
@@ -136,11 +109,7 @@ public class BeaconEndpoint {
   @Transactional
   public List<BeaconDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
     DurationLogger perf = DurationLogger.get(LOGGER).start("Find all beacons");
-    List<BeaconDTO> results = beaconRepository.findAll()
-        .page(Paging.from(startPosition, maxResult))
-        .stream()
-        .map(BeaconDTO::fromBeacon)
-        .collect(Collectors.toList());
+    List<BeaconDTO> results = beaconService.findAll(startPosition, maxResult);
     perf.end();
     return results;
   }
@@ -149,34 +118,24 @@ public class BeaconEndpoint {
   @Path("/{id:[0-9][0-9]*}")
   @Consumes(MediaType.APPLICATION_JSON)
   @Transactional
-  public Response update(@PathParam("id") long id, Beacon entity) {
+  public Response update(@PathParam("id") long id, BeaconDTO entity) {
     if (entity == null) {
       return Response.status(Status.BAD_REQUEST).build();
     }
     DurationLogger perf = DurationLogger.get(LOGGER).start("Update beacon number " + entity.getNumber());
-    if (id != entity.id) {
-      perf.end();
-      return Response.status(Status.CONFLICT).entity(entity).build();
-    }
-    Beacon beacon = beaconRepository.findById(id);
-    if (beacon == null) {
-      perf.end();
-      return Response.status(Status.NOT_FOUND).build();
-    }
-
-    // Update of pilot
-    if (entity.getPilot() != null && entity.getPilot().id > 0) {
-      Pilot pilot = pilotRepository.findById(entity.getPilot().id);
-      beacon.setPilot(pilot);
-    }
-    beacon.setNumber(entity.getNumber());
     try {
-      beaconRepository.persist(beacon);
+      beaconService.updateBeacon(id, entity);
     } catch (OptimisticLockException e) {
       return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
+    } catch (NoSuchElementException e) {
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (IllegalArgumentException e) {
+      return Response.status(Status.CONFLICT).entity(entity).build();
+    } finally {
+      perf.end();
     }
 
-    perf.end();
     return Response.noContent().build();
   }
+
 }
