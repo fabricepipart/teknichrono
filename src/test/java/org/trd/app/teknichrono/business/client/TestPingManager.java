@@ -1,14 +1,15 @@
 package org.trd.app.teknichrono.business.client;
 
 import org.jboss.logging.Logger;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.trd.app.teknichrono.model.jpa.Beacon;
 import org.trd.app.teknichrono.model.jpa.Chronometer;
 import org.trd.app.teknichrono.model.jpa.LapTime;
@@ -21,6 +22,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
@@ -29,7 +31,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class TestPingManager {
 
   private long laptimeIndex = 1L;
@@ -56,7 +59,7 @@ public class TestPingManager {
   private PingManager testMe = new PingManager(em);
   private final Beacon beacon = new Beacon();
 
-  @Before
+  @BeforeEach
   public void prepare() {
     beacon.setPilot(pilot);
     session.setStart(start);
@@ -145,13 +148,12 @@ public class TestPingManager {
     verify(em).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
-    Assert.assertTrue(lap != null);
-    Assert.assertEquals(pilot, lap.getPilot());
-    Assert.assertEquals(start, lap.getStartDate());
-    Assert.assertEquals(session, lap.getSession());
-    Assert.assertTrue(lap.getIntermediates().contains(p));
-    Assert.assertEquals(1, lap.getIntermediates().size());
-
+    assertThat(lap).isNotNull();
+    assertThat(lap.getPilot()).isEqualTo(pilot);
+    assertThat(lap.getStartDate()).isEqualTo(start);
+    assertThat(lap.getSession()).isEqualTo(session);
+    assertThat(lap.getIntermediates()).contains(p);
+    assertThat(lap.getIntermediates().size()).isEqualTo(1);
   }
 
   @Test
@@ -192,13 +194,13 @@ public class TestPingManager {
     verify(em).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
-    Assert.assertTrue(lap != null);
-    Assert.assertEquals(pilot, lap.getPilot());
-    Assert.assertEquals(start, lap.getStartDate());
-    Assert.assertEquals(session, lap.getSession());
-    Assert.assertEquals(2, lap.getIntermediates().size());
-    Assert.assertTrue(lap.getIntermediates().contains(p1));
-    Assert.assertEquals(1, lap.getIntermediates().indexOf(p1));
+    assertThat(lap).isNotNull();
+    assertThat(lap.getPilot()).isEqualTo(pilot);
+    assertThat(lap.getStartDate()).isEqualTo(start);
+    assertThat(lap.getSession()).isEqualTo(session);
+    assertThat(lap.getIntermediates().size()).isEqualTo(2);
+    assertThat(lap.getIntermediates()).contains(p1);
+    assertThat(lap.getIntermediates().indexOf(p1)).isEqualTo(1);
   }
 
   @Test
@@ -210,13 +212,13 @@ public class TestPingManager {
     verify(em).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
-    Assert.assertTrue(lap != null);
-    Assert.assertEquals(pilot, lap.getPilot());
-    Assert.assertEquals(start, lap.getStartDate());
-    Assert.assertEquals(session, lap.getSession());
-    Assert.assertTrue(lap.getIntermediates().contains(p2));
-    Assert.assertEquals(3, lap.getIntermediates().size());
-    Assert.assertEquals(2, lap.getIntermediates().indexOf(p2));
+    assertThat(lap).isNotNull();
+    assertThat(lap.getPilot()).isEqualTo(pilot);
+    assertThat(lap.getStartDate()).isEqualTo(start);
+    assertThat(lap.getSession()).isEqualTo(session);
+    assertThat(lap.getIntermediates()).contains(p2);
+    assertThat(lap.getIntermediates().size()).isEqualTo(3);
+    assertThat(lap.getIntermediates().indexOf(p2)).isEqualTo(2);
   }
 
   @Test
@@ -228,13 +230,13 @@ public class TestPingManager {
     verify(em).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
-    Assert.assertTrue(lap != null);
-    Assert.assertEquals(pilot, lap.getPilot());
-    Assert.assertEquals(start, lap.getStartDate());
-    Assert.assertEquals(session, lap.getSession());
-    Assert.assertTrue(lap.getIntermediates().contains(p3));
-    Assert.assertEquals(4, lap.getIntermediates().size());
-    Assert.assertEquals(3, lap.getIntermediates().indexOf(p3));
+    assertThat(lap).isNotNull();
+    assertThat(lap.getPilot()).isEqualTo(pilot);
+    assertThat(lap.getStartDate()).isEqualTo(start);
+    assertThat(lap.getSession()).isEqualTo(session);
+    assertThat(lap.getIntermediates()).contains(p3);
+    assertThat(lap.getIntermediates().size()).isEqualTo(4);
+    assertThat(lap.getIntermediates().indexOf(p3)).isEqualTo(3);
   }
 
   @Test
@@ -245,13 +247,13 @@ public class TestPingManager {
     verify(em).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
-    Assert.assertTrue(lap != null);
-    Assert.assertEquals(pilot, lap.getPilot());
-    Assert.assertEquals(p3.getInstant(), lap.getStartDate());
-    Assert.assertEquals(session, lap.getSession());
-    Assert.assertTrue(lap.getIntermediates().contains(p3));
-    Assert.assertEquals(1, lap.getIntermediates().size());
-    Assert.assertEquals(0, lap.getIntermediates().indexOf(p3));
+    assertThat(lap).isNotNull();
+    assertThat(lap.getPilot()).isEqualTo(pilot);
+    assertThat(lap.getStartDate()).isEqualTo(p3.getInstant());
+    assertThat(lap.getSession()).isEqualTo(session);
+    assertThat(lap.getIntermediates()).contains(p3);
+    assertThat(lap.getIntermediates().size()).isEqualTo(1);
+    assertThat(lap.getIntermediates().indexOf(p3)).isEqualTo(0);
   }
 
   @Test
@@ -263,13 +265,13 @@ public class TestPingManager {
     verify(em).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
-    Assert.assertTrue(lap != null);
-    Assert.assertEquals(pilot, lap.getPilot());
-    Assert.assertEquals(p2.getInstant(), lap.getStartDate());
-    Assert.assertEquals(session, lap.getSession());
-    Assert.assertTrue(lap.getIntermediates().contains(p2));
-    Assert.assertEquals(2, lap.getIntermediates().size());
-    Assert.assertEquals(0, lap.getIntermediates().indexOf(p2));
+    assertThat(lap).isNotNull();
+    assertThat(lap.getPilot()).isEqualTo(pilot);
+    assertThat(lap.getStartDate()).isEqualTo(p2.getInstant());
+    assertThat(lap.getSession()).isEqualTo(session);
+    assertThat(lap.getIntermediates()).contains(p2);
+    assertThat(lap.getIntermediates().size()).isEqualTo(2);
+    assertThat(lap.getIntermediates().indexOf(p2)).isEqualTo(0);
   }
 
   @Test
@@ -281,13 +283,13 @@ public class TestPingManager {
     verify(em).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
-    Assert.assertTrue(lap != null);
-    Assert.assertEquals(pilot, lap.getPilot());
-    Assert.assertEquals(p1.getInstant(), lap.getStartDate());
-    Assert.assertEquals(session, lap.getSession());
-    Assert.assertTrue(lap.getIntermediates().contains(p1));
-    Assert.assertEquals(3, lap.getIntermediates().size());
-    Assert.assertEquals(0, lap.getIntermediates().indexOf(p1));
+    assertThat(lap).isNotNull();
+    assertThat(lap.getPilot()).isEqualTo(pilot);
+    assertThat(lap.getStartDate()).isEqualTo(p1.getInstant());
+    assertThat(lap.getSession()).isEqualTo(session);
+    assertThat(lap.getIntermediates()).contains(p1);
+    assertThat(lap.getIntermediates().size()).isEqualTo(3);
+    assertThat(lap.getIntermediates().indexOf(p1)).isEqualTo(0);
   }
 
   @Test
@@ -299,13 +301,13 @@ public class TestPingManager {
     verify(em).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
-    Assert.assertTrue(lap != null);
-    Assert.assertEquals(pilot, lap.getPilot());
-    Assert.assertEquals(p0.getInstant(), lap.getStartDate());
-    Assert.assertEquals(session, lap.getSession());
-    Assert.assertTrue(lap.getIntermediates().contains(p0));
-    Assert.assertEquals(4, lap.getIntermediates().size());
-    Assert.assertEquals(0, lap.getIntermediates().indexOf(p0));
+    assertThat(lap).isNotNull();
+    assertThat(lap.getPilot()).isEqualTo(pilot);
+    assertThat(lap.getStartDate()).isEqualTo(p0.getInstant());
+    assertThat(lap.getSession()).isEqualTo(session);
+    assertThat(lap.getIntermediates()).contains(p0);
+    assertThat(lap.getIntermediates().size()).isEqualTo(4);
+    assertThat(lap.getIntermediates().indexOf(p0)).isEqualTo(0);
   }
 
   @Test
@@ -316,13 +318,13 @@ public class TestPingManager {
     verify(em).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
-    Assert.assertTrue(lap != null);
-    Assert.assertEquals(pilot, lap.getPilot());
-    Assert.assertEquals(p2.getInstant(), lap.getStartDate());
-    Assert.assertEquals(session, lap.getSession());
-    Assert.assertTrue(lap.getIntermediates().contains(p2));
-    Assert.assertEquals(1, lap.getIntermediates().size());
-    Assert.assertEquals(0, lap.getIntermediates().indexOf(p2));
+    assertThat(lap).isNotNull();
+    assertThat(lap.getPilot()).isEqualTo(pilot);
+    assertThat(lap.getStartDate()).isEqualTo(p2.getInstant());
+    assertThat(lap.getSession()).isEqualTo(session);
+    assertThat(lap.getIntermediates()).contains(p2);
+    assertThat(lap.getIntermediates().size()).isEqualTo(1);
+    assertThat(lap.getIntermediates().indexOf(p2)).isEqualTo(0);
   }
 
   @Test
@@ -334,13 +336,13 @@ public class TestPingManager {
     verify(em).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
-    Assert.assertTrue(lap != null);
-    Assert.assertEquals(pilot, lap.getPilot());
-    Assert.assertEquals(p0.getInstant(), lap.getStartDate());
-    Assert.assertEquals(session, lap.getSession());
-    Assert.assertTrue(lap.getIntermediates().contains(p0));
-    Assert.assertEquals(2, lap.getIntermediates().size());
-    Assert.assertEquals(0, lap.getIntermediates().indexOf(p0));
+    assertThat(lap).isNotNull();
+    assertThat(lap.getPilot()).isEqualTo(pilot);
+    assertThat(lap.getStartDate()).isEqualTo(p0.getInstant());
+    assertThat(lap.getSession()).isEqualTo(session);
+    assertThat(lap.getIntermediates()).contains(p0);
+    assertThat(lap.getIntermediates().size()).isEqualTo(2);
+    assertThat(lap.getIntermediates().indexOf(p0)).isEqualTo(0);
   }
 
   @Test
@@ -352,13 +354,13 @@ public class TestPingManager {
     verify(em).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
-    Assert.assertTrue(lap != null);
-    Assert.assertEquals(pilot, lap.getPilot());
-    Assert.assertEquals(start, lap.getStartDate());
-    Assert.assertEquals(session, lap.getSession());
-    Assert.assertTrue(lap.getIntermediates().contains(p3));
-    Assert.assertEquals(3, lap.getIntermediates().size());
-    Assert.assertEquals(2, lap.getIntermediates().indexOf(p3));
+    assertThat(lap).isNotNull();
+    assertThat(lap.getPilot()).isEqualTo(pilot);
+    assertThat(lap.getStartDate()).isEqualTo(start);
+    assertThat(lap.getSession()).isEqualTo(session);
+    assertThat(lap.getIntermediates()).contains(p3);
+    assertThat(lap.getIntermediates().size()).isEqualTo(3);
+    assertThat(lap.getIntermediates().indexOf(p3)).isEqualTo(2);
   }
 
   @Test
@@ -370,13 +372,13 @@ public class TestPingManager {
     verify(em).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
-    Assert.assertTrue(lap != null);
-    Assert.assertEquals(pilot, lap.getPilot());
-    Assert.assertEquals(start, lap.getStartDate());
-    Assert.assertEquals(session, lap.getSession());
-    Assert.assertTrue(lap.getIntermediates().contains(p1));
-    Assert.assertEquals(4, lap.getIntermediates().size());
-    Assert.assertEquals(1, lap.getIntermediates().indexOf(p1));
+    assertThat(lap).isNotNull();
+    assertThat(lap.getPilot()).isEqualTo(pilot);
+    assertThat(lap.getStartDate()).isEqualTo(start);
+    assertThat(lap.getSession()).isEqualTo(session);
+    assertThat(lap.getIntermediates()).contains(p1);
+    assertThat(lap.getIntermediates().size()).isEqualTo(4);
+    assertThat(lap.getIntermediates().indexOf(p1)).isEqualTo(1);
   }
 
 
@@ -389,13 +391,13 @@ public class TestPingManager {
     verify(em).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
-    Assert.assertTrue(lap != null);
-    Assert.assertEquals(pilot, lap.getPilot());
-    Assert.assertEquals(p1.getInstant(), lap.getStartDate());
-    Assert.assertEquals(session, lap.getSession());
-    Assert.assertTrue(lap.getIntermediates().contains(p1));
-    Assert.assertEquals(1, lap.getIntermediates().size());
-    Assert.assertEquals(0, lap.getIntermediates().indexOf(p1));
+    assertThat(lap).isNotNull();
+    assertThat(lap.getPilot()).isEqualTo(pilot);
+    assertThat(lap.getStartDate()).isEqualTo(p1.getInstant());
+    assertThat(lap.getSession()).isEqualTo(session);
+    assertThat(lap.getIntermediates()).contains(p1);
+    assertThat(lap.getIntermediates().size()).isEqualTo(1);
+    assertThat(lap.getIntermediates().indexOf(p1)).isEqualTo(0);
   }
 
 
@@ -408,13 +410,13 @@ public class TestPingManager {
     verify(em).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
-    Assert.assertTrue(lap != null);
-    Assert.assertEquals(pilot, lap.getPilot());
-    Assert.assertEquals(p1.getInstant(), lap.getStartDate());
-    Assert.assertEquals(session, lap.getSession());
-    Assert.assertTrue(lap.getIntermediates().contains(p1));
-    Assert.assertEquals(1, lap.getIntermediates().size());
-    Assert.assertEquals(0, lap.getIntermediates().indexOf(p1));
+    assertThat(lap).isNotNull();
+    assertThat(lap.getPilot()).isEqualTo(pilot);
+    assertThat(lap.getStartDate()).isEqualTo(p1.getInstant());
+    assertThat(lap.getSession()).isEqualTo(session);
+    assertThat(lap.getIntermediates()).contains(p1);
+    assertThat(lap.getIntermediates().size()).isEqualTo(1);
+    assertThat(lap.getIntermediates().indexOf(p1)).isEqualTo(0);
   }
 
 
@@ -428,13 +430,13 @@ public class TestPingManager {
     verify(em).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
-    Assert.assertTrue(lap != null);
-    Assert.assertEquals(pilot, lap.getPilot());
-    Assert.assertEquals(p1.getInstant(), lap.getStartDate());
-    Assert.assertEquals(session, lap.getSession());
-    Assert.assertTrue(lap.getIntermediates().contains(p1));
-    Assert.assertEquals(1, lap.getIntermediates().size());
-    Assert.assertEquals(0, lap.getIntermediates().indexOf(p1));
+    assertThat(lap).isNotNull();
+    assertThat(lap.getPilot()).isEqualTo(pilot);
+    assertThat(lap.getStartDate()).isEqualTo(p1.getInstant());
+    assertThat(lap.getSession()).isEqualTo(session);
+    assertThat(lap.getIntermediates()).contains(p1);
+    assertThat(lap.getIntermediates().size()).isEqualTo(1);
+    assertThat(lap.getIntermediates().indexOf(p1)).isEqualTo(0);
   }
 
 
@@ -449,13 +451,13 @@ public class TestPingManager {
     verify(em).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
-    Assert.assertTrue(lap != null);
-    Assert.assertEquals(pilot, lap.getPilot());
-    Assert.assertEquals(start.plus(Duration.ofMillis(40000)), lap.getStartDate());
-    Assert.assertEquals(session, lap.getSession());
-    Assert.assertTrue(lap.getIntermediates().contains(p1));
-    Assert.assertEquals(4, lap.getIntermediates().size());
-    Assert.assertEquals(1, lap.getIntermediates().indexOf(p1));
+    assertThat(lap).isNotNull();
+    assertThat(lap.getPilot()).isEqualTo(pilot);
+    assertThat(lap.getStartDate()).isEqualTo(start.plus(Duration.ofMillis(40000)));
+    assertThat(lap.getSession()).isEqualTo(session);
+    assertThat(lap.getIntermediates()).contains(p1);
+    assertThat(lap.getIntermediates().size()).isEqualTo(4);
+    assertThat(lap.getIntermediates().indexOf(p1)).isEqualTo(1);
   }
 
 
@@ -471,22 +473,22 @@ public class TestPingManager {
     boolean foundLapOne = false;
     boolean foundLapTwo = false;
     for (LapTime lap : laps) {
-      Assert.assertTrue(lap != null);
-      Assert.assertEquals(pilot, lap.getPilot());
-      Assert.assertEquals(session, lap.getSession());
+      assertThat(lap).isNotNull();
+      assertThat(lap.getPilot()).isEqualTo(pilot);
+      assertThat(lap.getSession()).isEqualTo(session);
       if (lap.getStartDate().equals(start)) {
         foundLapOne = true;
-        Assert.assertTrue(lap.getIntermediates().contains(p1));
-        Assert.assertEquals(2, lap.getIntermediates().size());
-        Assert.assertEquals(1, lap.getIntermediates().indexOf(p1));
+        assertThat(lap.getIntermediates()).contains(p1);
+        assertThat(lap.getIntermediates().size()).isEqualTo(2);
+        assertThat(lap.getIntermediates().indexOf(p1)).isEqualTo(1);
       } else if (lap.getStartDate().equals(start.plus(Duration.ofMillis(50000)))) {
         foundLapTwo = true;
-        Assert.assertTrue(!lap.getIntermediates().contains(p1));
-        Assert.assertEquals(3, lap.getIntermediates().size());
+        assertThat(lap.getIntermediates()).doesNotContain(p1);
+        assertThat(lap.getIntermediates().size()).isEqualTo(3);
       }
     }
-    Assert.assertTrue(foundLapOne);
-    Assert.assertTrue(foundLapTwo);
+    assertThat(foundLapOne).isTrue();
+    assertThat(foundLapTwo).isTrue();
   }
 
   @Test
@@ -498,13 +500,13 @@ public class TestPingManager {
     ArgumentCaptor<LapTime> captor = ArgumentCaptor.forClass(LapTime.class);
     verify(em).persist(captor.capture());
     LapTime lap = captor.getValue();
-    Assert.assertTrue(lap != null);
-    Assert.assertEquals(pilot, lap.getPilot());
-    Assert.assertEquals(p1.getInstant(), lap.getStartDate());
-    Assert.assertEquals(session, lap.getSession());
-    Assert.assertTrue(lap.getIntermediates().contains(p1));
-    Assert.assertEquals(2, lap.getIntermediates().size());
-    Assert.assertEquals(0, lap.getIntermediates().indexOf(p1));
+    assertThat(lap).isNotNull();
+    assertThat(lap.getPilot()).isEqualTo(pilot);
+    assertThat(lap.getStartDate()).isEqualTo(p1.getInstant());
+    assertThat(lap.getSession()).isEqualTo(session);
+    assertThat(lap.getIntermediates()).contains(p1);
+    assertThat(lap.getIntermediates().size()).isEqualTo(2);
+    assertThat(lap.getIntermediates().indexOf(p1)).isEqualTo(0);
   }
 
 
