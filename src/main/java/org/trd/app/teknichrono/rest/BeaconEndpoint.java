@@ -3,7 +3,7 @@ package org.trd.app.teknichrono.rest;
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.dto.BeaconDTO;
 import org.trd.app.teknichrono.model.jpa.Beacon;
-import org.trd.app.teknichrono.service.BeaconService;
+import org.trd.app.teknichrono.model.jpa.BeaconRepository;
 import org.trd.app.teknichrono.util.DurationLogger;
 import org.trd.app.teknichrono.util.exception.MissingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
@@ -32,11 +32,11 @@ public class BeaconEndpoint {
 
   private static final Logger LOGGER = Logger.getLogger(BeaconEndpoint.class);
 
-  private final BeaconService beaconService;
+  private final BeaconRepository beaconRepository;
 
   @Inject
-  public BeaconEndpoint(BeaconService beaconService) {
-    this.beaconService = beaconService;
+  public BeaconEndpoint(BeaconRepository beaconRepository) {
+    this.beaconRepository = beaconRepository;
   }
 
   @POST
@@ -45,7 +45,7 @@ public class BeaconEndpoint {
   public Response create(Beacon entity) {
     try (DurationLogger perf = DurationLogger.get(LOGGER).start("Create beacon " + entity.getNumber())) {
       try {
-        beaconService.create(entity);
+        beaconRepository.create(entity);
       } catch (NotFoundException e) {
         return Response.status(Status.NOT_FOUND).build();
       }
@@ -61,7 +61,7 @@ public class BeaconEndpoint {
   public Response deleteById(@PathParam("id") long id) {
     DurationLogger perf = DurationLogger.get(LOGGER).start("Delete beacon id=" + id);
     try {
-      beaconService.deleteById(id);
+      beaconRepository.deleteById(id);
     } catch (NotFoundException e) {
       return Response.status(Status.NOT_FOUND).build();
     } finally {
@@ -85,7 +85,7 @@ public class BeaconEndpoint {
   }
 
   private BeaconDTO findBeaconById(long id) {
-    Beacon entity = beaconService.findById(id);
+    Beacon entity = beaconRepository.findById(id);
     if (entity != null) {
       return BeaconDTO.fromBeacon(entity);
     }
@@ -99,7 +99,7 @@ public class BeaconEndpoint {
   @Transactional
   public Response findBeaconNumber(@PathParam("number") long number) {
     DurationLogger perf = DurationLogger.get(LOGGER).start("Find beacon number " + number);
-    Beacon entity = beaconService.findByNumber(number);
+    Beacon entity = beaconRepository.findByNumber(number);
     if (entity == null) {
       LOGGER.warn("Beacon Number=" + number + " not found");
       return Response.status(Status.NOT_FOUND).build();
@@ -114,7 +114,7 @@ public class BeaconEndpoint {
   @Transactional
   public List<BeaconDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
     DurationLogger perf = DurationLogger.get(LOGGER).start("Find all beacons");
-    List<BeaconDTO> results = beaconService.findAll(startPosition, maxResult);
+    List<BeaconDTO> results = beaconRepository.findAll(startPosition, maxResult);
     perf.end();
     return results;
   }
@@ -129,7 +129,7 @@ public class BeaconEndpoint {
     }
     DurationLogger perf = DurationLogger.get(LOGGER).start("Update beacon number " + entity.getNumber());
     try {
-      beaconService.updateBeacon(id, entity);
+      beaconRepository.updateBeacon(id, entity);
     } catch (OptimisticLockException e) {
       return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
     } catch (NotFoundException e) {
