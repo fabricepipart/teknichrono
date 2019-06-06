@@ -1,14 +1,14 @@
 package org.trd.app.teknichrono.rest;
 
+import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.dto.CategoryDTO;
-import org.trd.app.teknichrono.model.dto.NestedPilotDTO;
 import org.trd.app.teknichrono.model.jpa.Category;
-import org.trd.app.teknichrono.model.jpa.CategoryRepository;
-import org.trd.app.teknichrono.model.jpa.Pilot;
-import org.trd.app.teknichrono.model.jpa.PilotRepository;
+import org.trd.app.teknichrono.service.CategoryService;
+import org.trd.app.teknichrono.util.DurationLogger;
+import org.trd.app.teknichrono.util.exception.MissingIdException;
+import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
 import javax.persistence.OptimisticLockException;
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
@@ -25,52 +25,43 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Path("/categories")
 public class CategoryEndpoint {
 
-  // TODO, get rid of the em (still needed for the fromDTO)
-  private final EntityManager em;
+  private static final Logger LOGGER = Logger.getLogger(CategoryEndpoint.class);
 
-  private final CategoryRepository categoryRespository;
-
-  private final PilotRepository pilotRespository;
+  private final CategoryService categoryService;
 
   @Inject
-  public CategoryEndpoint(EntityManager em, CategoryRepository categoryRespository, PilotRepository pilotRespository) {
-    this.em = em;
-    this.categoryRespository = categoryRespository;
-    this.pilotRespository = pilotRespository;
+  public CategoryEndpoint(CategoryService categoryService) {
+    this.categoryService = categoryService;
   }
 
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Transactional
   public Response create(Category entity) {
-    categoryRespository.persist(entity);
-    return Response
-        .created(UriBuilder.fromResource(CategoryEndpoint.class).path(String.valueOf(entity.id)).build()).build();
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Create category " + entity.getName())) {
+      categoryService.create(entity);
+      UriBuilder path = UriBuilder.fromResource(CategoryEndpoint.class).path(String.valueOf(entity.id));
+      Response response = Response.created(path.build()).build();
+      return response;
+    }
   }
 
   @DELETE
   @Path("/{id:[0-9][0-9]*}")
   @Transactional
   public Response deleteById(@PathParam("id") long id) {
-    Category entity = categoryRespository.findById(id);
-    if (entity == null) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
-    Set<Pilot> pilots = entity.getPilots();
-    if (pilots != null) {
-      for (Pilot pilot : pilots) {
-        pilot.setCategory(null);
-        pilotRespository.persist(pilot);
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Delete category id=" + id)) {
+      try {
+        categoryService.deleteById(id);
+      } catch (NotFoundException e) {
+        return Response.status(Status.NOT_FOUND).build();
       }
+      return Response.noContent().build();
     }
-    categoryRespository.delete(entity);
-    return Response.noContent().build();
   }
 
   @GET
@@ -78,12 +69,14 @@ public class CategoryEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public Response findById(@PathParam("id") long id) {
-    Category entity = categoryRespository.findById(id);
-    if (entity == null) {
-      return Response.status(Status.NOT_FOUND).build();
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Find category id=" + id)) {
+      Category entity = categoryService.findById(id);
+      if (entity == null) {
+        return Response.status(Status.NOT_FOUND).build();
+      }
+      CategoryDTO dto = CategoryDTO.fromCategory(entity);
+      return Response.ok(dto).build();
     }
-    CategoryDTO dto = CategoryDTO.fromCategory(entity);
-    return Response.ok(dto).build();
   }
 
   @GET
@@ -91,23 +84,23 @@ public class CategoryEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public Response findCategoryByName(@QueryParam("name") String name) {
-    Category entity = categoryRespository.findByName(name);
-    if (entity == null) {
-      return Response.status(Status.NOT_FOUND).build();
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Find category name=" + name)) {
+      Category entity = categoryService.findByName(name);
+      if (entity == null) {
+        return Response.status(Status.NOT_FOUND).build();
+      }
+      CategoryDTO dto = CategoryDTO.fromCategory(entity);
+      return Response.ok(dto).build();
     }
-    CategoryDTO dto = CategoryDTO.fromCategory(entity);
-    return Response.ok(dto).build();
   }
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public List<CategoryDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
-    return categoryRespository.findAll()
-        .page(Paging.from(startPosition, maxResult))
-        .stream()
-        .map(CategoryDTO::fromCategory)
-        .collect(Collectors.toList());
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Find all categories")) {
+      return categoryService.findAll(startPosition, maxResult);
+    }
   }
 
   @POST
@@ -115,22 +108,14 @@ public class CategoryEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public Response addPilot(@PathParam("categoryId") long categoryId, @QueryParam("pilotId") Long pilotId) {
-    Category category = categoryRespository.findById(categoryId);
-    if (category == null) {
-      return Response.status(Status.NOT_FOUND).build();
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Add pilot id=" + pilotId + " to category id=" + categoryId)) {
+      try {
+        CategoryDTO dto = categoryService.addPilot(categoryId, pilotId);
+        return Response.ok(dto).build();
+      } catch (NotFoundException e) {
+        return Response.status(Status.NOT_FOUND).build();
+      }
     }
-    Pilot pilot = pilotRespository.findById(pilotId);
-    if (pilot == null) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
-    pilot.setCategory(category);
-    category.getPilots().add(pilot);
-    categoryRespository.persist(category);
-    for (Pilot c : category.getPilots()) {
-      pilotRespository.persist(c);
-    }
-    CategoryDTO dto = CategoryDTO.fromCategory(category);
-    return Response.ok(dto).build();
   }
 
   @PUT
@@ -138,31 +123,20 @@ public class CategoryEndpoint {
   @Consumes(MediaType.APPLICATION_JSON)
   @Transactional
   public Response update(@PathParam("id") long id, CategoryDTO dto) {
-    if (dto == null) {
-      return Response.status(Status.BAD_REQUEST).build();
-    }
-    if (id != dto.getId()) {
-      return Response.status(Status.CONFLICT).entity(dto).build();
-    }
-    Category category = categoryRespository.findById(id);
-    if (category == null) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
-
-    category.setName(dto.getName());
-    if (dto.getPilots() != null && dto.getPilots().size() > 0) {
-      for (NestedPilotDTO p : dto.getPilots()) {
-        Pilot pilot = pilotRespository.findById(p.getId());
-        category.getPilots().add(pilot);
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Update category id=" + id)) {
+      if (dto == null) {
+        return Response.status(Status.BAD_REQUEST).build();
       }
+      try {
+        categoryService.update(id, dto);
+      } catch (OptimisticLockException e) {
+        return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
+      } catch (NotFoundException e) {
+        return Response.status(Status.NOT_FOUND).build();
+      } catch (MissingIdException e) {
+        return Response.status(Status.CONFLICT).entity(dto).build();
+      }
+      return Response.noContent().build();
     }
-
-    try {
-      categoryRespository.persist(category);
-    } catch (OptimisticLockException e) {
-      return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
-    }
-
-    return Response.noContent().build();
   }
 }
