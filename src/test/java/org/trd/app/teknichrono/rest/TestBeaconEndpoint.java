@@ -15,6 +15,8 @@ import org.trd.app.teknichrono.model.jpa.Beacon;
 import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.model.jpa.Ping;
 import org.trd.app.teknichrono.service.BeaconService;
+import org.trd.app.teknichrono.util.exception.MissingIdException;
+import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import javax.persistence.OptimisticLockException;
 import javax.ws.rs.core.Response;
@@ -24,7 +26,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -83,7 +84,7 @@ public class TestBeaconEndpoint {
   }
 
   @Test
-  public void createsBeacon() {
+  public void createsBeacon() throws NotFoundException {
     Beacon entity = newBeacon(999, -1);
     Response r = endpoint.create(entity);
     verify(beaconService).create(entity);
@@ -111,7 +112,7 @@ public class TestBeaconEndpoint {
   }
 
   @Test
-  public void deleteById() {
+  public void deleteById() throws NotFoundException {
     Beacon entity = newBeacon(999, 9);
     when(beaconService.findById(entity.id)).thenReturn(entity);
     endpoint.deleteById(entity.id);
@@ -198,7 +199,7 @@ public class TestBeaconEndpoint {
   }
 
   @Test
-  public void update() {
+  public void update() throws MissingIdException, NotFoundException {
     Beacon before = newBeacon(999, 11);
     Beacon after = newBeacon(99, 12);
     after.setId(before.getId());
@@ -225,27 +226,27 @@ public class TestBeaconEndpoint {
   }
 
   @Test
-  public void updateIsConflictIfIdsDontMatch() {
+  public void updateIsConflictIfIdsDontMatch() throws MissingIdException, NotFoundException {
     Beacon before = newBeacon(999, 11);
     Beacon after = newBeacon(99, 12);
-    doThrow(new IllegalArgumentException()).when(beaconService).updateBeacon(anyLong(), any(BeaconDTO.class));
+    doThrow(new MissingIdException()).when(beaconService).updateBeacon(anyLong(), any(BeaconDTO.class));
     Response r = endpoint.update(before.getId(), BeaconDTO.fromBeacon(after));
     verify(responseBuilder).status((Response.StatusType) Response.Status.CONFLICT);
   }
 
   @Test
-  public void updateReturnsNullIfNotFound() {
+  public void updateReturnsNullIfNotFound() throws MissingIdException, NotFoundException {
     Beacon before = newBeacon(999, 11);
     Beacon after = newBeacon(99, 12);
     after.setId(before.getId());
-    doThrow(new NoSuchElementException()).when(beaconService).updateBeacon(anyLong(), any(BeaconDTO.class));
+    doThrow(new NotFoundException()).when(beaconService).updateBeacon(anyLong(), any(BeaconDTO.class));
     Response r = endpoint.update(before.getId(), BeaconDTO.fromBeacon(after));
     assertThat(r).isNotNull();
     verify(responseBuilder).status((Response.StatusType) javax.ws.rs.core.Response.Status.NOT_FOUND);
   }
 
   @Test
-  public void updateIsConflictIfOptimisticLockException() {
+  public void updateIsConflictIfOptimisticLockException() throws MissingIdException, NotFoundException {
     doThrow(new OptimisticLockException()).when(beaconService).updateBeacon(anyLong(), any(BeaconDTO.class));
     Beacon before = newBeacon(999, 11);
     Beacon after = newBeacon(99, 12);

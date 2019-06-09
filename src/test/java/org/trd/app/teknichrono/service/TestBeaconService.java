@@ -14,12 +14,13 @@ import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.model.jpa.PilotRepository;
 import org.trd.app.teknichrono.model.jpa.Ping;
 import org.trd.app.teknichrono.model.jpa.PingRepository;
+import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.atLeastOnce;
@@ -68,8 +69,9 @@ public class TestBeaconService {
   }
 
   @Test
-  public void createsBeaconWithCompletePilotIfIdProvided() {
+  public void createsBeaconWithCompletePilotIfIdProvided() throws NotFoundException {
     Beacon entity = newBeacon(999, 9);
+    when(pilotRepository.findById(9L)).thenReturn(entity.getPilot());
     service.create(entity);
     verify(pilotRepository).findById(9L);
 
@@ -81,7 +83,7 @@ public class TestBeaconService {
   }
 
   @Test
-  public void deleteByIdRemovesBeaconFromPilot() {
+  public void deleteByIdRemovesBeaconFromPilot() throws NotFoundException {
     Beacon entity = newBeacon(999, 9);
     when(beaconRepository.findById(anyLong())).thenReturn(entity);
     service.deleteById(entity.id);
@@ -98,7 +100,7 @@ public class TestBeaconService {
   }
 
   @Test
-  public void deleteByIdRemovesBeaconFromPings() {
+  public void deleteByIdRemovesBeaconFromPings() throws NotFoundException {
     Beacon entity = newBeacon(999, 9);
     when(beaconRepository.findById(anyLong())).thenReturn(entity);
     service.deleteById(entity.getId());
@@ -114,7 +116,7 @@ public class TestBeaconService {
   @Test
   public void deleteByIdReturnsErrorIfBeaconDoesNotExist() {
     Beacon entity = newBeacon(999, 9);
-    org.junit.jupiter.api.Assertions.assertThrows(NoSuchElementException.class, () -> service.deleteById(entity.id));
+    assertThrows(NotFoundException.class, () -> service.deleteById(entity.id));
     verify(beaconRepository, never()).delete(any());
   }
 

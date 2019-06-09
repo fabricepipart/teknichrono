@@ -5,6 +5,8 @@ import org.trd.app.teknichrono.model.dto.BeaconDTO;
 import org.trd.app.teknichrono.model.jpa.Beacon;
 import org.trd.app.teknichrono.service.BeaconService;
 import org.trd.app.teknichrono.util.DurationLogger;
+import org.trd.app.teknichrono.util.exception.MissingIdException;
+import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
@@ -24,7 +26,6 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Path("/beacons")
 public class BeaconEndpoint {
@@ -42,12 +43,16 @@ public class BeaconEndpoint {
   @Consumes(MediaType.APPLICATION_JSON)
   @Transactional
   public Response create(Beacon entity) {
-    DurationLogger perf = DurationLogger.get(LOGGER).start("Create beacon " + entity.getNumber());
-    beaconService.create(entity);
-    URI location = UriBuilder.fromResource(BeaconEndpoint.class).path(String.valueOf(entity.id)).build();
-    Response toReturn = Response.created(location).build();
-    perf.end();
-    return toReturn;
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Create beacon " + entity.getNumber())) {
+      try {
+        beaconService.create(entity);
+      } catch (NotFoundException e) {
+        return Response.status(Status.NOT_FOUND).build();
+      }
+      URI location = UriBuilder.fromResource(BeaconEndpoint.class).path(String.valueOf(entity.id)).build();
+      Response toReturn = Response.created(location).build();
+      return toReturn;
+    }
   }
 
   @DELETE
@@ -57,7 +62,7 @@ public class BeaconEndpoint {
     DurationLogger perf = DurationLogger.get(LOGGER).start("Delete beacon id=" + id);
     try {
       beaconService.deleteById(id);
-    } catch (NoSuchElementException e) {
+    } catch (NotFoundException e) {
       return Response.status(Status.NOT_FOUND).build();
     } finally {
       perf.end();
@@ -127,9 +132,9 @@ public class BeaconEndpoint {
       beaconService.updateBeacon(id, entity);
     } catch (OptimisticLockException e) {
       return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
-    } catch (NoSuchElementException e) {
+    } catch (NotFoundException e) {
       return Response.status(Status.NOT_FOUND).build();
-    } catch (IllegalArgumentException e) {
+    } catch (MissingIdException e) {
       return Response.status(Status.CONFLICT).entity(entity).build();
     } finally {
       perf.end();

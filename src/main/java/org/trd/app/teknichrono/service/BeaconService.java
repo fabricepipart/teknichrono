@@ -8,12 +8,13 @@ import org.trd.app.teknichrono.model.jpa.PilotRepository;
 import org.trd.app.teknichrono.model.jpa.Ping;
 import org.trd.app.teknichrono.model.jpa.PingRepository;
 import org.trd.app.teknichrono.rest.Paging;
+import org.trd.app.teknichrono.util.exception.MissingIdException;
+import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -45,13 +46,13 @@ public class BeaconService {
         .collect(Collectors.toList());
   }
 
-  public void updateBeacon(long id, BeaconDTO entity) throws IllegalArgumentException, NoSuchElementException {
+  public void updateBeacon(long id, BeaconDTO entity) throws MissingIdException, NotFoundException {
     if (id != entity.getId()) {
-      throw new IllegalArgumentException();
+      throw new MissingIdException();
     }
     Beacon beacon = beaconRepository.findById(id);
     if (beacon == null) {
-      throw new NoSuchElementException();
+      throw new NotFoundException();
     }
 
     // Update of pilot
@@ -63,19 +64,24 @@ public class BeaconService {
     beaconRepository.persist(beacon);
   }
 
-  public void create(Beacon entity) {
+  public void create(Beacon entity) throws NotFoundException {
     if (entity.getPilot() != null && entity.getPilot().id > 0) {
+      // TODO is that needed?
       Pilot pilot = pilotRepository.findById(entity.getPilot().id);
+      if (pilot == null) {
+        throw new NotFoundException("Pilot not found with ID=" + entity.getPilot().id);
+      }
       entity.setPilot(pilot);
+      pilot.setCurrentBeacon(entity);
       pilotRepository.persist(pilot);
     }
     beaconRepository.persist(entity);
   }
 
-  public void deleteById(long id) throws NoSuchElementException {
+  public void deleteById(long id) throws NotFoundException {
     Beacon entity = beaconRepository.findById(id);
     if (entity == null) {
-      throw new NoSuchElementException();
+      throw new NotFoundException();
     }
     Pilot associatedPilot = entity.getPilot();
     if (associatedPilot != null) {
