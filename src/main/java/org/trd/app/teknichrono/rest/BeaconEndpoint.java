@@ -26,6 +26,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Path("/beacons")
 public class BeaconEndpoint {
@@ -114,7 +115,9 @@ public class BeaconEndpoint {
   @Transactional
   public List<BeaconDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
     DurationLogger perf = DurationLogger.get(LOGGER).start("Find all beacons");
-    List<BeaconDTO> results = beaconRepository.findAll(startPosition, maxResult);
+    List<BeaconDTO> results = beaconRepository.findAll(startPosition, maxResult)
+            .map(BeaconDTO::fromBeacon)
+            .collect(Collectors.toList());
     perf.end();
     return results;
   }

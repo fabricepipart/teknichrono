@@ -26,6 +26,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -190,7 +191,7 @@ public class TestCategoryEndpoint {
     entities.add(CategoryDTO.fromCategory(entity2));
     entities.add(CategoryDTO.fromCategory(entity3));
 
-    when(categoryRepository.findAll(null, null)).thenReturn(entities);
+    when(categoryRepository.findAll(null, null)).thenReturn(Stream.of(entity1, entity2, entity3));
 
     List<CategoryDTO> categoryDTOS = endpoint.listAll(null, null);
     assertThat(categoryDTOS).isNotNull();
@@ -208,7 +209,7 @@ public class TestCategoryEndpoint {
     Category entity1 = newCategory(9, 10, 11);
     entities.add(CategoryDTO.fromCategory(entity1));
 
-    when(categoryRepository.findAll(1, 1)).thenReturn(entities);
+    when(categoryRepository.findAll(1, 1)).thenReturn(Stream.of(entity1));
 
     List<CategoryDTO> beacons = endpoint.listAll(1, 1);
     assertThat(beacons).isNotNull();

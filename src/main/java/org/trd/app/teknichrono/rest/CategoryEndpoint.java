@@ -25,6 +25,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Path("/categories")
 public class CategoryEndpoint {
@@ -99,7 +100,9 @@ public class CategoryEndpoint {
   @Transactional
   public List<CategoryDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
     try (DurationLogger perf = DurationLogger.get(LOGGER).start("Find all categories")) {
-      return categoryRepository.findAll(startPosition, maxResult);
+      return categoryRepository.findAll(startPosition, maxResult)
+              .map(CategoryDTO::fromCategory)
+              .collect(Collectors.toList());
     }
   }
 

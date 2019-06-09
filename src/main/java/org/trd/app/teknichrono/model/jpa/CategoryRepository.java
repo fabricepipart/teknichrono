@@ -3,28 +3,42 @@ package org.trd.app.teknichrono.model.jpa;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import org.trd.app.teknichrono.model.dto.CategoryDTO;
 import org.trd.app.teknichrono.model.dto.NestedPilotDTO;
-import org.trd.app.teknichrono.rest.Paging;
 import org.trd.app.teknichrono.util.exception.MissingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
-public class CategoryRepository implements PanacheRepository<Category> {
+public class CategoryRepository extends PanacheRepositoryWrapper<Category> {
+
+    @ApplicationScoped
+    public static class Panache implements PanacheRepository<Category> {
+    }
+
+    private final Panache panacheRepository;
+
+    private final PilotRepository pilotRepository;
+
+    protected CategoryRepository() {
+        // Only needed because of Weld proxy being a subtype of current type: https://stackoverflow.com/a/48418256/2989857
+        this(null, null);
+    }
 
     @Inject
-    private PilotRepository pilotRepository;
+    public CategoryRepository(Panache panacheRepository, PilotRepository pilotRepository) {
+        super(panacheRepository);
+        this.panacheRepository = panacheRepository;
+        this.pilotRepository = pilotRepository;
+    }
 
     public Category findByName(String name) {
-        return find("name", name).firstResult();
+        return panacheRepository.find("name", name).firstResult();
     }
 
     public void create(Category entity) {
-        persist(entity);
+        panacheRepository.persist(entity);
     }
 
     public void deleteById(long id) throws NotFoundException {
@@ -39,15 +53,7 @@ public class CategoryRepository implements PanacheRepository<Category> {
                 pilotRepository.persist(associatedPilot);
             }
         }
-        delete(entity);
-    }
-
-    public List<CategoryDTO> findAll(Integer startPosition, Integer maxResult) {
-        return findAll()
-                .page(Paging.from(startPosition, maxResult))
-                .stream()
-                .map(CategoryDTO::fromCategory)
-                .collect(Collectors.toList());
+        panacheRepository.delete(entity);
     }
 
     public CategoryDTO addPilot(long categoryId, Long pilotId) throws NotFoundException {
@@ -87,6 +93,6 @@ public class CategoryRepository implements PanacheRepository<Category> {
             }
         }
         category.setName(entity.getName());
-        persist(category);
+        panacheRepository.persist(category);
     }
 }

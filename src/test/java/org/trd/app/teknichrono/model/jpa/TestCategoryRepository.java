@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.trd.app.teknichrono.model.dto.CategoryDTO;
 import org.trd.app.teknichrono.model.dto.NestedPilotDTO;
@@ -15,8 +14,6 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -30,10 +27,11 @@ public class TestCategoryRepository {
   @Mock
   private PilotRepository pilotRepository;
 
-  @Spy
+  @Mock
+  private CategoryRepository.Panache categoryPanacheRepository;
+
   @InjectMocks
   private CategoryRepository categoryRespository;
-
 
   public Category newCategory(int... pilotIds) {
     Category category = new Category();
@@ -58,12 +56,11 @@ public class TestCategoryRepository {
     Category entity = newCategory(9, 10, 11);
     Set<Pilot> pilots = entity.getPilots();
 
-    doReturn(entity).when(categoryRespository).findById(entity.getId());
-    doNothing().when(categoryRespository).delete(entity);
+    when(categoryPanacheRepository.findById(entity.getId())).thenReturn(entity);
 
     categoryRespository.deleteById(entity.getId());
 
-    verify(categoryRespository).delete(entity);
+    verify(categoryPanacheRepository).delete(entity);
     for (Pilot pilot : pilots) {
       verify(pilotRepository).persist(pilot);
       assertThat(pilot.getCurrentBeacon()).isNull();
@@ -72,9 +69,8 @@ public class TestCategoryRepository {
 
   @Test
   public void deleteByIdReturnsErrorIfCategoryDoesNotExist() {
-    doReturn(null).when(categoryRespository).findById(42L);
     Assertions.assertThrows(NotFoundException.class, () -> categoryRespository.deleteById(42L));
-    verify(categoryRespository, never()).delete(any());
+    verify(categoryPanacheRepository, never()).delete(any());
   }
 
 
@@ -84,8 +80,7 @@ public class TestCategoryRepository {
     pilot.setId(102L);
     Category entity = newCategory(9, 10, 11);
 
-    doReturn(entity).when(categoryRespository).findById(entity.getId());
-    doNothing().when(categoryRespository).persist(entity);
+    when(categoryPanacheRepository.findById(entity.getId())).thenReturn(entity);
     when(pilotRepository.findById(102L)).thenReturn(pilot);
 
     CategoryDTO modifiedCategory = categoryRespository.addPilot(entity.getId(), 102L);
@@ -104,11 +99,11 @@ public class TestCategoryRepository {
     pilot.setId(102L);
     Category entity = newCategory(9, 10, 11);
 
-    doReturn(null).when(categoryRespository).findById(entity.getId());
+    when(categoryPanacheRepository.findById(entity.getId())).thenReturn(null);
 
     Assertions.assertThrows(NotFoundException.class, () -> categoryRespository.addPilot(entity.getId(), 102L));
 
-    verify(categoryRespository, never()).persist(any(Category.class));
+    verify(categoryPanacheRepository, never()).persist(any(Category.class));
     verify(pilotRepository, never()).persist(any(Pilot.class));
   }
 
@@ -118,11 +113,11 @@ public class TestCategoryRepository {
     pilot.setId(102L);
     Category entity = newCategory(9, 10, 11);
 
-    doReturn(entity).when(categoryRespository).findById(entity.getId());
+    when(categoryPanacheRepository.findById(entity.getId())).thenReturn(entity);
 
     Assertions.assertThrows(NotFoundException.class, () -> categoryRespository.addPilot(entity.getId(), 102L));
 
-    verify(categoryRespository, never()).persist(any(Category.class));
+    verify(categoryPanacheRepository, never()).persist(any(Category.class));
     verify(pilotRepository, never()).persist(any(Pilot.class));
 
   }

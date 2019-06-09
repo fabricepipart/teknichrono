@@ -26,6 +26,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,7 +44,8 @@ import static org.mockito.Mockito.when;
 public class TestBeaconEndpoint {
 
   private long id = 1L;
-  RuntimeDelegate previousRuntimeDelegate;
+
+  private RuntimeDelegate previousRuntimeDelegate;
 
   @Mock
   private RuntimeDelegate runtimeDelegate;
@@ -163,40 +165,40 @@ public class TestBeaconEndpoint {
     verify(responseBuilder).status((Response.StatusType) javax.ws.rs.core.Response.Status.NOT_FOUND);
   }
 
-//  @Test
-//  public void listAll() {
-//    List<BeaconDTO> entities = new ArrayList<>();
-//    Beacon entity1 = newBeacon(999, 9);
-//    Beacon entity2 = newBeacon(-1, 10);
-//    Beacon entity3 = newBeacon(46, -1);
-//    entities.add(BeaconDTO.fromBeacon(entity1));
-//    entities.add(BeaconDTO.fromBeacon(entity2));
-//    entities.add(BeaconDTO.fromBeacon(entity3));
-//
-//    when(beaconService.findAll(null, null)).thenReturn(entities);
-//
-//    List<BeaconDTO> beacons = endpoint.listAll(null, null);
-//    assertThat(beacons).isNotNull();
-//    assertThat(beacons).hasSize(3);
-//
-//    assertThat(beacons.stream().filter(b -> (b.getNumber() == 999 && b.getPilot() != null && b.getPilot().getId() == 9)).count()).isEqualTo(1);
-//    assertThat(beacons.stream().filter(b -> (b.getPilot() != null && b.getPilot().getId() == 10)).count()).isEqualTo(1);
-//    assertThat(beacons.stream().filter(b -> (b.getNumber() == 46 && b.getPilot() == null)).count()).isEqualTo(1);
-//
-//  }
+  @Test
+  public void listAll() {
+    List<BeaconDTO> entities = new ArrayList<>();
+    Beacon entity1 = newBeacon(999, 9);
+    Beacon entity2 = newBeacon(-1, 10);
+    Beacon entity3 = newBeacon(46, -1);
+    entities.add(BeaconDTO.fromBeacon(entity1));
+    entities.add(BeaconDTO.fromBeacon(entity2));
+    entities.add(BeaconDTO.fromBeacon(entity3));
 
-//  @Test
-//  public void listAllCanUseWindows() {
-//    List<BeaconDTO> entities = new ArrayList<>();
-//    Beacon entity1 = newBeacon(999, 9);
-//    entities.add(BeaconDTO.fromBeacon(entity1));
-//
-//    when(beaconService.findAll(1, 1)).thenReturn(entities);
-//
-//    List<BeaconDTO> beacons = endpoint.listAll(1, 1);
-//    assertThat(beacons).isNotNull();
-//    assertThat(beacons).hasSize(1);
-//  }
+    when(beaconService.findAll(null, null)).thenReturn(Stream.of(entity1, entity2, entity3));
+
+    List<BeaconDTO> beacons = endpoint.listAll(null, null);
+    assertThat(beacons).isNotNull();
+    assertThat(beacons).hasSize(3);
+
+    assertThat(beacons.stream().filter(b -> (b.getNumber() == 999 && b.getPilot() != null && b.getPilot().getId() == 9)).count()).isEqualTo(1);
+    assertThat(beacons.stream().filter(b -> (b.getPilot() != null && b.getPilot().getId() == 10)).count()).isEqualTo(1);
+    assertThat(beacons.stream().filter(b -> (b.getNumber() == 46 && b.getPilot() == null)).count()).isEqualTo(1);
+
+  }
+
+  @Test
+  public void listAllCanUseWindows() {
+    List<BeaconDTO> entities = new ArrayList<>();
+    Beacon entity1 = newBeacon(999, 9);
+    entities.add(BeaconDTO.fromBeacon(entity1));
+
+    when(beaconService.findAll(1, 1)).thenReturn(Stream.of(entity1));
+
+    List<BeaconDTO> beacons = endpoint.listAll(1, 1);
+    assertThat(beacons).isNotNull();
+    assertThat(beacons).hasSize(1);
+  }
 
   @Test
   public void update() throws MissingIdException, NotFoundException {
@@ -205,7 +207,6 @@ public class TestBeaconEndpoint {
     after.setId(before.getId());
 
     when(beaconService.findById(before.getId())).thenReturn(before);
-    //when(pilotRepository.findById(after.getPilot().getId())).thenReturn(after.getPilot());
 
     Response r = endpoint.update(before.getId(), BeaconDTO.fromBeacon(after));
 
@@ -220,7 +221,7 @@ public class TestBeaconEndpoint {
   @Test
   public void updateIsBadRequestIfNoBeaconPassed() {
     Beacon before = newBeacon(999, 11);
-    Response r = endpoint.update(before.getId(), null);
+    endpoint.update(before.getId(), null);
 
     verify(responseBuilder).status((Response.StatusType) Response.Status.BAD_REQUEST);
   }
@@ -230,7 +231,7 @@ public class TestBeaconEndpoint {
     Beacon before = newBeacon(999, 11);
     Beacon after = newBeacon(99, 12);
     doThrow(new MissingIdException()).when(beaconService).updateBeacon(anyLong(), any(BeaconDTO.class));
-    Response r = endpoint.update(before.getId(), BeaconDTO.fromBeacon(after));
+    endpoint.update(before.getId(), BeaconDTO.fromBeacon(after));
     verify(responseBuilder).status((Response.StatusType) Response.Status.CONFLICT);
   }
 
@@ -251,7 +252,7 @@ public class TestBeaconEndpoint {
     Beacon before = newBeacon(999, 11);
     Beacon after = newBeacon(99, 12);
     after.setId(before.getId());
-    Response r = endpoint.update(before.getId(), BeaconDTO.fromBeacon(after));
+    endpoint.update(before.getId(), BeaconDTO.fromBeacon(after));
     verify(responseBuilder).status((Response.StatusType) Response.Status.CONFLICT);
   }
 

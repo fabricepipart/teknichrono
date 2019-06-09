@@ -5,26 +5,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.trd.app.teknichrono.model.dto.BeaconDTO;
-import org.trd.app.teknichrono.model.jpa.Beacon;
-import org.trd.app.teknichrono.model.jpa.BeaconRepository;
-import org.trd.app.teknichrono.model.jpa.Pilot;
-import org.trd.app.teknichrono.model.jpa.PilotRepository;
-import org.trd.app.teknichrono.model.jpa.Ping;
-import org.trd.app.teknichrono.model.jpa.PingRepository;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -41,7 +32,9 @@ public class TestBeaconRepository {
   @Mock
   private PingRepository pingRepository;
 
-  @Spy
+  @Mock
+  private BeaconRepository.Panache beaconPanacheRepository;
+
   @InjectMocks
   private BeaconRepository beaconRepository;
 
@@ -71,12 +64,11 @@ public class TestBeaconRepository {
     Pilot pilot = entity.getPilot();
 
     when(pilotRepository.findById(9L)).thenReturn(pilot);
-    doNothing().when(beaconRepository).persist(entity);
 
     beaconRepository.create(entity);
 
     verify(pilotRepository).findById(9L);
-    verify(beaconRepository).persist(entity);
+    verify(beaconPanacheRepository).persist(entity);
   }
 
   @Test
@@ -84,12 +76,11 @@ public class TestBeaconRepository {
     Beacon entity = newBeacon(999, 9);
     Pilot pilot = entity.getPilot();
 
-    doReturn(entity).when(beaconRepository).findById(anyLong());
-    doNothing().when(beaconRepository).delete(entity);
+    when(beaconPanacheRepository.findById(entity.id)).thenReturn(entity);
 
     beaconRepository.deleteById(entity.id);
 
-    verify(beaconRepository).delete(entity);
+    verify(beaconPanacheRepository).delete(entity);
     verify(pilotRepository).persist(pilot);
     assertThat(pilot.getCurrentBeacon()).isNull();
   }
@@ -99,12 +90,11 @@ public class TestBeaconRepository {
     Beacon entity = newBeacon(999, 9);
     List<Ping> pings = entity.getPings();
 
-    doReturn(entity).when(beaconRepository).findById(anyLong());
-    doNothing().when(beaconRepository).delete(entity);
+    when(beaconPanacheRepository.findById(anyLong())).thenReturn(entity);
 
     beaconRepository.deleteById(entity.id);
 
-    verify(beaconRepository).delete(entity);
+    verify(beaconPanacheRepository).delete(entity);
 
     for (Ping ping : pings) {
       verify(pingRepository).persist(ping);
@@ -114,9 +104,8 @@ public class TestBeaconRepository {
 
   @Test
   public void deleteByIdReturnsErrorIfBeaconDoesNotExist() {
-    doReturn(null).when(beaconRepository).findById(42L);
     assertThrows(NotFoundException.class, () -> beaconRepository.deleteById(42L));
-    verify(beaconRepository, never()).delete(any());
+    verify(beaconPanacheRepository, never()).delete(any());
   }
 
 
@@ -131,11 +120,11 @@ public class TestBeaconRepository {
     entities.add(entity3);
 
     PanacheQuery<Beacon> query = mock(PanacheQuery.class);
-    doReturn(query).when(beaconRepository).findAll();
+    when(beaconPanacheRepository.findAll()).thenReturn(query);
     when(query.page(any())).thenReturn(query);
     when(query.stream()).thenReturn(entities.stream());
 
-    List<BeaconDTO> beacons = beaconRepository.findAll(null, null);
+    List<Beacon> beacons = beaconRepository.findAll(null, null).collect(Collectors.toList());
     assertThat(beacons).isNotNull();
     assertThat(beacons).hasSize(3);
 
@@ -152,11 +141,11 @@ public class TestBeaconRepository {
     entities.add(entity1);
 
     PanacheQuery<Beacon> query = mock(PanacheQuery.class);
-    doReturn(query).when(beaconRepository).findAll();
+    when(beaconPanacheRepository.findAll()).thenReturn(query);
     when(query.page(any())).thenReturn(query);
     when(query.stream()).thenReturn(entities.stream());
 
-    List<BeaconDTO> beacons = beaconRepository.findAll(1, 1);
+    List<Beacon> beacons = beaconRepository.findAll(1, 1).collect(Collectors.toList());
     assertThat(beacons).isNotNull();
     assertThat(beacons).hasSize(1);
   }
