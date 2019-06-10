@@ -3,10 +3,11 @@ package org.trd.app.teknichrono.it;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.trd.app.teknichrono.model.dto.BeaconDTO;
+import org.trd.app.teknichrono.model.dto.NestedPilotDTO;
+import org.trd.app.teknichrono.model.dto.PilotDTO;
 import org.trd.app.teknichrono.model.jpa.Beacon;
 
 import javax.json.bind.Jsonb;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.*;
 
 @Tag("integration")
 @QuarkusTest
@@ -29,23 +31,23 @@ public class TestRestBeaconEndpoint {
   @Test
   public void testLists() {
     List<BeaconDTO> beacons = getAllBeacons();
-    Assertions.assertThat(beacons.size()).isEqualTo(0);
+    assertThat(beacons.size()).isEqualTo(0);
     create(123);
     beacons = getAllBeacons();
-    Assertions.assertThat(beacons.size()).isEqualTo(1);
+    assertThat(beacons.size()).isEqualTo(1);
     create(234);
     beacons = getAllBeacons();
-    Assertions.assertThat(beacons.size()).isEqualTo(2);
+    assertThat(beacons.size()).isEqualTo(2);
 
     List<BeaconDTO> someBeacons = getAllBeaconsWindow(1, 1);
-    Assertions.assertThat(someBeacons.size()).isEqualTo(1);
+    assertThat(someBeacons.size()).isEqualTo(1);
 
     beacons = getAllBeacons();
     for (BeaconDTO beacon : beacons) {
       delete(beacon.getId());
     }
     beacons = getAllBeacons();
-    Assertions.assertThat(beacons.size()).isEqualTo(0);
+    assertThat(beacons.size()).isEqualTo(0);
   }
 
 
@@ -62,19 +64,88 @@ public class TestRestBeaconEndpoint {
     modifiedBeacon.setId(id);
     update(id, modifiedBeacon);
     List<BeaconDTO> beacons = getAllBeacons();
-    Assertions.assertThat(beacons.size()).isEqualTo(1);
+    assertThat(beacons.size()).isEqualTo(1);
     getByNumberFails(120);
     BeaconDTO newReturnedBeacon = getByNumber(140);
-    Assertions.assertThat(newReturnedBeacon.getId()).isEqualTo(id);
+    assertThat(newReturnedBeacon.getId()).isEqualTo(id);
 
     delete(id);
+  }
+
+
+  @Test
+  public void testCreateWithPilot() {
+    createWithPilot(120, "Pilot", "OfBeacon");
+    BeaconDTO b = getByNumber(120);
+    assertThat(b.getPilot()).isNotNull();
+    assertThat(b.getPilot().getFirstName()).isNotNull();
+    assertThat(b.getPilot().getLastName()).isNotNull();
+    assertThat(b.getPilot().getId()).isNotNull();
+    assertThat(b.getPilot().getBeaconNumber()).isEqualTo(120);
+    long id = b.getId();
+    getById(id);
+    deleteWithPilot(id, b.getPilot().getId());
+  }
+
+  @Test
+  public void testAddPilot() {
+    create(120);
+    BeaconDTO b = getByNumber(120);
+    assertThat(b.getPilot()).isNull();
+    long id = b.getId();
+
+    BeaconDTO modifiedBeacon = new BeaconDTO();
+    modifiedBeacon.setNumber(160);
+    modifiedBeacon.setId(id);
+
+    TestRestPilotEndPoint.create("Pilot", "OfBeacon");
+    PilotDTO pilot = TestRestPilotEndPoint.getByName("Pilot", "OfBeacon");
+    long pilotId = pilot.getId();
+    NestedPilotDTO pilotDto = new NestedPilotDTO();
+    pilotDto.setId(pilot.getId());
+    modifiedBeacon.setPilot(pilotDto);
+
+    update(id, modifiedBeacon);
+
+    List<BeaconDTO> beacons = getAllBeacons();
+    assertThat(beacons.size()).isEqualTo(1);
+    getByNumberFails(120);
+    BeaconDTO newReturnedBeacon = getByNumber(160);
+    assertThat(newReturnedBeacon.getId()).isEqualTo(id);
+    assertThat(newReturnedBeacon.getPilot()).isNotNull();
+    assertThat(newReturnedBeacon.getPilot().getId()).isEqualTo(pilotId);
+    assertThat(newReturnedBeacon.getPilot().getFirstName()).isEqualTo("Pilot");
+    assertThat(newReturnedBeacon.getPilot().getLastName()).isEqualTo("OfBeacon");
+    assertThat(newReturnedBeacon.getPilot().getBeaconNumber()).isEqualTo(160);
+    deleteWithPilot(id, pilotId);
+  }
+
+  @Test
+  public void testRemovePilot() {
+    createWithPilot(120, "Pilot", "OfBeacon");
+    BeaconDTO b = getByNumber(120);
+    long id = b.getId();
+    long pilotId = b.getPilot().getId();
+
+    BeaconDTO modifiedBeacon = new BeaconDTO();
+    modifiedBeacon.setNumber(140);
+    modifiedBeacon.setId(id);
+    update(id, modifiedBeacon);
+    List<BeaconDTO> beacons = getAllBeacons();
+    assertThat(beacons.size()).isEqualTo(1);
+    getByNumberFails(120);
+    BeaconDTO newReturnedBeacon = getByNumber(140);
+    assertThat(newReturnedBeacon.getId()).isEqualTo(id);
+    assertThat(newReturnedBeacon.getPilot()).isNull();
+
+    deleteWithPilot(id, pilotId);
   }
 
   /**
    * ******************** Reusable *********************
    **/
 
-  private void update(long id, BeaconDTO modifiedBeacon) {
+  public static void update(long id, BeaconDTO modifiedBeacon) {
     given().pathParam("id", id)
         .when().contentType(ContentType.JSON).body(jsonb.toJson(modifiedBeacon)).put("/rest/beacons/{id}")
         .then()
@@ -82,7 +153,7 @@ public class TestRestBeaconEndpoint {
   }
 
 
-  public List<BeaconDTO> getAllBeacons() {
+  public static List<BeaconDTO> getAllBeacons() {
     Response r = given()
         .when().get("/rest/beacons")
         .then()
@@ -92,7 +163,7 @@ public class TestRestBeaconEndpoint {
     }.getClass().getGenericSuperclass());
   }
 
-  public List<BeaconDTO> getAllBeaconsWindow(int page, int pageSize) {
+  public static List<BeaconDTO> getAllBeaconsWindow(int page, int pageSize) {
     Response r = given().queryParam("page", page).queryParam("pageSize", pageSize)
         .when().get("/rest/beacons")
         .then()
@@ -102,14 +173,23 @@ public class TestRestBeaconEndpoint {
     }.getClass().getGenericSuperclass());
   }
 
-  public void delete(long id) {
+  public static void delete(long id) {
     given().pathParam("id", id)
         .when().delete("/rest/beacons/{id}")
         .then()
         .statusCode(204);
   }
 
-  public BeaconDTO getById(long id) {
+  public static void deleteWithPilot(long id, Long aLong) {
+
+    TestRestPilotEndPoint.delete(aLong);
+    given().pathParam("id", id)
+        .when().delete("/rest/beacons/{id}")
+        .then()
+        .statusCode(204);
+  }
+
+  public static BeaconDTO getById(long id) {
     Response r = given().pathParam("id", id)
         .when().get("/rest/beacons/{id}")
         .then()
@@ -118,14 +198,14 @@ public class TestRestBeaconEndpoint {
     return jsonb.fromJson(r.asString(), BeaconDTO.class);
   }
 
-  public void getByNumberFails(int beaconNumber) {
+  public static void getByNumberFails(int beaconNumber) {
     given().pathParam("number", beaconNumber)
         .when().get("/rest/beacons/number/{number}")
         .then()
         .statusCode(404);
   }
 
-  public BeaconDTO getByNumber(int beaconNumber) {
+  public static BeaconDTO getByNumber(int beaconNumber) {
     Response r = given().pathParam("number", beaconNumber)
         .when().get("/rest/beacons/number/{number}")
         .then()
@@ -137,6 +217,25 @@ public class TestRestBeaconEndpoint {
   public static void create(int beaconNumber) {
     Beacon b = new Beacon();
     b.setNumber(beaconNumber);
+    given()
+        .when().contentType(ContentType.JSON).body(jsonb.toJson(b)).post("/rest/beacons")
+        .then()
+        .statusCode(201);
+  }
+
+  public static void createWithPilot(int beaconNumber, String firstName, String lastName) {
+    TestRestPilotEndPoint.create(firstName, lastName);
+    PilotDTO pilot = TestRestPilotEndPoint.getByName(firstName, lastName);
+
+    BeaconDTO b = new BeaconDTO();
+    b.setNumber(beaconNumber);
+
+    NestedPilotDTO p = new NestedPilotDTO();
+    p.setId(pilot.getId());
+    p.setFirstName(pilot.getFirstName());
+    p.setLastName(pilot.getLastName());
+    b.setPilot(p);
+
     given()
         .when().contentType(ContentType.JSON).body(jsonb.toJson(b)).post("/rest/beacons")
         .then()

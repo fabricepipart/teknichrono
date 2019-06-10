@@ -1,10 +1,13 @@
 package org.trd.app.teknichrono.rest;
 
+import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.dto.LocationDTO;
 import org.trd.app.teknichrono.model.jpa.Location;
 import org.trd.app.teknichrono.model.jpa.LocationRepository;
 import org.trd.app.teknichrono.model.jpa.Session;
 import org.trd.app.teknichrono.model.jpa.SessionRepository;
+import org.trd.app.teknichrono.util.DurationLogger;
+import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
@@ -28,6 +31,8 @@ import java.util.stream.Collectors;
 @Path("/locations")
 public class LocationEndpoint {
 
+  private static final Logger LOGGER = Logger.getLogger(LocationEndpoint.class);
+
   private final LocationRepository locationRepository;
   private final SessionRepository sessionRepository;
 
@@ -50,12 +55,14 @@ public class LocationEndpoint {
   @Path("/{id:[0-9][0-9]*}")
   @Transactional
   public Response deleteById(@PathParam("id") long id) {
-    Location entity = locationRepository.findById(id);
-    if (entity == null) {
-      return Response.status(Status.NOT_FOUND).build();
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Delete pilot id=" + id)) {
+      try {
+        locationRepository.deleteById(id);
+      } catch (NotFoundException e) {
+        return Response.status(Status.NOT_FOUND).build();
+      }
+      return Response.noContent().build();
     }
-    locationRepository.delete(entity);
-    return Response.noContent().build();
   }
 
   @GET
@@ -86,11 +93,13 @@ public class LocationEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public List<LocationDTO> listAll(@QueryParam("page") Integer pageIndex, @QueryParam("pageSize") Integer pageSize) {
-    return locationRepository.findAll()
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Find all locations")) {
+      return locationRepository.findAll()
             .page(Paging.from(pageIndex, pageSize))
             .stream()
             .map(LocationDTO::fromLocation)
             .collect(Collectors.toList());
+    }
   }
 
   @POST

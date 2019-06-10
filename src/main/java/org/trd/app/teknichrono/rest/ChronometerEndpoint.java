@@ -4,10 +4,9 @@ import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.dto.ChronometerDTO;
 import org.trd.app.teknichrono.model.jpa.Chronometer;
 import org.trd.app.teknichrono.model.jpa.ChronometerRepository;
-import org.trd.app.teknichrono.model.jpa.Ping;
 import org.trd.app.teknichrono.model.jpa.PingRepository;
-import org.trd.app.teknichrono.model.jpa.Session;
 import org.trd.app.teknichrono.util.DurationLogger;
+import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
@@ -25,7 +24,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,24 +58,15 @@ public class ChronometerEndpoint {
   @Path("/{id:[0-9][0-9]*}")
   @Transactional
   public Response deleteById(@PathParam("id") long id) {
-    try (DurationLogger dl = new DurationLogger(LOGGER, "Delete chronometer ID=" + id)) {
-      Chronometer entity = chronometerRepository.findById(id);
-      if (entity == null) {
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Delete chronometer id=" + id)) {
+      try {
+        chronometerRepository.deleteById(id);
+      } catch (NotFoundException e) {
         return Response.status(Status.NOT_FOUND).build();
       }
-      for (Session s : entity.getSessions()) {
-        s.getChronometers().remove(entity);
-      }
-      List<Ping> pings = new ArrayList<>(entity.getPings());
-      if (pings != null) {
-        for (Ping ping : pings) {
-          ping.setChrono(null);
-          pingRepository.persist(ping);
-        }
-      }
-      chronometerRepository.delete(entity);
+      return Response.noContent().build();
     }
-    return Response.noContent().build();
+
   }
 
   @GET

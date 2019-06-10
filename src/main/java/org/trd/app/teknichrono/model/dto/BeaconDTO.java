@@ -14,4 +14,5 @@ public class BeaconDTO {
   public static BeaconDTO fromBeacon(Beacon beacon) {
     return DtoMapper.INSTANCE.asBeaconDto(beacon);
   }
+
 }

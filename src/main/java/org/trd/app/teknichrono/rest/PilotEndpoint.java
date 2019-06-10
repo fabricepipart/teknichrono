@@ -1,13 +1,12 @@
 package org.trd.app.teknichrono.rest;
 
+import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.dto.PilotDTO;
-import org.trd.app.teknichrono.model.jpa.Beacon;
-import org.trd.app.teknichrono.model.jpa.BeaconRepository;
-import org.trd.app.teknichrono.model.jpa.Category;
-import org.trd.app.teknichrono.model.jpa.CategoryRepository;
 import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.model.jpa.PilotRepository;
-import org.trd.app.teknichrono.model.jpa.Session;
+import org.trd.app.teknichrono.util.DurationLogger;
+import org.trd.app.teknichrono.util.exception.ConflictingIdException;
+import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
@@ -31,46 +30,45 @@ import java.util.stream.Collectors;
 @Path("/pilots")
 public class PilotEndpoint {
 
+  private static final Logger LOGGER = Logger.getLogger(PilotEndpoint.class);
+
   private final PilotRepository pilotRepository;
 
-  private final BeaconRepository beaconRepository;
-
-  private final CategoryRepository categoryRepository;
-
   @Inject
-  public PilotEndpoint(PilotRepository pilotRepository, BeaconRepository beaconRepository,
-                       CategoryRepository categoryRepository) {
-    this.categoryRepository = categoryRepository;
+  public PilotEndpoint(PilotRepository pilotRepository) {
     this.pilotRepository = pilotRepository;
-    this.beaconRepository = beaconRepository;
   }
 
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Transactional
-  public Response create(Pilot entity) {
-    if (entity.getCurrentBeacon() != null && entity.getCurrentBeacon().id > 0) {
-      Beacon beacon = beaconRepository.findById(entity.getCurrentBeacon().id);
-      entity.setCurrentBeacon(beacon);
+  public Response create(PilotDTO entity) {
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Create pilot " + entity.getFirstName() + " " + entity.getLastName())) {
+      try {
+        pilotRepository.create(entity);
+      } catch (NotFoundException e) {
+        return Response.status(Status.NOT_FOUND).build();
+      } catch (ConflictingIdException e) {
+        return Response.status(Status.CONFLICT).build();
+      }
+      UriBuilder path = UriBuilder.fromResource(CategoryEndpoint.class).path(String.valueOf(entity.getId()));
+      Response response = Response.created(path.build()).build();
+      return response;
     }
-    pilotRepository.persist(entity);
-    return Response.created(UriBuilder.fromResource(PilotEndpoint.class).path(String.valueOf(entity.id)).build())
-        .build();
   }
 
   @DELETE
   @Path("/{id:[0-9][0-9]*}")
   @Transactional
   public Response deleteById(@PathParam("id") long id) {
-    Pilot entity = pilotRepository.findById(id);
-    if (entity == null) {
-      return Response.status(Status.NOT_FOUND).build();
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Delete pilot id=" + id)) {
+      try {
+        pilotRepository.deleteById(id);
+      } catch (NotFoundException e) {
+        return Response.status(Status.NOT_FOUND).build();
+      }
+      return Response.noContent().build();
     }
-    for (Session s : entity.getSessions()) {
-      s.getPilots().remove(entity);
-    }
-    pilotRepository.delete(entity);
-    return Response.noContent().build();
   }
 
   @GET
@@ -78,12 +76,14 @@ public class PilotEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public Response findById(@PathParam("id") long id) {
-    Pilot entity = pilotRepository.findById(id);
-    if (entity == null) {
-      return Response.status(Status.NOT_FOUND).build();
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Find pilot id=" + id)) {
+      Pilot entity = pilotRepository.findById(id);
+      if (entity == null) {
+        return Response.status(Status.NOT_FOUND).build();
+      }
+      PilotDTO dto = PilotDTO.fromPilot(entity);
+      return Response.ok(dto).build();
     }
-    PilotDTO dto = PilotDTO.fromPilot(entity);
-    return Response.ok(dto).build();
   }
 
   @GET
@@ -91,20 +91,24 @@ public class PilotEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public Response findByName(@QueryParam("firstname") String firstname, @QueryParam("lastname") String lastname) {
-    Pilot entity = pilotRepository.findByName(firstname, lastname);
-    if (entity == null) {
-      return Response.status(Status.NOT_FOUND).build();
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Find pilot " + firstname + " " + lastname)) {
+      Pilot entity = pilotRepository.findByName(firstname, lastname);
+      if (entity == null) {
+        return Response.status(Status.NOT_FOUND).build();
+      }
+      PilotDTO dto = PilotDTO.fromPilot(entity);
+      return Response.ok(dto).build();
     }
-    PilotDTO dto = PilotDTO.fromPilot(entity);
-    return Response.ok(dto).build();
   }
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public List<PilotDTO> listAll(@QueryParam("page") Integer pageIndex, @QueryParam("pageSize") Integer pageSize) {
-    return pilotRepository.findAll().page(Paging.from(pageIndex, pageSize)).stream().map(PilotDTO::fromPilot)
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Find all pilots")) {
+      return pilotRepository.findAll().page(Paging.from(pageIndex, pageSize)).stream().map(PilotDTO::fromPilot)
         .collect(Collectors.toList());
+    }
   }
 
   @POST
@@ -112,57 +116,35 @@ public class PilotEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public Response associateBeacon(@PathParam("pilotId") long pilotId, @QueryParam("beaconId") long beaconId) {
-    Pilot pilot = pilotRepository.findById(pilotId);
-    if (pilot == null) {
-      return Response.status(Status.NOT_FOUND).build();
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Associate pilot id=" + pilotId + " to beacon id=" + beaconId)) {
+      try {
+        PilotDTO dto = pilotRepository.associateBeacon(pilotId, beaconId);
+        return Response.ok(dto).build();
+      } catch (NotFoundException e) {
+        return Response.status(Status.NOT_FOUND).build();
+      }
     }
-    Beacon beacon = beaconRepository.findById(beaconId);
-    if (beacon == null) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
-    pilot.setCurrentBeacon(beacon);
-    pilotRepository.persist(pilot);
-    beaconRepository.persist(beacon);
-    PilotDTO dto = PilotDTO.fromPilot(pilot);
-    return Response.ok(dto).build();
   }
 
   @PUT
   @Path("/{id:[0-9][0-9]*}")
   @Consumes(MediaType.APPLICATION_JSON)
   @Transactional
-  public Response update(@PathParam("id") long id, Pilot dto) {
-    if (dto == null) {
-      return Response.status(Status.BAD_REQUEST).build();
+  public Response update(@PathParam("id") long id, PilotDTO dto) {
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Update category id=" + id)) {
+      if (dto == null) {
+        return Response.status(Status.BAD_REQUEST).build();
+      }
+      try {
+        pilotRepository.update(id, dto);
+      } catch (OptimisticLockException e) {
+        return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
+      } catch (NotFoundException e) {
+        return Response.status(Status.NOT_FOUND).build();
+      } catch (ConflictingIdException e) {
+        return Response.status(Status.CONFLICT).entity(dto).build();
+      }
+      return Response.noContent().build();
     }
-    if (id != dto.id) {
-      return Response.status(Status.CONFLICT).entity(dto).build();
-    }
-    Pilot pilot = pilotRepository.findById(id);
-    if (pilot == null) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
-    // Update of category
-    pilot.setCategory(null);
-    if (dto.getCategory() != null && dto.getCategory().getId() != null && dto.getCategory().getId() > 0) {
-      Category category = categoryRepository.findById(dto.getCategory().id);
-      pilot.setCategory(category);
-    }
-    // Update of beacon
-    pilot.setCurrentBeacon(null);
-    if (dto.getCurrentBeacon() != null && dto.getCurrentBeacon().getId() != null
-        && dto.getCurrentBeacon().getId() > 0) {
-      Beacon beacon = beaconRepository.findById(dto.getCurrentBeacon().id);
-      pilot.setCurrentBeacon(beacon);
-    }
-    pilot.setFirstName(dto.getFirstName());
-    pilot.setLastName(dto.getLastName());
-    try {
-      pilotRepository.persist(pilot);
-    } catch (OptimisticLockException e) {
-      return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
-    }
-
-    return Response.noContent().build();
   }
 }

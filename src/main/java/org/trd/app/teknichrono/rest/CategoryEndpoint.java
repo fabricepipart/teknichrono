@@ -5,6 +5,7 @@ import org.trd.app.teknichrono.model.dto.CategoryDTO;
 import org.trd.app.teknichrono.model.jpa.Category;
 import org.trd.app.teknichrono.model.jpa.CategoryRepository;
 import org.trd.app.teknichrono.util.DurationLogger;
+import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.MissingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
@@ -42,10 +43,16 @@ public class CategoryEndpoint {
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Transactional
-  public Response create(Category entity) {
+  public Response create(CategoryDTO entity) {
     try (DurationLogger perf = DurationLogger.get(LOGGER).start("Create category " + entity.getName())) {
-      categoryRepository.create(entity);
-      UriBuilder path = UriBuilder.fromResource(CategoryEndpoint.class).path(String.valueOf(entity.id));
+      try {
+        categoryRepository.create(entity);
+      } catch (NotFoundException e) {
+        return Response.status(Status.NOT_FOUND).build();
+      } catch (ConflictingIdException e) {
+        return Response.status(Status.CONFLICT).build();
+      }
+      UriBuilder path = UriBuilder.fromResource(CategoryEndpoint.class).path(String.valueOf(entity.getId()));
       Response response = Response.created(path.build()).build();
       return response;
     }

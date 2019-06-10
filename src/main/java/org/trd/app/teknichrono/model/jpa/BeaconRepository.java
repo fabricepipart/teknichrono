@@ -2,6 +2,7 @@ package org.trd.app.teknichrono.model.jpa;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import org.trd.app.teknichrono.model.dto.BeaconDTO;
+import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.MissingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
@@ -40,19 +41,28 @@ public class BeaconRepository extends PanacheRepositoryWrapper<Beacon> {
     return panacheRepository.find("number", number).firstResult();
   }
 
-  public void create(Beacon entity) throws NotFoundException {
-    if (entity.getPilot() != null && entity.getPilot().id > 0) {
-      // TODO is that needed?
-      Pilot pilot = pilotRepository.findById(entity.getPilot().id);
-      if (pilot == null) {
-        throw new NotFoundException("Pilot not found with ID=" + entity.getPilot().id);
-      }
-      entity.setPilot(pilot);
-      pilot.setCurrentBeacon(entity);
-      pilotRepository.persist(pilot);
-    }
-    panacheRepository.persist(entity);
+  public void create(BeaconDTO entity) throws NotFoundException, ConflictingIdException {
+    Beacon beacon = fromDTO(entity);
+    panacheRepository.persist(beacon);
   }
+
+  public Beacon fromDTO(BeaconDTO entity) throws ConflictingIdException, NotFoundException {
+    Beacon beacon = new Beacon();
+    if (entity.getId() > 0) {
+      throw new ConflictingIdException("Can't create Beacon with already an ID");
+    }
+    beacon.setNumber(entity.getNumber());
+    if (entity.getPilot() != null && entity.getPilot().getId() > 0) {
+      Pilot pilot = pilotRepository.findById(entity.getPilot().getId());
+      if (pilot == null) {
+        throw new NotFoundException("Pilot not found with ID=" + entity.getPilot().getId());
+      }
+      beacon.setPilot(pilot);
+      pilot.setCurrentBeacon(beacon);
+    }
+    return beacon;
+  }
+
 
   public void updateBeacon(long id, BeaconDTO entity) throws MissingIdException, NotFoundException {
     if (id != entity.getId()) {
@@ -64,6 +74,7 @@ public class BeaconRepository extends PanacheRepositoryWrapper<Beacon> {
     }
 
     // Update of pilot
+    beacon.setPilot(null);
     if (entity.getPilot() != null && entity.getPilot().getId() > 0) {
       Pilot pilot = pilotRepository.findById(entity.getPilot().getId());
       beacon.setPilot(pilot);

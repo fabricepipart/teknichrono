@@ -2,6 +2,7 @@ package org.trd.app.teknichrono.model.jpa;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Chronometer extends PanacheEntity  {
+public class Chronometer extends PanacheEntity {
 
   @Version
   @Column(name = "version")
@@ -23,7 +24,7 @@ public class Chronometer extends PanacheEntity  {
   private String name;
 
   // Can be null if after event, items are reassociated
-  @OneToMany(mappedBy = "chrono")
+  @OneToMany(mappedBy = "chrono", cascade = CascadeType.REMOVE)
   private List<Ping> pings = new ArrayList<>();
 
   @ManyToMany(mappedBy = "chronometers")
@@ -75,11 +76,11 @@ public class Chronometer extends PanacheEntity  {
       return null;
     }
     Ping lastestPing = null;
-    for (Ping p : pings){
-      if(p.getInstant() != null){
+    for (Ping p : pings) {
+      if (p.getInstant() != null) {
         boolean moreRecent = lastestPing != null && lastestPing.getInstant().isBefore(p.getInstant());
         boolean isFirst = lastestPing == null;
-        if(moreRecent || isFirst){
+        if (moreRecent || isFirst) {
           lastestPing = p;
         }
       }

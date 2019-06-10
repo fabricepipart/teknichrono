@@ -18,7 +18,7 @@ public class Category extends PanacheEntity {
   @Column(name = "version")
   private int version;
 
-  @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(fetch = FetchType.EAGER)
   @JoinColumn(name = "categoryId")
   private Set<Pilot> pilots = new HashSet<>();
 
