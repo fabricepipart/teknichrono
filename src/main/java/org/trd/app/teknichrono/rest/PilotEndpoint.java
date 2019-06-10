@@ -102,8 +102,8 @@ public class PilotEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
-  public List<PilotDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
-    return pilotRepository.findAll().page(Paging.from(startPosition, maxResult)).stream().map(PilotDTO::fromPilot)
+  public List<PilotDTO> listAll(@QueryParam("page") Integer pageIndex, @QueryParam("pageSize") Integer pageSize) {
+    return pilotRepository.findAll().page(Paging.from(pageIndex, pageSize)).stream().map(PilotDTO::fromPilot)
         .collect(Collectors.toList());
   }
 

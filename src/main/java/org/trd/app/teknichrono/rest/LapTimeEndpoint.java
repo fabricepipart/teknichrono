@@ -1,6 +1,7 @@
 package org.trd.app.teknichrono.rest;
 
 import com.opencsv.exceptions.CsvException;
+import io.quarkus.panache.common.Page;
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.business.view.LapTimeConverter;
 import org.trd.app.teknichrono.business.view.LapTimeDisplay;
@@ -141,11 +142,10 @@ public class LapTimeEndpoint {
   @Transactional
   public Response best(@QueryParam("pilotId") Long pilotId, @QueryParam("sessionId") Long sessionId,
                        @QueryParam("locationId") Long locationId, @QueryParam("eventId") Long eventId,
-                       @QueryParam("categoryId") Long categoryId, @QueryParam("start") Integer startPosition,
-                       @QueryParam("max") Integer maxResult) {
+                       @QueryParam("categoryId") Long categoryId, @QueryParam("page") Integer pageIndex,
+                       @QueryParam("pageSize") Integer pageSize) {
     try {
-      List<LapTimeDTO> lapTimes = bestLapTimes(pilotId, sessionId, locationId, eventId, categoryId, startPosition,
-          maxResult);
+      List<LapTimeDTO> lapTimes = bestLapTimes(pilotId, sessionId, locationId, eventId, categoryId, pageIndex, pageSize);
       return Response.ok().entity(lapTimes).build();
     } catch (IllegalArgumentException e) {
       return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
@@ -153,13 +153,13 @@ public class LapTimeEndpoint {
   }
 
   private List<LapTimeDTO> bestLapTimes(Long pilotId, Long sessionId, Long locationId, Long eventId, Long categoryId,
-                                        Integer startPosition, Integer maxResult) {
+                                        Integer pageIndex, Integer pageSize) {
     if (sessionId == null && locationId == null && eventId == null) {
       LOGGER.error("Please define a sessiondId, locationId or eventId to get best laps.");
       throw new IllegalArgumentException("Please define a sessiondId, locationId or eventId to get best laps.");
     }
     List<LapTimeDTO> results = getAllLapsDTOOrderedByStartDate(pilotId, sessionId, locationId, eventId, categoryId,
-        startPosition, maxResult);
+            pageIndex, pageSize);
     if (pilotId != null) {
       lapTimeManager.arrangeDisplay(results, LapTimeDisplay.ORDER_BY_DURATION);
     } else {
@@ -193,11 +193,10 @@ public class LapTimeEndpoint {
   @Transactional
   public Response results(@QueryParam("pilotId") Long pilotId, @QueryParam("sessionId") Long sessionId,
                           @QueryParam("locationId") Long locationId, @QueryParam("eventId") Long eventId,
-                          @QueryParam("categoryId") Long categoryId, @QueryParam("start") Integer startPosition,
-                          @QueryParam("max") Integer maxResult) {
+                          @QueryParam("categoryId") Long categoryId, @QueryParam("page") Integer pageIndex,
+                          @QueryParam("pageSize") Integer pageSize) {
     try {
-      List<LapTimeDTO> lapTimes = resultsList(pilotId, sessionId, locationId, eventId, categoryId, startPosition,
-          maxResult);
+      List<LapTimeDTO> lapTimes = resultsList(pilotId, sessionId, locationId, eventId, categoryId, pageIndex, pageSize);
       return Response.ok().entity(lapTimes).build();
     } catch (IllegalArgumentException e) {
       return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
@@ -262,10 +261,10 @@ public class LapTimeEndpoint {
   @Transactional
   public Response listAll(@QueryParam("pilotId") Long pilotId, @QueryParam("sessionId") Long sessionId,
                           @QueryParam("locationId") Long locationId, @QueryParam("eventId") Long eventId,
-                          @QueryParam("categoryId") Long categoryId, @QueryParam("start") Integer startPosition,
-                          @QueryParam("max") Integer maxResult) {
+                          @QueryParam("categoryId") Long categoryId, @QueryParam("page") Integer pageIndex,
+                          @QueryParam("pageSize") Integer pageSize) {
     try {
-      List<LapTimeDTO> lapTimes = all(pilotId, sessionId, locationId, eventId, categoryId, startPosition, maxResult);
+      List<LapTimeDTO> lapTimes = all(pilotId, sessionId, locationId, eventId, categoryId, pageIndex, pageSize);
       return Response.ok().entity(lapTimes).build();
     } catch (IllegalArgumentException e) {
       return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
@@ -287,14 +286,14 @@ public class LapTimeEndpoint {
   }
 
   private List<LapTimeDTO> getAllLapsDTOOrderedByStartDate(Long pilotId, Long sessionId, Long locationId, Long eventId,
-                                                           Long categoryId, Integer startPosition, Integer maxResult) {
+                                                           Long categoryId, Integer pageIndex, Integer pageSize) {
     List<LapTime> searchResults = getAllLapsOrderedByStartDate(pilotId, sessionId, locationId, eventId, categoryId,
-        startPosition, maxResult);
+            pageIndex, pageSize);
     return lapTimeConverter.convert(searchResults);
   }
 
   private List<LapTime> getAllLapsOrderedByStartDate(Long pilotId, Long sessionId, Long locationId, Long eventId,
-                                                     Long categoryId, Integer startPosition, Integer maxResult) {
+                                                     Long categoryId, Integer pageIndex, Integer pageSize) {
     WhereClauseBuilder whereClauseBuilder = buildWhereClause(pilotId, sessionId, locationId, eventId, categoryId);
     OrderByClauseBuilder orderByClauseBuilder = new OrderByClauseBuilder();
     // Necessary to have the lapTimeManager.manage working
@@ -303,12 +302,9 @@ public class LapTimeEndpoint {
     TypedQuery<LapTime> findAllQuery = em.createQuery("SELECT DISTINCT l FROM LapTime l"
         + " LEFT JOIN FETCH l.pilot LEFT JOIN FETCH l.session LEFT JOIN FETCH l.intermediates"
         + whereClauseBuilder.build() + orderByClauseBuilder.build(), LapTime.class);
-    if (startPosition != null) {
-      findAllQuery.setFirstResult(startPosition);
-    }
-    if (maxResult != null) {
-      findAllQuery.setMaxResults(maxResult);
-    }
+    Page page = Paging.from(pageIndex, pageSize);
+    findAllQuery.setFirstResult(page.index * page.size);
+    findAllQuery.setMaxResults(page.size);
     whereClauseBuilder.applyClauses(findAllQuery);
     return findAllQuery.getResultList();
   }

@@ -168,17 +168,17 @@ public class SessionEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
-  public List<SessionDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
+  public List<SessionDTO> listAll(@QueryParam("page") Integer pageIndex, @QueryParam("pageSize") Integer pageSize) {
     DurationLogger perf = DurationLogger.get(logger).start("List sessions");
-    List<SessionDTO> sessions = listAllSessions(startPosition, maxResult)
+    List<SessionDTO> sessions = listAllSessions(pageIndex, pageSize)
         .map(SessionDTO::fromSession)
         .collect(Collectors.toList());
     perf.end();
     return sessions;
   }
 
-  private Stream<Session> listAllSessions(Integer startPosition, Integer maxResult) {
-    return sessionRepository.findAll().page(Paging.from(startPosition, maxResult)).stream();
+  private Stream<Session> listAllSessions(Integer pageIndex, Integer pageSize) {
+    return sessionRepository.findAll().page(Paging.from(pageIndex, pageSize)).stream();
   }
 
   @POST

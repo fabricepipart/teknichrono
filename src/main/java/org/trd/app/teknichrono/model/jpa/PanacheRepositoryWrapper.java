@@ -20,9 +20,9 @@ abstract class PanacheRepositoryWrapper<T> implements Repository<T> {
     }
 
     @Override
-    public Stream<T> findAll(Integer startPosition, Integer maxResult) {
+    public Stream<T> findAll(Integer pageIndex, Integer pageSize) {
         return panacheRepository.findAll()
-                .page(Paging.from(startPosition, maxResult))
+                .page(Paging.from(pageIndex, pageSize))
                 .stream();
     }
 

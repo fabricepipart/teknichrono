@@ -108,9 +108,9 @@ public class PingEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
-  public List<NestedPingDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
+  public List<NestedPingDTO> listAll(@QueryParam("page") Integer pageIndex, @QueryParam("pageSize") Integer pageSize) {
     return pingRepository.findAll()
-            .page(Paging.from(startPosition, maxResult))
+            .page(Paging.from(pageIndex, pageSize))
             .stream()
             .map(NestedPingDTO::fromPing)
             .collect(Collectors.toList());

@@ -92,8 +92,8 @@ public class TestRestBeaconEndpoint {
     }.getClass().getGenericSuperclass());
   }
 
-  public List<BeaconDTO> getAllBeaconsWindow(int start, int max) {
-    Response r = given().queryParam("start", Integer.valueOf(start)).queryParam("max", Integer.valueOf(max))
+  public List<BeaconDTO> getAllBeaconsWindow(int page, int pageSize) {
+    Response r = given().queryParam("page", page).queryParam("pageSize", pageSize)
         .when().get("/rest/beacons")
         .then()
         .statusCode(200)
