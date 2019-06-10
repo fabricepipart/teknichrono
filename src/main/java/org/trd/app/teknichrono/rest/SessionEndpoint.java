@@ -44,6 +44,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Path("/sessions")
 public class SessionEndpoint {
@@ -162,14 +163,14 @@ public class SessionEndpoint {
   @Transactional
   public List<SessionDTO> listAll(@QueryParam("page") Integer pageIndex, @QueryParam("pageSize") Integer pageSize) {
     try (DurationLogger perf = DurationLogger.get(LOGGER).start("Find all sessions")) {
-    List<SessionDTO> sessions = listAllSessions(pageIndex, pageSize)
+      return listAllSessions(pageIndex, pageSize)
           .map(SessionDTO::fromSession)
           .collect(Collectors.toList());
     }
   }
-  
+
   private Stream<Session> listAllSessions(Integer pageIndex, Integer pageSize) {
-    return sessionRepository.findAll().page(Paging.from(pageIndex, pageSize)).stream();
+    return sessionRepository.findAll(pageIndex, pageSize);
   }
 
   @POST

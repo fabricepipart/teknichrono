@@ -106,8 +106,7 @@ public class PilotEndpoint {
   @Transactional
   public List<PilotDTO> listAll(@QueryParam("page") Integer pageIndex, @QueryParam("pageSize") Integer pageSize) {
     try (DurationLogger perf = DurationLogger.get(LOGGER).start("Find all pilots")) {
-      return pilotRepository.findAll().page(Paging.from(pageIndex, pageSize)).stream().map(PilotDTO::fromPilot)
-        .collect(Collectors.toList());
+      return pilotRepository.findAll(pageIndex, pageSize).map(PilotDTO::fromPilot).collect(Collectors.toList());
     }
   }
 

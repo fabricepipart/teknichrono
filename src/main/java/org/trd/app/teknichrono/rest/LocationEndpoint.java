@@ -4,9 +4,9 @@ import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.dto.LocationDTO;
 import org.trd.app.teknichrono.model.jpa.Location;
 import org.trd.app.teknichrono.model.jpa.LocationRepository;
-import org.trd.app.teknichrono.model.jpa.Session;
-import org.trd.app.teknichrono.model.jpa.SessionRepository;
 import org.trd.app.teknichrono.util.DurationLogger;
+import org.trd.app.teknichrono.util.exception.ConflictingIdException;
+import org.trd.app.teknichrono.util.exception.MissingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import javax.inject.Inject;
@@ -34,28 +34,35 @@ public class LocationEndpoint {
   private static final Logger LOGGER = Logger.getLogger(LocationEndpoint.class);
 
   private final LocationRepository locationRepository;
-  private final SessionRepository sessionRepository;
 
   @Inject
-  public LocationEndpoint(LocationRepository locationRepository, SessionRepository sessionRepository) {
+  public LocationEndpoint(LocationRepository locationRepository) {
     this.locationRepository = locationRepository;
-    this.sessionRepository = sessionRepository;
   }
 
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Transactional
-  public Response create(Location entity) {
-    locationRepository.persist(entity);
-    return Response
-        .created(UriBuilder.fromResource(LocationEndpoint.class).path(String.valueOf(entity.id)).build()).build();
+  public Response create(LocationDTO entity) {
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Create location " + entity.getName())) {
+      try {
+        locationRepository.create(entity);
+      } catch (NotFoundException e) {
+        return Response.status(Status.NOT_FOUND).build();
+      } catch (ConflictingIdException e) {
+        return Response.status(Status.CONFLICT).build();
+      }
+      UriBuilder path = UriBuilder.fromResource(CategoryEndpoint.class).path(String.valueOf(entity.getId()));
+      Response response = Response.created(path.build()).build();
+      return response;
+    }
   }
 
   @DELETE
   @Path("/{id:[0-9][0-9]*}")
   @Transactional
   public Response deleteById(@PathParam("id") long id) {
-    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Delete pilot id=" + id)) {
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Delete location id=" + id)) {
       try {
         locationRepository.deleteById(id);
       } catch (NotFoundException e) {
@@ -70,11 +77,14 @@ public class LocationEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public Response findById(@PathParam("id") long id) {
-    LocationDTO entity = LocationDTO.fromLocation(locationRepository.findById(id));
-    if (entity == null) {
-      return Response.status(Status.NOT_FOUND).build();
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Find location id=" + id)) {
+      Location entity = locationRepository.findById(id);
+      if (entity == null) {
+        return Response.status(Status.NOT_FOUND).build();
+      }
+      LocationDTO dto = LocationDTO.fromLocation(entity);
+      return Response.ok(dto).build();
     }
-    return Response.ok(entity).build();
   }
 
   @GET
@@ -82,11 +92,14 @@ public class LocationEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public Response findLocationByName(@QueryParam("name") String name) {
-    LocationDTO entity = LocationDTO.fromLocation(locationRepository.findByName(name));
-    if (entity == null) {
-      return Response.status(Status.NOT_FOUND).build();
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Find location name=" + name)) {
+      Location entity = locationRepository.findByName(name);
+      if (entity == null) {
+        return Response.status(Status.NOT_FOUND).build();
+      }
+      LocationDTO dto = LocationDTO.fromLocation(entity);
+      return Response.ok(dto).build();
     }
-    return Response.ok(entity).build();
   }
 
   @GET
@@ -94,11 +107,9 @@ public class LocationEndpoint {
   @Transactional
   public List<LocationDTO> listAll(@QueryParam("page") Integer pageIndex, @QueryParam("pageSize") Integer pageSize) {
     try (DurationLogger perf = DurationLogger.get(LOGGER).start("Find all locations")) {
-      return locationRepository.findAll()
-            .page(Paging.from(pageIndex, pageSize))
-            .stream()
-            .map(LocationDTO::fromLocation)
-            .collect(Collectors.toList());
+      return locationRepository.findAll(pageIndex, pageSize)
+          .map(LocationDTO::fromLocation)
+          .collect(Collectors.toList());
     }
   }
 
@@ -107,41 +118,35 @@ public class LocationEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public Response addSession(@PathParam("locationId") long locationId, @QueryParam("sessionId") Long sessionId) {
-    Location location = locationRepository.findById(locationId);
-    if (location == null) {
-      return Response.status(Status.NOT_FOUND).build();
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Add session id=" + sessionId + " to location id=" + locationId)) {
+      try {
+        LocationDTO dto = locationRepository.addSession(locationId, sessionId);
+        return Response.ok(dto).build();
+      } catch (NotFoundException e) {
+        return Response.status(Status.NOT_FOUND).build();
+      }
     }
-    Session session = sessionRepository.findById(sessionId);
-    if (session == null) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
-    session.setLocation(location);
-    location.getSessions().add(session);
-    locationRepository.persist(location);
-    sessionRepository.persist(session);
-    LocationDTO dto = LocationDTO.fromLocation(location);
-    return Response.ok(dto).build();
   }
 
   @PUT
   @Path("/{id:[0-9][0-9]*}")
   @Consumes(MediaType.APPLICATION_JSON)
   @Transactional
-  public Response update(@PathParam("id") long id, Location entity) {
-    if (entity == null) {
-      return Response.status(Status.BAD_REQUEST).build();
+  public Response update(@PathParam("id") long id, LocationDTO dto) {
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Update category id=" + id)) {
+      if (dto == null) {
+        return Response.status(Status.BAD_REQUEST).build();
+      }
+      try {
+        locationRepository.update(id, dto);
+      } catch (OptimisticLockException e) {
+        return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
+      } catch (NotFoundException e) {
+        return Response.status(Status.NOT_FOUND).build();
+      } catch (MissingIdException e) {
+        return Response.status(Status.CONFLICT).entity(dto).build();
+      }
+      return Response.noContent().build();
     }
-    if (id != entity.id) {
-      return Response.status(Status.CONFLICT).entity(entity).build();
-    }
-    if (locationRepository.findById(id) == null) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
-    try {
-      locationRepository.persist(entity);
-    } catch (OptimisticLockException e) {
-      return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
-    }
-    return Response.noContent().build();
   }
 }

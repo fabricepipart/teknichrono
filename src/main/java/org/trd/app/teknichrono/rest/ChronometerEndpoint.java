@@ -101,9 +101,7 @@ public class ChronometerEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   public List<ChronometerDTO> listAll(@QueryParam("page") Integer pageIndex, @QueryParam("pageSize") Integer pageSize) {
     try (DurationLogger dl = new DurationLogger(LOGGER, "Get all chronometers")) {
-      return chronometerRepository.findAll()
-          .page(Paging.from(pageIndex, pageSize))
-          .stream()
+      return chronometerRepository.findAll(pageIndex, pageSize)
           .map(ChronometerDTO::fromChronometer)
           .collect(Collectors.toList());
     }
