@@ -3,7 +3,7 @@ package org.trd.app.teknichrono.rest;
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.dto.CategoryDTO;
 import org.trd.app.teknichrono.model.jpa.Category;
-import org.trd.app.teknichrono.service.CategoryService;
+import org.trd.app.teknichrono.model.jpa.CategoryRepository;
 import org.trd.app.teknichrono.util.DurationLogger;
 import org.trd.app.teknichrono.util.exception.MissingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
@@ -25,17 +25,18 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Path("/categories")
 public class CategoryEndpoint {
 
   private static final Logger LOGGER = Logger.getLogger(CategoryEndpoint.class);
 
-  private final CategoryService categoryService;
+  private final CategoryRepository categoryRepository;
 
   @Inject
-  public CategoryEndpoint(CategoryService categoryService) {
-    this.categoryService = categoryService;
+  public CategoryEndpoint(CategoryRepository categoryRepository) {
+    this.categoryRepository = categoryRepository;
   }
 
   @POST
@@ -43,7 +44,7 @@ public class CategoryEndpoint {
   @Transactional
   public Response create(Category entity) {
     try (DurationLogger perf = DurationLogger.get(LOGGER).start("Create category " + entity.getName())) {
-      categoryService.create(entity);
+      categoryRepository.create(entity);
       UriBuilder path = UriBuilder.fromResource(CategoryEndpoint.class).path(String.valueOf(entity.id));
       Response response = Response.created(path.build()).build();
       return response;
@@ -56,7 +57,7 @@ public class CategoryEndpoint {
   public Response deleteById(@PathParam("id") long id) {
     try (DurationLogger perf = DurationLogger.get(LOGGER).start("Delete category id=" + id)) {
       try {
-        categoryService.deleteById(id);
+        categoryRepository.deleteById(id);
       } catch (NotFoundException e) {
         return Response.status(Status.NOT_FOUND).build();
       }
@@ -70,7 +71,7 @@ public class CategoryEndpoint {
   @Transactional
   public Response findById(@PathParam("id") long id) {
     try (DurationLogger perf = DurationLogger.get(LOGGER).start("Find category id=" + id)) {
-      Category entity = categoryService.findById(id);
+      Category entity = categoryRepository.findById(id);
       if (entity == null) {
         return Response.status(Status.NOT_FOUND).build();
       }
@@ -85,7 +86,7 @@ public class CategoryEndpoint {
   @Transactional
   public Response findCategoryByName(@QueryParam("name") String name) {
     try (DurationLogger perf = DurationLogger.get(LOGGER).start("Find category name=" + name)) {
-      Category entity = categoryService.findByName(name);
+      Category entity = categoryRepository.findByName(name);
       if (entity == null) {
         return Response.status(Status.NOT_FOUND).build();
       }
@@ -99,7 +100,9 @@ public class CategoryEndpoint {
   @Transactional
   public List<CategoryDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
     try (DurationLogger perf = DurationLogger.get(LOGGER).start("Find all categories")) {
-      return categoryService.findAll(startPosition, maxResult);
+      return categoryRepository.findAll(startPosition, maxResult)
+              .map(CategoryDTO::fromCategory)
+              .collect(Collectors.toList());
     }
   }
 
@@ -110,7 +113,7 @@ public class CategoryEndpoint {
   public Response addPilot(@PathParam("categoryId") long categoryId, @QueryParam("pilotId") Long pilotId) {
     try (DurationLogger perf = DurationLogger.get(LOGGER).start("Add pilot id=" + pilotId + " to category id=" + categoryId)) {
       try {
-        CategoryDTO dto = categoryService.addPilot(categoryId, pilotId);
+        CategoryDTO dto = categoryRepository.addPilot(categoryId, pilotId);
         return Response.ok(dto).build();
       } catch (NotFoundException e) {
         return Response.status(Status.NOT_FOUND).build();
@@ -128,7 +131,7 @@ public class CategoryEndpoint {
         return Response.status(Status.BAD_REQUEST).build();
       }
       try {
-        categoryService.update(id, dto);
+        categoryRepository.update(id, dto);
       } catch (OptimisticLockException e) {
         return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
       } catch (NotFoundException e) {

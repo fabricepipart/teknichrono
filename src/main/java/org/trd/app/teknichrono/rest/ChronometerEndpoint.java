@@ -58,6 +58,7 @@ public class ChronometerEndpoint {
 
   @DELETE
   @Path("/{id:[0-9][0-9]*}")
+  @Transactional
   public Response deleteById(@PathParam("id") long id) {
     try (DurationLogger dl = new DurationLogger(LOGGER, "Delete chronometer ID=" + id)) {
       Chronometer entity = chronometerRepository.findById(id);
@@ -122,6 +123,7 @@ public class ChronometerEndpoint {
   @PUT
   @Path("/{id:[0-9][0-9]*}")
   @Consumes(MediaType.APPLICATION_JSON)
+  @Transactional
   public Response update(@PathParam("id") long id, Chronometer dto) {
     try (DurationLogger dl = new DurationLogger(LOGGER, "Update chronometer ID=" + id)) {
       if (dto == null) {

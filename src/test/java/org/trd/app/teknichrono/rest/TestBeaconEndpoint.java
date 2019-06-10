@@ -12,9 +12,9 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.trd.app.teknichrono.model.dto.BeaconDTO;
 import org.trd.app.teknichrono.model.jpa.Beacon;
+import org.trd.app.teknichrono.model.jpa.BeaconRepository;
 import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.model.jpa.Ping;
-import org.trd.app.teknichrono.service.BeaconService;
 import org.trd.app.teknichrono.util.exception.MissingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
@@ -26,8 +26,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -43,7 +44,8 @@ import static org.mockito.Mockito.when;
 public class TestBeaconEndpoint {
 
   private long id = 1L;
-  RuntimeDelegate previousRuntimeDelegate;
+
+  private RuntimeDelegate previousRuntimeDelegate;
 
   @Mock
   private RuntimeDelegate runtimeDelegate;
@@ -56,7 +58,7 @@ public class TestBeaconEndpoint {
   private UriBuilder uriBuilder;
 
   @Mock
-  private BeaconService beaconService;
+  private BeaconRepository beaconService;
 
   @InjectMocks
   private BeaconEndpoint endpoint;
@@ -173,7 +175,7 @@ public class TestBeaconEndpoint {
     entities.add(BeaconDTO.fromBeacon(entity2));
     entities.add(BeaconDTO.fromBeacon(entity3));
 
-    when(beaconService.findAll(null, null)).thenReturn(entities);
+    when(beaconService.findAll(null, null)).thenReturn(Stream.of(entity1, entity2, entity3));
 
     List<BeaconDTO> beacons = endpoint.listAll(null, null);
     assertThat(beacons).isNotNull();
@@ -191,7 +193,7 @@ public class TestBeaconEndpoint {
     Beacon entity1 = newBeacon(999, 9);
     entities.add(BeaconDTO.fromBeacon(entity1));
 
-    when(beaconService.findAll(1, 1)).thenReturn(entities);
+    when(beaconService.findAll(1, 1)).thenReturn(Stream.of(entity1));
 
     List<BeaconDTO> beacons = endpoint.listAll(1, 1);
     assertThat(beacons).isNotNull();
@@ -205,7 +207,6 @@ public class TestBeaconEndpoint {
     after.setId(before.getId());
 
     when(beaconService.findById(before.getId())).thenReturn(before);
-    //when(pilotRepository.findById(after.getPilot().getId())).thenReturn(after.getPilot());
 
     Response r = endpoint.update(before.getId(), BeaconDTO.fromBeacon(after));
 
@@ -220,7 +221,7 @@ public class TestBeaconEndpoint {
   @Test
   public void updateIsBadRequestIfNoBeaconPassed() {
     Beacon before = newBeacon(999, 11);
-    Response r = endpoint.update(before.getId(), null);
+    endpoint.update(before.getId(), null);
 
     verify(responseBuilder).status((Response.StatusType) Response.Status.BAD_REQUEST);
   }
@@ -230,7 +231,7 @@ public class TestBeaconEndpoint {
     Beacon before = newBeacon(999, 11);
     Beacon after = newBeacon(99, 12);
     doThrow(new MissingIdException()).when(beaconService).updateBeacon(anyLong(), any(BeaconDTO.class));
-    Response r = endpoint.update(before.getId(), BeaconDTO.fromBeacon(after));
+    endpoint.update(before.getId(), BeaconDTO.fromBeacon(after));
     verify(responseBuilder).status((Response.StatusType) Response.Status.CONFLICT);
   }
 
@@ -251,7 +252,7 @@ public class TestBeaconEndpoint {
     Beacon before = newBeacon(999, 11);
     Beacon after = newBeacon(99, 12);
     after.setId(before.getId());
-    Response r = endpoint.update(before.getId(), BeaconDTO.fromBeacon(after));
+    endpoint.update(before.getId(), BeaconDTO.fromBeacon(after));
     verify(responseBuilder).status((Response.StatusType) Response.Status.CONFLICT);
   }
 

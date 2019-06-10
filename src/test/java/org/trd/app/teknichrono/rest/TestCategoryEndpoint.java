@@ -7,13 +7,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.trd.app.teknichrono.model.dto.CategoryDTO;
 import org.trd.app.teknichrono.model.jpa.Category;
+import org.trd.app.teknichrono.model.jpa.CategoryRepository;
 import org.trd.app.teknichrono.model.jpa.Pilot;
-import org.trd.app.teknichrono.service.CategoryService;
 import org.trd.app.teknichrono.util.exception.MissingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
@@ -25,6 +26,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -52,7 +54,7 @@ public class TestCategoryEndpoint {
   private UriBuilder uriBuilder;
 
   @Mock
-  private CategoryService categoryService;
+  private CategoryRepository categoryRepository;
 
   @InjectMocks
   private CategoryEndpoint endpoint;
@@ -82,7 +84,7 @@ public class TestCategoryEndpoint {
   public void createsCategory() {
     Category entity = newCategory(9);
     Response r = endpoint.create(entity);
-    verify(categoryService).create(entity);
+    verify(categoryRepository).create(entity);
     assertThat(r).isEqualTo(response);
   }
 
@@ -90,7 +92,7 @@ public class TestCategoryEndpoint {
   public void createsCategoryWithNoPilot() {
     Category entity = newCategory();
     Response r = endpoint.create(entity);
-    verify(categoryService).create(entity);
+    verify(categoryRepository).create(entity);
     assertThat(r).isEqualTo(response);
   }
 
@@ -98,7 +100,7 @@ public class TestCategoryEndpoint {
   public void createsCategoryWithSeveralPilots() {
     Category entity = newCategory(9, 10, 11);
     Response r = endpoint.create(entity);
-    verify(categoryService).create(entity);
+    verify(categoryRepository).create(entity);
     assertThat(r).isEqualTo(response);
   }
 
@@ -123,15 +125,15 @@ public class TestCategoryEndpoint {
   @Test
   public void deleteById() throws NotFoundException {
     Category entity = newCategory();
-    when(categoryService.findById(entity.getId())).thenReturn(entity);
+    when(categoryRepository.findById(entity.getId())).thenReturn(entity);
     Response r = endpoint.deleteById(entity.getId());
-    verify(categoryService).deleteById(entity.getId());
+    verify(categoryRepository).deleteById(entity.getId());
   }
 
   @Test
   public void findById() {
     Category entity = newCategory(9, 10, 11);
-    when(categoryService.findById(entity.getId())).thenReturn(entity);
+    when(categoryRepository.findById(entity.getId())).thenReturn(entity);
     Response r = endpoint.findById(entity.getId());
     assertThat(r).isNotNull();
     ArgumentCaptor<CategoryDTO> captor = ArgumentCaptor.forClass(CategoryDTO.class);
@@ -145,7 +147,7 @@ public class TestCategoryEndpoint {
 
   @Test
   public void findByIdReturnsNullIfNotFound() {
-    when(categoryService.findById(any())).thenReturn(null);
+    when(categoryRepository.findById(any())).thenReturn(null);
     Response r = endpoint.findById(999);
     assertThat(r).isNotNull();
     verify(responseBuilder, never()).entity(any());
@@ -155,7 +157,7 @@ public class TestCategoryEndpoint {
   @Test
   public void findCategoryByName() {
     Category entity = newCategory(9, 10, 11);
-    when(categoryService.findByName(entity.getName())).thenReturn(entity);
+    when(categoryRepository.findByName(entity.getName())).thenReturn(entity);
     Response r = endpoint.findCategoryByName(entity.getName());
     assertThat(r).isNotNull();
 
@@ -172,7 +174,7 @@ public class TestCategoryEndpoint {
   @Test
   public void findCategoryByNameReturnsAnEmptyIfNotFound() {
     Category entity = newCategory(9, 10, 11);
-    when(categoryService.findByName(anyString())).thenReturn(null);
+    when(categoryRepository.findByName(anyString())).thenReturn(null);
     Response r = endpoint.findCategoryByName(entity.getName());
     assertThat(r).isNotNull();
     verify(responseBuilder, never()).entity(any());
@@ -189,7 +191,7 @@ public class TestCategoryEndpoint {
     entities.add(CategoryDTO.fromCategory(entity2));
     entities.add(CategoryDTO.fromCategory(entity3));
 
-    when(categoryService.findAll(null, null)).thenReturn(entities);
+    when(categoryRepository.findAll(null, null)).thenReturn(Stream.of(entity1, entity2, entity3));
 
     List<CategoryDTO> categoryDTOS = endpoint.listAll(null, null);
     assertThat(categoryDTOS).isNotNull();
@@ -207,7 +209,7 @@ public class TestCategoryEndpoint {
     Category entity1 = newCategory(9, 10, 11);
     entities.add(CategoryDTO.fromCategory(entity1));
 
-    when(categoryService.findAll(1, 1)).thenReturn(entities);
+    when(categoryRepository.findAll(1, 1)).thenReturn(Stream.of(entity1));
 
     List<CategoryDTO> beacons = endpoint.listAll(1, 1);
     assertThat(beacons).isNotNull();
@@ -219,13 +221,13 @@ public class TestCategoryEndpoint {
     Pilot pilot = new Pilot();
     pilot.setId(102L);
     Category entity = newCategory(9, 10, 11);
-    when(categoryService.findById(entity.getId())).thenReturn(entity);
+    when(categoryRepository.findById(entity.getId())).thenReturn(entity);
     //when(pilotRepository.findById(102L)).thenReturn(pilot);
 
     Response r = endpoint.addPilot(entity.getId(), 102L);
     assertThat(r).isNotNull();
 
-    verify(categoryService, atLeastOnce()).addPilot(entity.getId(), 102L);
+    verify(categoryRepository, atLeastOnce()).addPilot(entity.getId(), 102L);
   }
 
   @Test
@@ -238,12 +240,12 @@ public class TestCategoryEndpoint {
     //when(em.createQuery(anyString(), eq(Pilot.class))).thenReturn(queryPilot);
 
 
-    when(categoryService.findById(before.getId())).thenReturn(before);
+    when(categoryRepository.findById(before.getId())).thenReturn(before);
     Response r = endpoint.update(before.getId(), dto);
 
     assertThat(r).isNotNull();
     ArgumentCaptor<CategoryDTO> captor = ArgumentCaptor.forClass(CategoryDTO.class);
-    verify(categoryService, atLeastOnce()).update(anyLong(), captor.capture());
+    verify(categoryRepository, atLeastOnce()).update(anyLong(), captor.capture());
     CategoryDTO c = captor.getAllValues().get(0);
     assertThat(c.getName()).isEqualTo(entity.getName());
 
@@ -260,7 +262,7 @@ public class TestCategoryEndpoint {
 
   @Test
   public void updateIsConflictIfIdsDontMatch() throws MissingIdException, NotFoundException {
-    doThrow(MissingIdException.class).when(categoryService).update(anyLong(), any(CategoryDTO.class));
+    doThrow(MissingIdException.class).when(categoryRepository).update(anyLong(), any(CategoryDTO.class));
     Category before = newCategory(9, 10, 11);
     Category after = newCategory(9, 11, 12);
     after.setName("new");
@@ -271,13 +273,13 @@ public class TestCategoryEndpoint {
 
   @Test
   public void updateReturnsNullIfNotFound() throws MissingIdException, NotFoundException {
-    doThrow(NotFoundException.class).when(categoryService).update(anyLong(), any(CategoryDTO.class));
+    doThrow(NotFoundException.class).when(categoryRepository).update(anyLong(), any(CategoryDTO.class));
     Category before = newCategory(9, 10, 11);
     Category after = newCategory(9, 11, 12);
     after.setId(before.getId());
     after.setName("new");
     CategoryDTO dto = CategoryDTO.fromCategory(after);
-    when(categoryService.findById(before.getId())).thenReturn(null);
+    when(categoryRepository.findById(before.getId())).thenReturn(null);
     Response r = endpoint.update(before.getId(), dto);
     assertThat(r).isNotNull();
     verify(responseBuilder).status((Response.StatusType) javax.ws.rs.core.Response.Status.NOT_FOUND);
@@ -285,14 +287,14 @@ public class TestCategoryEndpoint {
 
   @Test
   public void updateIsConflictIfOptimisticLockException() throws MissingIdException, NotFoundException {
-    doThrow(new OptimisticLockException()).when(categoryService).update(anyLong(), any(CategoryDTO.class));
+    doThrow(new OptimisticLockException()).when(categoryRepository).update(anyLong(), any(CategoryDTO.class));
     Category before = newCategory(9, 10, 11);
     Category after = newCategory(9, 11, 12);
     after.setId(before.getId());
     after.setName("new");
     CategoryDTO dto = CategoryDTO.fromCategory(after);
     //when(em.createQuery(anyString(), eq(Pilot.class))).thenReturn(queryPilot);
-    when(categoryService.findById(before.getId())).thenReturn(before);
+    when(categoryRepository.findById(before.getId())).thenReturn(before);
     Response r = endpoint.update(before.getId(), dto);
     verify(responseBuilder).status((Response.StatusType) Response.Status.CONFLICT);
   }
