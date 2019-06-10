@@ -15,6 +15,7 @@ import org.trd.app.teknichrono.model.jpa.Beacon;
 import org.trd.app.teknichrono.model.jpa.BeaconRepository;
 import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.model.jpa.Ping;
+import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.MissingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -86,10 +87,10 @@ public class TestBeaconEndpoint {
   }
 
   @Test
-  public void createsBeacon() throws NotFoundException {
+  public void createsBeacon() throws NotFoundException, ConflictingIdException {
     Beacon entity = newBeacon(999, -1);
-    Response r = endpoint.create(entity);
-    verify(beaconService).create(entity);
+    Response r = endpoint.create(BeaconDTO.fromBeacon(entity));
+    verify(beaconService).create(BeaconDTO.fromBeacon(entity));
     assertThat(r).isEqualTo(response);
   }
 

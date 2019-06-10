@@ -7,6 +7,7 @@ import org.trd.app.teknichrono.model.jpa.EventRepository;
 import org.trd.app.teknichrono.model.jpa.Session;
 import org.trd.app.teknichrono.model.jpa.SessionRepository;
 import org.trd.app.teknichrono.util.DurationLogger;
+import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
@@ -55,11 +56,14 @@ public class EventEndpoint {
   @Path("/{id:[0-9][0-9]*}")
   @Transactional
   public Response deleteById(@PathParam("id") long id) {
-    Event entity = eventRepository.findById(id);
-    if (entity == null) {
+    DurationLogger perf = DurationLogger.get(LOGGER).start("Delete event id=" + id);
+    try {
+      eventRepository.deleteById(id);
+    } catch (NotFoundException e) {
       return Response.status(Status.NOT_FOUND).build();
+    } finally {
+      perf.end();
     }
-    eventRepository.delete(entity);
     return Response.noContent().build();
   }
 
@@ -90,11 +94,13 @@ public class EventEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public List<EventDTO> listAll(@QueryParam("page") Integer pageIndex, @QueryParam("pageSize") Integer pageSize) {
-    return eventRepository.findAll()
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Find all events")) {
+      return eventRepository.findAll()
             .page(Paging.from(pageIndex, pageSize))
             .stream()
             .map(EventDTO::fromEvent)
             .collect(Collectors.toList());
+    }
   }
 
   @POST

@@ -3,16 +3,19 @@ package org.trd.app.teknichrono.model.jpa;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.trd.app.teknichrono.model.dto.BeaconDTO;
+import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -22,7 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class TestBeaconRepository {
+class TestBeaconRepository {
 
   private long id = 1L;
 
@@ -38,7 +41,7 @@ public class TestBeaconRepository {
   @InjectMocks
   private BeaconRepository beaconRepository;
 
-  public Beacon newBeacon(long number, long pilotId) {
+  Beacon newBeacon(long number, long pilotId) {
     Beacon beacon = new Beacon();
     beacon.id = id++;
     beacon.setNumber(number);
@@ -59,20 +62,23 @@ public class TestBeaconRepository {
   }
 
   @Test
-  public void createsBeaconWithCompletePilotIfIdProvided() throws NotFoundException {
+  void createsBeaconWithCompletePilotIfIdProvided() throws NotFoundException, ConflictingIdException {
     Beacon entity = newBeacon(999, 9);
-    Pilot pilot = entity.getPilot();
+    BeaconDTO dto = BeaconDTO.fromBeacon(entity);
+    dto.setId(0);
+    when(pilotRepository.findById(9L)).thenReturn(entity.getPilot());
 
-    when(pilotRepository.findById(9L)).thenReturn(pilot);
-
-    beaconRepository.create(entity);
+    beaconRepository.create(dto);
 
     verify(pilotRepository).findById(9L);
-    verify(beaconPanacheRepository).persist(entity);
+
+    ArgumentCaptor<Beacon> captor = ArgumentCaptor.forClass(Beacon.class);
+    verify(beaconPanacheRepository).persist(captor.capture());
+    assertThat(captor.getValue().getNumber()).isEqualTo(entity.getNumber());
   }
 
   @Test
-  public void deleteByIdRemovesBeaconFromPilot() throws NotFoundException {
+  void deleteByIdRemovesBeaconFromPilot() throws NotFoundException {
     Beacon entity = newBeacon(999, 9);
     Pilot pilot = entity.getPilot();
 
@@ -86,7 +92,7 @@ public class TestBeaconRepository {
   }
 
   @Test
-  public void deleteByIdRemovesBeaconFromPings() throws NotFoundException {
+  void deleteByIdRemovesBeaconFromPings() throws NotFoundException {
     Beacon entity = newBeacon(999, 9);
     List<Ping> pings = entity.getPings();
 
@@ -103,14 +109,15 @@ public class TestBeaconRepository {
   }
 
   @Test
-  public void deleteByIdReturnsErrorIfBeaconDoesNotExist() {
+  void deleteByIdReturnsErrorIfBeaconDoesNotExist() {
     assertThrows(NotFoundException.class, () -> beaconRepository.deleteById(42L));
     verify(beaconPanacheRepository, never()).delete(any());
   }
 
 
   @Test
-  public void listAll() {
+  @SuppressWarnings("unchecked")
+  void listAll() {
     List<Beacon> entities = new ArrayList<>();
     Beacon entity1 = newBeacon(999, 9);
     Beacon entity2 = newBeacon(-1, 10);
@@ -135,7 +142,8 @@ public class TestBeaconRepository {
   }
 
   @Test
-  public void listAllCanUseWindows() {
+  @SuppressWarnings("unchecked")
+  void listAllCanUseWindows() {
     List<Beacon> entities = new ArrayList<>();
     Beacon entity1 = newBeacon(999, 9);
     entities.add(entity1);

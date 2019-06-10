@@ -5,6 +5,7 @@ import org.trd.app.teknichrono.model.dto.BeaconDTO;
 import org.trd.app.teknichrono.model.jpa.Beacon;
 import org.trd.app.teknichrono.model.jpa.BeaconRepository;
 import org.trd.app.teknichrono.util.DurationLogger;
+import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.MissingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
@@ -43,14 +44,16 @@ public class BeaconEndpoint {
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Transactional
-  public Response create(Beacon entity) {
+  public Response create(BeaconDTO entity) {
     try (DurationLogger perf = DurationLogger.get(LOGGER).start("Create beacon " + entity.getNumber())) {
       try {
         beaconRepository.create(entity);
       } catch (NotFoundException e) {
         return Response.status(Status.NOT_FOUND).build();
+      } catch (ConflictingIdException e) {
+        return Response.status(Status.CONFLICT).build();
       }
-      URI location = UriBuilder.fromResource(BeaconEndpoint.class).path(String.valueOf(entity.id)).build();
+      URI location = UriBuilder.fromResource(BeaconEndpoint.class).path(String.valueOf(entity.getId())).build();
       Response toReturn = Response.created(location).build();
       return toReturn;
     }

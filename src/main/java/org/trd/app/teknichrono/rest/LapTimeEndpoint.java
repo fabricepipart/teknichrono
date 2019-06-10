@@ -56,7 +56,7 @@ public class LapTimeEndpoint {
   // TODO, get rid of the em (still needed for the fromDTO)
   private final EntityManager em;
 
-  private final LapTimeRepository lapTimeRepository;
+  private final LapTimeRepository.Panache lapTimeRepository;
 
   private final SessionRepository sessionRepository;
 
@@ -73,8 +73,9 @@ public class LapTimeEndpoint {
   private final CSVConverter csvConverter = new CSVConverter();
 
   @Inject
-  public LapTimeEndpoint(EntityManager em, LapTimeRepository lapTimeRepository, SessionRepository sessionRepository,
-                         CategoryRepository categoryRepository, EventRepository eventRepository, LocationRepository locationRepository) {
+  public LapTimeEndpoint(EntityManager em, LapTimeRepository.Panache lapTimeRepository, SessionRepository sessionRepository,
+                         CategoryRepository categoryRepository, EventRepository eventRepository,
+                         LocationRepository locationRepository) {
     this.em = em;
     this.lapTimeRepository = lapTimeRepository;
     this.sessionRepository = sessionRepository;

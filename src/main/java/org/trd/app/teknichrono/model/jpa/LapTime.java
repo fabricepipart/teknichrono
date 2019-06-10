@@ -45,7 +45,7 @@ public class LapTime extends PanacheEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   private Session session;
 
-  @OneToMany
+  @OneToMany(orphanRemoval = true)
   @OrderColumn(name = "dateTime")
   private List<Ping> intermediates = new ArrayList<>();
 

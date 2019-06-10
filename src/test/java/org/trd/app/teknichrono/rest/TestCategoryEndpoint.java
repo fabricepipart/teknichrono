@@ -7,7 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -15,6 +14,7 @@ import org.trd.app.teknichrono.model.dto.CategoryDTO;
 import org.trd.app.teknichrono.model.jpa.Category;
 import org.trd.app.teknichrono.model.jpa.CategoryRepository;
 import org.trd.app.teknichrono.model.jpa.Pilot;
+import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.MissingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
@@ -81,24 +81,24 @@ public class TestCategoryEndpoint {
   }
 
   @Test
-  public void createsCategory() {
-    Category entity = newCategory(9);
+  public void createsCategory() throws ConflictingIdException, NotFoundException {
+    CategoryDTO entity = CategoryDTO.fromCategory(newCategory(9));
     Response r = endpoint.create(entity);
     verify(categoryRepository).create(entity);
     assertThat(r).isEqualTo(response);
   }
 
   @Test
-  public void createsCategoryWithNoPilot() {
-    Category entity = newCategory();
+  public void createsCategoryWithNoPilot() throws ConflictingIdException, NotFoundException {
+    CategoryDTO entity = CategoryDTO.fromCategory(newCategory());
     Response r = endpoint.create(entity);
     verify(categoryRepository).create(entity);
     assertThat(r).isEqualTo(response);
   }
 
   @Test
-  public void createsCategoryWithSeveralPilots() {
-    Category entity = newCategory(9, 10, 11);
+  public void createsCategoryWithSeveralPilots() throws ConflictingIdException, NotFoundException {
+    CategoryDTO entity = CategoryDTO.fromCategory(newCategory(9, 10, 11));
     Response r = endpoint.create(entity);
     verify(categoryRepository).create(entity);
     assertThat(r).isEqualTo(response);
