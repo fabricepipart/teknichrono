@@ -98,9 +98,9 @@ public class CategoryEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
-  public List<CategoryDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
+  public List<CategoryDTO> listAll(@QueryParam("page") Integer pageIndex, @QueryParam("pageSize") Integer pageSize) {
     try (DurationLogger perf = DurationLogger.get(LOGGER).start("Find all categories")) {
-      return categoryRepository.findAll(startPosition, maxResult)
+      return categoryRepository.findAll(pageIndex, pageSize)
               .map(CategoryDTO::fromCategory)
               .collect(Collectors.toList());
     }

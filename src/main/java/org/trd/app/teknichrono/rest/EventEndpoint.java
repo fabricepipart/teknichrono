@@ -89,9 +89,9 @@ public class EventEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
-  public List<EventDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
+  public List<EventDTO> listAll(@QueryParam("page") Integer pageIndex, @QueryParam("pageSize") Integer pageSize) {
     return eventRepository.findAll()
-            .page(Paging.from(startPosition, maxResult))
+            .page(Paging.from(pageIndex, pageSize))
             .stream()
             .map(EventDTO::fromEvent)
             .collect(Collectors.toList());

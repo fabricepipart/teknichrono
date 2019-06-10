@@ -91,8 +91,8 @@ public class TestRestCategoryEndpoint {
     }.getClass().getGenericSuperclass());
   }
 
-  public List<CategoryDTO> getAllCategoriesWindow(int start, int max) {
-    Response r = given().queryParam("start", Integer.valueOf(start)).queryParam("max", Integer.valueOf(max))
+  public List<CategoryDTO> getAllCategoriesWindow(int page, int pageSize) {
+    Response r = given().queryParam("page", page).queryParam("pageSize", pageSize)
         .when().get("/rest/categories")
         .then()
         .statusCode(200)

@@ -85,9 +85,9 @@ public class LocationEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
-  public List<LocationDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
+  public List<LocationDTO> listAll(@QueryParam("page") Integer pageIndex, @QueryParam("pageSize") Integer pageSize) {
     return locationRepository.findAll()
-            .page(Paging.from(startPosition, maxResult))
+            .page(Paging.from(pageIndex, pageSize))
             .stream()
             .map(LocationDTO::fromLocation)
             .collect(Collectors.toList());

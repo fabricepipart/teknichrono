@@ -113,9 +113,9 @@ public class BeaconEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
-  public List<BeaconDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
+  public List<BeaconDTO> listAll(@QueryParam("page") Integer pageIndex, @QueryParam("pageSize") Integer pageSize) {
     DurationLogger perf = DurationLogger.get(LOGGER).start("Find all beacons");
-    List<BeaconDTO> results = beaconRepository.findAll(startPosition, maxResult)
+    List<BeaconDTO> results = beaconRepository.findAll(pageIndex, pageSize)
             .map(BeaconDTO::fromBeacon)
             .collect(Collectors.toList());
     perf.end();
