@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 @ApplicationScoped
-public class PilotRepository extends PanacheRepositoryWrapper<Pilot> {
+public class PilotRepository extends PanacheRepositoryWrapper<Pilot> implements EntityRepository<Pilot, PilotDTO> {
 
   @ApplicationScoped
   public static class Panache implements PanacheRepository<Pilot> {
@@ -48,11 +48,17 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot> {
     return panacheRepository.find("firstName = ?1 AND lastName = ?2", firstname, lastname).firstResult();
   }
 
+  @Override
+  public String getEntityName() {
+    return Pilot.class.getName();
+  }
+
   public void create(PilotDTO entity) throws ConflictingIdException, NotFoundException {
     Pilot pilot = fromDTO(entity);
     panacheRepository.persist(pilot);
   }
 
+  @Override
   public Pilot fromDTO(PilotDTO entity) throws ConflictingIdException, NotFoundException {
     Pilot pilot = new Pilot();
     if (entity.getId() > 0) {
@@ -77,6 +83,11 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot> {
       pilot.setCategory(category);
     }
     return pilot;
+  }
+
+  @Override
+  public PilotDTO toDTO(Pilot p) {
+    return PilotDTO.fromPilot(p);
   }
 
 

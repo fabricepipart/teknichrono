@@ -4,7 +4,6 @@ import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import org.trd.app.teknichrono.model.dto.LocationDTO;
 import org.trd.app.teknichrono.model.dto.NestedSessionDTO;
 import org.trd.app.teknichrono.util.exception.ConflictingIdException;
-import org.trd.app.teknichrono.util.exception.MissingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -12,7 +11,7 @@ import javax.inject.Inject;
 import java.util.Set;
 
 @ApplicationScoped
-public class LocationRepository extends PanacheRepositoryWrapper<Location> {
+public class LocationRepository extends PanacheRepositoryWrapper<Location> implements EntityRepository<Location, LocationDTO> {
 
   @ApplicationScoped
   public static class Panache implements PanacheRepository<Location> {
@@ -39,6 +38,17 @@ public class LocationRepository extends PanacheRepositoryWrapper<Location> {
     panacheRepository.persist(location);
   }
 
+  @Override
+  public String getEntityName() {
+    return Location.class.getName();
+  }
+
+  @Override
+  public LocationDTO toDTO(Location dto) {
+    return LocationDTO.fromLocation(dto);
+  }
+
+  @Override
   public Location fromDTO(LocationDTO entity) throws ConflictingIdException, NotFoundException {
     Location location = new Location();
     if (entity.getId() > 0) {
@@ -98,9 +108,9 @@ public class LocationRepository extends PanacheRepositoryWrapper<Location> {
     panacheRepository.delete(entity);
   }
 
-  public void update(long id, LocationDTO entity) throws MissingIdException, NotFoundException {
+  public void update(long id, LocationDTO entity) throws ConflictingIdException, NotFoundException {
     if (id != entity.getId()) {
-      throw new MissingIdException();
+      throw new ConflictingIdException();
     }
     Location location = findById(id);
     if (location == null) {

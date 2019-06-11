@@ -296,7 +296,7 @@ public class TestRestLocationEndpoint {
     given()
         .when().contentType(ContentType.JSON).body(jsonb.toJson(p)).post("/rest/locations")
         .then()
-        .statusCode(201);
+        .statusCode(204);
   }
 
   public static void createWithSession(String name, String sessionName) {
@@ -313,7 +313,7 @@ public class TestRestLocationEndpoint {
     given()
         .when().contentType(ContentType.JSON).body(jsonb.toJson(locationDTO)).post("/rest/locations")
         .then()
-        .statusCode(201);
+        .statusCode(204);
   }
 
   public void assertTestCleanedEverything() {

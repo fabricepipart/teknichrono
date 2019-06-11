@@ -40,4 +40,8 @@ abstract class PanacheRepositoryWrapper<T> implements Repository<T> {
     panacheRepository.delete(entity);
   }
 
+  public T findByField(String fieldName, Object fieldValue) {
+    return panacheRepository.find(fieldName, fieldValue).firstResult();
+  }
+
 }
