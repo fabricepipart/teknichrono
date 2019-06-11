@@ -111,7 +111,9 @@ public class CategoryRepository extends PanacheRepositoryWrapper<Category> {
         if (pilot == null) {
           throw new NotFoundException("Pilot not found with ID=" + pilotDto.getId());
         }
+        pilot.setCategory(category);
         category.getPilots().add(pilot);
+        pilotRepository.persist(pilot);
       }
     }
     category.setName(entity.getName());

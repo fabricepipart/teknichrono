@@ -3,8 +3,8 @@ package org.trd.app.teknichrono.model.dto;
 import lombok.Data;
 import org.trd.app.teknichrono.model.jpa.Location;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class LocationDTO {
@@ -13,7 +13,7 @@ public class LocationDTO {
   private int version;
   private String name;
   private boolean loopTrack;
-  private List<NestedSessionDTO> sessions = new ArrayList<>();
+  private Set<NestedSessionDTO> sessions = new HashSet<>();
 
   public static LocationDTO fromLocation(Location location) {
     return DtoMapper.INSTANCE.asLocationDto(location);

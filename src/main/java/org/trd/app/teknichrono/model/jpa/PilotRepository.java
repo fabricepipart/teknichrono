@@ -151,6 +151,7 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot> {
       }
       category.getPilots().add(pilot);
       pilot.setCategory(category);
+      categoryRepository.persist(category);
     }
     // Update of beacon
     pilot.setCurrentBeacon(null);
@@ -161,6 +162,7 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot> {
       }
       beacon.setPilot(pilot);
       pilot.setCurrentBeacon(beacon);
+      beaconRepository.persist(beacon);
     }
     panacheRepository.persist(pilot);
   }

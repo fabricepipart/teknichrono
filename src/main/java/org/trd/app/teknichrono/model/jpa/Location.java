@@ -7,8 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Location extends PanacheEntity {
@@ -28,7 +28,7 @@ public class Location extends PanacheEntity {
 
   @OneToMany(orphanRemoval = true)
   @JoinColumn(name = "locationId")
-  private List<Session> sessions = new ArrayList<>();
+  private Set<Session> sessions = new HashSet<>();
 
   public Long getId() {
     return this.id;
@@ -62,11 +62,11 @@ public class Location extends PanacheEntity {
     this.loopTrack = loop;
   }
 
-  public List<Session> getSessions() {
+  public Set<Session> getSessions() {
     return this.sessions;
   }
 
-  public void setSessions(final List<Session> sessions) {
+  public void setSessions(final Set<Session> sessions) {
     this.sessions = sessions;
   }
 

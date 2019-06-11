@@ -291,8 +291,8 @@ public class TestRestPilotEndPoint {
     }.getClass().getGenericSuperclass());
   }
 
-  public static List<PilotDTO> getAllPilotsWindow(int start, int max) {
-    Response r = given().queryParam("start", Integer.valueOf(start)).queryParam("max", Integer.valueOf(max))
+  public static List<PilotDTO> getAllPilotsWindow(int page, int pageSize) {
+    Response r = given().queryParam("page", page).queryParam("pageSize", pageSize)
         .when().get("/rest/pilots")
         .then()
         .statusCode(200)

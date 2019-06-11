@@ -95,11 +95,9 @@ public class EventEndpoint {
   @Transactional
   public List<EventDTO> listAll(@QueryParam("page") Integer pageIndex, @QueryParam("pageSize") Integer pageSize) {
     try (DurationLogger perf = DurationLogger.get(LOGGER).start("Find all events")) {
-      return eventRepository.findAll()
-            .page(Paging.from(pageIndex, pageSize))
-            .stream()
-            .map(EventDTO::fromEvent)
-            .collect(Collectors.toList());
+      return eventRepository.findAll(pageIndex, pageSize)
+          .map(EventDTO::fromEvent)
+          .collect(Collectors.toList());
     }
   }
 

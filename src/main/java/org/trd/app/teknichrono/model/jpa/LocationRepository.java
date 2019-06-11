@@ -1,11 +1,15 @@
 package org.trd.app.teknichrono.model.jpa;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import org.trd.app.teknichrono.model.dto.LocationDTO;
+import org.trd.app.teknichrono.model.dto.NestedSessionDTO;
+import org.trd.app.teknichrono.util.exception.ConflictingIdException;
+import org.trd.app.teknichrono.util.exception.MissingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.util.List;
+import java.util.Set;
 
 @ApplicationScoped
 public class LocationRepository extends PanacheRepositoryWrapper<Location> {
@@ -30,6 +34,49 @@ public class LocationRepository extends PanacheRepositoryWrapper<Location> {
     this.sessionRepository = sessionRepository;
   }
 
+  public void create(LocationDTO entity) throws ConflictingIdException, NotFoundException {
+    Location location = fromDTO(entity);
+    panacheRepository.persist(location);
+  }
+
+  public Location fromDTO(LocationDTO entity) throws ConflictingIdException, NotFoundException {
+    Location location = new Location();
+    if (entity.getId() > 0) {
+      throw new ConflictingIdException("Can't create Location with already an ID");
+    }
+    location.setLoopTrack(entity.isLoopTrack());
+    location.setName(entity.getName());
+
+    Set<NestedSessionDTO> associatedSessions = entity.getSessions();
+    if (associatedSessions != null) {
+      for (NestedSessionDTO associatedSession : associatedSessions) {
+        Session session = sessionRepository.findById(associatedSession.getId());
+        if (session == null) {
+          throw new NotFoundException("Session not found with ID=" + associatedSession.getId());
+        }
+        session.setLocation(location);
+        location.getSessions().add(session);
+      }
+    }
+    return location;
+  }
+
+  public LocationDTO addSession(long locationId, long sessionId) throws NotFoundException {
+    Location location = findById(locationId);
+    if (location == null) {
+      throw new NotFoundException("Location not found with ID=" + locationId);
+    }
+    Session session = sessionRepository.findById(sessionId);
+    if (session == null) {
+      throw new NotFoundException("Session not found with ID=" + sessionId);
+    }
+    session.setLocation(location);
+    location.getSessions().add(session);
+    persist(location);
+    sessionRepository.persist(session);
+    return LocationDTO.fromLocation(location);
+  }
+
   public Location findByName(String name) {
     return panacheRepository.find("name", name).firstResult();
   }
@@ -41,7 +88,7 @@ public class LocationRepository extends PanacheRepositoryWrapper<Location> {
       throw new NotFoundException();
     }
 
-    List<Session> sessions = entity.getSessions();
+    Set<Session> sessions = entity.getSessions();
     if (sessions != null) {
       for (Session session : sessions) {
         session.setLocation(null);
@@ -49,5 +96,32 @@ public class LocationRepository extends PanacheRepositoryWrapper<Location> {
       }
     }
     panacheRepository.delete(entity);
+  }
+
+  public void update(long id, LocationDTO entity) throws MissingIdException, NotFoundException {
+    if (id != entity.getId()) {
+      throw new MissingIdException();
+    }
+    Location location = findById(id);
+    if (location == null) {
+      throw new NotFoundException("Location not found with ID=" + id);
+    }
+
+    location.setName(entity.getName());
+    location.setLoopTrack(entity.isLoopTrack());
+    // Update of pilots
+    location.getSessions().clear();
+    if (entity.getSessions() != null) {
+      for (NestedSessionDTO sessionDto : entity.getSessions()) {
+        Session session = sessionRepository.findById(sessionDto.getId());
+        if (session == null) {
+          throw new NotFoundException("Session not found with ID=" + sessionDto.getId());
+        }
+        location.getSessions().add(session);
+        session.setLocation(location);
+        sessionRepository.persist(session);
+      }
+    }
+    panacheRepository.persist(location);
   }
 }
