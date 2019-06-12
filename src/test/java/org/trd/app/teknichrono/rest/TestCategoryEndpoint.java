@@ -231,7 +231,7 @@ public class TestCategoryEndpoint {
   }
 
   @Test
-  public void update() throws MissingIdException, NotFoundException {
+  public void update() throws ConflictingIdException, NotFoundException {
     Category before = newCategory(9, 10, 11);
     Category entity = newCategory(9, 11, 12);
     entity.setId(before.getId());
@@ -261,7 +261,7 @@ public class TestCategoryEndpoint {
   }
 
   @Test
-  public void updateIsConflictIfIdsDontMatch() throws MissingIdException, NotFoundException {
+  public void updateIsConflictIfIdsDontMatch() throws ConflictingIdException, NotFoundException {
     doThrow(MissingIdException.class).when(categoryRepository).update(anyLong(), any(CategoryDTO.class));
     Category before = newCategory(9, 10, 11);
     Category after = newCategory(9, 11, 12);
@@ -272,7 +272,7 @@ public class TestCategoryEndpoint {
   }
 
   @Test
-  public void updateReturnsNullIfNotFound() throws MissingIdException, NotFoundException {
+  public void updateReturnsNullIfNotFound() throws ConflictingIdException, NotFoundException {
     doThrow(NotFoundException.class).when(categoryRepository).update(anyLong(), any(CategoryDTO.class));
     Category before = newCategory(9, 10, 11);
     Category after = newCategory(9, 11, 12);
@@ -286,7 +286,7 @@ public class TestCategoryEndpoint {
   }
 
   @Test
-  public void updateIsConflictIfOptimisticLockException() throws MissingIdException, NotFoundException {
+  public void updateIsConflictIfOptimisticLockException() throws ConflictingIdException, NotFoundException {
     doThrow(new OptimisticLockException()).when(categoryRepository).update(anyLong(), any(CategoryDTO.class));
     Category before = newCategory(9, 10, 11);
     Category after = newCategory(9, 11, 12);

@@ -202,7 +202,7 @@ public class TestBeaconEndpoint {
   }
 
   @Test
-  public void update() throws MissingIdException, NotFoundException {
+  public void update() throws ConflictingIdException, NotFoundException {
     Beacon before = newBeacon(999, 11);
     Beacon after = newBeacon(99, 12);
     after.setId(before.getId());
@@ -213,7 +213,7 @@ public class TestBeaconEndpoint {
 
     assertThat(r).isNotNull();
     ArgumentCaptor<BeaconDTO> captor = ArgumentCaptor.forClass(BeaconDTO.class);
-    verify(beaconService).updateBeacon(eq(after.getId()), captor.capture());
+    verify(beaconService).update(eq(after.getId()), captor.capture());
     BeaconDTO beacon = captor.getValue();
     assertThat(beacon.getNumber()).isEqualTo(99);
     assertThat(beacon.getPilot().getId()).isEqualTo(12L);
@@ -228,28 +228,28 @@ public class TestBeaconEndpoint {
   }
 
   @Test
-  public void updateIsConflictIfIdsDontMatch() throws MissingIdException, NotFoundException {
+  public void updateIsConflictIfIdsDontMatch() throws ConflictingIdException, NotFoundException {
     Beacon before = newBeacon(999, 11);
     Beacon after = newBeacon(99, 12);
-    doThrow(new MissingIdException()).when(beaconService).updateBeacon(anyLong(), any(BeaconDTO.class));
+    doThrow(new MissingIdException()).when(beaconService).update(anyLong(), any(BeaconDTO.class));
     endpoint.update(before.getId(), BeaconDTO.fromBeacon(after));
     verify(responseBuilder).status((Response.StatusType) Response.Status.CONFLICT);
   }
 
   @Test
-  public void updateReturnsNullIfNotFound() throws MissingIdException, NotFoundException {
+  public void updateReturnsNullIfNotFound() throws ConflictingIdException, NotFoundException {
     Beacon before = newBeacon(999, 11);
     Beacon after = newBeacon(99, 12);
     after.setId(before.getId());
-    doThrow(new NotFoundException()).when(beaconService).updateBeacon(anyLong(), any(BeaconDTO.class));
+    doThrow(new NotFoundException()).when(beaconService).update(anyLong(), any(BeaconDTO.class));
     Response r = endpoint.update(before.getId(), BeaconDTO.fromBeacon(after));
     assertThat(r).isNotNull();
     verify(responseBuilder).status((Response.StatusType) javax.ws.rs.core.Response.Status.NOT_FOUND);
   }
 
   @Test
-  public void updateIsConflictIfOptimisticLockException() throws MissingIdException, NotFoundException {
-    doThrow(new OptimisticLockException()).when(beaconService).updateBeacon(anyLong(), any(BeaconDTO.class));
+  public void updateIsConflictIfOptimisticLockException() throws NotFoundException, ConflictingIdException {
+    doThrow(new OptimisticLockException()).when(beaconService).update(anyLong(), any(BeaconDTO.class));
     Beacon before = newBeacon(999, 11);
     Beacon after = newBeacon(99, 12);
     after.setId(before.getId());

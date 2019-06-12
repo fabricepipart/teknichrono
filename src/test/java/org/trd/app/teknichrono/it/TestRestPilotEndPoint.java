@@ -350,7 +350,7 @@ public class TestRestPilotEndPoint {
     given()
         .when().contentType(ContentType.JSON).body(jsonb.toJson(p)).post("/rest/pilots")
         .then()
-        .statusCode(201);
+        .statusCode(204);
   }
 
   public static void createWithBeacon(String first, String last, int beaconNumber) {
@@ -367,7 +367,7 @@ public class TestRestPilotEndPoint {
     given()
         .when().contentType(ContentType.JSON).body(jsonb.toJson(p)).post("/rest/pilots")
         .then()
-        .statusCode(201);
+        .statusCode(204);
   }
 
   public static void createWithCategory(String first, String last, String categoryName) {
@@ -384,7 +384,7 @@ public class TestRestPilotEndPoint {
     given()
         .when().contentType(ContentType.JSON).body(jsonb.toJson(p)).post("/rest/pilots")
         .then()
-        .statusCode(201);
+        .statusCode(204);
   }
 
   public void assertTestCleanedEverything() {

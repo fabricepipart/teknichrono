@@ -220,7 +220,7 @@ public class TestRestBeaconEndpoint {
     given()
         .when().contentType(ContentType.JSON).body(jsonb.toJson(b)).post("/rest/beacons")
         .then()
-        .statusCode(201);
+        .statusCode(204);
   }
 
   public static void createWithPilot(int beaconNumber, String firstName, String lastName) {
@@ -239,7 +239,7 @@ public class TestRestBeaconEndpoint {
     given()
         .when().contentType(ContentType.JSON).body(jsonb.toJson(b)).post("/rest/beacons")
         .then()
-        .statusCode(201);
+        .statusCode(204);
   }
 
 }

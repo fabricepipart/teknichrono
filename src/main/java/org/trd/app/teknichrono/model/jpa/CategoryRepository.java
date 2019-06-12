@@ -4,7 +4,6 @@ import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import org.trd.app.teknichrono.model.dto.CategoryDTO;
 import org.trd.app.teknichrono.model.dto.NestedPilotDTO;
 import org.trd.app.teknichrono.util.exception.ConflictingIdException;
-import org.trd.app.teknichrono.util.exception.MissingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -12,7 +11,7 @@ import javax.inject.Inject;
 import java.util.Set;
 
 @ApplicationScoped
-public class CategoryRepository extends PanacheRepositoryWrapper<Category> {
+public class CategoryRepository extends PanacheRepositoryWrapper<Category> implements EntityRepository<Category, CategoryDTO> {
 
   @ApplicationScoped
   public static class Panache implements PanacheRepository<Category> {
@@ -43,6 +42,17 @@ public class CategoryRepository extends PanacheRepositoryWrapper<Category> {
     panacheRepository.persist(category);
   }
 
+  @Override
+  public String getEntityName() {
+    return Category.class.getName();
+  }
+
+  @Override
+  public CategoryDTO toDTO(Category dto) {
+    return CategoryDTO.fromCategory(dto);
+  }
+
+  @Override
   public Category fromDTO(CategoryDTO entity) throws ConflictingIdException, NotFoundException {
     Category category = new Category();
     if (entity.getId() > 0) {
@@ -94,9 +104,9 @@ public class CategoryRepository extends PanacheRepositoryWrapper<Category> {
     return CategoryDTO.fromCategory(category);
   }
 
-  public void update(long id, CategoryDTO entity) throws MissingIdException, NotFoundException {
+  public void update(long id, CategoryDTO entity) throws ConflictingIdException, NotFoundException {
     if (id != entity.getId()) {
-      throw new MissingIdException();
+      throw new ConflictingIdException();
     }
     Category category = findById(id);
     if (category == null) {

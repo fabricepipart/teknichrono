@@ -295,7 +295,7 @@ public class TestRestCategoryEndpoint {
     given()
         .when().contentType(ContentType.JSON).body(jsonb.toJson(c)).post("/rest/categories")
         .then()
-        .statusCode(201);
+        .statusCode(204);
   }
 
   public static void createWithPilot(String name, String firstName, String lastName) {
@@ -313,7 +313,7 @@ public class TestRestCategoryEndpoint {
     given()
         .when().contentType(ContentType.JSON).body(jsonb.toJson(c)).post("/rest/categories")
         .then()
-        .statusCode(201);
+        .statusCode(204);
   }
 
   public static void assertTestCleanedEverything() {
