@@ -7,10 +7,11 @@ import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import java.util.Set;
 
-@ApplicationScoped
+@Dependent
 public class CategoryRepository extends PanacheRepositoryWrapper<Category> implements EntityRepository<Category, CategoryDTO> {
 
   @ApplicationScoped
@@ -20,11 +21,6 @@ public class CategoryRepository extends PanacheRepositoryWrapper<Category> imple
   private final Panache panacheRepository;
 
   private final PilotRepository pilotRepository;
-
-  protected CategoryRepository() {
-    // Only needed because of Weld proxy being a subtype of current type: https://stackoverflow.com/a/48418256/2989857
-    this(null, null);
-  }
 
   @Inject
   public CategoryRepository(Panache panacheRepository, PilotRepository pilotRepository) {

@@ -7,10 +7,11 @@ import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import java.util.Set;
 
-@ApplicationScoped
+@Dependent
 public class LocationRepository extends PanacheRepositoryWrapper<Location> implements EntityRepository<Location, LocationDTO> {
 
   @ApplicationScoped
@@ -21,12 +22,7 @@ public class LocationRepository extends PanacheRepositoryWrapper<Location> imple
 
   private final SessionRepository.Panache sessionRepository;
 
-  protected LocationRepository() {
-    // Only needed because of Weld proxy being a subtype of current type: https://stackoverflow.com/a/48418256/2989857
-    this(null, null);
-  }
-
-  @Inject
+   @Inject
   public LocationRepository(Panache panacheRepository, SessionRepository.Panache sessionRepository) {
     super(panacheRepository);
     this.panacheRepository = panacheRepository;

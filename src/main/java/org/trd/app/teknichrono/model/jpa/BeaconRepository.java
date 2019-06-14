@@ -6,11 +6,12 @@ import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
-@ApplicationScoped
+@Dependent
 public class BeaconRepository extends PanacheRepositoryWrapper<Beacon> implements EntityRepository<Beacon, BeaconDTO> {
 
   @ApplicationScoped
@@ -22,11 +23,6 @@ public class BeaconRepository extends PanacheRepositoryWrapper<Beacon> implement
   private final PilotRepository pilotRepository;
 
   private final PingRepository pingRepository;
-
-  protected BeaconRepository() {
-    // Only needed because of Weld proxy being a subtype of current type: https://stackoverflow.com/a/48418256/2989857
-    this(null, null, null);
-  }
 
   @Inject
   public BeaconRepository(Panache panacheRepository, PilotRepository pilotRepository, PingRepository pingRepository) {

@@ -6,11 +6,12 @@ import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Set;
 
-@ApplicationScoped
+@Dependent
 public class PilotRepository extends PanacheRepositoryWrapper<Pilot> implements EntityRepository<Pilot, PilotDTO> {
 
   @ApplicationScoped
@@ -26,11 +27,6 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot> implements 
   private final LapTimeRepository.Panache laptimeRepository;
 
   private final SessionRepository.Panache sessionRepository;
-
-  protected PilotRepository() {
-    // Only needed because of Weld proxy being a subtype of current type: https://stackoverflow.com/a/48418256/2989857
-    this(null, null, null, null, null);
-  }
 
   @Inject
   public PilotRepository(Panache panacheRepository, BeaconRepository.Panache beaconRepository,

@@ -4,11 +4,12 @@ import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Set;
 
-@ApplicationScoped
+@Dependent
 public class SessionRepository extends PanacheRepositoryWrapper<Session> {
 
   @ApplicationScoped
@@ -24,11 +25,6 @@ public class SessionRepository extends PanacheRepositoryWrapper<Session> {
   private final EventRepository.Panache eventRepository;
 
   private final PilotRepository.Panache pilotRepository;
-
-  protected SessionRepository() {
-    // Only needed because of Weld proxy being a subtype of current type: https://stackoverflow.com/a/48418256/2989857
-    this(null, null, null, null, null);
-  }
 
   @Inject
   public SessionRepository(Panache panacheRepository, ChronometerRepository.Panache chronometerRepository,
