@@ -7,9 +7,10 @@ import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
-@ApplicationScoped
+@Dependent
 public class PingRepository extends PanacheRepositoryWrapper<Ping, PingDTO> {
 
   @ApplicationScoped
@@ -17,11 +18,6 @@ public class PingRepository extends PanacheRepositoryWrapper<Ping, PingDTO> {
   }
 
   private final Panache panacheRepository;
-
-  protected PingRepository() {
-    // Only needed because of Weld proxy being a subtype of current type: https://stackoverflow.com/a/48418256/2989857
-    this(null);
-  }
 
   @Inject
   public PingRepository(Panache panacheRepository) {
@@ -53,6 +49,5 @@ public class PingRepository extends PanacheRepositoryWrapper<Ping, PingDTO> {
   public void update(long id, PingDTO dto) throws ConflictingIdException, NotFoundException {
 
   }
-
 
 }
