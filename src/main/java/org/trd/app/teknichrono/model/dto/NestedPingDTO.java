@@ -6,9 +6,9 @@ import org.trd.app.teknichrono.model.jpa.Ping;
 import java.time.Instant;
 
 @Data
-public class NestedPingDTO {
+public class NestedPingDTO implements EntityDTO {
 
-  private long id;
+  private Long id;
   private int version;
   private NestedBeaconDTO beacon;
   private Instant instant;

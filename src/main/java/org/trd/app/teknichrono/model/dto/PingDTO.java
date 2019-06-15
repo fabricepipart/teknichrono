@@ -1,12 +1,14 @@
 package org.trd.app.teknichrono.model.dto;
 
+import lombok.Data;
 import org.trd.app.teknichrono.model.jpa.Ping;
 
 import java.time.Instant;
 
-public class PingDTO {
+@Data
+public class PingDTO implements EntityDTO {
 
-  private long id;
+  private Long id;
   private int version;
   private NestedBeaconDTO beacon;
   private Instant instant;

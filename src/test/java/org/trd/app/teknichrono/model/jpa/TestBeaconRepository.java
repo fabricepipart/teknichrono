@@ -46,7 +46,7 @@ class TestBeaconRepository {
 
   Beacon newBeacon(long number, long pilotId) {
     Beacon beacon = new Beacon();
-    beacon.id = id++;
+    beacon.id = this.id++;
     beacon.setNumber(number);
     if (pilotId >= 0) {
       Pilot p = new Pilot();
@@ -57,7 +57,7 @@ class TestBeaconRepository {
     }
     for (int i = 0; i < 10; i++) {
       Ping p = new Ping();
-      p.id = id++;
+      p.id = this.id++;
       p.setBeacon(beacon);
       beacon.getPings().add(p);
     }
@@ -68,15 +68,15 @@ class TestBeaconRepository {
   void createsBeaconWithCompletePilotIfIdProvided() throws NotFoundException, ConflictingIdException {
     Beacon entity = newBeacon(999, 9);
     BeaconDTO dto = BeaconDTO.fromBeacon(entity);
-    dto.setId(0);
-    when(pilotRepository.findById(9L)).thenReturn(entity.getPilot());
+    dto.setId(0L);
+    when(this.pilotRepository.findById(9L)).thenReturn(entity.getPilot());
 
-    beaconRepository.create(dto);
+    this.beaconRepository.create(dto);
 
-    verify(pilotRepository).findById(9L);
+    verify(this.pilotRepository).findById(9L);
 
     ArgumentCaptor<Beacon> captor = ArgumentCaptor.forClass(Beacon.class);
-    verify(beaconPanacheRepository).persist(captor.capture());
+    verify(this.beaconPanacheRepository).persist(captor.capture());
     assertThat(captor.getValue().getNumber()).isEqualTo(entity.getNumber());
   }
 
@@ -85,12 +85,12 @@ class TestBeaconRepository {
     Beacon entity = newBeacon(999, 9);
     Pilot pilot = entity.getPilot();
 
-    when(beaconPanacheRepository.findById(entity.id)).thenReturn(entity);
+    when(this.beaconPanacheRepository.findById(entity.id)).thenReturn(entity);
 
-    beaconRepository.deleteById(entity.id);
+    this.beaconRepository.deleteById(entity.id);
 
-    verify(beaconPanacheRepository).delete(entity);
-    verify(pilotRepository).persist(pilot);
+    verify(this.beaconPanacheRepository).delete(entity);
+    verify(this.pilotRepository).persist(pilot);
     assertThat(pilot.getCurrentBeacon()).isNull();
   }
 
@@ -99,22 +99,22 @@ class TestBeaconRepository {
     Beacon entity = newBeacon(999, 9);
     List<Ping> pings = entity.getPings();
 
-    when(beaconPanacheRepository.findById(anyLong())).thenReturn(entity);
+    when(this.beaconPanacheRepository.findById(anyLong())).thenReturn(entity);
 
-    beaconRepository.deleteById(entity.id);
+    this.beaconRepository.deleteById(entity.id);
 
-    verify(beaconPanacheRepository).delete(entity);
+    verify(this.beaconPanacheRepository).delete(entity);
 
     for (Ping ping : pings) {
-      verify(pingRepository).persist(ping);
+      verify(this.pingRepository).persist(ping);
       assertThat(ping.getBeacon()).isNull();
     }
   }
 
   @Test
   void deleteByIdReturnsErrorIfBeaconDoesNotExist() {
-    assertThrows(NotFoundException.class, () -> beaconRepository.deleteById(42L));
-    verify(beaconPanacheRepository, never()).delete(any());
+    assertThrows(NotFoundException.class, () -> this.beaconRepository.deleteById(42L));
+    verify(this.beaconPanacheRepository, never()).delete(any());
   }
 
 
@@ -130,11 +130,11 @@ class TestBeaconRepository {
     entities.add(entity3);
 
     PanacheQuery<Beacon> query = mock(PanacheQuery.class);
-    when(beaconPanacheRepository.findAll()).thenReturn(query);
+    when(this.beaconPanacheRepository.findAll()).thenReturn(query);
     when(query.page(any())).thenReturn(query);
     when(query.stream()).thenReturn(entities.stream());
 
-    List<Beacon> beacons = beaconRepository.findAll(null, null).collect(Collectors.toList());
+    List<Beacon> beacons = this.beaconRepository.findAll(null, null).collect(Collectors.toList());
     assertThat(beacons).isNotNull();
     assertThat(beacons).hasSize(3);
 
@@ -152,11 +152,11 @@ class TestBeaconRepository {
     entities.add(entity1);
 
     PanacheQuery<Beacon> query = mock(PanacheQuery.class);
-    when(beaconPanacheRepository.findAll()).thenReturn(query);
+    when(this.beaconPanacheRepository.findAll()).thenReturn(query);
     when(query.page(any())).thenReturn(query);
     when(query.stream()).thenReturn(entities.stream());
 
-    List<Beacon> beacons = beaconRepository.findAll(1, 1).collect(Collectors.toList());
+    List<Beacon> beacons = this.beaconRepository.findAll(1, 1).collect(Collectors.toList());
     assertThat(beacons).isNotNull();
     assertThat(beacons).hasSize(1);
   }

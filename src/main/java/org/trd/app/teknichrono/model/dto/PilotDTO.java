@@ -4,9 +4,9 @@ import lombok.Data;
 import org.trd.app.teknichrono.model.jpa.Pilot;
 
 @Data
-public class PilotDTO {
+public class PilotDTO implements EntityDTO {
 
-  private long id;
+  private Long id;
   private int version;
   private String firstName;
   private String lastName;

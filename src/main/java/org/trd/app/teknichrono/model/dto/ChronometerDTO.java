@@ -4,9 +4,9 @@ import lombok.Data;
 import org.trd.app.teknichrono.model.jpa.Chronometer;
 
 @Data
-public class ChronometerDTO {
+public class ChronometerDTO implements EntityDTO {
 
-  private long id;
+  private Long id;
   private int version;
   private String name;
   private NestedPingDTO lastSeen;

@@ -11,8 +11,6 @@ import org.trd.app.teknichrono.util.exception.NotFoundException;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
 
 @Dependent
 public class BeaconRepository extends PanacheRepositoryWrapper<Beacon, BeaconDTO> {
@@ -36,9 +34,10 @@ public class BeaconRepository extends PanacheRepositoryWrapper<Beacon, BeaconDTO
     this.pingRepository = pingRepository;
   }
 
+  @Override
   public void create(BeaconDTO entity) throws NotFoundException, ConflictingIdException {
     Beacon beacon = fromDTO(entity);
-    panacheRepository.persist(beacon);
+    this.panacheRepository.persist(beacon);
   }
 
   @Override
@@ -53,57 +52,31 @@ public class BeaconRepository extends PanacheRepositoryWrapper<Beacon, BeaconDTO
 
   @Override
   public Beacon fromDTO(BeaconDTO entity) throws ConflictingIdException, NotFoundException {
+    checkNoId(entity);
     Beacon beacon = new Beacon();
-    if (entity.getId() > 0) {
-      throw new ConflictingIdException("Can't create Beacon with already an ID");
-    }
     beacon.setNumber(entity.getNumber());
-    if (entity.getPilot() != null && entity.getPilot().getId() > 0) {
-      Pilot pilot = pilotRepository.findById(entity.getPilot().getId());
-      if (pilot == null) {
-        throw new NotFoundException("Pilot not found with ID=" + entity.getPilot().getId());
-      }
-      beacon.setPilot(pilot);
-      pilot.setCurrentBeacon(beacon);
-    }
+    setField(beacon, entity.getPilot(), Beacon::setPilot, Pilot::setCurrentBeacon, this.pilotRepository);
+    // Create create with Pings (not even in DTO)
     return beacon;
   }
 
-
+  @Override
   public void update(long id, BeaconDTO entity) throws ConflictingIdException, NotFoundException {
-    if (id != entity.getId()) {
-      throw new ConflictingIdException();
-    }
-    Beacon beacon = findById(id);
-    if (beacon == null) {
-      throw new NotFoundException();
-    }
+    checkIdsMatch(id, entity);
+    Beacon beacon = ensureFindById(id);
+    beacon.setNumber(entity.getNumber());
 
     // Update of pilot
-    beacon.setPilot(null);
-    if (entity.getPilot() != null && entity.getPilot().getId() > 0) {
-      Pilot pilot = pilotRepository.findById(entity.getPilot().getId());
-      beacon.setPilot(pilot);
-    }
-    beacon.setNumber(entity.getNumber());
-    panacheRepository.persist(beacon);
+    updateField(beacon, entity.getPilot(), Beacon::setPilot, Pilot::setCurrentBeacon, this.pilotRepository);
+    // Create update with Pings (not even in DTO)
+    this.panacheRepository.persist(beacon);
   }
 
+  @Override
   public void deleteById(long id) throws NotFoundException {
-    Beacon entity = findById(id);
-    if (entity == null) {
-      throw new NotFoundException();
-    }
-    Pilot associatedPilot = entity.getPilot();
-    if (associatedPilot != null) {
-      associatedPilot.setCurrentBeacon(null);
-      pilotRepository.persist(associatedPilot);
-    }
-    List<Ping> pings = new ArrayList<>(entity.getPings());
-    for (Ping ping : pings) {
-      ping.setBeacon(null);
-      pingRepository.persist(ping);
-    }
-    panacheRepository.delete(entity);
+    Beacon entity = ensureFindById(id);
+    nullifyField(entity.getPilot(), Pilot::setCurrentBeacon, this.pilotRepository);
+    nullifyInCollectionField(entity.getPings(), Ping::setBeacon, this.pingRepository);
+    this.panacheRepository.delete(entity);
   }
 }

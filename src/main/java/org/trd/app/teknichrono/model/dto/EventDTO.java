@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class EventDTO {
+public class EventDTO implements EntityDTO {
 
-  private long id;
+  private Long id;
   private int version;
   private String name;
   private List<NestedSessionDTO> sessions = new ArrayList<>();

@@ -8,7 +8,7 @@ import javax.persistence.TypedQuery;
 import java.time.Instant;
 
 @Data
-public class NestedSessionDTO {
+public class NestedSessionDTO implements EntityDTO {
 
   private Long id;
   private int version;

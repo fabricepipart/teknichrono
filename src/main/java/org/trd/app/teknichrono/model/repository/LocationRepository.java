@@ -2,7 +2,6 @@ package org.trd.app.teknichrono.model.repository;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import org.trd.app.teknichrono.model.dto.LocationDTO;
-import org.trd.app.teknichrono.model.dto.NestedSessionDTO;
 import org.trd.app.teknichrono.model.jpa.Location;
 import org.trd.app.teknichrono.model.jpa.Session;
 import org.trd.app.teknichrono.util.exception.ConflictingIdException;
@@ -11,7 +10,6 @@ import org.trd.app.teknichrono.util.exception.NotFoundException;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
-import java.util.Set;
 
 @Dependent
 public class LocationRepository extends PanacheRepositoryWrapper<Location, LocationDTO> {
@@ -31,6 +29,7 @@ public class LocationRepository extends PanacheRepositoryWrapper<Location, Locat
     this.sessionRepository = sessionRepository;
   }
 
+  @Override
   public void create(LocationDTO entity) throws ConflictingIdException, NotFoundException {
     Location location = fromDTO(entity);
     panacheRepository.persist(location);
@@ -48,88 +47,38 @@ public class LocationRepository extends PanacheRepositoryWrapper<Location, Locat
 
   @Override
   public Location fromDTO(LocationDTO entity) throws ConflictingIdException, NotFoundException {
+    checkNoId(entity);
     Location location = new Location();
-    if (entity.getId() > 0) {
-      throw new ConflictingIdException("Can't create Location with already an ID");
-    }
     location.setLoopTrack(entity.isLoopTrack());
     location.setName(entity.getName());
-
-    Set<NestedSessionDTO> associatedSessions = entity.getSessions();
-    if (associatedSessions != null) {
-      for (NestedSessionDTO associatedSession : associatedSessions) {
-        Session session = sessionRepository.findById(associatedSession.getId());
-        if (session == null) {
-          throw new NotFoundException("Session not found with ID=" + associatedSession.getId());
-        }
-        session.setLocation(location);
-        location.getSessions().add(session);
-      }
-    }
+    setCollectionField(location, entity.getSessions(), Location::getSessions, Session::setLocation, sessionRepository);
     return location;
   }
 
   public LocationDTO addSession(long locationId, long sessionId) throws NotFoundException {
-    Location location = findById(locationId);
-    if (location == null) {
-      throw new NotFoundException("Location not found with ID=" + locationId);
-    }
-    Session session = sessionRepository.findById(sessionId);
-    if (session == null) {
-      throw new NotFoundException("Session not found with ID=" + sessionId);
-    }
-    session.setLocation(location);
-    location.getSessions().add(session);
-    persist(location);
+    Location location = ensureFindById(locationId);
+    Session session = addToCollectionField(location, sessionId, Location::getSessions, Session::setLocation, sessionRepository);
     sessionRepository.persist(session);
+    persist(location);
     return LocationDTO.fromLocation(location);
   }
 
-  public Location findByName(String name) {
-    return panacheRepository.find("name", name).firstResult();
-  }
-
-
+  @Override
   public void deleteById(long id) throws NotFoundException {
-    Location entity = panacheRepository.findById(id);
-    if (entity == null) {
-      throw new NotFoundException();
-    }
-
-    Set<Session> sessions = entity.getSessions();
-    if (sessions != null) {
-      for (Session session : sessions) {
-        session.setLocation(null);
-        sessionRepository.persist(session);
-      }
-    }
+    Location entity = ensureFindById(id);
+    nullifyInCollectionField(entity.getSessions(), Session::setLocation, sessionRepository);
     panacheRepository.delete(entity);
   }
 
+  @Override
   public void update(long id, LocationDTO entity) throws ConflictingIdException, NotFoundException {
-    if (id != entity.getId()) {
-      throw new ConflictingIdException();
-    }
-    Location location = findById(id);
-    if (location == null) {
-      throw new NotFoundException("Location not found with ID=" + id);
-    }
-
+    checkIdsMatch(id, entity);
+    Location location = ensureFindById(id);
     location.setName(entity.getName());
     location.setLoopTrack(entity.isLoopTrack());
+
     // Update of pilots
-    location.getSessions().clear();
-    if (entity.getSessions() != null) {
-      for (NestedSessionDTO sessionDto : entity.getSessions()) {
-        Session session = sessionRepository.findById(sessionDto.getId());
-        if (session == null) {
-          throw new NotFoundException("Session not found with ID=" + sessionDto.getId());
-        }
-        location.getSessions().add(session);
-        session.setLocation(location);
-        sessionRepository.persist(session);
-      }
-    }
+    setCollectionField(location, entity.getSessions(), Location::getSessions, Session::setLocation, sessionRepository);
     panacheRepository.persist(location);
   }
 }

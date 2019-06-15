@@ -54,6 +54,7 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot, PilotDTO> {
     return Pilot.class.getName();
   }
 
+  @Override
   public void create(PilotDTO entity) throws ConflictingIdException, NotFoundException {
     Pilot pilot = fromDTO(entity);
     panacheRepository.persist(pilot);
@@ -61,10 +62,9 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot, PilotDTO> {
 
   @Override
   public Pilot fromDTO(PilotDTO entity) throws ConflictingIdException, NotFoundException {
+    checkNoId(entity);
+
     Pilot pilot = new Pilot();
-    if (entity.getId() > 0) {
-      throw new ConflictingIdException("Can't create Pilot with already an ID");
-    }
     pilot.setFirstName(entity.getFirstName());
     pilot.setLastName(entity.getLastName());
     if (entity.getCurrentBeacon() != null && entity.getCurrentBeacon().getId() > 0) {
@@ -92,6 +92,7 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot, PilotDTO> {
   }
 
 
+  @Override
   public void deleteById(long id) throws NotFoundException {
     Pilot entity = findById(id);
     if (entity == null) {
@@ -143,6 +144,7 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot, PilotDTO> {
   }
 
 
+  @Override
   public void update(long id, PilotDTO dto) throws ConflictingIdException, NotFoundException {
     if (id != dto.getId()) {
       throw new ConflictingIdException();

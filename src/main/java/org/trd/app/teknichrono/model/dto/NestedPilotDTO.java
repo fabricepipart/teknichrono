@@ -7,7 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
 @Data
-public class NestedPilotDTO {
+public class NestedPilotDTO implements EntityDTO {
 
   private Long id;
   private String firstName;

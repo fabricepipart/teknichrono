@@ -2,7 +2,6 @@ package org.trd.app.teknichrono.model.repository;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import org.trd.app.teknichrono.model.dto.CategoryDTO;
-import org.trd.app.teknichrono.model.dto.NestedPilotDTO;
 import org.trd.app.teknichrono.model.jpa.Category;
 import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.util.exception.ConflictingIdException;
@@ -11,7 +10,6 @@ import org.trd.app.teknichrono.util.exception.NotFoundException;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
-import java.util.Set;
 
 @Dependent
 public class CategoryRepository extends PanacheRepositoryWrapper<Category, CategoryDTO> {
@@ -32,9 +30,10 @@ public class CategoryRepository extends PanacheRepositoryWrapper<Category, Categ
   }
 
   public Category findByName(String name) {
-    return panacheRepository.find("name", name).firstResult();
+    return this.panacheRepository.find("name", name).firstResult();
   }
 
+  @Override
   public void create(CategoryDTO entity) throws ConflictingIdException, NotFoundException {
     Category category = fromDTO(entity);
     panacheRepository.persist(category);
@@ -52,79 +51,37 @@ public class CategoryRepository extends PanacheRepositoryWrapper<Category, Categ
 
   @Override
   public Category fromDTO(CategoryDTO entity) throws ConflictingIdException, NotFoundException {
+    checkNoId(entity);
     Category category = new Category();
-    if (entity.getId() > 0) {
-      throw new ConflictingIdException("Can't create Category with already an ID");
-    }
     category.setName(entity.getName());
-    if (entity.getPilots() != null) {
-      for (NestedPilotDTO nestedPilot : entity.getPilots()) {
-        Pilot pilot = pilotRepository.findById(nestedPilot.getId());
-        if (pilot == null) {
-          throw new NotFoundException("Pilot not found with ID=" + nestedPilot.getId());
-        }
-        pilot.setCategory(category);
-        category.getPilots().add(pilot);
-      }
-    }
+    setCollectionField(category, entity.getPilots(), Category::getPilots, Pilot::setCategory, pilotRepository);
     return category;
   }
 
 
+  @Override
   public void deleteById(long id) throws NotFoundException {
-    Category entity = findById(id);
-    if (entity == null) {
-      throw new NotFoundException();
-    }
-    Set<Pilot> associatedPilots = entity.getPilots();
-    if (associatedPilots != null) {
-      for (Pilot associatedPilot : associatedPilots) {
-        associatedPilot.setCategory(null);
-        pilotRepository.persist(associatedPilot);
-      }
-    }
+    Category entity = ensureFindById(id);
+    nullifyInCollectionField(entity.getPilots(), Pilot::setCategory, pilotRepository);
     panacheRepository.delete(entity);
   }
 
   public CategoryDTO addPilot(long categoryId, Long pilotId) throws NotFoundException {
-    Category category = findById(categoryId);
-    if (category == null) {
-      throw new NotFoundException("Category not found with ID=" + categoryId);
-    }
-    Pilot pilot = pilotRepository.findById(pilotId);
-    if (pilot == null) {
-      throw new NotFoundException("Pilot not found with ID=" + pilotId);
-    }
-    pilot.setCategory(category);
-    category.getPilots().add(pilot);
-    persist(category);
+    Category category = ensureFindById(categoryId);
+    Pilot pilot = addToCollectionField(category, pilotId, Category::getPilots, Pilot::setCategory, pilotRepository);
     pilotRepository.persist(pilot);
+    persist(category);
     return CategoryDTO.fromCategory(category);
   }
 
+  @Override
   public void update(long id, CategoryDTO entity) throws ConflictingIdException, NotFoundException {
-    if (id != entity.getId()) {
-      throw new ConflictingIdException();
-    }
-    Category category = findById(id);
-    if (category == null) {
-      throw new NotFoundException("Category not found with ID=" + id);
-    }
+    checkIdsMatch(id, entity);
+    Category category = ensureFindById(id);
+    category.setName(entity.getName());
 
     // Update of pilots
-    category.getPilots().clear();
-    if (entity.getPilots() != null) {
-      for (NestedPilotDTO pilotDto : entity.getPilots()) {
-        Pilot pilot = pilotRepository.findById(pilotDto.getId());
-        if (pilot == null) {
-          throw new NotFoundException("Pilot not found with ID=" + pilotDto.getId());
-        }
-        pilot.setCategory(category);
-        category.getPilots().add(pilot);
-        pilotRepository.persist(pilot);
-      }
-    }
-    category.setName(entity.getName());
+    setCollectionField(category, entity.getPilots(), Category::getPilots, Pilot::setCategory, pilotRepository);
     panacheRepository.persist(category);
   }
 }
