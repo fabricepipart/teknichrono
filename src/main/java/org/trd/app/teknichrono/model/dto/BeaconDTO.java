@@ -4,9 +4,9 @@ import lombok.Data;
 import org.trd.app.teknichrono.model.jpa.Beacon;
 
 @Data
-public class BeaconDTO {
+public class BeaconDTO implements EntityDTO {
 
-  private long id;
+  private Long id;
   private int version;
   private long number;
   private NestedPilotDTO pilot;

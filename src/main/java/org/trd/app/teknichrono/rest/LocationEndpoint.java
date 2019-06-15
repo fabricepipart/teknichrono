@@ -1,10 +1,10 @@
 package org.trd.app.teknichrono.rest;
 
-import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.dto.LocationDTO;
-import org.trd.app.teknichrono.model.jpa.LocationRepository;
-import org.trd.app.teknichrono.util.DurationLogger;
-import org.trd.app.teknichrono.util.exception.NotFoundException;
+import org.trd.app.teknichrono.model.jpa.Location;
+import org.trd.app.teknichrono.model.jpa.Session;
+import org.trd.app.teknichrono.model.repository.LocationRepository;
+import org.trd.app.teknichrono.model.repository.SessionRepository;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -19,21 +19,18 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import java.util.List;
 
 @Path("/locations")
 public class LocationEndpoint {
 
-  private static final Logger LOGGER = Logger.getLogger(LocationEndpoint.class);
-
-  private final LocationRepository locationRepository;
-  private final EntityEndpoint entityEndpoint;
+  private final SessionRepository sessionRepository;
+  private final EntityEndpoint<Location, LocationDTO> entityEndpoint;
 
   @Inject
-  public LocationEndpoint(LocationRepository locationRepository) {
-    this.locationRepository = locationRepository;
-    this.entityEndpoint = new EntityEndpoint(locationRepository);
+  public LocationEndpoint(LocationRepository locationRepository, SessionRepository sessionRepository) {
+    this.sessionRepository = sessionRepository;
+    this.entityEndpoint = new EntityEndpoint<>(locationRepository);
   }
 
   @POST
@@ -78,14 +75,8 @@ public class LocationEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public Response addSession(@PathParam("locationId") long locationId, @QueryParam("sessionId") Long sessionId) {
-    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Add session id=" + sessionId + " to location id=" + locationId)) {
-      try {
-        LocationDTO dto = locationRepository.addSession(locationId, sessionId);
-        return Response.ok(dto).build();
-      } catch (NotFoundException e) {
-        return Response.status(Status.NOT_FOUND).build();
-      }
-    }
+    return entityEndpoint.addToCollectionField(locationId, sessionId, sessionRepository,
+        Session::setLocation, Location::getSessions);
   }
 
   @PUT

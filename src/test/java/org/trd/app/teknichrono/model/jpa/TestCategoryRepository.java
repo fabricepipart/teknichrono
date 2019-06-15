@@ -8,11 +8,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.trd.app.teknichrono.model.dto.CategoryDTO;
 import org.trd.app.teknichrono.model.dto.NestedPilotDTO;
+import org.trd.app.teknichrono.model.repository.CategoryRepository;
+import org.trd.app.teknichrono.model.repository.PilotRepository;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -25,7 +27,7 @@ public class TestCategoryRepository {
   private long id = 1L;
 
   @Mock
-  private PilotRepository pilotRepository;
+  private PilotRepository.Panache pilotRepository;
 
   @Mock
   private CategoryRepository.Panache categoryPanacheRepository;

@@ -3,9 +3,9 @@ package org.trd.app.teknichrono.rest;
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.dto.EventDTO;
 import org.trd.app.teknichrono.model.jpa.Event;
-import org.trd.app.teknichrono.model.jpa.EventRepository;
 import org.trd.app.teknichrono.model.jpa.Session;
-import org.trd.app.teknichrono.model.jpa.SessionRepository;
+import org.trd.app.teknichrono.model.repository.EventRepository;
+import org.trd.app.teknichrono.model.repository.SessionRepository;
 import org.trd.app.teknichrono.util.DurationLogger;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 

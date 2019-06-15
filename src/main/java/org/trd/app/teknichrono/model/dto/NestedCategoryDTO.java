@@ -3,9 +3,9 @@ package org.trd.app.teknichrono.model.dto;
 import lombok.Data;
 
 @Data
-public class NestedCategoryDTO {
+public class NestedCategoryDTO implements EntityDTO {
 
-  private long id;
+  private Long id;
   private int version;
   private String name;
 }

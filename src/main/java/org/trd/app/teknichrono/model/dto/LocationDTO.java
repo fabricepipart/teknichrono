@@ -7,9 +7,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-public class LocationDTO {
+public class LocationDTO implements EntityDTO {
 
-  private long id;
+  private Long id;
   private int version;
   private String name;
   private boolean loopTrack;

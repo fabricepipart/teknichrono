@@ -1,7 +1,12 @@
-package org.trd.app.teknichrono.model.jpa;
+package org.trd.app.teknichrono.model.repository;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import org.trd.app.teknichrono.model.dto.PilotDTO;
+import org.trd.app.teknichrono.model.jpa.Beacon;
+import org.trd.app.teknichrono.model.jpa.Category;
+import org.trd.app.teknichrono.model.jpa.LapTime;
+import org.trd.app.teknichrono.model.jpa.Pilot;
+import org.trd.app.teknichrono.model.jpa.Session;
 import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
@@ -12,7 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 @Dependent
-public class PilotRepository extends PanacheRepositoryWrapper<Pilot> implements EntityRepository<Pilot, PilotDTO> {
+public class PilotRepository extends PanacheRepositoryWrapper<Pilot, PilotDTO> {
 
   @ApplicationScoped
   public static class Panache implements PanacheRepository<Pilot> {
@@ -49,6 +54,7 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot> implements 
     return Pilot.class.getName();
   }
 
+  @Override
   public void create(PilotDTO entity) throws ConflictingIdException, NotFoundException {
     Pilot pilot = fromDTO(entity);
     panacheRepository.persist(pilot);
@@ -56,10 +62,9 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot> implements 
 
   @Override
   public Pilot fromDTO(PilotDTO entity) throws ConflictingIdException, NotFoundException {
+    checkNoId(entity);
+
     Pilot pilot = new Pilot();
-    if (entity.getId() > 0) {
-      throw new ConflictingIdException("Can't create Pilot with already an ID");
-    }
     pilot.setFirstName(entity.getFirstName());
     pilot.setLastName(entity.getLastName());
     if (entity.getCurrentBeacon() != null && entity.getCurrentBeacon().getId() > 0) {
@@ -87,6 +92,7 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot> implements 
   }
 
 
+  @Override
   public void deleteById(long id) throws NotFoundException {
     Pilot entity = findById(id);
     if (entity == null) {
@@ -138,6 +144,7 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot> implements 
   }
 
 
+  @Override
   public void update(long id, PilotDTO dto) throws ConflictingIdException, NotFoundException {
     if (id != dto.getId()) {
       throw new ConflictingIdException();

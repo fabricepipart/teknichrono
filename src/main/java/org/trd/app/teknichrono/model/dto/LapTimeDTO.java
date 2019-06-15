@@ -12,11 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class LapTimeDTO {
+public class LapTimeDTO implements EntityDTO {
 
   private static final Logger LOGGER = Logger.getLogger(LapTimeDTO.class);
 
-  private long id;
+  private Long id;
   private int version;
   private NestedPilotDTO pilot;
   private NestedSessionDTO session;
@@ -55,7 +55,7 @@ public class LapTimeDTO {
 
   public void setStartDate(Instant startDate) {
     this.startDate = startDate;
-    duration = computeDuration(startDate, endDate);
+    this.duration = computeDuration(startDate, this.endDate);
   }
 
   public void setStartDate(Ping start) {
@@ -64,7 +64,7 @@ public class LapTimeDTO {
 
   public void setEndDate(Instant endDate) {
     this.endDate = endDate;
-    duration = computeDuration(startDate, endDate);
+    this.duration = computeDuration(this.startDate, endDate);
   }
 
   private Duration computeDuration(Instant startDate, Instant endDate) {
@@ -82,8 +82,8 @@ public class LapTimeDTO {
    */
   public void addLastSector(Instant endDate) {
     // If we have a proper sector, we use it
-    if (intermediates.size() > 0) {
-      SectorDTO previousLast = this.intermediates.get(intermediates.size() - 1);
+    if (this.intermediates.size() > 0) {
+      SectorDTO previousLast = this.intermediates.get(this.intermediates.size() - 1);
       Instant previousLastStart = previousLast.getStart();
       Instant previousLastEnd = previousLastStart.plus(previousLast.getDuration());
       long previousLastChronoId = previousLast.getToChronoId();

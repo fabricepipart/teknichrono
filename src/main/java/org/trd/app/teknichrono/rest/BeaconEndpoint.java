@@ -1,8 +1,8 @@
 package org.trd.app.teknichrono.rest;
 
-import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.dto.BeaconDTO;
-import org.trd.app.teknichrono.model.jpa.BeaconRepository;
+import org.trd.app.teknichrono.model.jpa.Beacon;
+import org.trd.app.teknichrono.model.repository.BeaconRepository;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -22,14 +22,10 @@ import java.util.List;
 @Path("/beacons")
 public class BeaconEndpoint {
 
-  private static final Logger LOGGER = Logger.getLogger(BeaconEndpoint.class);
-
-  private final BeaconRepository beaconRepository;
-  private final EntityEndpoint entityEndpoint;
+  private final EntityEndpoint<Beacon, BeaconDTO> entityEndpoint;
 
   @Inject
   public BeaconEndpoint(BeaconRepository beaconRepository) {
-    this.beaconRepository = beaconRepository;
     this.entityEndpoint = new EntityEndpoint(beaconRepository);
   }
 

@@ -9,17 +9,17 @@ import org.trd.app.teknichrono.business.view.LapTimeManager;
 import org.trd.app.teknichrono.model.dto.LapTimeDTO;
 import org.trd.app.teknichrono.model.dto.NestedPilotDTO;
 import org.trd.app.teknichrono.model.jpa.Category;
-import org.trd.app.teknichrono.model.jpa.CategoryRepository;
 import org.trd.app.teknichrono.model.jpa.Event;
-import org.trd.app.teknichrono.model.jpa.EventRepository;
 import org.trd.app.teknichrono.model.jpa.LapTime;
-import org.trd.app.teknichrono.model.jpa.LapTimeRepository;
 import org.trd.app.teknichrono.model.jpa.Location;
-import org.trd.app.teknichrono.model.jpa.LocationRepository;
 import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.model.jpa.Session;
-import org.trd.app.teknichrono.model.jpa.SessionRepository;
 import org.trd.app.teknichrono.model.jpa.SessionType;
+import org.trd.app.teknichrono.model.repository.CategoryRepository;
+import org.trd.app.teknichrono.model.repository.EventRepository;
+import org.trd.app.teknichrono.model.repository.LapTimeRepository;
+import org.trd.app.teknichrono.model.repository.LocationRepository;
+import org.trd.app.teknichrono.model.repository.SessionRepository;
 import org.trd.app.teknichrono.util.csv.CSVConverter;
 import org.trd.app.teknichrono.util.sql.OrderByClauseBuilder;
 import org.trd.app.teknichrono.util.sql.WhereClauseBuilder;
@@ -160,7 +160,7 @@ public class LapTimeEndpoint {
       throw new IllegalArgumentException("Please define a sessiondId, locationId or eventId to get best laps.");
     }
     List<LapTimeDTO> results = getAllLapsDTOOrderedByStartDate(pilotId, sessionId, locationId, eventId, categoryId,
-            pageIndex, pageSize);
+        pageIndex, pageSize);
     if (pilotId != null) {
       lapTimeManager.arrangeDisplay(results, LapTimeDisplay.ORDER_BY_DURATION);
     } else {
@@ -289,7 +289,7 @@ public class LapTimeEndpoint {
   private List<LapTimeDTO> getAllLapsDTOOrderedByStartDate(Long pilotId, Long sessionId, Long locationId, Long eventId,
                                                            Long categoryId, Integer pageIndex, Integer pageSize) {
     List<LapTime> searchResults = getAllLapsOrderedByStartDate(pilotId, sessionId, locationId, eventId, categoryId,
-            pageIndex, pageSize);
+        pageIndex, pageSize);
     return lapTimeConverter.convert(searchResults);
   }
 

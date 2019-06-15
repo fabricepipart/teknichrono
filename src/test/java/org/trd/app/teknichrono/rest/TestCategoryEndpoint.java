@@ -12,10 +12,10 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.trd.app.teknichrono.model.dto.CategoryDTO;
 import org.trd.app.teknichrono.model.jpa.Category;
-import org.trd.app.teknichrono.model.jpa.CategoryRepository;
 import org.trd.app.teknichrono.model.jpa.Pilot;
+import org.trd.app.teknichrono.model.repository.CategoryRepository;
+import org.trd.app.teknichrono.model.repository.PilotRepository;
 import org.trd.app.teknichrono.util.exception.ConflictingIdException;
-import org.trd.app.teknichrono.util.exception.MissingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import javax.persistence.OptimisticLockException;
@@ -32,6 +32,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -55,6 +56,9 @@ public class TestCategoryEndpoint {
 
   @Mock
   private CategoryRepository categoryRepository;
+
+  @Mock
+  private PilotRepository pilotRepository;
 
   @InjectMocks
   private CategoryEndpoint endpoint;
@@ -134,15 +138,10 @@ public class TestCategoryEndpoint {
   public void findById() {
     Category entity = newCategory(9, 10, 11);
     when(categoryRepository.findById(entity.getId())).thenReturn(entity);
+    when(categoryRepository.toDTO(entity)).thenReturn(CategoryDTO.fromCategory(entity));
     Response r = endpoint.findById(entity.getId());
     assertThat(r).isNotNull();
-    ArgumentCaptor<CategoryDTO> captor = ArgumentCaptor.forClass(CategoryDTO.class);
-    verify(responseBuilder).entity(captor.capture());
-    CategoryDTO dto = captor.getValue();
-    assertThat(dto.getName()).isEqualTo(entity.getName());
-    assertThat(dto.getPilots().stream().filter(p -> p.getId() == 9).count()).isEqualTo(1);
-    assertThat(dto.getPilots().stream().filter(p -> p.getId() == 10).count()).isEqualTo(1);
-    assertThat(dto.getPilots().stream().filter(p -> p.getId() == 11).count()).isEqualTo(1);
+    verify(responseBuilder).entity(any(CategoryDTO.class));
   }
 
   @Test
@@ -157,18 +156,12 @@ public class TestCategoryEndpoint {
   @Test
   public void findCategoryByName() {
     Category entity = newCategory(9, 10, 11);
-    when(categoryRepository.findByName(entity.getName())).thenReturn(entity);
+    when(categoryRepository.findByField("name", entity.getName())).thenReturn(entity);
+
     Response r = endpoint.findCategoryByName(entity.getName());
+
     assertThat(r).isNotNull();
-
-    ArgumentCaptor<CategoryDTO> captor = ArgumentCaptor.forClass(CategoryDTO.class);
-    verify(responseBuilder).entity(captor.capture());
-    CategoryDTO dto = captor.getValue();
-
-    assertThat(dto.getName()).isEqualTo(entity.getName());
-    assertThat(dto.getPilots().stream().filter(p -> p.getId() == 9).count()).isEqualTo(1);
-    assertThat(dto.getPilots().stream().filter(p -> p.getId() == 10).count()).isEqualTo(1);
-    assertThat(dto.getPilots().stream().filter(p -> p.getId() == 11).count()).isEqualTo(1);
+    verify(responseBuilder).entity(any());
   }
 
   @Test
@@ -197,10 +190,6 @@ public class TestCategoryEndpoint {
     assertThat(categoryDTOS).isNotNull();
     assertThat(categoryDTOS).hasSize(3);
 
-    assertThat(categoryDTOS.stream().filter(b -> (b.getName() == entity1.getName() && b.getPilots() != null && b.getPilots().size() == 3)).count()).isEqualTo(1);
-    assertThat(categoryDTOS.stream().filter(b -> (b.getPilots() != null && b.getPilots().size() == 1)).count()).isEqualTo(1);
-    assertThat(categoryDTOS.stream().filter(b -> (b.getName() == entity3.getName() && b.getPilots().size() == 0)).count()).isEqualTo(1);
-
   }
 
   @Test
@@ -227,7 +216,8 @@ public class TestCategoryEndpoint {
     Response r = endpoint.addPilot(entity.getId(), 102L);
     assertThat(r).isNotNull();
 
-    verify(categoryRepository, atLeastOnce()).addPilot(entity.getId(), 102L);
+    verify(categoryRepository, atLeastOnce()).addToCollectionField(eq(entity.getId()), eq(102L),
+        eq(pilotRepository), any(), any());
   }
 
   @Test
@@ -262,7 +252,7 @@ public class TestCategoryEndpoint {
 
   @Test
   public void updateIsConflictIfIdsDontMatch() throws ConflictingIdException, NotFoundException {
-    doThrow(MissingIdException.class).when(categoryRepository).update(anyLong(), any(CategoryDTO.class));
+    doThrow(ConflictingIdException.class).when(categoryRepository).update(anyLong(), any(CategoryDTO.class));
     Category before = newCategory(9, 10, 11);
     Category after = newCategory(9, 11, 12);
     after.setName("new");

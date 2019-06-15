@@ -8,8 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Chronometer extends PanacheEntity {
@@ -25,10 +25,10 @@ public class Chronometer extends PanacheEntity {
 
   // Can be null if after event, items are reassociated
   @OneToMany(mappedBy = "chrono", cascade = CascadeType.REMOVE)
-  private List<Ping> pings = new ArrayList<>();
+  private Set<Ping> pings = new HashSet<>();
 
   @ManyToMany(mappedBy = "chronometers")
-  private List<Session> sessions = new ArrayList<>();
+  private Set<Session> sessions = new HashSet<>();
 
   /* ===================== Getters and setters ======================== */
   public Long getId() {
@@ -55,19 +55,19 @@ public class Chronometer extends PanacheEntity {
     this.name = name;
   }
 
-  public List<Ping> getPings() {
+  public Set<Ping> getPings() {
     return pings;
   }
 
-  public void setPings(List<Ping> pings) {
+  public void setPings(Set<Ping> pings) {
     this.pings = pings;
   }
 
-  public List<Session> getSessions() {
+  public Set<Session> getSessions() {
     return sessions;
   }
 
-  public void setSessions(List<Session> sessions) {
+  public void setSessions(Set<Session> sessions) {
     this.sessions = sessions;
   }
 

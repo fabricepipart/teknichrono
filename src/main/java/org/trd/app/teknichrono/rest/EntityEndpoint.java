@@ -1,22 +1,26 @@
 package org.trd.app.teknichrono.rest;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import org.jboss.logging.Logger;
-import org.trd.app.teknichrono.model.jpa.EntityRepository;
+import org.trd.app.teknichrono.model.repository.Repository;
 import org.trd.app.teknichrono.util.DurationLogger;
 import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import javax.persistence.OptimisticLockException;
 import javax.ws.rs.core.Response;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class EntityEndpoint<E, D> {
+public class EntityEndpoint<E extends PanacheEntity, D> {
 
   private static final Logger LOGGER = Logger.getLogger(EntityEndpoint.class);
-  private final EntityRepository<E, D> repository;
+  private final Repository<E, D> repository;
 
-  public EntityEndpoint(EntityRepository<E, D> repository) {
+  public EntityEndpoint(Repository<E, D> repository) {
     this.repository = repository;
   }
 
@@ -61,6 +65,23 @@ public class EntityEndpoint<E, D> {
       return repository.findAll(pageIndex, pageSize).map(repository::toDTO).collect(Collectors.toList());
     }
   }
+
+
+  public <F extends PanacheEntity> Response addToCollectionField(long entityId, long fieldEntityId, Repository<F, ?> elementRepository,
+                                                                 BiConsumer<F, E> fieldEntitySetter,
+                                                                 Function<E, ? extends Collection<F>> entityListGetter) {
+    try (DurationLogger dl = DurationLogger.get(LOGGER).start("Add entity id=" + fieldEntityId +
+        " to list field of entity id=" + entityId)) {
+      try {
+        D dto = repository.addToCollectionField(entityId, fieldEntityId, elementRepository,
+            fieldEntitySetter, entityListGetter);
+        return Response.ok(dto).build();
+      } catch (NotFoundException e) {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+    }
+  }
+
 
   public Response update(long id, D dto) {
     try (DurationLogger dl = DurationLogger.get(LOGGER).start("Update " + repository.getEntityName() + " id=" + id)) {
