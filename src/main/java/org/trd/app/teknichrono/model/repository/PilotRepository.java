@@ -1,7 +1,12 @@
-package org.trd.app.teknichrono.model.jpa;
+package org.trd.app.teknichrono.model.repository;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import org.trd.app.teknichrono.model.dto.PilotDTO;
+import org.trd.app.teknichrono.model.jpa.Beacon;
+import org.trd.app.teknichrono.model.jpa.Category;
+import org.trd.app.teknichrono.model.jpa.LapTime;
+import org.trd.app.teknichrono.model.jpa.Pilot;
+import org.trd.app.teknichrono.model.jpa.Session;
 import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
@@ -12,7 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 @Dependent
-public class PilotRepository extends PanacheRepositoryWrapper<Pilot> implements EntityRepository<Pilot, PilotDTO> {
+public class PilotRepository extends PanacheRepositoryWrapper<Pilot, PilotDTO> {
 
   @ApplicationScoped
   public static class Panache implements PanacheRepository<Pilot> {

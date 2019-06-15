@@ -1,8 +1,10 @@
-package org.trd.app.teknichrono.model.jpa;
+package org.trd.app.teknichrono.model.repository;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import org.trd.app.teknichrono.model.dto.LocationDTO;
 import org.trd.app.teknichrono.model.dto.NestedSessionDTO;
+import org.trd.app.teknichrono.model.jpa.Location;
+import org.trd.app.teknichrono.model.jpa.Session;
 import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
@@ -12,7 +14,7 @@ import javax.inject.Inject;
 import java.util.Set;
 
 @Dependent
-public class LocationRepository extends PanacheRepositoryWrapper<Location> implements EntityRepository<Location, LocationDTO> {
+public class LocationRepository extends PanacheRepositoryWrapper<Location, LocationDTO> {
 
   @ApplicationScoped
   public static class Panache implements PanacheRepository<Location> {

@@ -8,6 +8,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.trd.app.teknichrono.model.dto.BeaconDTO;
+import org.trd.app.teknichrono.model.repository.BeaconRepository;
+import org.trd.app.teknichrono.model.repository.PilotRepository;
+import org.trd.app.teknichrono.model.repository.PingRepository;
 import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
@@ -30,10 +33,10 @@ class TestBeaconRepository {
   private long id = 1L;
 
   @Mock
-  private PilotRepository pilotRepository;
+  private PilotRepository.Panache pilotRepository;
 
   @Mock
-  private PingRepository pingRepository;
+  private PingRepository.Panache pingRepository;
 
   @Mock
   private BeaconRepository.Panache beaconPanacheRepository;

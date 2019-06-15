@@ -3,7 +3,7 @@ package org.trd.app.teknichrono.rest;
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.dto.PilotDTO;
 import org.trd.app.teknichrono.model.jpa.Pilot;
-import org.trd.app.teknichrono.model.jpa.PilotRepository;
+import org.trd.app.teknichrono.model.repository.PilotRepository;
 import org.trd.app.teknichrono.util.DurationLogger;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 

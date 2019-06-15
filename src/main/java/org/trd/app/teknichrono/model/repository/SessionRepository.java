@@ -1,6 +1,13 @@
-package org.trd.app.teknichrono.model.jpa;
+package org.trd.app.teknichrono.model.repository;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import org.trd.app.teknichrono.model.dto.SessionDTO;
+import org.trd.app.teknichrono.model.jpa.Chronometer;
+import org.trd.app.teknichrono.model.jpa.Event;
+import org.trd.app.teknichrono.model.jpa.Location;
+import org.trd.app.teknichrono.model.jpa.Pilot;
+import org.trd.app.teknichrono.model.jpa.Session;
+import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -10,7 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 @Dependent
-public class SessionRepository extends PanacheRepositoryWrapper<Session> {
+public class SessionRepository extends PanacheRepositoryWrapper<Session, SessionDTO> {
 
   @ApplicationScoped
   public static class Panache implements PanacheRepository<Session> {
@@ -74,5 +81,30 @@ public class SessionRepository extends PanacheRepositoryWrapper<Session> {
       eventRepository.persist(associatedEvent);
     }
     panacheRepository.delete(entity);
+  }
+
+  @Override
+  public String getEntityName() {
+    return Session.class.getName();
+  }
+
+  @Override
+  public void create(SessionDTO entity) throws ConflictingIdException, NotFoundException {
+
+  }
+
+  @Override
+  public Session fromDTO(SessionDTO dto) throws ConflictingIdException, NotFoundException {
+    return null;
+  }
+
+  @Override
+  public SessionDTO toDTO(Session dto) {
+    return null;
+  }
+
+  @Override
+  public void update(long id, SessionDTO dto) throws ConflictingIdException, NotFoundException {
+
   }
 }

@@ -71,6 +71,8 @@ interface DtoMapper {
 
   NestedPingDTO asNestedPingDto(Ping ping);
 
+  PingDTO asPingDto(Ping ping);
+
   @Mapping(target = "loopTrack", source = "location.loopTrack")
   @Mapping(target = "chronometersCount", expression = "java(session.getChronometers().size())")
   NestedSessionDTO asNestedSessionDto(Session session);

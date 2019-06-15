@@ -1,7 +1,10 @@
-package org.trd.app.teknichrono.model.jpa;
+package org.trd.app.teknichrono.model.repository;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import org.trd.app.teknichrono.model.dto.BeaconDTO;
+import org.trd.app.teknichrono.model.jpa.Beacon;
+import org.trd.app.teknichrono.model.jpa.Pilot;
+import org.trd.app.teknichrono.model.jpa.Ping;
 import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
@@ -12,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Dependent
-public class BeaconRepository extends PanacheRepositoryWrapper<Beacon> implements EntityRepository<Beacon, BeaconDTO> {
+public class BeaconRepository extends PanacheRepositoryWrapper<Beacon, BeaconDTO> {
 
   @ApplicationScoped
   public static class Panache implements PanacheRepository<Beacon> {
@@ -20,20 +23,17 @@ public class BeaconRepository extends PanacheRepositoryWrapper<Beacon> implement
 
   private final Panache panacheRepository;
 
-  private final PilotRepository pilotRepository;
+  private final PilotRepository.Panache pilotRepository;
 
-  private final PingRepository pingRepository;
+  private final PingRepository.Panache pingRepository;
 
   @Inject
-  public BeaconRepository(Panache panacheRepository, PilotRepository pilotRepository, PingRepository pingRepository) {
+  public BeaconRepository(Panache panacheRepository, PilotRepository.Panache pilotRepository,
+                          PingRepository.Panache pingRepository) {
     super(panacheRepository);
     this.panacheRepository = panacheRepository;
     this.pilotRepository = pilotRepository;
     this.pingRepository = pingRepository;
-  }
-
-  public Beacon findByNumber(long number) {
-    return panacheRepository.find("number", number).firstResult();
   }
 
   public void create(BeaconDTO entity) throws NotFoundException, ConflictingIdException {

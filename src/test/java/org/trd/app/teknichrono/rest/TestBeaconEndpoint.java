@@ -12,11 +12,10 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.trd.app.teknichrono.model.dto.BeaconDTO;
 import org.trd.app.teknichrono.model.jpa.Beacon;
-import org.trd.app.teknichrono.model.jpa.BeaconRepository;
 import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.model.jpa.Ping;
+import org.trd.app.teknichrono.model.repository.BeaconRepository;
 import org.trd.app.teknichrono.util.exception.ConflictingIdException;
-import org.trd.app.teknichrono.util.exception.MissingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import javax.persistence.OptimisticLockException;
@@ -126,13 +125,10 @@ public class TestBeaconEndpoint {
   public void findById() {
     Beacon entity = newBeacon(999, 9);
     when(beaconService.findById(entity.getId())).thenReturn(entity);
+    when(beaconService.toDTO(entity)).thenReturn(BeaconDTO.fromBeacon(entity));
     Response r = endpoint.findById(entity.getId());
     assertThat(r).isNotNull();
-    ArgumentCaptor<BeaconDTO> captor = ArgumentCaptor.forClass(BeaconDTO.class);
-    verify(responseBuilder).entity(captor.capture());
-    BeaconDTO dto = captor.getValue();
-    assertThat(dto.getNumber()).isEqualTo(999);
-    assertThat(dto.getPilot().getId()).isEqualTo(9L);
+    verify(responseBuilder).entity(any(BeaconDTO.class));
   }
 
   @Test
@@ -148,14 +144,10 @@ public class TestBeaconEndpoint {
   @Test
   public void findBeaconNumber() {
     Beacon entity = newBeacon(999, 9);
-    when(beaconService.findByNumber(entity.getNumber())).thenReturn(entity);
+    when(beaconService.findByField("number", entity.getNumber())).thenReturn(entity);
     Response r = endpoint.findBeaconNumber(999);
     assertThat(r).isNotNull();
-    ArgumentCaptor<BeaconDTO> captor = ArgumentCaptor.forClass(BeaconDTO.class);
-    verify(responseBuilder).entity(captor.capture());
-    BeaconDTO dto = captor.getValue();
-    assertThat(dto.getNumber()).isEqualTo(999);
-    assertThat(dto.getPilot().getId()).isEqualTo(9L);
+    verify(responseBuilder).entity(any());
   }
 
   @Test
@@ -181,10 +173,6 @@ public class TestBeaconEndpoint {
     List<BeaconDTO> beacons = endpoint.listAll(null, null);
     assertThat(beacons).isNotNull();
     assertThat(beacons).hasSize(3);
-
-    assertThat(beacons.stream().filter(b -> (b.getNumber() == 999 && b.getPilot() != null && b.getPilot().getId() == 9)).count()).isEqualTo(1);
-    assertThat(beacons.stream().filter(b -> (b.getPilot() != null && b.getPilot().getId() == 10)).count()).isEqualTo(1);
-    assertThat(beacons.stream().filter(b -> (b.getNumber() == 46 && b.getPilot() == null)).count()).isEqualTo(1);
 
   }
 
@@ -231,7 +219,7 @@ public class TestBeaconEndpoint {
   public void updateIsConflictIfIdsDontMatch() throws ConflictingIdException, NotFoundException {
     Beacon before = newBeacon(999, 11);
     Beacon after = newBeacon(99, 12);
-    doThrow(new MissingIdException()).when(beaconService).update(anyLong(), any(BeaconDTO.class));
+    doThrow(new ConflictingIdException()).when(beaconService).update(anyLong(), any(BeaconDTO.class));
     endpoint.update(before.getId(), BeaconDTO.fromBeacon(after));
     verify(responseBuilder).status((Response.StatusType) Response.Status.CONFLICT);
   }

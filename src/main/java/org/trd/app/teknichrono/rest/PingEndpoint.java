@@ -4,11 +4,11 @@ import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.business.client.PingManager;
 import org.trd.app.teknichrono.model.dto.NestedPingDTO;
 import org.trd.app.teknichrono.model.jpa.Beacon;
-import org.trd.app.teknichrono.model.jpa.BeaconRepository;
 import org.trd.app.teknichrono.model.jpa.Chronometer;
-import org.trd.app.teknichrono.model.jpa.ChronometerRepository;
 import org.trd.app.teknichrono.model.jpa.Ping;
-import org.trd.app.teknichrono.model.jpa.PingRepository;
+import org.trd.app.teknichrono.model.repository.BeaconRepository;
+import org.trd.app.teknichrono.model.repository.ChronometerRepository;
+import org.trd.app.teknichrono.model.repository.PingRepository;
 import org.trd.app.teknichrono.util.DurationLogger;
 
 import javax.inject.Inject;
@@ -29,7 +29,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Path("/pings")
 public class PingEndpoint {
@@ -41,6 +40,7 @@ public class PingEndpoint {
   private final ChronometerRepository chronometerRepository;
 
   private final BeaconRepository beaconRepository;
+  private final EntityEndpoint entityEndpoint;
 
   // TODO get rid of this
   private final EntityManager em;
@@ -51,6 +51,7 @@ public class PingEndpoint {
     this.pingRepository = pingRepository;
     this.chronometerRepository = chronometerRepository;
     this.beaconRepository = beaconRepository;
+    this.entityEndpoint = new EntityEndpoint(pingRepository);
     this.em = em;
   }
 
@@ -85,12 +86,7 @@ public class PingEndpoint {
   @Path("/{id:[0-9][0-9]*}")
   @Transactional
   public Response deleteById(@PathParam("id") long id) {
-    Ping entity = pingRepository.findById(id);
-    if (entity == null) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
-    pingRepository.delete(entity);
-    return Response.noContent().build();
+    return entityEndpoint.deleteById(id);
   }
 
   @GET
@@ -109,11 +105,7 @@ public class PingEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public List<NestedPingDTO> listAll(@QueryParam("page") Integer pageIndex, @QueryParam("pageSize") Integer pageSize) {
-    return pingRepository.findAll()
-            .page(Paging.from(pageIndex, pageSize))
-            .stream()
-            .map(NestedPingDTO::fromPing)
-            .collect(Collectors.toList());
+    return entityEndpoint.listAll(pageIndex, pageSize);
   }
 
   @PUT

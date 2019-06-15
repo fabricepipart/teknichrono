@@ -1,8 +1,10 @@
-package org.trd.app.teknichrono.model.jpa;
+package org.trd.app.teknichrono.model.repository;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import org.trd.app.teknichrono.model.dto.CategoryDTO;
 import org.trd.app.teknichrono.model.dto.NestedPilotDTO;
+import org.trd.app.teknichrono.model.jpa.Category;
+import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
@@ -12,7 +14,7 @@ import javax.inject.Inject;
 import java.util.Set;
 
 @Dependent
-public class CategoryRepository extends PanacheRepositoryWrapper<Category> implements EntityRepository<Category, CategoryDTO> {
+public class CategoryRepository extends PanacheRepositoryWrapper<Category, CategoryDTO> {
 
   @ApplicationScoped
   public static class Panache implements PanacheRepository<Category> {
@@ -20,10 +22,10 @@ public class CategoryRepository extends PanacheRepositoryWrapper<Category> imple
 
   private final Panache panacheRepository;
 
-  private final PilotRepository pilotRepository;
+  private final PilotRepository.Panache pilotRepository;
 
   @Inject
-  public CategoryRepository(Panache panacheRepository, PilotRepository pilotRepository) {
+  public CategoryRepository(Panache panacheRepository, PilotRepository.Panache pilotRepository) {
     super(panacheRepository);
     this.panacheRepository = panacheRepository;
     this.pilotRepository = pilotRepository;

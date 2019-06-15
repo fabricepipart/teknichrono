@@ -3,8 +3,8 @@ package org.trd.app.teknichrono.rest;
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.dto.ChronometerDTO;
 import org.trd.app.teknichrono.model.jpa.Chronometer;
-import org.trd.app.teknichrono.model.jpa.ChronometerRepository;
-import org.trd.app.teknichrono.model.jpa.PingRepository;
+import org.trd.app.teknichrono.model.repository.ChronometerRepository;
+import org.trd.app.teknichrono.model.repository.PingRepository;
 import org.trd.app.teknichrono.util.DurationLogger;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
