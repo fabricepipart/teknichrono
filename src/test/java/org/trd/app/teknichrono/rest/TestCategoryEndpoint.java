@@ -216,7 +216,7 @@ public class TestCategoryEndpoint {
     Response r = endpoint.addPilot(entity.getId(), 102L);
     assertThat(r).isNotNull();
 
-    verify(categoryRepository, atLeastOnce()).addToCollectionField(eq(entity.getId()), eq(102L),
+    verify(categoryRepository, atLeastOnce()).addToOneToManyRelationship(eq(entity.getId()), eq(102L),
         eq(pilotRepository), any(), any());
   }
 

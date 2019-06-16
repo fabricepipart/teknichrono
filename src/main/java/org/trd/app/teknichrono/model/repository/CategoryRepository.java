@@ -54,7 +54,7 @@ public class CategoryRepository extends PanacheRepositoryWrapper<Category, Categ
     checkNoId(entity);
     Category category = new Category();
     category.setName(entity.getName());
-    setCollectionField(category, entity.getPilots(), Category::getPilots, Pilot::setCategory, pilotRepository);
+    setOneToManyRelationship(category, entity.getPilots(), Category::getPilots, Pilot::setCategory, pilotRepository);
     return category;
   }
 
@@ -62,13 +62,13 @@ public class CategoryRepository extends PanacheRepositoryWrapper<Category, Categ
   @Override
   public void deleteById(long id) throws NotFoundException {
     Category entity = ensureFindById(id);
-    nullifyInCollectionField(entity.getPilots(), Pilot::setCategory, pilotRepository);
+    nullifyOneToManyRelationship(entity.getPilots(), Pilot::setCategory, pilotRepository);
     panacheRepository.delete(entity);
   }
 
   public CategoryDTO addPilot(long categoryId, Long pilotId) throws NotFoundException {
     Category category = ensureFindById(categoryId);
-    Pilot pilot = addToCollectionField(category, pilotId, Category::getPilots, Pilot::setCategory, pilotRepository);
+    Pilot pilot = addToOneToManyRelationship(category, pilotId, Category::getPilots, Pilot::setCategory, pilotRepository);
     pilotRepository.persist(pilot);
     persist(category);
     return CategoryDTO.fromCategory(category);
@@ -81,7 +81,7 @@ public class CategoryRepository extends PanacheRepositoryWrapper<Category, Categ
     category.setName(entity.getName());
 
     // Update of pilots
-    setCollectionField(category, entity.getPilots(), Category::getPilots, Pilot::setCategory, pilotRepository);
+    setOneToManyRelationship(category, entity.getPilots(), Category::getPilots, Pilot::setCategory, pilotRepository);
     panacheRepository.persist(category);
   }
 }

@@ -40,9 +40,8 @@ public interface Repository<E extends PanacheEntity, D> {
 
   E findByField(String fieldName, Object fieldValue);
 
-  <F extends PanacheEntity> D addToCollectionField(long entityId, long fieldId, Repository<F, ?> elementRepository,
-                                                   BiConsumer<F, E> fieldEntitySetter,
-                                                   Function<E, ? extends Collection<F>> entityListGetter)
+  <F extends PanacheEntity> D addToOneToManyRelationship(long entityId, long fieldId, Repository<F, ?> elementRepository,
+                                                         BiConsumer<F, E> fieldEntitySetter,
+                                                         Function<E, ? extends Collection<F>> entityListGetter)
       throws NotFoundException;
-
 }

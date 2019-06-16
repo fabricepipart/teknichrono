@@ -37,8 +37,8 @@ public class ChronometerRepository extends PanacheRepositoryWrapper<Chronometer,
   @Override
   public void deleteById(long id) throws NotFoundException {
     Chronometer entity = ensureFindById(id);
-    nullifyInCollectionField(entity.getPings(), Ping::setChrono, pingRepository);
-    removeFromCollectionField(id, entity.getSessions(), Session::getChronometers, sessionRepository);
+    nullifyOneToManyRelationship(entity.getPings(), Ping::setChrono, pingRepository);
+    removeFromManyToManyRelationship(id, entity.getSessions(), Session::getChronometers, sessionRepository);
     panacheRepository.delete(entity);
   }
 

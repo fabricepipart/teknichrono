@@ -2,17 +2,14 @@ package org.trd.app.teknichrono.it;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
-import io.restassured.response.Response;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.trd.app.teknichrono.model.dto.LocationDTO;
 import org.trd.app.teknichrono.model.dto.NestedSessionDTO;
 import org.trd.app.teknichrono.model.dto.SessionDTO;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-import java.util.ArrayList;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
@@ -20,9 +17,18 @@ import static org.assertj.core.api.Assertions.*;
 
 @Tag("integration")
 @QuarkusTest
-public class TestRestLocationEndpoint {
+public class TestRestLocationEndpoint extends TestRestEndpoint<LocationDTO> {
 
-  private static Jsonb jsonb = JsonbBuilder.create();
+  private TestRestSessionEndpoint restSession;
+
+  public TestRestLocationEndpoint() {
+    super("locations", LocationDTO.class);
+  }
+
+  @BeforeEach
+  public void prepare() {
+    restSession = new TestRestSessionEndpoint();
+  }
 
   /**
    * ******************** Tests *********************
@@ -30,23 +36,23 @@ public class TestRestLocationEndpoint {
 
   @Test
   public void testLists() {
-    List<LocationDTO> locations = getAllLocations();
+    List<LocationDTO> locations = getAll();
     Assertions.assertThat(locations.size()).isEqualTo(0);
     create("Newbie");
-    locations = getAllLocations();
+    locations = getAll();
     Assertions.assertThat(locations.size()).isEqualTo(1);
     create("Expert");
-    locations = getAllLocations();
+    locations = getAll();
     Assertions.assertThat(locations.size()).isEqualTo(2);
 
-    List<LocationDTO> someBeacons = getAllLocationsWindow(1, 1);
+    List<LocationDTO> someBeacons = getAllInWindow(1, 1);
     Assertions.assertThat(someBeacons.size()).isEqualTo(1);
 
-    locations = getAllLocations();
+    locations = getAll();
     for (LocationDTO beacon : locations) {
       delete(beacon.getId());
     }
-    locations = getAllLocations();
+    locations = getAll();
     Assertions.assertThat(locations.size()).isEqualTo(0);
   }
 
@@ -63,9 +69,9 @@ public class TestRestLocationEndpoint {
     modifiedLocation.setName("Elsewhere");
     modifiedLocation.setId(id);
     update(id, modifiedLocation);
-    List<LocationDTO> locations = getAllLocations();
+    List<LocationDTO> locations = getAll();
     Assertions.assertThat(locations.size()).isEqualTo(1);
-    getByNameFails("Somewhere");
+    getByName("Somewhere", NOT_FOUND);
     LocationDTO newLocation = getByName("Elsewhere");
     Assertions.assertThat(newLocation.getId()).isEqualTo(id);
 
@@ -107,8 +113,8 @@ public class TestRestLocationEndpoint {
     modifiedLocation.setLoopTrack(true);
     modifiedLocation.setId(id);
 
-    TestRestSessionEndpoint.create("Session Name");
-    SessionDTO sessionDto1 = TestRestSessionEndpoint.getByName("Session Name");
+    restSession.create("Session Name");
+    SessionDTO sessionDto1 = restSession.getByName("Session Name");
     long session1Id = sessionDto1.getId();
     NestedSessionDTO nestedSession1dto = new NestedSessionDTO();
     nestedSession1dto.setId(session1Id);
@@ -118,7 +124,7 @@ public class TestRestLocationEndpoint {
     // Update twice has no impact
     update(id, modifiedLocation);
 
-    getByNameFails("Here");
+    getByName("Here", NOT_FOUND);
     LocationDTO newReturnedLocation = getByName("Elswere");
     assertThat(newReturnedLocation.getId()).isEqualTo(id);
     assertThat(newReturnedLocation.isLoopTrack()).isEqualTo(true);
@@ -133,8 +139,8 @@ public class TestRestLocationEndpoint {
     modifiedLocation.setId(id);
     modifiedLocation.setLoopTrack(false);
 
-    TestRestSessionEndpoint.create("Other Session Name");
-    SessionDTO sessionDto2 = TestRestSessionEndpoint.getByName("Other Session Name");
+    restSession.create("Other Session Name");
+    SessionDTO sessionDto2 = restSession.getByName("Other Session Name");
     long session2Id = sessionDto2.getId();
     NestedSessionDTO nestedSession2dto = new NestedSessionDTO();
     nestedSession2dto.setId(session2Id);
@@ -159,8 +165,8 @@ public class TestRestLocationEndpoint {
     LocationDTO b = getByName("Heaven");
     long id = b.getId();
 
-    TestRestSessionEndpoint.create("Session Name");
-    SessionDTO sessionDto1 = TestRestSessionEndpoint.getByName("Session Name");
+    restSession.create("Session Name");
+    SessionDTO sessionDto1 = restSession.getByName("Session Name");
     long session1Id = sessionDto1.getId();
 
     addSession(id, session1Id);
@@ -175,8 +181,8 @@ public class TestRestLocationEndpoint {
     assertThat(sessionDtoFound.getId()).isEqualTo(session1Id);
     assertThat(sessionDtoFound.getName()).isEqualTo("Session Name");
 
-    TestRestSessionEndpoint.create("Other Session Name");
-    SessionDTO sessionDto2 = TestRestSessionEndpoint.getByName("Other Session Name");
+    restSession.create("Other Session Name");
+    SessionDTO sessionDto2 = restSession.getByName("Other Session Name");
     long session2Id = sessionDto2.getId();
 
     addSession(id, session2Id);
@@ -216,13 +222,6 @@ public class TestRestLocationEndpoint {
    * ******************** Reusable *********************
    **/
 
-  public static void update(long id, LocationDTO modifiedLocation) {
-    given().pathParam("id", id)
-        .when().contentType(ContentType.JSON).body(jsonb.toJson(modifiedLocation)).put("/rest/locations/{id}")
-        .then()
-        .statusCode(204);
-  }
-
   public static void addSession(long id, long sessionId) {
     given().pathParam("id", id).queryParam("sessionId", sessionId)
         .when().contentType(ContentType.JSON).post("/rest/locations/{id}/addSession")
@@ -230,78 +229,22 @@ public class TestRestLocationEndpoint {
         .statusCode(200);
   }
 
-
-  public static List<LocationDTO> getAllLocations() {
-    Response r = given()
-        .when().get("/rest/locations")
-        .then()
-        .statusCode(200)
-        .extract().response();
-    return jsonb.fromJson(r.asString(), new ArrayList<LocationDTO>() {
-    }.getClass().getGenericSuperclass());
-  }
-
-  public static List<LocationDTO> getAllLocationsWindow(int page, int pageSize) {
-    Response r = given().queryParam("page", page).queryParam("pageSize", pageSize)
-        .when().get("/rest/locations")
-        .then()
-        .statusCode(200)
-        .extract().response();
-    return jsonb.fromJson(r.asString(), new ArrayList<LocationDTO>() {
-    }.getClass().getGenericSuperclass());
-  }
-
-  public static void delete(long id) {
-    given().pathParam("id", id)
-        .when().delete("/rest/locations/{id}")
-        .then()
-        .statusCode(204);
-  }
-
-  public static void deleteWithSessions(long id, long... sessionIds) {
+  public void deleteWithSessions(long id, long... sessionIds) {
     for (Long sessionId : sessionIds) {
-      TestRestSessionEndpoint.delete(sessionId);
+      restSession.delete(sessionId);
     }
     delete(id);
   }
 
-  public static LocationDTO getById(long id) {
-    Response r = given().pathParam("id", id)
-        .when().get("/rest/locations/{id}")
-        .then()
-        .statusCode(200)
-        .extract().response();
-    return jsonb.fromJson(r.asString(), LocationDTO.class);
-  }
-
-  public static void getByNameFails(String name) {
-    given().queryParam("name", name)
-        .when().get("/rest/locations/name")
-        .then()
-        .statusCode(404);
-  }
-
-  public static LocationDTO getByName(String name) {
-    Response r = given().queryParam("name", name)
-        .when().get("/rest/locations/name")
-        .then()
-        .statusCode(200)
-        .extract().response();
-    return jsonb.fromJson(r.asString(), LocationDTO.class);
-  }
-
-  public static void create(String name) {
+  public void create(String name) {
     LocationDTO p = new LocationDTO();
     p.setName(name);
-    given()
-        .when().contentType(ContentType.JSON).body(jsonb.toJson(p)).post("/rest/locations")
-        .then()
-        .statusCode(204);
+    create(p);
   }
 
-  public static void createWithSession(String name, String sessionName) {
-    TestRestSessionEndpoint.create(sessionName);
-    SessionDTO session = TestRestSessionEndpoint.getByName(sessionName);
+  public void createWithSession(String name, String sessionName) {
+    restSession.create(sessionName);
+    SessionDTO session = restSession.getByName(sessionName);
     NestedSessionDTO nestedSessionDTO = new NestedSessionDTO();
     nestedSessionDTO.setId(session.getId());
     nestedSessionDTO.setName(session.getName());
@@ -310,14 +253,11 @@ public class TestRestLocationEndpoint {
     locationDTO.setName(name);
     locationDTO.getSessions().add(nestedSessionDTO);
 
-    given()
-        .when().contentType(ContentType.JSON).body(jsonb.toJson(locationDTO)).post("/rest/locations")
-        .then()
-        .statusCode(204);
+    create(locationDTO);
   }
 
   public void assertTestCleanedEverything() {
-    assertThat(getAllLocations()).isNullOrEmpty();
-    assertThat(TestRestSessionEndpoint.getAllSessions()).isNullOrEmpty();
+    assertThat(getAll()).isNullOrEmpty();
+    assertThat(restSession.getAll()).isNullOrEmpty();
   }
 }

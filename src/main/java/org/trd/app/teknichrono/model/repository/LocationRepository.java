@@ -22,7 +22,7 @@ public class LocationRepository extends PanacheRepositoryWrapper<Location, Locat
 
   private final SessionRepository.Panache sessionRepository;
 
-   @Inject
+  @Inject
   public LocationRepository(Panache panacheRepository, SessionRepository.Panache sessionRepository) {
     super(panacheRepository);
     this.panacheRepository = panacheRepository;
@@ -51,13 +51,13 @@ public class LocationRepository extends PanacheRepositoryWrapper<Location, Locat
     Location location = new Location();
     location.setLoopTrack(entity.isLoopTrack());
     location.setName(entity.getName());
-    setCollectionField(location, entity.getSessions(), Location::getSessions, Session::setLocation, sessionRepository);
+    setOneToManyRelationship(location, entity.getSessions(), Location::getSessions, Session::setLocation, sessionRepository);
     return location;
   }
 
   public LocationDTO addSession(long locationId, long sessionId) throws NotFoundException {
     Location location = ensureFindById(locationId);
-    Session session = addToCollectionField(location, sessionId, Location::getSessions, Session::setLocation, sessionRepository);
+    Session session = addToOneToManyRelationship(location, sessionId, Location::getSessions, Session::setLocation, sessionRepository);
     sessionRepository.persist(session);
     persist(location);
     return LocationDTO.fromLocation(location);
@@ -66,7 +66,7 @@ public class LocationRepository extends PanacheRepositoryWrapper<Location, Locat
   @Override
   public void deleteById(long id) throws NotFoundException {
     Location entity = ensureFindById(id);
-    nullifyInCollectionField(entity.getSessions(), Session::setLocation, sessionRepository);
+    nullifyOneToManyRelationship(entity.getSessions(), Session::setLocation, sessionRepository);
     panacheRepository.delete(entity);
   }
 
@@ -78,7 +78,7 @@ public class LocationRepository extends PanacheRepositoryWrapper<Location, Locat
     location.setLoopTrack(entity.isLoopTrack());
 
     // Update of pilots
-    setCollectionField(location, entity.getSessions(), Location::getSessions, Session::setLocation, sessionRepository);
+    setOneToManyRelationship(location, entity.getSessions(), Location::getSessions, Session::setLocation, sessionRepository);
     panacheRepository.persist(location);
   }
 }
