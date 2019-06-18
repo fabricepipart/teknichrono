@@ -98,7 +98,7 @@ abstract class PanacheRepositoryWrapper<E extends PanacheEntity, D> implements R
                                                                    PanacheRepository<F> fieldRepository)
       throws NotFoundException {
     if (fieldDto != null && fieldDto.getId() > 0) {
-      setOneToOneRelationship(entity, fieldDto, setterEntity, setterFieldEntity, fieldRepository);
+      setOneToOneRelationship(entity, fieldDto.getId(), setterEntity, setterFieldEntity, fieldRepository);
     }
   }
 
@@ -129,11 +129,27 @@ abstract class PanacheRepositoryWrapper<E extends PanacheEntity, D> implements R
                                                                     BiConsumer<E, F> setterEntity,
                                                                     Function<F, Collection<E>> entityCollectionGetter,
                                                                     PanacheRepository<F> fieldRepository)
-      throws NotFoundException {
+          throws NotFoundException {
+    setterEntity.accept(entity, null);
     if (fieldDto != null && fieldDto.getId() > 0) {
       F field = ensureFindFieldById(fieldDto.getId(), fieldRepository);
       entityCollectionGetter.apply(field).add(entity);
       setterEntity.accept(entity, field);
+    }
+  }
+
+  protected <F extends PanacheEntity> void setManyToManyRelationship(E entity, Collection<? extends EntityDTO> fieldDtos,
+                                                                     Function<E, Collection<F>> entityCollectionGetter,
+                                                                    Function<F, Collection<E>> entityFieldCollectionGetter,
+                                                                    PanacheRepository<F> fieldRepository)
+          throws NotFoundException {
+    entityCollectionGetter.apply(entity).clear();
+    if (fieldDtos != null) {
+      for (EntityDTO fieldDto : fieldDtos) {
+        F field = ensureFindFieldById(fieldDto.getId(), fieldRepository);
+        entityCollectionGetter.apply(entity).add(field);
+        entityFieldCollectionGetter.apply(field).add(entity);
+      }
     }
   }
 
@@ -142,21 +158,10 @@ abstract class PanacheRepositoryWrapper<E extends PanacheEntity, D> implements R
                                                                       BiConsumer<F, E> setterFieldEntity,
                                                                       PanacheRepository<F> fieldRepository)
       throws NotFoundException {
-    setterEntity.accept(entity, null);
-    if (fieldDto != null && fieldDto.getId() > 0) {
-      setOneToOneRelationship(entity, fieldDto, setterEntity, setterFieldEntity, fieldRepository);
-    }
-  }
-
-  protected <F extends PanacheEntity> void updateManyToOneRelationship(E entity, EntityDTO fieldDto,
-                                                                       BiConsumer<E, F> setterEntity,
-                                                                       Function<F, Collection<E>> entityCollectionGetter,
-                                                                       PanacheRepository<F> fieldRepository)
-      throws NotFoundException {
-    setterEntity.accept(entity, null);
-    if (fieldDto != null && fieldDto.getId() > 0) {
-      setManyToOneRelationship(entity, fieldDto, setterEntity, entityCollectionGetter, fieldRepository);
-    }
+      setterEntity.accept(entity, null);
+      if (fieldDto != null && fieldDto.getId() > 0) {
+        setOneToOneRelationship(entity, fieldDto, setterEntity, setterFieldEntity, fieldRepository);
+      }
   }
 
   protected <F extends PanacheEntity> void nullifyOneToOneRelationship(F field, BiConsumer<F, E> setterFieldEntity,

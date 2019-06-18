@@ -111,7 +111,7 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot, PilotDTO> {
     // Don't update Sessions
 
     // Update of category
-    updateManyToOneRelationship(pilot, dto.getCategory(), Pilot::setCategory, Category::getPilots, categoryRepository);
+    setManyToOneRelationship(pilot, dto.getCategory(), Pilot::setCategory, Category::getPilots, categoryRepository);
     updateOneToOneRelationship(pilot, dto.getCurrentBeacon(), Pilot::setCurrentBeacon, Beacon::setPilot, beaconRepository);
 
     panacheRepository.persist(pilot);

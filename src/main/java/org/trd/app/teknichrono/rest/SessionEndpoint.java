@@ -49,16 +49,12 @@ import java.util.stream.Stream;
 @Path("/sessions")
 public class SessionEndpoint {
 
+
+  private final EntityEndpoint<Session, SessionDTO> entityEndpoint;
+
   private Logger LOGGER = Logger.getLogger(SessionEndpoint.class);
 
-  // TODO get rid of this
-  private final EntityManager em;
-
   private final SessionRepository sessionRepository;
-
-  private final EventRepository eventRepository;
-
-  private final LocationRepository locationRepository;
 
   private final ChronometerRepository chronometerRepository;
 
@@ -66,51 +62,33 @@ public class SessionEndpoint {
 
   private final PingRepository pingRepository;
 
+  //TODO Remove me
+  private EntityManager em;
+
   @Inject
-  public SessionEndpoint(EntityManager em, SessionRepository sessionRepository, EventRepository eventRepository,
-                         LocationRepository locationRepository, ChronometerRepository chronometerRepository,
-                         PilotRepository pilotRepository, PingRepository pingRepository) {
-    this.em = em;
+  public SessionEndpoint(EntityManager em, SessionRepository sessionRepository,
+                         ChronometerRepository chronometerRepository, PilotRepository pilotRepository,
+                         PingRepository pingRepository) {
     this.sessionRepository = sessionRepository;
-    this.eventRepository = eventRepository;
-    this.locationRepository = locationRepository;
     this.chronometerRepository = chronometerRepository;
     this.pilotRepository = pilotRepository;
     this.pingRepository = pingRepository;
+    this.entityEndpoint = new EntityEndpoint(sessionRepository);
+    this.em = em;
   }
 
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Transactional
-  public Response create(Session entity) {
-    DurationLogger perf = DurationLogger.get(LOGGER).start("Create session " + entity.getName());
-    if (entity.getEvent() != null && entity.getEvent().id > 0) {
-      Event event = eventRepository.findById(entity.getEvent().id);
-      entity.setEvent(event);
-    }
-    if (entity.getLocation() != null && entity.getLocation().id > 0) {
-      Location loc = locationRepository.findById(entity.getLocation().id);
-      entity.setLocation(loc);
-    }
-    sessionRepository.persist(entity);
-    Response response = Response
-        .created(UriBuilder.fromResource(SessionEndpoint.class).path(String.valueOf(entity.id)).build()).build();
-    perf.end();
-    return response;
+  public Response create(SessionDTO entity) {
+    return entityEndpoint.create(entity, String.valueOf(entity.getName()));
   }
 
   @DELETE
   @Path("/{id:[0-9][0-9]*}")
   @Transactional
   public Response deleteById(@PathParam("id") long id) {
-    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Delete session id=" + id)) {
-      try {
-        sessionRepository.deleteById(id);
-      } catch (NotFoundException e) {
-        return Response.status(Status.NOT_FOUND).build();
-      }
-      return Response.noContent().build();
-    }
+    return entityEndpoint.deleteById(id);
   }
 
   @GET
@@ -118,14 +96,7 @@ public class SessionEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public Response findById(@PathParam("id") long id) {
-    DurationLogger perf = DurationLogger.get(LOGGER).start("Find session id " + id);
-    Session entity = sessionRepository.findById(id);
-    if (entity == null) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
-    perf.end();
-    SessionDTO dto = SessionDTO.fromSession(entity);
-    return Response.ok(dto).build();
+    return entityEndpoint.findById(id);
   }
 
   @GET
@@ -148,29 +119,14 @@ public class SessionEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public Response findSessionByName(@QueryParam("name") String name) {
-    DurationLogger perf = DurationLogger.get(LOGGER).start("Find session named " + name);
-    Session entity = sessionRepository.findByName(name);
-    if (entity == null) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
-    perf.end();
-    SessionDTO dto = SessionDTO.fromSession(entity);
-    return Response.ok(dto).build();
+    return entityEndpoint.findByField("name", name);
   }
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public List<SessionDTO> listAll(@QueryParam("page") Integer pageIndex, @QueryParam("pageSize") Integer pageSize) {
-    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Find all sessions")) {
-      return listAllSessions(pageIndex, pageSize)
-          .map(SessionDTO::fromSession)
-          .collect(Collectors.toList());
-    }
-  }
-
-  private Stream<Session> listAllSessions(Integer pageIndex, Integer pageSize) {
-    return sessionRepository.findAll(pageIndex, pageSize);
+    return entityEndpoint.listAll(pageIndex, pageSize);
   }
 
   @POST
@@ -321,65 +277,7 @@ public class SessionEndpoint {
   @Path("/{id:[0-9][0-9]*}")
   @Consumes(MediaType.APPLICATION_JSON)
   @Transactional
-  public Response update(@PathParam("id") long id, Session entity) {
-    if (entity == null) {
-      return Response.status(Status.BAD_REQUEST).build();
-    }
-    DurationLogger perf = DurationLogger.get(LOGGER).start("Update session id " + entity.id);
-    if (id != entity.id) {
-      perf.end();
-      return Response.status(Status.CONFLICT).entity(entity).build();
-    }
-    Session session = sessionRepository.findById(id);
-    if (session == null) {
-      perf.end();
-      return Response.status(Status.NOT_FOUND).build();
-    }
-
-    if (entity.getLocation() != null && entity.getLocation().id > 0) {
-      Location location = locationRepository.findById(entity.getLocation().id);
-      session.setLocation(location);
-    }
-    if (entity.getEvent() != null && entity.getEvent().id > 0) {
-      Event event = eventRepository.findById(entity.getEvent().id);
-      session.setEvent(event);
-    }
-    if (entity.getPilots() != null && entity.getPilots().size() > 0) {
-      Set<Pilot> pilotsToSet = new HashSet<>();
-      for (Pilot p : entity.getPilots()) {
-        if (p != null && p.id > 0) {
-          Pilot pilot = pilotRepository.findById(p.id);
-          pilotsToSet.add(pilot);
-        }
-      }
-      session.setPilots(pilotsToSet);
-    }
-    if (entity.getChronometers() != null && entity.getChronometers().size() > 0) {
-      LOGGER.warn("Session ID=" + session.id + " Chronometers list has not been updated to avoid messing order");
-      List<Chronometer> chronosToSet = new ArrayList<>();
-      for (Chronometer c : entity.getChronometers()) {
-        if (c != null && c.id > 0) {
-          Chronometer chrono = chronometerRepository.findById(c.id);
-          chronosToSet.add(chrono);
-        }
-      }
-      chronosToSet.sort(Comparator.comparing(Chronometer::getName));
-      session.setChronometers(chronosToSet);
-    }
-    session.setName(entity.getName());
-    session.setStart(entity.getStart());
-    session.setEnd(entity.getEnd());
-    session.setType(entity.getType());
-    session.setInactivity(entity.getInactivity());
-    session.setCurrent(entity.isCurrent());
-
-    try {
-      sessionRepository.persist(session);
-    } catch (OptimisticLockException e) {
-      return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
-    }
-
-    perf.end();
-    return Response.noContent().build();
+  public Response update(@PathParam("id") long id, SessionDTO dto) {
+    return entityEndpoint.update(id, dto);
   }
 }

@@ -1,5 +1,7 @@
 package org.trd.app.teknichrono.it;
 
+import io.restassured.response.Response;
+
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -8,6 +10,8 @@ import org.trd.app.teknichrono.model.dto.BeaconDTO;
 import org.trd.app.teknichrono.model.dto.NestedPilotDTO;
 import org.trd.app.teknichrono.model.dto.PilotDTO;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
@@ -19,7 +23,8 @@ public class TestRestBeaconEndpoint extends TestRestEndpoint<BeaconDTO> {
   private TestRestPilotEndPoint restPilot;
 
   public TestRestBeaconEndpoint() {
-    super("beacons", BeaconDTO.class);
+    super("beacons", BeaconDTO.class, new ArrayList<BeaconDTO>() {
+    }.getClass().getGenericSuperclass());
   }
 
   @BeforeEach
@@ -152,8 +157,8 @@ public class TestRestBeaconEndpoint extends TestRestEndpoint<BeaconDTO> {
     return getBy("number", "number", i);
   }
 
-  private BeaconDTO getByNumber(int i, int expectedStatus) {
-    return getBy("number", "number", i, expectedStatus);
+  private void getByNumber(int i, int expectedStatus) {
+    getBy("number", "number", i, expectedStatus);
   }
 
 

@@ -13,6 +13,7 @@ import org.trd.app.teknichrono.util.exception.NotFoundException;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Set;
 
@@ -45,41 +46,14 @@ public class SessionRepository extends PanacheRepositoryWrapper<Session, Session
     this.pilotRepository = pilotRepository;
   }
 
-  public Session findByName(String name) {
-    return panacheRepository.find("name", name).firstResult();
-  }
-
-
   public void deleteById(long id) throws NotFoundException {
-    Session entity = panacheRepository.findById(id);
-    if (entity == null) {
-      throw new NotFoundException();
-    }
+    Session entity = ensureFindById(id);
 
-    List<Chronometer> chronometers = entity.getChronometers();
-    if (chronometers != null) {
-      for (Chronometer chrono : chronometers) {
-        chrono.getSessions().removeIf(p -> p.getId() == id);
-        chronometerRepository.persist(chrono);
-      }
-    }
-    Set<Pilot> pilots = entity.getPilots();
-    if (pilots != null) {
-      for (Pilot pilot : pilots) {
-        pilot.getSessions().removeIf(p -> p.getId() == id);
-        pilotRepository.persist(pilot);
-      }
-    }
-    Location associatedLocation = entity.getLocation();
-    if (associatedLocation != null) {
-      associatedLocation.getSessions().removeIf(p -> p.getId() == id);
-      locationRepository.persist(associatedLocation);
-    }
-    Event associatedEvent = entity.getEvent();
-    if (associatedEvent != null) {
-      associatedEvent.getSessions().removeIf(p -> p.getId() == id);
-      eventRepository.persist(associatedEvent);
-    }
+    removeFromManyToManyRelationship(id, entity.getChronometers(), Chronometer::getSessions, chronometerRepository);
+    removeFromManyToManyRelationship(id, entity.getPilots(), Pilot::getSessions, pilotRepository);
+    removeFromManyToOneRelationship(id, entity.getLocation(), Location::getSessions, locationRepository);
+    removeFromManyToOneRelationship(id, entity.getEvent(), Event::getSessions, eventRepository);
+
     panacheRepository.delete(entity);
   }
 
@@ -90,21 +64,52 @@ public class SessionRepository extends PanacheRepositoryWrapper<Session, Session
 
   @Override
   public void create(SessionDTO entity) throws ConflictingIdException, NotFoundException {
-
+    Session session = fromDTO(entity);
+    panacheRepository.persist(session);
   }
 
   @Override
   public Session fromDTO(SessionDTO dto) throws ConflictingIdException, NotFoundException {
-    return null;
+    checkNoId(dto);
+    Session session = new Session();
+    session.setInactivity(dto.getInactivity());
+    session.setStart(dto.getStart());
+    session.setEnd(dto.getEnd());
+    session.setType(dto.getType());
+    session.setCurrent(dto.isCurrent());
+    session.setName(dto.getName());
+
+    setManyToManyRelationship(session, dto.getChronometers(), Session::getChronometers, Chronometer::getSessions, chronometerRepository);
+    setManyToManyRelationship(session, dto.getPilots(), Session::getPilots, Pilot::getSessions, pilotRepository);
+    setManyToOneRelationship(session, dto.getLocation(), Session::setLocation, Location::getSessions, locationRepository);
+    setManyToOneRelationship(session, dto.getEvent(), Session::setEvent, Event::getSessions, eventRepository);
+
+    // Create create with Pings (not even in DTO)
+    return session;
   }
 
   @Override
   public SessionDTO toDTO(Session dto) {
-    return null;
+    return SessionDTO.fromSession(dto);
   }
 
   @Override
   public void update(long id, SessionDTO dto) throws ConflictingIdException, NotFoundException {
+    checkIdsMatch(id, dto);
+    Session session = ensureFindById(id);
 
+    session.setInactivity(dto.getInactivity());
+    session.setStart(dto.getStart());
+    session.setEnd(dto.getEnd());
+    session.setType(dto.getType());
+    session.setCurrent(dto.isCurrent());
+    session.setName(dto.getName());
+
+    setManyToManyRelationship(session, dto.getChronometers(), Session::getChronometers, Chronometer::getSessions, chronometerRepository);
+    setManyToManyRelationship(session, dto.getPilots(), Session::getPilots, Pilot::getSessions, pilotRepository);
+    setManyToOneRelationship(session, dto.getLocation(), Session::setLocation, Location::getSessions, locationRepository);
+    setManyToOneRelationship(session, dto.getEvent(), Session::setEvent, Event::getSessions, eventRepository);
+
+    panacheRepository.persist(session);
   }
 }

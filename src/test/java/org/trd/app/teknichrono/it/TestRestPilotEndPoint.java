@@ -2,6 +2,7 @@ package org.trd.app.teknichrono.it;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.trd.app.teknichrono.model.dto.NestedBeaconDTO;
 import org.trd.app.teknichrono.model.dto.NestedCategoryDTO;
 import org.trd.app.teknichrono.model.dto.PilotDTO;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
@@ -25,7 +27,8 @@ public class TestRestPilotEndPoint extends TestRestEndpoint<PilotDTO> {
   private TestRestCategoryEndpoint restCategory;
 
   public TestRestPilotEndPoint() {
-    super("pilots", PilotDTO.class);
+    super("pilots", PilotDTO.class, new ArrayList<PilotDTO>() {
+    }.getClass().getGenericSuperclass());
   }
 
   @BeforeEach
@@ -289,10 +292,10 @@ public class TestRestPilotEndPoint extends TestRestEndpoint<PilotDTO> {
   }
 
   public PilotDTO getByName(String first, String last) {
-    return getByName(first, last, OK);
+    return getByQuery("name", "firstname", first, "lastname", last);
   }
 
-  public PilotDTO getByName(String first, String last, int expected) {
+  public Response getByName(String first, String last, int expected) {
     return getByQuery("name", "firstname", first, "lastname", last, expected);
   }
 

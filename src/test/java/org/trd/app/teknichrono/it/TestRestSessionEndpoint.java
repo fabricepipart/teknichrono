@@ -1,14 +1,17 @@
 package org.trd.app.teknichrono.it;
 
+import org.trd.app.teknichrono.model.dto.BeaconDTO;
 import org.trd.app.teknichrono.model.dto.SessionDTO;
 import org.trd.app.teknichrono.model.jpa.SessionType;
 
 import java.time.Instant;
+import java.util.ArrayList;
 
 public class TestRestSessionEndpoint extends TestRestEndpoint<SessionDTO> {
 
   public TestRestSessionEndpoint() {
-    super("sessions", SessionDTO.class);
+    super("sessions", SessionDTO.class, new ArrayList<SessionDTO>() {
+    }.getClass().getGenericSuperclass());
   }
   /**
    * ******************** Tests *********************

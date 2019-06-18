@@ -6,10 +6,12 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.trd.app.teknichrono.model.dto.BeaconDTO;
 import org.trd.app.teknichrono.model.dto.CategoryDTO;
 import org.trd.app.teknichrono.model.dto.NestedPilotDTO;
 import org.trd.app.teknichrono.model.dto.PilotDTO;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
@@ -22,7 +24,8 @@ public class TestRestCategoryEndpoint extends TestRestEndpoint<CategoryDTO> {
   private TestRestPilotEndPoint restPilot;
 
   public TestRestCategoryEndpoint() {
-    super("categories", CategoryDTO.class);
+    super("categories", CategoryDTO.class, new ArrayList<CategoryDTO>() {
+    }.getClass().getGenericSuperclass());
   }
 
   @BeforeEach
@@ -196,6 +199,7 @@ public class TestRestCategoryEndpoint extends TestRestEndpoint<CategoryDTO> {
   @Test
   public void testRemovePilot() {
     createWithPilot("Testers", "Pilot", "OfCategory");
+    List<CategoryDTO> categories = getAll();
     CategoryDTO c = getByName("Testers");
     long id = c.getId();
     long pilotId = c.getPilots().iterator().next().getId();

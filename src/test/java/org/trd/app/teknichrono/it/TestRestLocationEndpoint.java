@@ -6,10 +6,12 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.trd.app.teknichrono.model.dto.BeaconDTO;
 import org.trd.app.teknichrono.model.dto.LocationDTO;
 import org.trd.app.teknichrono.model.dto.NestedSessionDTO;
 import org.trd.app.teknichrono.model.dto.SessionDTO;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
@@ -22,7 +24,8 @@ public class TestRestLocationEndpoint extends TestRestEndpoint<LocationDTO> {
   private TestRestSessionEndpoint restSession;
 
   public TestRestLocationEndpoint() {
-    super("locations", LocationDTO.class);
+    super("locations", LocationDTO.class, new ArrayList<LocationDTO>() {
+    }.getClass().getGenericSuperclass());
   }
 
   @BeforeEach
