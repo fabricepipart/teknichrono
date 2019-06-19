@@ -37,7 +37,7 @@ public class BeaconRepository extends PanacheRepositoryWrapper<Beacon, BeaconDTO
   @Override
   public void create(BeaconDTO entity) throws NotFoundException, ConflictingIdException {
     Beacon beacon = fromDTO(entity);
-    this.panacheRepository.persist(beacon);
+    panacheRepository.persist(beacon);
   }
 
   @Override
@@ -55,7 +55,7 @@ public class BeaconRepository extends PanacheRepositoryWrapper<Beacon, BeaconDTO
     checkNoId(entity);
     Beacon beacon = new Beacon();
     beacon.setNumber(entity.getNumber());
-    setField(beacon, entity.getPilot(), Beacon::setPilot, Pilot::setCurrentBeacon, this.pilotRepository);
+    setOneToOneRelationship(beacon, entity.getPilot(), Beacon::setPilot, Pilot::setCurrentBeacon, pilotRepository);
     // Create create with Pings (not even in DTO)
     return beacon;
   }
@@ -67,16 +67,16 @@ public class BeaconRepository extends PanacheRepositoryWrapper<Beacon, BeaconDTO
     beacon.setNumber(entity.getNumber());
 
     // Update of pilot
-    updateField(beacon, entity.getPilot(), Beacon::setPilot, Pilot::setCurrentBeacon, this.pilotRepository);
+    updateOneToOneRelationship(beacon, entity.getPilot(), Beacon::setPilot, Pilot::setCurrentBeacon, pilotRepository);
     // Create update with Pings (not even in DTO)
-    this.panacheRepository.persist(beacon);
+    panacheRepository.persist(beacon);
   }
 
   @Override
   public void deleteById(long id) throws NotFoundException {
     Beacon entity = ensureFindById(id);
-    nullifyField(entity.getPilot(), Pilot::setCurrentBeacon, this.pilotRepository);
-    nullifyInCollectionField(entity.getPings(), Ping::setBeacon, this.pingRepository);
-    this.panacheRepository.delete(entity);
+    nullifyOneToOneRelationship(entity.getPilot(), Pilot::setCurrentBeacon, pilotRepository);
+    nullifyOneToManyRelationship(entity.getPings(), Ping::setBeacon, pingRepository);
+    panacheRepository.delete(entity);
   }
 }

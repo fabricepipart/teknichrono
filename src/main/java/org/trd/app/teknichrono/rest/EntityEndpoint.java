@@ -73,7 +73,7 @@ public class EntityEndpoint<E extends PanacheEntity, D> {
     try (DurationLogger dl = DurationLogger.get(LOGGER).start("Add entity id=" + fieldEntityId +
         " to list field of entity id=" + entityId)) {
       try {
-        D dto = repository.addToCollectionField(entityId, fieldEntityId, elementRepository,
+        D dto = repository.addToOneToManyRelationship(entityId, fieldEntityId, elementRepository,
             fieldEntitySetter, entityListGetter);
         return Response.ok(dto).build();
       } catch (NotFoundException e) {

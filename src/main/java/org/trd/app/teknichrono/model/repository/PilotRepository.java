@@ -4,7 +4,6 @@ import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import org.trd.app.teknichrono.model.dto.PilotDTO;
 import org.trd.app.teknichrono.model.jpa.Beacon;
 import org.trd.app.teknichrono.model.jpa.Category;
-import org.trd.app.teknichrono.model.jpa.LapTime;
 import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.model.jpa.Session;
 import org.trd.app.teknichrono.util.exception.ConflictingIdException;
@@ -13,8 +12,6 @@ import org.trd.app.teknichrono.util.exception.NotFoundException;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
-import java.util.List;
-import java.util.Set;
 
 @Dependent
 public class PilotRepository extends PanacheRepositoryWrapper<Pilot, PilotDTO> {
@@ -67,22 +64,12 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot, PilotDTO> {
     Pilot pilot = new Pilot();
     pilot.setFirstName(entity.getFirstName());
     pilot.setLastName(entity.getLastName());
-    if (entity.getCurrentBeacon() != null && entity.getCurrentBeacon().getId() > 0) {
-      Beacon beacon = beaconRepository.findById(entity.getCurrentBeacon().getId());
-      if (beacon == null) {
-        throw new NotFoundException("Beacon not found with ID=" + entity.getCurrentBeacon().getId());
-      }
-      beacon.setPilot(pilot);
-      pilot.setCurrentBeacon(beacon);
-    }
-    if (entity.getCategory() != null && entity.getCategory().getId() > 0) {
-      Category category = categoryRepository.findById(entity.getCategory().getId());
-      if (category == null) {
-        throw new NotFoundException("Category not found with ID=" + entity.getCategory().getId());
-      }
-      category.getPilots().add(pilot);
-      pilot.setCategory(category);
-    }
+
+    setOneToOneRelationship(pilot, entity.getCurrentBeacon(), Pilot::setCurrentBeacon, Beacon::setPilot, beaconRepository);
+    setManyToOneRelationship(pilot, entity.getCategory(), Pilot::setCategory, Category::getPilots, categoryRepository);
+    // Don't create with Laps
+    // Don't create with Sessions
+
     return pilot;
   }
 
@@ -94,90 +81,39 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot, PilotDTO> {
 
   @Override
   public void deleteById(long id) throws NotFoundException {
-    Pilot entity = findById(id);
-    if (entity == null) {
-      throw new NotFoundException();
-    }
+    Pilot entity = ensureFindById(id);
 
-    Category associatedCategory = entity.getCategory();
-    if (associatedCategory != null) {
-      associatedCategory.getPilots().removeIf(p -> p.getId() == id);
-      categoryRepository.persist(associatedCategory);
-    }
-    Beacon associatedBeacon = entity.getCurrentBeacon();
-    if (associatedBeacon != null) {
-      associatedBeacon.setPilot(null);
-      beaconRepository.persist(associatedBeacon);
-    }
-    List<LapTime> laps = entity.getLaps();
-    if (laps != null) {
-      for (LapTime lap : laps) {
-        lap.setPilot(null);
-        laptimeRepository.persist(lap);
-      }
-    }
-    Set<Session> sessions = entity.getSessions();
-    if (sessions != null) {
-      for (Session session : sessions) {
-        session.getPilots().removeIf(p -> p.getId() == id);
-        sessionRepository.persist(session);
-      }
-    }
+    removeFromManyToOneRelationship(id, entity.getCategory(), Category::getPilots, categoryRepository);
+    nullifyOneToOneRelationship(entity.getCurrentBeacon(), Beacon::setPilot, beaconRepository);
+    // Cascading should do its job for Laps or we should create a deleteFromOneToManyRelationship
+    removeFromManyToManyRelationship(id, entity.getSessions(), Session::getPilots, sessionRepository);
+
     panacheRepository.delete(entity);
   }
 
 
   public PilotDTO associateBeacon(long pilotId, long beaconId) throws NotFoundException {
-    Pilot pilot = findById(pilotId);
-    if (pilot == null) {
-      throw new NotFoundException("Pilot not found with ID=" + pilotId);
-    }
-    Beacon beacon = beaconRepository.findById(beaconId);
-    if (beacon == null) {
-      throw new NotFoundException("Beacon not found with ID=" + beaconId);
-    }
-    pilot.setCurrentBeacon(beacon);
-    beacon.setPilot(pilot);
+    Pilot pilot = ensureFindById(pilotId);
+    setOneToOneRelationship(pilot, beaconId, Pilot::setCurrentBeacon, Beacon::setPilot, beaconRepository);
     persist(pilot);
-    beaconRepository.persist(beacon);
     return PilotDTO.fromPilot(pilot);
   }
 
 
   @Override
   public void update(long id, PilotDTO dto) throws ConflictingIdException, NotFoundException {
-    if (id != dto.getId()) {
-      throw new ConflictingIdException();
-    }
-    Pilot pilot = findById(id);
-    if (pilot == null) {
-      throw new NotFoundException("Pilot not found with ID=" + id);
-    }
+    checkIdsMatch(id, dto);
+    Pilot pilot = ensureFindById(id);
 
     pilot.setFirstName(dto.getFirstName());
     pilot.setLastName(dto.getLastName());
+    // Don't update Laps
+    // Don't update Sessions
+
     // Update of category
-    pilot.setCategory(null);
-    if (dto.getCategory() != null && dto.getCategory().getId() > 0) {
-      Category category = categoryRepository.findById(dto.getCategory().getId());
-      if (category == null) {
-        throw new NotFoundException("Category not found with ID=" + id);
-      }
-      category.getPilots().add(pilot);
-      pilot.setCategory(category);
-      categoryRepository.persist(category);
-    }
-    // Update of beacon
-    pilot.setCurrentBeacon(null);
-    if (dto.getCurrentBeacon() != null && dto.getCurrentBeacon().getId() > 0) {
-      Beacon beacon = beaconRepository.findById(dto.getCurrentBeacon().getId());
-      if (beacon == null) {
-        throw new NotFoundException("Beacon not found with ID=" + id);
-      }
-      beacon.setPilot(pilot);
-      pilot.setCurrentBeacon(beacon);
-      beaconRepository.persist(beacon);
-    }
+    setManyToOneRelationship(pilot, dto.getCategory(), Pilot::setCategory, Category::getPilots, categoryRepository);
+    updateOneToOneRelationship(pilot, dto.getCurrentBeacon(), Pilot::setCurrentBeacon, Beacon::setPilot, beaconRepository);
+
     panacheRepository.persist(pilot);
   }
 }
