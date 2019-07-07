@@ -35,7 +35,7 @@ public class DurationLogger implements AutoCloseable {
   @Override
   public void close() {
     long end = System.nanoTime();
-    double duration = (end - start) / 1000000.0;
+    double duration = (end - start) / 1_000_000d;
     endpointLogger.info(doing + " (" + String.format("%.02f", duration) + " ms)");
   }
 }

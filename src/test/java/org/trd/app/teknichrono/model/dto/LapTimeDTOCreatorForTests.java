@@ -3,16 +3,17 @@ package org.trd.app.teknichrono.model.dto;
 import org.trd.app.teknichrono.business.view.LapTimeConverter;
 import org.trd.app.teknichrono.business.view.LapTimeFiller;
 import org.trd.app.teknichrono.model.jpa.LapTime;
-import org.trd.app.teknichrono.model.jpa.TestLapTimeCreator;
+import org.trd.app.teknichrono.model.jpa.LapTimeCreatorForTests;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class TestLapTimeDTOCreator {
+public class LapTimeDTOCreatorForTests {
 
-  private int lapId = 0;
-  private int pilotId = 0;
+  private long lapId = 0;
+  private long pilotId = 0;
   private long now = System.currentTimeMillis();
 
   public void nextPilot() {
@@ -20,40 +21,32 @@ public class TestLapTimeDTOCreator {
   }
 
 
-  public LapTimeDTO createDTOLapTimeWithSession(long startDate, long endDate, int lapNb, NestedSessionDTO session) {
+  public LapTimeDTO createDTOLapTimeWithSession(long startDate, long endDate, long lapNb, NestedSessionDTO session) {
     LapTimeDTO lap = createDTOLapTime(startDate, endDate, lapNb);
     lap.setSession(session);
     return lap;
   }
 
-  public LapTimeDTO createDTOLapTime(long startDate, long endDate, int lapNb) {
+  public LapTimeDTO createDTOLapTime(long startDate, long endDate, long lapNb) {
     LapTimeDTO laptime = new LapTimeDTO();
     laptime.setId(++lapId);
     NestedPilotDTO p = new NestedPilotDTO();
     p.setId(pilotId);
     laptime.setPilot(p);
-    laptime.setStartDate(new Timestamp(startDate));
+    laptime.setStartDate(Instant.ofEpochMilli(startDate));
     if (endDate > 0) {
-      laptime.setEndDate(new Timestamp(endDate));
+      laptime.setEndDate(Instant.ofEpochMilli(endDate));
     }
-    laptime.setLastSeenDate(new Timestamp(Math.max(startDate, endDate)));
+    laptime.setLastSeenDate(Instant.ofEpochMilli(Math.max(startDate, endDate)));
     if (lapNb > 0) {
       laptime.setLapNumber(lapNb);
     }
     return laptime;
   }
 
-  public List<LapTimeDTO> convertList(List<LapTime> laps) {
-    List<LapTimeDTO> toReturn = new ArrayList<>();
-    for (LapTime l : laps) {
-      toReturn.add(new LapTimeDTO(l));
-    }
-    return toReturn;
-  }
-
 
   public List<LapTimeDTO> createLaps() {
-    List<LapTimeDTO> laps = new ArrayList();
+    List<LapTimeDTO> laps = new ArrayList<>();
     // Pilots with 1 lap or several
     // Pilots with laps in order and not in order
     // Pilots with laps contiguous and not contiguous
@@ -123,20 +116,17 @@ public class TestLapTimeDTOCreator {
   }
 
   public List<LapTimeDTO> createLapsWithIntermediates() {
-    List laps = (new TestLapTimeCreator()).createLapsWithIntermediates();
-    return convertList(laps);
+    List<LapTime> laps = new LapTimeCreatorForTests().createLapsWithIntermediates();
+    return laps.stream().map(LapTimeDTO::fromLapTime).collect(Collectors.toList());
   }
-
 
   public List<LapTimeDTO> createRaceLapsWithIntermediates() {
-    TestLapTimeCreator testLapTimeCreator = new TestLapTimeCreator();
+    LapTimeCreatorForTests testLapTimeCreator = new LapTimeCreatorForTests();
     testLapTimeCreator.nextLocation(true);
-    List laps = testLapTimeCreator.createLapsWithIntermediates();
+    List<LapTime> laps = testLapTimeCreator.createLapsWithIntermediates();
     LapTimeConverter converter = new LapTimeConverter();
-    List toReturn = converter.convert(laps);
-    (new LapTimeFiller()).fillLapsNumber(toReturn);
+    List<LapTimeDTO> toReturn = converter.convert(laps);
+    new LapTimeFiller().fillLapsNumber(toReturn);
     return toReturn;
   }
-
-
 }

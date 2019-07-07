@@ -1,45 +1,24 @@
 package org.trd.app.teknichrono.model.jpa;
 
-import java.io.Serializable;
-import java.sql.Timestamp;
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Version;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import java.time.Instant;
 
 @Entity
-@XmlRootElement
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class Ping implements Serializable {
-
-  /* =========================== Entity stuff =========================== */
-  /**
-   * 
-   */
-  private static final long serialVersionUID = -7022575222961829989L;
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "id", updatable = false, nullable = false)
-  private int id;
+public class Ping extends PanacheEntity {
 
   @Version
   @Column(name = "version")
   private int version;
 
   /* =============================== Fields =============================== */
-
-  @Column(columnDefinition="TIMESTAMP(3)", nullable = false)
-  private Timestamp dateTime;
+  @Column(columnDefinition = "TIMESTAMP(3)", nullable = false)
+  private Instant instant;
 
   // Can be null if after event, items are reassociated
   @ManyToOne(optional = true)
@@ -47,7 +26,7 @@ public class Ping implements Serializable {
   private Beacon beacon;
 
   @Column
-  private int power;
+  private long power;
 
   // Can be null if after event, items are reassociated
   @ManyToOne(optional = true)
@@ -55,14 +34,6 @@ public class Ping implements Serializable {
   private Chronometer chrono;
 
   /* ===================== Getters and setters ======================== */
-
-  public int getId() {
-    return this.id;
-  }
-
-  public void setId(final int id) {
-    this.id = id;
-  }
 
   public int getVersion() {
     return this.version;
@@ -72,19 +43,19 @@ public class Ping implements Serializable {
     this.version = version;
   }
 
-  public Timestamp getDateTime() {
-    return dateTime;
+  public Instant getInstant() {
+    return instant;
   }
 
-  public void setDateTime(Timestamp dateTime) {
-    this.dateTime = dateTime;
+  public void setInstant(Instant instant) {
+    this.instant = instant;
   }
 
-  public int getPower() {
+  public long getPower() {
     return power;
   }
 
-  public void setPower(int power) {
+  public void setPower(long power) {
     this.power = power;
   }
 
@@ -107,7 +78,7 @@ public class Ping implements Serializable {
   @Override
   public String toString() {
     String result = getClass().getSimpleName() + " ";
-    result += "time: " + dateTime;
+    result += "time: " + instant;
     result += ", beaconId: " + beacon;
     result += ", power: " + power;
     result += ", chronoId: " + chrono;

@@ -3,7 +3,8 @@ package org.trd.app.teknichrono.model.compare;
 import org.trd.app.teknichrono.model.dto.LapTimeDTO;
 import org.trd.app.teknichrono.model.dto.SectorDTO;
 
-import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 
@@ -16,13 +17,13 @@ public class LapTimeDTORaceComparator implements Comparator<LapTimeDTO> {
 
   @Override
   public int compare(LapTimeDTO l1, LapTimeDTO l2) {
-    int lapNumberComparison = Integer.valueOf(l2.getLapIndex()).compareTo(l1.getLapIndex());
+    int lapNumberComparison = Long.valueOf(l2.getLapIndex()).compareTo(l1.getLapIndex());
     if (lapNumberComparison == 0) {
-      Timestamp l1EndDate = l1.getEndDate();
-      Timestamp l2EndDate = l2.getEndDate();
+      Instant l1EndDate = l1.getEndDate();
+      Instant l2EndDate = l2.getEndDate();
       int endDateComparison = compareDates(l1EndDate, l2EndDate);
       if (endDateComparison == 0) {
-        // Compare sectors
+        // Compare intermediates
         int sectorsComparison = compareSectors(l1.getIntermediates(), l2.getIntermediates());
         if (sectorsComparison == 0) {
           return compareDates(l1.getStartDate(), l2.getStartDate());
@@ -34,14 +35,14 @@ public class LapTimeDTORaceComparator implements Comparator<LapTimeDTO> {
     return lapNumberComparison;
   }
 
-  private int compareDates(Timestamp date1, Timestamp date2) {
+  private int compareDates(Instant date1, Instant date2) {
     int comparison = 0;
     if (date1 == null && date2 != null) {
       comparison = 1;
     } else if (date2 == null && date1 != null) {
       comparison = -1;
     } else if (date1 != null && date2 != null) {
-      comparison = Long.valueOf(date1.getTime()).compareTo(date2.getTime());
+      comparison = date1.compareTo(date2);
     }
     return comparison;
   }
@@ -57,7 +58,7 @@ public class LapTimeDTORaceComparator implements Comparator<LapTimeDTO> {
       SectorDTO lastSector = sectors2.get(sectors2.size() - 1);
       SectorDTO correspondingSector = getCorrespondingSector(lastSector, sectors1);
       if (correspondingSector != null) {
-        comparison = compareDates(new Timestamp(correspondingSector.getStart()), new Timestamp(lastSector.getStart()));
+        comparison = compareDates(correspondingSector.getStart(), lastSector.getStart());
       }
     }
     return comparison;
@@ -78,12 +79,12 @@ public class LapTimeDTORaceComparator implements Comparator<LapTimeDTO> {
    * @param l2
    * @return the distance between the two laps (>0 is l2 is after l1)
    */
-  public long distance(LapTimeDTO l1, LapTimeDTO l2) {
+  public Duration distance(LapTimeDTO l1, LapTimeDTO l2) {
     if (l2.getLapNumber() == l1.getLapNumber()) {
-      Timestamp l1EndDate = l1.getEndDate();
-      Timestamp l2EndDate = l2.getEndDate();
+      Instant l1EndDate = l1.getEndDate();
+      Instant l2EndDate = l2.getEndDate();
       if (l1EndDate == null && l2EndDate == null) {
-        // Compare sectors
+        // Compare intermediates
         List<SectorDTO> sectors1 = l1.getIntermediates();
         List<SectorDTO> sectors2 = l2.getIntermediates();
         if ((sectors2 == null || sectors2.isEmpty()) && (sectors1 == null || sectors1.isEmpty())) {
@@ -91,11 +92,11 @@ public class LapTimeDTORaceComparator implements Comparator<LapTimeDTO> {
           return distance(l1.getStartDate(), l2.getStartDate());
         }
         if (sectors2 != null && !sectors2.isEmpty() && sectors1 != null && !sectors1.isEmpty()) {
-          // Compare sectors dates
+          // Compare intermediates dates
           SectorDTO lastSector = sectors2.get(sectors2.size() - 1);
           SectorDTO correspondingSector = getCorrespondingSector(lastSector, sectors1);
           if (correspondingSector != null) {
-            return lastSector.getStart() - correspondingSector.getStart();
+            return Duration.between(lastSector.getStart(), correspondingSector.getStart()).abs();
           }
         }
       }
@@ -104,7 +105,7 @@ public class LapTimeDTORaceComparator implements Comparator<LapTimeDTO> {
         return distance(l1EndDate, l2EndDate);
       }
     }
-    return 0;
+    return Duration.ZERO;
   }
 
   /**
@@ -112,17 +113,17 @@ public class LapTimeDTORaceComparator implements Comparator<LapTimeDTO> {
    * @param d2
    * @return the distance between the two laps (>0 is l2 is after l1)
    */
-  private long distance(Timestamp d1, Timestamp d2) {
+  private Duration distance(Instant d1, Instant d2) {
     if (d1 != null) {
       if (d2 != null) {
-        return d2.getTime() - d1.getTime();
+        return Duration.between(d2, d1).abs();
       }
-      return -d1.getTime();
+      return Duration.ZERO;
     }
     if (d2 != null) {
-      return d2.getTime();
+      return Duration.ZERO;
     }
-    return 0;
+    return Duration.ZERO;
   }
 
 }

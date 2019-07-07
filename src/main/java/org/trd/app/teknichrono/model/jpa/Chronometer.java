@@ -1,36 +1,18 @@
 package org.trd.app.teknichrono.model.jpa;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@XmlRootElement
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class Chronometer implements Serializable {
-
-  /* =========================== Entity stuff =========================== */
-
-  private static final long serialVersionUID = 108231410607139227L;
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "id", updatable = false, nullable = false)
-  private int id;
+public class Chronometer extends PanacheEntity {
 
   @Version
   @Column(name = "version")
@@ -42,20 +24,18 @@ public class Chronometer implements Serializable {
   private String name;
 
   // Can be null if after event, items are reassociated
-  @OneToMany(mappedBy = "chrono")
-  @JsonBackReference(value = "ping-chronometer")
-  private List<Ping> pings = new ArrayList<Ping>();
+  @OneToMany(mappedBy = "chrono", cascade = CascadeType.REMOVE)
+  private Set<Ping> pings = new HashSet<>();
 
   @ManyToMany(mappedBy = "chronometers")
-  @JsonBackReference(value = "session-chronometer")
-  private List<Session> sessions = new ArrayList<Session>();
+  private Set<Session> sessions = new HashSet<>();
 
   /* ===================== Getters and setters ======================== */
-  public int getId() {
+  public Long getId() {
     return this.id;
   }
 
-  public void setId(final int id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
@@ -75,20 +55,37 @@ public class Chronometer implements Serializable {
     this.name = name;
   }
 
-  public List<Ping> getPings() {
+  public Set<Ping> getPings() {
     return pings;
   }
 
-  public void setPings(List<Ping> pings) {
+  public void setPings(Set<Ping> pings) {
     this.pings = pings;
   }
 
-  public List<Session> getSessions() {
+  public Set<Session> getSessions() {
     return sessions;
   }
 
-  public void setSessions(List<Session> sessions) {
+  public void setSessions(Set<Session> sessions) {
     this.sessions = sessions;
+  }
+
+  public Ping getLastestPing() {
+    if (pings != null) {
+      return null;
+    }
+    Ping lastestPing = null;
+    for (Ping p : pings) {
+      if (p.getInstant() != null) {
+        boolean moreRecent = lastestPing != null && lastestPing.getInstant().isBefore(p.getInstant());
+        boolean isFirst = lastestPing == null;
+        if (moreRecent || isFirst) {
+          lastestPing = p;
+        }
+      }
+    }
+    return lastestPing;
   }
 
   /* ===================== Other ======================== */

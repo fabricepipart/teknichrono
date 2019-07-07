@@ -1,41 +1,23 @@
 package org.trd.app.teknichrono.model.jpa;
 // Generated 5 mai 2016 11:08:49 by Hibernate Tools 4.3.1.Final
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
+import javax.persistence.Transient;
 import javax.persistence.Version;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@XmlRootElement
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class LapTime implements java.io.Serializable {
-
-  /* =========================== Entity stuff =========================== */
-  /**
-   * 
-   */
-  private static final long serialVersionUID = -2438563507266191424L;
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "id", updatable = false, nullable = false)
-  private int id;
+public class LapTime extends PanacheEntity {
 
   @Version
   @Column(name = "version")
@@ -48,31 +30,32 @@ public class LapTime implements java.io.Serializable {
   private Pilot pilot;
 
   // Used to order the laps for the pilot relationship
-  @Column(columnDefinition="TIMESTAMP(3)")
-  private Timestamp startDate;
+  @Column(columnDefinition = "TIMESTAMP(3)")
+  private Instant startDate;
+
+  @Transient
+  private Instant startChronoInstant;
+
+  @Transient
+  private Instant endChronoInstant;
+
+  @Transient
+  private Instant lastChronoInstant;
 
   @ManyToOne(fetch = FetchType.LAZY)
   private Session session;
 
-  @OneToMany
+  @OneToMany(orphanRemoval = true)
   @OrderColumn(name = "dateTime")
-  private List<Ping> intermediates = new ArrayList<Ping>();
+  private List<Ping> intermediates = new ArrayList<>();
 
   /* ===================== Getters and setters ======================== */
 
-  public int getId() {
-    return this.id;
-  }
-
-  public void setId(int id) {
-    this.id = id;
-  }
-
   public int getVersion() {
-    return this.version;
+    return version;
   }
 
-  public void setVersion(final int version) {
+  public void setVersion(int version) {
     this.version = version;
   }
 
@@ -84,20 +67,88 @@ public class LapTime implements java.io.Serializable {
     this.pilot = pilot;
   }
 
-  public Timestamp getStartDate() {
+  public Instant getStartDate() {
+    if (startDate == null && intermediates != null) {
+      recomputeDates();
+    }
     return startDate;
   }
 
-  public void setStartDate(Timestamp captureDate) {
-    this.startDate = captureDate;
+  public void setStartDate(Instant captureDate) {
+    startDate = captureDate;
+  }
+
+  public Instant getStartChronoInstant() {
+    if (startChronoInstant == null && intermediates != null) {
+      recomputeDates();
+    }
+    return startChronoInstant;
+  }
+
+  public Instant getEndChronoInstant() {
+    if (endChronoInstant == null && intermediates != null) {
+      recomputeDates();
+    }
+    return endChronoInstant;
+  }
+
+  public Instant getLastChronoInstant() {
+    if (lastChronoInstant == null && intermediates != null) {
+      recomputeDates();
+    }
+    return lastChronoInstant;
+  }
+
+  public void recomputeDates() {
+    startDate = null;
+    intermediates.forEach(this::updateDates);
+  }
+
+  private void updateDates(Ping p) {
+    if (startDate == null || p.getInstant().isBefore(startDate)) {
+      startDate = p.getInstant();
+    }
+    if (session != null) {
+      long currentChronoIndex = session.getChronoIndex(p.getChrono());
+      if (startChronoInstant == null && currentChronoIndex == 0) {
+        startChronoInstant = p.getInstant();
+      }
+      if (endChronoInstant == null && !isLoopTrack() && currentChronoIndex == (session.getChronometers().size() - 1)) {
+        endChronoInstant = p.getInstant();
+      }
+    }
+    if (lastChronoInstant == null || p.getInstant().isAfter(lastChronoInstant)) {
+      lastChronoInstant = p.getInstant();
+    }
+  }
+
+  private boolean isLoopTrack() {
+    return session.getLocation() != null && session.getLocation().isLoopTrack();
   }
 
   public Session getSession() {
-    return this.session;
+    return session;
   }
 
-  public void setSession(final Session session) {
+  public void setSession(Session session) {
     this.session = session;
+  }
+
+  public List<Ping> getIntermediates() {
+    return intermediates;
+  }
+
+  public void setIntermediates(List<Ping> intermediates) {
+    this.intermediates = intermediates;
+  }
+
+  public void addIntermediates(Ping p) {
+    addIntermediates(intermediates.size(), p);
+  }
+
+  public void addIntermediates(int index, Ping p) {
+    updateDates(p);
+    intermediates.add(index, p);
   }
 
   @Override
@@ -107,35 +158,4 @@ public class LapTime implements java.io.Serializable {
     result += "start: " + startDate;
     return result;
   }
-
-  public List<Ping> getIntermediates() {
-    return this.intermediates;
-  }
-
-  public void setIntermediates(final List<Ping> intermediates) {
-    this.intermediates = intermediates;
-  }
-
-  public void addIntermediates(Ping p) {
-    addIntermediates(this.intermediates.size(), p);
-  }
-
-  public void addIntermediates(int index, Ping p) {
-    updateStartDate(p);
-    this.intermediates.add(index, p);
-  }
-
-  private void updateStartDate(Ping p) {
-    if (startDate == null || startDate.getTime() > p.getDateTime().getTime()) {
-      startDate = p.getDateTime();
-    }
-  }
-
-  public void setStartDate() {
-    startDate = null;
-    for (Ping ping : intermediates) {
-      updateStartDate(ping);
-    }
-  }
-
 }

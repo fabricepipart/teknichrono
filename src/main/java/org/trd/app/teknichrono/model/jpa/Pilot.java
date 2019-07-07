@@ -1,47 +1,15 @@
 package org.trd.app.teknichrono.model.jpa;
 
-import java.io.Serializable;
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.OrderBy;
-import javax.persistence.Version;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 @Entity
-@XmlRootElement
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class Pilot implements Serializable {
-
-  /* =========================== Entity stuff =========================== */
-
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 5594553167060540038L;
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "id", updatable = false, nullable = false)
-  private int id;
+public class Pilot extends PanacheEntity {
 
   @Version
   @Column(name = "version")
@@ -54,25 +22,30 @@ public class Pilot implements Serializable {
   @Column(nullable = false)
   private String lastName;
 
-  @OneToOne(fetch = FetchType.EAGER, optional = true, cascade = CascadeType.MERGE)
+  @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
   @JoinColumn(name = "currentBeaconId")
   private Beacon currentBeacon;
 
   @OneToMany(cascade = CascadeType.REMOVE)
   @OrderBy(value = "startDate")
   @JoinColumn(name = "pilotId")
-  @JsonBackReference(value = "laptime-pilot")
-  private List<LapTime> laps = new ArrayList<LapTime>();
+  private List<LapTime> laps = new ArrayList<>();
 
-  @ManyToOne(fetch = FetchType.EAGER, optional = true, cascade = CascadeType.MERGE)
+  @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
   @JoinColumn(name = "categoryId")
   private Category category;
 
   @ManyToMany(mappedBy = "pilots")
-  @JsonBackReference(value = "session-pilot")
-  private Set<Session> sessions = new HashSet<Session>();
+  private Set<Session> sessions = new HashSet<>();
 
   /* ===================== Getters and setters ======================== */
+  public Long getId() {
+    return this.id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
 
   public Set<Session> getSessions() {
     return sessions;
@@ -88,14 +61,6 @@ public class Pilot implements Serializable {
 
   public void setCategory(Category category) {
     this.category = category;
-  }
-
-  public int getId() {
-    return this.id;
-  }
-
-  public void setId(final int id) {
-    this.id = id;
   }
 
   public int getVersion() {

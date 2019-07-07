@@ -1,13 +1,17 @@
 package org.trd.app.teknichrono.rest;
 
-import java.util.List;
+import org.jboss.logging.Logger;
+import org.trd.app.teknichrono.model.dto.EventDTO;
+import org.trd.app.teknichrono.model.jpa.Event;
+import org.trd.app.teknichrono.model.jpa.Session;
+import org.trd.app.teknichrono.model.repository.EventRepository;
+import org.trd.app.teknichrono.model.repository.SessionRepository;
+import org.trd.app.teknichrono.util.DurationLogger;
+import org.trd.app.teknichrono.util.exception.NotFoundException;
 
-import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
+import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
+import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -17,59 +21,58 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import org.jboss.logging.Logger;
-import org.trd.app.teknichrono.model.jpa.Event;
-import org.trd.app.teknichrono.model.jpa.Session;
-import org.trd.app.teknichrono.util.DurationLogger;
-
-/**
- * 
- */
-@Stateless
 @Path("/events")
 public class EventEndpoint {
-  @PersistenceContext(unitName = "teknichrono-persistence-unit")
-  private EntityManager em;
 
+  private static final Logger LOGGER = Logger.getLogger(EventEndpoint.class);
 
-  private Logger logger = Logger.getLogger(EventEndpoint.class);
+  private final EventRepository eventRepository;
+
+  private final SessionRepository sessionRepository;
+
+  @Inject
+  public EventEndpoint(EventRepository eventRepository, SessionRepository sessionRepository) {
+    this.eventRepository = eventRepository;
+    this.sessionRepository = sessionRepository;
+  }
 
   @POST
-  @Consumes("application/json")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Transactional
   public Response create(Event entity) {
-    em.persist(entity);
-    return Response.created(UriBuilder.fromResource(EventEndpoint.class).path(String.valueOf(entity.getId())).build())
+    eventRepository.persist(entity);
+    return Response.created(UriBuilder.fromResource(EventEndpoint.class).path(String.valueOf(entity.id)).build())
         .build();
   }
 
   @DELETE
   @Path("/{id:[0-9][0-9]*}")
-  public Response deleteById(@PathParam("id") int id) {
-    Event entity = em.find(Event.class, id);
-    if (entity == null) {
+  @Transactional
+  public Response deleteById(@PathParam("id") long id) {
+    DurationLogger perf = DurationLogger.get(LOGGER).start("Delete event id=" + id);
+    try {
+      eventRepository.deleteById(id);
+    } catch (NotFoundException e) {
       return Response.status(Status.NOT_FOUND).build();
+    } finally {
+      perf.end();
     }
-    em.remove(entity);
     return Response.noContent().build();
   }
 
   @GET
   @Path("/{id:[0-9][0-9]*}")
-  @Produces("application/json")
-  public Response findById(@PathParam("id") int id) {
-    TypedQuery<Event> findByIdQuery = em.createQuery(
-        "SELECT DISTINCT e FROM Event e LEFT JOIN FETCH e.sessions WHERE e.id = :entityId ORDER BY e.id", Event.class);
-    findByIdQuery.setParameter("entityId", id);
-    Event entity;
-    try {
-      entity = findByIdQuery.getSingleResult();
-    } catch (NoResultException nre) {
-      entity = null;
-    }
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response findById(@PathParam("id") long id) {
+    Event entity = eventRepository.findById(id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -78,72 +81,65 @@ public class EventEndpoint {
 
   @GET
   @Path("/name")
-  @Produces("application/json")
-  public Event findEventByName(@QueryParam("name") String name) {
-    TypedQuery<Event> findByNameQuery = em.createQuery(
-        "SELECT DISTINCT e FROM Event e LEFT JOIN FETCH e.sessions WHERE e.name = :name ORDER BY e.id", Event.class);
-    findByNameQuery.setParameter("name", name);
-    Event entity;
-    try {
-      entity = findByNameQuery.getSingleResult();
-    } catch (NoResultException nre) {
-      entity = null;
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response findEventByName(@QueryParam("name") String name) {
+    Event entity = eventRepository.findByName(name);
+    if (entity == null) {
+      return Response.status(Status.NOT_FOUND).build();
     }
-    return entity;
+    return Response.ok(entity).build();
   }
 
   @GET
-  @Produces("application/json")
-  public List<Event> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
-    TypedQuery<Event> findAllQuery = em
-        .createQuery("SELECT DISTINCT e FROM Event e LEFT JOIN FETCH e.sessions ORDER BY e.id", Event.class);
-    if (startPosition != null) {
-      findAllQuery.setFirstResult(startPosition);
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public List<EventDTO> listAll(@QueryParam("page") Integer pageIndex, @QueryParam("pageSize") Integer pageSize) {
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Find all events")) {
+      return eventRepository.findAll(pageIndex, pageSize)
+          .map(EventDTO::fromEvent)
+          .collect(Collectors.toList());
     }
-    if (maxResult != null) {
-      findAllQuery.setMaxResults(maxResult);
-    }
-    final List<Event> results = findAllQuery.getResultList();
-    return results;
   }
 
   @POST
   @Path("{eventId:[0-9][0-9]*}/addSession")
-  @Produces("application/json")
-  public Response addSession(@PathParam("eventId") int eventId, @QueryParam("sessionId") Integer sessionId) {
-    try(DurationLogger dl = new DurationLogger(logger, "Add session session ID=" + sessionId + " to event ID=" + eventId)) {
-      Event event = em.find(Event.class, eventId);
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response addSession(@PathParam("eventId") long eventId, @QueryParam("sessionId") Long sessionId) {
+    try (DurationLogger dl = new DurationLogger(LOGGER, "Add session session ID=" + sessionId + " to event ID=" + eventId)) {
+      Event event = eventRepository.findById(eventId);
       if (event == null) {
         return Response.status(Status.NOT_FOUND).build();
       }
-      Session session = em.find(Session.class, sessionId);
+      Session session = sessionRepository.findById(sessionId);
       if (session == null) {
         return Response.status(Status.NOT_FOUND).build();
       }
       session.setEvent(event);
       event.getSessions().add(session);
-      em.persist(event);
-      em.persist(session);
-
-      return Response.ok(event).build();
+      eventRepository.persist(event);
+      sessionRepository.persist(session);
+      EventDTO dto = EventDTO.fromEvent(event);
+      return Response.ok(dto).build();
     }
   }
 
   @PUT
   @Path("/{id:[0-9][0-9]*}")
-  @Consumes("application/json")
-  public Response update(@PathParam("id") int id, Event entity) {
-    if (entity == null) {
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response update(@PathParam("id") long id, Event dto) {
+    if (dto == null) {
       return Response.status(Status.BAD_REQUEST).build();
     }
-    if (id != entity.getId()) {
-      return Response.status(Status.CONFLICT).entity(entity).build();
+    if (id != dto.id) {
+      return Response.status(Status.CONFLICT).entity(dto).build();
     }
-    if (em.find(Event.class, id) == null) {
+    if (eventRepository.findById(id) == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
     try {
-      entity = em.merge(entity);
+      eventRepository.persist(dto);
     } catch (OptimisticLockException e) {
       return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
     }

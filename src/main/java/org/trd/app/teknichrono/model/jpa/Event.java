@@ -1,36 +1,17 @@
 package org.trd.app.teknichrono.model.jpa;
 
-import java.util.ArrayList;
-import java.util.List;
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@XmlRootElement
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class Event implements java.io.Serializable {
-
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 929783339304030614L;
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "id", unique = true, nullable = false)
-  private int id;
+public class Event extends PanacheEntity {
 
   @Version
   @Column(name = "version")
@@ -38,17 +19,16 @@ public class Event implements java.io.Serializable {
 
   @OneToMany(orphanRemoval = true)
   @JoinColumn(name = "eventId")
-  @JsonBackReference(value = "session-event")
-  private List<Session> sessions = new ArrayList<Session>();
+  private List<Session> sessions = new ArrayList<>();
 
   @Column(nullable = false)
   private String name;
 
-  public int getId() {
+  public Long getId() {
     return this.id;
   }
 
-  public void setId(int id) {
+  public void setId(Long id) {
     this.id = id;
   }
 

@@ -64,19 +64,19 @@ def addPilotToSession(sessionId, pilotId):
   return
 
 
-def startSession(sessionId, dateTime):
+def startSession(sessionId, instant):
   "Starts the session"
-  data = '{"dateTime":"' + formatDatetime(dateTime) + '"}'
+  data = '{"instant":"' + formatDatetime(instant) + '"}'
   url = SessionsUrl + '/' + str(sessionId) + '/start'
   post(data, url)
   print("Start the session " + str(sessionId))
   return
 
 
-def endSession(sessionId, dateTime):
+def endSession(sessionId, instant):
   "Ends the session"
-  date = formatDatetime(dateTime)
-  data = '{"dateTime":"' + date + '"}'
+  date = formatDatetime(instant)
+  data = '{"instant":"' + date + '"}'
   url = SessionsUrl + '/' + str(sessionId) + '/end'
   post(data, url)
   print("End the session " + str(sessionId) + " @ " + date)

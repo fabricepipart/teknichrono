@@ -5,6 +5,7 @@ import requests
 import json
 from datetime import date, datetime, timedelta
 import datetime as dt
+import isodate
 
 headers = {'Content-type': 'application/json'}
 debug = True
@@ -27,7 +28,7 @@ def post(dataString, url, params=[]):
   response = requests.post(host + url, data=dataString, params=params, headers=headers)
   if (not response.ok):
     print("Request returned an invalid status. Text output : " + response.text)
-    print("To reproduce : curl -X POST " + host + url + " --data '" + dataString + "' --header \"Content-Type:application/json\" with params " + str(params))
+    print("To reproduce : curl -X POST '" + host + url + "' --data '" + dataString + "' --header \"Content-Type:application/json\" with params " + str(params))
     response.raise_for_status()
   return
 
@@ -96,3 +97,17 @@ def pretty_time_delta(milliseconds):
     return '%d.%03d' % (seconds, milliseconds)
   else:
     return ''
+
+
+def pretty_time_delta_iso(time_iso):
+  return pretty_time_delta(iso_to_millis(time_iso))
+
+def iso_to_millis(time_iso):
+  timedeltaObject = isodate.parse_duration(time_iso)
+  milliseconds = (timedeltaObject / timedelta(microseconds=1000))
+  return milliseconds
+
+def iso_date_to_millis(time_iso):
+  dateTimeObject = isodate.parse_datetime(time_iso)
+  return int(dateTimeObject.timestamp() * 1000)
+    

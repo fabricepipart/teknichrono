@@ -1,8 +1,0 @@
-{
-    "python.pythonPath": "/usr/local/bin/python3",
-    "python.linting.pylintEnabled": true,
-    "python.linting.enabled": true,
-    "python.formatting.provider": "yapf",
-    "editor.minimap.maxColumn": 180,
-    "java.configuration.updateBuildConfiguration": "disabled"
-}
