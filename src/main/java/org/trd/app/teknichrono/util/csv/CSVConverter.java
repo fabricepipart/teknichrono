@@ -3,7 +3,6 @@ package org.trd.app.teknichrono.util.csv;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
-import com.opencsv.exceptions.CsvException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.dto.LapTimeDTO;
@@ -17,8 +16,7 @@ public class CSVConverter {
   private static final Logger LOGGER = Logger.getLogger(CSVConverter.class);
 
 
-  public static String convertToCsv(List<LapTimeDTO> results) throws CsvRequiredFieldEmptyException, IOException,
-      CsvDataTypeMismatchException {
+  public static String convertToCsv(List<LapTimeDTO> results) throws IOException {
     String csvResult;
     StringWriter writer = new StringWriter();
     // TODO StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder<LapTimeDTO>(writer).withMappingStrategy(new LapTimeMappingStrategy()).build();
@@ -27,9 +25,9 @@ public class CSVConverter {
       beanToCsv.write(results);
       csvResult = writer.toString();
       writer.close();
-    } catch (CsvException | IOException e) {
+    } catch (IOException | CsvDataTypeMismatchException | CsvRequiredFieldEmptyException e) {
       LOGGER.error("unable to generate lap times CSV", e);
-      throw e;
+      throw new IOException(e);
     }
     return csvResult;
   }

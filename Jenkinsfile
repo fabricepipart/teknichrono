@@ -35,6 +35,9 @@ timeout(60) {
           },
           'Package': {
             openshift.withCluster() {
+              openshift.withProject('teknichrono-staging'){
+                openshift.delete("all", "-l", "app=teknichrono-staging", "--ignore-not-found=true")
+              }
               openshift.withProject('ci'){
                 openshift.delete("bc/teknichrono", "--ignore-not-found=true")
                 openshift.newBuild("--binary", "--name", "teknichrono", "--to=teknichrono:${version}")
@@ -48,7 +51,6 @@ timeout(60) {
         stage('Start staging'){
           openshift.withCluster() {
             openshift.withProject('teknichrono-staging'){
-              openshift.delete("all", "-l", "app=teknichrono-staging", "--ignore-not-found=true")
               openshift.newApp("--image-stream=ci/teknichrono:${version}", "--name=teknichrono-staging")
               if(!openshift.selector("route", "teknichrono-staging-route").exists()){
                 openshift.expose("service", "teknichrono-staging", "--name=teknichrono-staging-route", "--port=8080", "--hostname=${STAGING_HOST}")
