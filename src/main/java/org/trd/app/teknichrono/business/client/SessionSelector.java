@@ -77,11 +77,11 @@ public class SessionSelector {
       Session pilotLapSession = pilotLap.getSession();
       // Intersect with chronoSessions
       for (Session chronoSession : chronoSessions) {
-        if (chronoSession.id == pilotLapSession.id) {
+        if (chronoSession.id.longValue() == pilotLapSession.id.longValue()) {
           // This is a lap of a session that contains this chronometer
           boolean containsAnIntermediateForChrono = false;
           for (Ping intermediate : pilotLap.getIntermediates()) {
-            if (intermediate.getChrono().id == chrono.id) {
+            if (intermediate.getChrono().id.longValue() == chrono.id.longValue()) {
               containsAnIntermediateForChrono = true;
             }
           }
@@ -97,7 +97,7 @@ public class SessionSelector {
   private boolean containsPilot(Session s, Pilot pilot) {
     if (s.getPilots() != null) {
       for (Pilot p : s.getPilots()) {
-        if (p.id == pilot.id) {
+        if (p.id != null && pilot.id != null && p.id.longValue() == pilot.id.longValue()) {
           return true;
         }
       }
