@@ -14,7 +14,7 @@ public class SessionDTO implements EntityDTO {
 
   private Long id;
   private Instant start;
-  private long inactivity = 60000L;
+  private long inactivity = 0L;
   private Instant end;
   private String type;
   private boolean current = false;
