@@ -1,6 +1,5 @@
 package org.trd.app.teknichrono.rest;
 
-import com.opencsv.exceptions.CsvException;
 import io.quarkus.panache.common.Page;
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.business.view.LapTimeConverter;
@@ -70,8 +69,6 @@ public class LapTimeEndpoint {
 
   private final LapTimeConverter lapTimeConverter = new LapTimeConverter();
 
-  private final CSVConverter csvConverter = new CSVConverter();
-
   @Inject
   public LapTimeEndpoint(EntityManager em, LapTimeRepository.Panache lapTimeRepository, SessionRepository sessionRepository,
                          CategoryRepository categoryRepository, EventRepository eventRepository,
@@ -128,11 +125,12 @@ public class LapTimeEndpoint {
                             @QueryParam("categoryId") Long categoryId) {
     try {
       List<LapTimeDTO> results = bestLapTimes(pilotId, sessionId, locationId, eventId, categoryId, null, null);
+      CSVConverter csvConverter = new CSVConverter();
       String csvResults = csvConverter.convertToCsv(results);
       return Response.ok().entity(csvResults).build();
     } catch (IllegalArgumentException e) {
       return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
-    } catch (CsvException | IOException e) {
+    } catch (IOException e) {
       return Response.serverError().build();
     }
   }
@@ -179,11 +177,12 @@ public class LapTimeEndpoint {
                                @QueryParam("categoryId") Long categoryId) {
     try {
       List<LapTimeDTO> results = resultsList(pilotId, sessionId, locationId, eventId, categoryId, null, null);
+      CSVConverter csvConverter = new CSVConverter();
       String csvResults = csvConverter.convertToCsv(results);
       return Response.ok().entity(csvResults).build();
     } catch (IllegalArgumentException e) {
       return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
-    } catch (CsvException | IOException e) {
+    } catch (IOException e) {
       return Response.serverError().build();
     }
   }
@@ -248,11 +247,12 @@ public class LapTimeEndpoint {
                                @QueryParam("categoryId") Long categoryId) {
     try {
       List<LapTimeDTO> results = all(pilotId, sessionId, locationId, eventId, categoryId, null, null);
+      CSVConverter csvConverter = new CSVConverter();
       String csvResults = csvConverter.convertToCsv(results);
       return Response.ok().entity(csvResults).build();
     } catch (IllegalArgumentException e) {
       return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
-    } catch (CsvException | IOException e) {
+    } catch (IOException e) {
       return Response.serverError().build();
     }
   }

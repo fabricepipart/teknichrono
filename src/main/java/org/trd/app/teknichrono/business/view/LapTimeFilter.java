@@ -6,6 +6,7 @@ import org.trd.app.teknichrono.model.dto.NestedLocationDTO;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,18 +36,19 @@ public class LapTimeFilter {
         }
       }
     }
-    Map<Long, Duration> averagePerLocation = new HashMap<>();
+    Map<Long, Duration> medianPerLocation = new HashMap<>();
     for (Map.Entry<Long, List<LapTimeDTO>> entry : lapsPerLocation.entrySet()) {
       Long locationId = entry.getKey();
       List<LapTimeDTO> laps = entry.getValue();
-      Duration sum = laps.stream().map(LapTimeDTO::getDuration).reduce(Duration.ZERO, Duration::plus);
-      averagePerLocation.put(locationId, sum.dividedBy(laps.size()));
+      new LapTimeOrder().orderByDuration(laps);
+      Duration medianDuration = laps.get(laps.size() / 2).getDuration();
+      medianPerLocation.put(locationId, medianDuration);
     }
 
     List<LapTimeDTO> toRemove = new ArrayList<>();
     for (LapTimeDTO lapTimeDTO : results) {
       NestedLocationDTO location = lapTimeDTO.getSession().getLocation();
-      Duration averageOfLocation = averagePerLocation.get(location.getId());
+      Duration averageOfLocation = medianPerLocation.get(location.getId());
       if (averageOfLocation != null && lapTimeDTO.getDuration() != null && lapTimeDTO.getDuration().compareTo(Duration.ZERO) > 0) {
         if (lapTimeDTO.getDuration().compareTo(averageOfLocation.multipliedBy(ACCEPTANCE_FACTOR)) > 0) {
           logger.info("Discarding lap ID " + lapTimeDTO.getId()

@@ -133,7 +133,7 @@ public class PingManager {
           // We ll insert it in the lap of the ping before
           int insertAtIndex = lapTimeOfPingBefore.getIntermediates().indexOf(pingBefore) + 1;
           // Is this index taken by pingAfter ?
-          if (lapTimeOfPingBefore.id == lapTimeOfPingAfter.id
+          if (lapTimeOfPingBefore.id.longValue() == lapTimeOfPingAfter.id.longValue()
               && chronoIndex >= session.getChronoIndex(pingAfter.getChrono())) {
             // Split
             List<Ping> toInsertInNewLap = lapTimeOfPingBefore.getIntermediates().subList(insertAtIndex,
