@@ -7,7 +7,7 @@ import org.trd.app.teknichrono.model.dto.NestedPilotDTO;
 import org.trd.app.teknichrono.model.dto.NestedSessionDTO;
 import org.trd.app.teknichrono.model.jpa.LapTime;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,10 +28,10 @@ public class LapTimeConverter {
 
     // Check if we are in a loop session
     // Keep a map of last pilot laps to set new laptime when next lap is reached
-    Map<Integer, List<LapTimeDTO>> lapsPerPilot = new HashMap<Integer, List<LapTimeDTO>>();
+    Map<Long, List<LapTimeDTO>> lapsPerPilot = new HashMap<>();
     final List<LapTimeDTO> results = new ArrayList<LapTimeDTO>();
     for (LapTime searchResult : lapTimes) {
-      LapTimeDTO dto = new LapTimeDTO(searchResult);
+      LapTimeDTO dto = LapTimeDTO.fromLapTime(searchResult);
       NestedSessionDTO session = dto.getSession();
       NestedPilotDTO pilot = dto.getPilot();
       if (pilot != null) {
@@ -44,8 +44,8 @@ public class LapTimeConverter {
           lapsPerPilot.put(pilot.getId(), lapsOfPilot);
         }
         if (session.isLoopTrack() && lastPilotLap != null && lastPilotLap.getSession().getId() == session.getId()) {
-          Timestamp startDate = dto.getStartDate();
-          if (startDate != null && startDate.getTime() > 0) {
+          Instant startDate = dto.getStartDate();
+          if (startDate != null) {
             logger.debug("Add last sector to lap " + lastPilotLap + " because we now found " + dto);
             lastPilotLap.addLastSector(startDate);
           }

@@ -1,9 +1,6 @@
 package org.trd.app.teknichrono.rest;
 
-import com.opencsv.bean.StatefulBeanToCsv;
-import com.opencsv.bean.StatefulBeanToCsvBuilder;
-import com.opencsv.exceptions.CsvDataTypeMismatchException;
-import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
+import io.quarkus.panache.common.Page;
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.business.view.LapTimeConverter;
 import org.trd.app.teknichrono.business.view.LapTimeDisplay;
@@ -17,16 +14,20 @@ import org.trd.app.teknichrono.model.jpa.Location;
 import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.model.jpa.Session;
 import org.trd.app.teknichrono.model.jpa.SessionType;
-import org.trd.app.teknichrono.util.InvalidArgumentException;
+import org.trd.app.teknichrono.model.repository.CategoryRepository;
+import org.trd.app.teknichrono.model.repository.EventRepository;
+import org.trd.app.teknichrono.model.repository.LapTimeRepository;
+import org.trd.app.teknichrono.model.repository.LocationRepository;
+import org.trd.app.teknichrono.model.repository.SessionRepository;
+import org.trd.app.teknichrono.util.csv.CSVConverter;
 import org.trd.app.teknichrono.util.sql.OrderByClauseBuilder;
 import org.trd.app.teknichrono.util.sql.WhereClauseBuilder;
 
-import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.OptimisticLockException;
-import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -36,92 +37,128 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-/**
- *
- */
-@Stateless
 @Path("/laptimes")
 public class LapTimeEndpoint {
-  @PersistenceContext(unitName = "teknichrono-persistence-unit")
-  private EntityManager em;
 
-  private Logger logger = Logger.getLogger(LapTimeEndpoint.class);
-  private LapTimeManager lapTimeManager = new LapTimeManager();
-  private LapTimeConverter lapTimeConverter = new LapTimeConverter();
+  private static final Logger LOGGER = Logger.getLogger(LapTimeEndpoint.class);
+
+  // TODO, get rid of the em (still needed for the fromDTO)
+  private final EntityManager em;
+
+  private final LapTimeRepository.Panache lapTimeRepository;
+
+  private final SessionRepository sessionRepository;
+
+  private final CategoryRepository categoryRepository;
+
+  private final EventRepository eventRepository;
+
+  private final LocationRepository locationRepository;
+
+  private final LapTimeManager lapTimeManager = new LapTimeManager();
+
+  private final LapTimeConverter lapTimeConverter = new LapTimeConverter();
+
+  @Inject
+  public LapTimeEndpoint(EntityManager em, LapTimeRepository.Panache lapTimeRepository, SessionRepository sessionRepository,
+                         CategoryRepository categoryRepository, EventRepository eventRepository,
+                         LocationRepository locationRepository) {
+    this.em = em;
+    this.lapTimeRepository = lapTimeRepository;
+    this.sessionRepository = sessionRepository;
+    this.categoryRepository = categoryRepository;
+    this.eventRepository = eventRepository;
+    this.locationRepository = locationRepository;
+  }
 
   @POST
-  @Consumes("application/json")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Transactional
   public Response create(LapTimeDTO dto) {
     LapTime entity = dto.fromDTO(null, em);
-    em.persist(entity);
-    return Response.created(UriBuilder.fromResource(LapTimeEndpoint.class).path(String.valueOf(entity.getId())).build())
+    lapTimeRepository.persist(entity);
+    return Response.created(UriBuilder.fromResource(LapTimeEndpoint.class).path(String.valueOf(entity.id)).build())
         .build();
   }
 
   @DELETE
   @Path("/{id:[0-9][0-9]*}")
-  public Response deleteById(@PathParam("id") int id) {
-    LapTime entity = em.find(LapTime.class, id);
+  @Transactional
+  public Response deleteById(@PathParam("id") long id) {
+    LapTime entity = lapTimeRepository.findById(id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    em.remove(entity);
+    lapTimeRepository.delete(entity);
     return Response.noContent().build();
   }
 
   @GET
   @Path("/{id:[0-9][0-9]*}")
-  @Produces("application/json")
-  public Response findById(@PathParam("id") int id) {
-    TypedQuery<LapTime> findByIdQuery = em.createQuery("SELECT DISTINCT l FROM LapTime"
-        + " l LEFT JOIN FETCH l.pilot LEFT JOIN FETCH l.session LEFT JOIN FETCH l.intermediates"
-        + " WHERE l.id = :entityId ORDER BY l.id", LapTime.class);
-    findByIdQuery.setParameter("entityId", id);
-    LapTime entity;
-    try {
-      entity = findByIdQuery.getSingleResult();
-    } catch (NoResultException nre) {
-      entity = null;
-    }
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response findById(@PathParam("id") long id) {
+    LapTime entity = lapTimeRepository.findById(id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    LapTimeDTO dto = new LapTimeDTO(entity);
+    LapTimeDTO dto = LapTimeDTO.fromLapTime(entity);
     return Response.ok(dto).build();
   }
 
   @GET
   @Path("/csv/best")
   @Produces("text/csv")
-  public String bestToCsv(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
-                          @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
-                          @QueryParam("categoryId") Integer categoryId) {
-    List<LapTimeDTO> results = best(pilotId, sessionId, locationId, eventId, categoryId, null, null);
-    return convertToCsv(results);
+  @Transactional
+  public Response bestToCsv(@QueryParam("pilotId") Long pilotId, @QueryParam("sessionId") Long sessionId,
+                            @QueryParam("locationId") Long locationId, @QueryParam("eventId") Long eventId,
+                            @QueryParam("categoryId") Long categoryId) {
+    try {
+      List<LapTimeDTO> results = bestLapTimes(pilotId, sessionId, locationId, eventId, categoryId, null, null);
+      CSVConverter csvConverter = new CSVConverter();
+      String csvResults = csvConverter.convertToCsv(results);
+      return Response.ok().entity(csvResults).build();
+    } catch (IllegalArgumentException e) {
+      return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
+    } catch (IOException e) {
+      return Response.serverError().build();
+    }
   }
 
   @GET
   @Path("/best")
-  @Produces("application/json")
-  public List<LapTimeDTO> best(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
-                               @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
-                               @QueryParam("categoryId") Integer categoryId, @QueryParam("start") Integer startPosition,
-                               @QueryParam("max") Integer maxResult) {
-    if (sessionId == null && locationId == null && eventId == null) {
-      logger.error("Please define a sessiondId, locationId or eventId to get best laps.");
-      throw new InvalidArgumentException();
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response best(@QueryParam("pilotId") Long pilotId, @QueryParam("sessionId") Long sessionId,
+                       @QueryParam("locationId") Long locationId, @QueryParam("eventId") Long eventId,
+                       @QueryParam("categoryId") Long categoryId, @QueryParam("page") Integer pageIndex,
+                       @QueryParam("pageSize") Integer pageSize) {
+    try {
+      List<LapTimeDTO> lapTimes = bestLapTimes(pilotId, sessionId, locationId, eventId, categoryId, pageIndex, pageSize);
+      return Response.ok().entity(lapTimes).build();
+    } catch (IllegalArgumentException e) {
+      return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
     }
-    final List<LapTimeDTO> results = getAllLapsDTOOrderedByStartDate(pilotId, sessionId, locationId, eventId,
-        categoryId, startPosition, maxResult);
+  }
+
+  private List<LapTimeDTO> bestLapTimes(Long pilotId, Long sessionId, Long locationId, Long eventId, Long categoryId,
+                                        Integer pageIndex, Integer pageSize) {
+    if (sessionId == null && locationId == null && eventId == null) {
+      LOGGER.error("Please define a sessiondId, locationId or eventId to get best laps.");
+      throw new IllegalArgumentException("Please define a sessiondId, locationId or eventId to get best laps.");
+    }
+    List<LapTimeDTO> results = getAllLapsDTOOrderedByStartDate(pilotId, sessionId, locationId, eventId, categoryId,
+        pageIndex, pageSize);
     if (pilotId != null) {
       lapTimeManager.arrangeDisplay(results, LapTimeDisplay.ORDER_BY_DURATION);
     } else {
@@ -134,46 +171,51 @@ public class LapTimeEndpoint {
   @GET
   @Path("/csv/results")
   @Produces("text/csv")
-  public String resultsToCsv(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
-                             @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
-                             @QueryParam("categoryId") Integer categoryId) {
-
-    List<LapTimeDTO> results = results(pilotId, sessionId, locationId, eventId, categoryId, null, null);
-    return convertToCsv(results);
-  }
-
-  private String convertToCsv(List<LapTimeDTO> results) {
-    String csvResult = null;
-    StringWriter writer = new StringWriter();
-    // TODO StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder<LapTimeDTO>(writer).withMappingStrategy(new LapTimeMappingStrategy()).build();
-    StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder<LapTimeDTO>(writer).build();
+  @Transactional
+  public Response resultsToCsv(@QueryParam("pilotId") Long pilotId, @QueryParam("sessionId") Long sessionId,
+                               @QueryParam("locationId") Long locationId, @QueryParam("eventId") Long eventId,
+                               @QueryParam("categoryId") Long categoryId) {
     try {
-      beanToCsv.write(results);
-      csvResult = writer.toString();
-      writer.close();
-    } catch (CsvDataTypeMismatchException | CsvRequiredFieldEmptyException | IOException e) {
-      e.printStackTrace();
+      List<LapTimeDTO> results = resultsList(pilotId, sessionId, locationId, eventId, categoryId, null, null);
+      CSVConverter csvConverter = new CSVConverter();
+      String csvResults = csvConverter.convertToCsv(results);
+      return Response.ok().entity(csvResults).build();
+    } catch (IllegalArgumentException e) {
+      return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
+    } catch (IOException e) {
+      return Response.serverError().build();
     }
-    return csvResult;
   }
 
   @GET
   @Path("/results")
-  @Produces("application/json")
-  public List<LapTimeDTO> results(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
-                                  @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
-                                  @QueryParam("categoryId") Integer categoryId, @QueryParam("start") Integer startPosition,
-                                  @QueryParam("max") Integer maxResult) {
-    if (sessionId == null) {
-      logger.error("Please define a sessiondId to get race laps.");
-      throw new InvalidArgumentException();
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response results(@QueryParam("pilotId") Long pilotId, @QueryParam("sessionId") Long sessionId,
+                          @QueryParam("locationId") Long locationId, @QueryParam("eventId") Long eventId,
+                          @QueryParam("categoryId") Long categoryId, @QueryParam("page") Integer pageIndex,
+                          @QueryParam("pageSize") Integer pageSize) {
+    try {
+      List<LapTimeDTO> lapTimes = resultsList(pilotId, sessionId, locationId, eventId, categoryId, pageIndex, pageSize);
+      return Response.ok().entity(lapTimes).build();
+    } catch (IllegalArgumentException e) {
+      return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
     }
-    Session session = em.find(Session.class, sessionId);
+  }
 
-    final List<LapTimeDTO> results = getAllLapsDTOOrderedByStartDate(pilotId, sessionId, locationId, eventId,
-        categoryId, startPosition, maxResult);
+  private List<LapTimeDTO> resultsList(Long pilotId, Long sessionId, Long locationId, Long eventId, Long categoryId,
+                                       Integer startPosition, Integer maxResult) {
+    if (sessionId == null) {
+      LOGGER.error("Please define a sessiondId to get race laps.");
+      throw new IllegalArgumentException("Please define a sessiondId to get race laps.");
+    }
+    Session session = sessionRepository.findById(sessionId);
 
-    Set<NestedPilotDTO> pilots = NestedPilotDTO.fromPilots(session.getPilots());
+    List<LapTimeDTO> results = getAllLapsDTOOrderedByStartDate(pilotId, sessionId, locationId, eventId, categoryId,
+        startPosition, maxResult);
+
+    Set<NestedPilotDTO> pilots = session.getPilots().stream().map(NestedPilotDTO::fromPilot)
+        .collect(Collectors.toSet());
     if (session.getSessionType() == SessionType.RACE) {
       if (pilotId != null) {
         lapTimeManager.arrangeDisplay(results, LapTimeDisplay.KEEP_COMPLETE);
@@ -194,48 +236,65 @@ public class LapTimeEndpoint {
       }
     }
     return results;
-
   }
 
   @GET
   @Path("/csv")
   @Produces("text/csv")
-  public String listAllToCsv(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
-                             @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
-                             @QueryParam("categoryId") Integer categoryId) {
-    List<LapTimeDTO> results = listAll(pilotId, sessionId, locationId, eventId, categoryId, null, null);
-    return convertToCsv(results);
+  @Transactional
+  public Response listAllToCsv(@QueryParam("pilotId") Long pilotId, @QueryParam("sessionId") Long sessionId,
+                               @QueryParam("locationId") Long locationId, @QueryParam("eventId") Long eventId,
+                               @QueryParam("categoryId") Long categoryId) {
+    try {
+      List<LapTimeDTO> results = all(pilotId, sessionId, locationId, eventId, categoryId, null, null);
+      CSVConverter csvConverter = new CSVConverter();
+      String csvResults = csvConverter.convertToCsv(results);
+      return Response.ok().entity(csvResults).build();
+    } catch (IllegalArgumentException e) {
+      return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
+    } catch (IOException e) {
+      return Response.serverError().build();
+    }
   }
 
   @GET
-  @Produces("application/json")
-  public List<LapTimeDTO> listAll(@QueryParam("pilotId") Integer pilotId, @QueryParam("sessionId") Integer sessionId,
-                                  @QueryParam("locationId") Integer locationId, @QueryParam("eventId") Integer eventId,
-                                  @QueryParam("categoryId") Integer categoryId, @QueryParam("start") Integer startPosition,
-                                  @QueryParam("max") Integer maxResult) {
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response listAll(@QueryParam("pilotId") Long pilotId, @QueryParam("sessionId") Long sessionId,
+                          @QueryParam("locationId") Long locationId, @QueryParam("eventId") Long eventId,
+                          @QueryParam("categoryId") Long categoryId, @QueryParam("page") Integer pageIndex,
+                          @QueryParam("pageSize") Integer pageSize) {
+    try {
+      List<LapTimeDTO> lapTimes = all(pilotId, sessionId, locationId, eventId, categoryId, pageIndex, pageSize);
+      return Response.ok().entity(lapTimes).build();
+    } catch (IllegalArgumentException e) {
+      return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
+    }
+  }
+
+  private List<LapTimeDTO> all(Long pilotId, Long sessionId, Long locationId, Long eventId, Long categoryId,
+                               Integer startPosition, Integer maxResult) {
     if (sessionId == null && locationId == null && eventId == null) {
-      logger.error("Please define a sessiondId, locationId or eventId to get laps.");
-      throw new InvalidArgumentException();
+      LOGGER.error("Please define a sessiondId, locationId or eventId to get laps.");
+      throw new IllegalArgumentException("Please define a sessiondId, locationId or eventId to get laps.");
     }
 
-    final List<LapTimeDTO> results = getAllLapsDTOOrderedByStartDate(pilotId, sessionId, locationId, eventId,
-        categoryId, startPosition, maxResult);
+    List<LapTimeDTO> results = getAllLapsDTOOrderedByStartDate(pilotId, sessionId, locationId, eventId, categoryId,
+        startPosition, maxResult);
     // TODO Remove LapTimeDisplay.KEEP_COMPLETE if session is ongoing
     lapTimeManager.arrangeDisplay(results, LapTimeDisplay.KEEP_COMPLETE, LapTimeDisplay.ORDER_BY_LAST_SEEN);
-
     return results;
   }
 
-  private List<LapTimeDTO> getAllLapsDTOOrderedByStartDate(Integer pilotId, Integer sessionId, Integer locationId,
-                                                           Integer eventId, Integer categoryId, Integer startPosition, Integer maxResult) {
-    final List<LapTime> searchResults = getAllLapsOrderedByStartDate(pilotId, sessionId, locationId, eventId,
-        categoryId, startPosition, maxResult);
-    final List<LapTimeDTO> results = lapTimeConverter.convert(searchResults);
-    return results;
+  private List<LapTimeDTO> getAllLapsDTOOrderedByStartDate(Long pilotId, Long sessionId, Long locationId, Long eventId,
+                                                           Long categoryId, Integer pageIndex, Integer pageSize) {
+    List<LapTime> searchResults = getAllLapsOrderedByStartDate(pilotId, sessionId, locationId, eventId, categoryId,
+        pageIndex, pageSize);
+    return lapTimeConverter.convert(searchResults);
   }
 
-  private List<LapTime> getAllLapsOrderedByStartDate(Integer pilotId, Integer sessionId, Integer locationId,
-                                                     Integer eventId, Integer categoryId, Integer startPosition, Integer maxResult) {
+  private List<LapTime> getAllLapsOrderedByStartDate(Long pilotId, Long sessionId, Long locationId, Long eventId,
+                                                     Long categoryId, Integer pageIndex, Integer pageSize) {
     WhereClauseBuilder whereClauseBuilder = buildWhereClause(pilotId, sessionId, locationId, eventId, categoryId);
     OrderByClauseBuilder orderByClauseBuilder = new OrderByClauseBuilder();
     // Necessary to have the lapTimeManager.manage working
@@ -244,29 +303,25 @@ public class LapTimeEndpoint {
     TypedQuery<LapTime> findAllQuery = em.createQuery("SELECT DISTINCT l FROM LapTime l"
         + " LEFT JOIN FETCH l.pilot LEFT JOIN FETCH l.session LEFT JOIN FETCH l.intermediates"
         + whereClauseBuilder.build() + orderByClauseBuilder.build(), LapTime.class);
-    if (startPosition != null) {
-      findAllQuery.setFirstResult(startPosition);
-    }
-    if (maxResult != null) {
-      findAllQuery.setMaxResults(maxResult);
-    }
+    Page page = Paging.from(pageIndex, pageSize);
+    findAllQuery.setFirstResult(page.index * page.size);
+    findAllQuery.setMaxResults(page.size);
     whereClauseBuilder.applyClauses(findAllQuery);
-    final List<LapTime> searchResults = findAllQuery.getResultList();
-    return searchResults;
+    return findAllQuery.getResultList();
   }
 
-  private WhereClauseBuilder buildWhereClause(Integer pilotId, Integer sessionId, Integer locationId, Integer eventId,
-                                              Integer categoryId) {
+  private WhereClauseBuilder buildWhereClause(Long pilotId, Long sessionId, Long locationId, Long eventId,
+                                              Long categoryId) {
     WhereClauseBuilder whereClauseBuilder = new WhereClauseBuilder();
     if (pilotId != null) {
       whereClauseBuilder.addEqualsClause("l.pilot.id", "pilotId", pilotId);
     } else {
       if (categoryId != null) {
-        Category category = em.find(Category.class, categoryId);
+        Category category = categoryRepository.findById(categoryId);
         if (category != null) {
-          List<Integer> categoryPilotsIds = new ArrayList<>();
+          List<Long> categoryPilotsIds = new ArrayList<>();
           for (Pilot p : category.getPilots()) {
-            categoryPilotsIds.add(p.getId());
+            categoryPilotsIds.add(p.id);
           }
           whereClauseBuilder.addInClause("l.pilot.id", "categoryPilotsIds", categoryPilotsIds);
         }
@@ -276,21 +331,21 @@ public class LapTimeEndpoint {
       whereClauseBuilder.addEqualsClause("l.session.id", "sessionId", sessionId);
     } else {
       if (eventId != null) {
-        Event event = em.find(Event.class, eventId);
+        Event event = eventRepository.findById(eventId);
         if (event != null) {
-          List<Integer> eventSessionIds = new ArrayList<>();
+          List<Long> eventSessionIds = new ArrayList<>();
           for (Session s : event.getSessions()) {
-            eventSessionIds.add(s.getId());
+            eventSessionIds.add(s.id);
           }
           whereClauseBuilder.addInClause("l.session.id", "eventSessionIds", eventSessionIds);
         }
       }
       if (locationId != null) {
-        Location location = em.find(Location.class, locationId);
+        Location location = locationRepository.findById(locationId);
         if (location != null) {
-          List<Integer> locationSessionIds = new ArrayList<>();
+          List<Long> locationSessionIds = new ArrayList<>();
           for (Session s : location.getSessions()) {
-            locationSessionIds.add(s.getId());
+            locationSessionIds.add(s.id);
           }
           whereClauseBuilder.addInClause("l.session.id", "locationSessionIds", locationSessionIds);
         }
@@ -301,21 +356,22 @@ public class LapTimeEndpoint {
 
   @PUT
   @Path("/{id:[0-9][0-9]*}")
-  @Consumes("application/json")
-  public Response update(@PathParam("id") int id, LapTimeDTO dto) {
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response update(@PathParam("id") long id, LapTimeDTO dto) {
     if (dto == null) {
       return Response.status(Status.BAD_REQUEST).build();
     }
     if (id != dto.getId()) {
       return Response.status(Status.CONFLICT).entity(dto).build();
     }
-    LapTime entity = em.find(LapTime.class, id);
+    LapTime entity = lapTimeRepository.findById(id);
     if (entity == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
     entity = dto.fromDTO(entity, em);
     try {
-      entity = em.merge(entity);
+      lapTimeRepository.persist(entity);
     } catch (OptimisticLockException e) {
       return Response.status(Status.CONFLICT).entity(e.getEntity()).build();
     }

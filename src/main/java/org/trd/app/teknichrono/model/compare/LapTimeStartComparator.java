@@ -16,7 +16,7 @@ public class LapTimeStartComparator implements Comparator<LapTime> {
     } else if (l2.getStartDate() == null) {
       return 1;
     } else {
-      return Long.valueOf(l1.getStartDate().getTime()).compareTo(l2.getStartDate().getTime());
+      return l1.getStartDate().compareTo(l2.getStartDate());
     }
   }
 }

@@ -5,6 +5,7 @@ import org.trd.app.teknichrono.model.compare.LapTimeDTOLastSeenComparator;
 import org.trd.app.teknichrono.model.compare.LapTimeDTORaceComparator;
 import org.trd.app.teknichrono.model.dto.LapTimeDTO;
 
+import java.time.Duration;
 import java.util.List;
 
 public class LapTimeOrder {
@@ -19,19 +20,20 @@ public class LapTimeOrder {
    * @param results List of laps ordered by duration. Laps with no duration at the end. Modified in place.
    */
   void fillGapsInfoWhenOrderedByDuration(List<LapTimeDTO> results) {
-    long best = -1;
-    long previous = -1;
+    Duration initialDuration = Duration.ofMillis(-1);
+    Duration best = initialDuration;
+    Duration previous = initialDuration;
     for (LapTimeDTO lapTimeDTO : results) {
-      if (best == -1) {
+      if (best.equals(initialDuration)) {
         best = lapTimeDTO.getDuration();
         previous = lapTimeDTO.getDuration();
-        lapTimeDTO.setGapWithBest(0);
-        lapTimeDTO.setGapWithPrevious(0);
+        lapTimeDTO.setGapWithBest(Duration.ZERO);
+        lapTimeDTO.setGapWithPrevious(Duration.ZERO);
       } else {
-        long lapDuration = lapTimeDTO.getDuration();
-        if (lapDuration > 0) {
-          lapTimeDTO.setGapWithBest(lapDuration - best);
-          lapTimeDTO.setGapWithPrevious(lapDuration - previous);
+        Duration lapDuration = lapTimeDTO.getDuration();
+        if (lapDuration != null && lapDuration.compareTo(Duration.ZERO) > 0) {
+          lapTimeDTO.setGapWithBest(lapDuration.minus(best).abs());
+          lapTimeDTO.setGapWithPrevious(lapDuration.minus(previous).abs());
         }
         previous = lapDuration;
       }
@@ -51,8 +53,8 @@ public class LapTimeOrder {
       if (best == null) {
         best = lapTimeDTO;
         previous = lapTimeDTO;
-        lapTimeDTO.setGapWithBest(0);
-        lapTimeDTO.setGapWithPrevious(0);
+        lapTimeDTO.setGapWithBest(Duration.ZERO);
+        lapTimeDTO.setGapWithPrevious(Duration.ZERO);
       } else {
         lapTimeDTO.setGapWithBest(comparator.distance(best, lapTimeDTO));
         lapTimeDTO.setGapWithPrevious(comparator.distance(previous, lapTimeDTO));

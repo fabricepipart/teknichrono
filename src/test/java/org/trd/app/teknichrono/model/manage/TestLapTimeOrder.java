@@ -1,47 +1,53 @@
 package org.trd.app.teknichrono.model.manage;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.trd.app.teknichrono.business.view.LapTimeConverter;
 import org.trd.app.teknichrono.business.view.LapTimeFiller;
 import org.trd.app.teknichrono.business.view.LapTimeFilter;
 import org.trd.app.teknichrono.business.view.LapTimeOrder;
 import org.trd.app.teknichrono.model.compare.LapTimeStartComparator;
 import org.trd.app.teknichrono.model.dto.LapTimeDTO;
-import org.trd.app.teknichrono.model.dto.TestLapTimeDTOCreator;
+import org.trd.app.teknichrono.model.dto.LapTimeDTOCreatorForTests;
 import org.trd.app.teknichrono.model.jpa.LapTime;
-import org.trd.app.teknichrono.model.jpa.TestLapTimeCreator;
+import org.trd.app.teknichrono.model.jpa.LapTimeCreatorForTests;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.*;
 
 public class TestLapTimeOrder {
 
 
-  private TestLapTimeDTOCreator dtoCreator;
-  private TestLapTimeCreator creator;
+  private LapTimeDTOCreatorForTests dtoCreator;
+  private LapTimeCreatorForTests creator;
 
-  @Before
-  public void setUp() throws Exception {
-    dtoCreator = new TestLapTimeDTOCreator();
-    creator = new TestLapTimeCreator();
+  @BeforeEach
+  public void setUp() {
+    dtoCreator = new LapTimeDTOCreatorForTests();
+    creator = new LapTimeCreatorForTests();
   }
 
   @Test
   public void ordersByStartDate() {
     List<LapTime> laps = creator.createLapsWithIntermediates();
     laps.sort(new LapTimeStartComparator());
-    long previousStart = -1;
+    Instant previousStart = Instant.MIN;
     boolean lastStartAvailable = false;
     for (LapTime l : laps) {
       if (l.getStartDate() != null) {
-        Assert.assertTrue("Last seen date in incorrect order", l.getStartDate().getTime() >= previousStart);
-        previousStart = l.getStartDate().getTime();
+        assertThat(l.getStartDate().compareTo(previousStart)).
+            isGreaterThanOrEqualTo(0).describedAs("Last seen date in incorrect order");
+        previousStart = l.getStartDate();
         lastStartAvailable = true;
       } else {
-        Assert.assertFalse("There has been a laptime with time before and " +
-            "this one has no time. Laps was no time are considered the oldest.", lastStartAvailable);
+        assertThat(lastStartAvailable).isFalse().describedAs("There has been a laptime with time before and " +
+            "this one has no time. Laps was no time are considered the oldest.");
       }
     }
   }
@@ -67,42 +73,44 @@ public class TestLapTimeOrder {
     dtoCreator.nextPilot();
     result.add(dtoCreator.createDTOLapTime(time + 20, time + 410, 1));
     testMe.orderbyLastSeen(result);
-    org.junit.Assert.assertEquals(8, result.size());
+    Assertions.assertEquals(8, result.size());
 
-    org.junit.Assert.assertEquals(6, result.get(0).getId());
-    org.junit.Assert.assertEquals(4, result.get(1).getId());
-    org.junit.Assert.assertEquals(3, result.get(2).getId());
-    org.junit.Assert.assertEquals(2, result.get(3).getId());
-    org.junit.Assert.assertEquals(7, result.get(4).getId());
-    org.junit.Assert.assertEquals(8, result.get(5).getId());
-    org.junit.Assert.assertEquals(1, result.get(6).getId());
-    org.junit.Assert.assertEquals(5, result.get(7).getId());
+    Assertions.assertEquals(6, result.get(0).getId());
+    Assertions.assertEquals(4, result.get(1).getId());
+    Assertions.assertEquals(3, result.get(2).getId());
+    Assertions.assertEquals(2, result.get(3).getId());
+    Assertions.assertEquals(7, result.get(4).getId());
+    Assertions.assertEquals(8, result.get(5).getId());
+    Assertions.assertEquals(1, result.get(6).getId());
+    Assertions.assertEquals(5, result.get(7).getId());
   }
 
   @Test
   public void ordersByStartDateOrEndDateWithIncompleteLaps() {
     LapTimeOrder testMe = new LapTimeOrder();
     List<LapTimeDTO> lapsWithIntermediates = dtoCreator.createLapsWithIntermediates();
-    int nbLapsBefore = lapsWithIntermediates.size();
+    long nbLapsBefore = lapsWithIntermediates.size();
     testMe.orderbyLastSeen(lapsWithIntermediates);
 
-    org.junit.Assert.assertEquals(nbLapsBefore, lapsWithIntermediates.size());
+    Assertions.assertEquals(nbLapsBefore, lapsWithIntermediates.size());
     checkOrderByDateWithIntermediates(lapsWithIntermediates);
   }
 
 
   private void checkOrderByDateWithIntermediates(List<LapTimeDTO> laps) {
     // All start dates are in order
-    long previousLastSeen = -1;
+    Instant previousLastSeen = Instant.MIN;
     boolean lastSeenAvailable = false;
     for (LapTimeDTO l : laps) {
       if (l.getLastSeenDate() != null) {
-        Assert.assertTrue("Last seen date in incorrect order", l.getLastSeenDate().getTime() >= previousLastSeen);
-        previousLastSeen = l.getLastSeenDate().getTime();
+
+        assertThat(l.getLastSeenDate().compareTo(previousLastSeen)).
+            isGreaterThanOrEqualTo(0).describedAs("Last seen date in incorrect order");
+        previousLastSeen = l.getLastSeenDate();
         lastSeenAvailable = true;
       } else {
-        Assert.assertFalse("There has been a laptime with time before and " +
-            "this one has no time. Laps was no time are considered the oldest.", lastSeenAvailable);
+        assertThat(lastSeenAvailable).isFalse().describedAs("There has been a laptime with time before and " +
+            "this one has no time. Laps was no time are considered the oldest.");
       }
     }
   }
@@ -111,21 +119,21 @@ public class TestLapTimeOrder {
   public void ordersByDuration() {
     LapTimeOrder testMe = new LapTimeOrder();
     ArrayList<LapTime> searchResults = new ArrayList<LapTime>();
-    long time = System.currentTimeMillis();
+    Instant time = Instant.now();
     LapTime l1 = creator.createLapTimeWithNoIntermediate(1, true, time);
-    time = time + 111;
+    time = time.plus(Duration.ofMillis(111));
 
     LapTime l2 = creator.createLapTimeWithNoIntermediate(2, true, time);
-    time = time + 162;
+    time = time.plus(Duration.ofMillis(162));
 
     LapTime l3 = creator.createLapTimeWithNoIntermediate(3, true, time);
-    time = time + 133;
+    time = time.plus(Duration.ofMillis(133));
 
     LapTime l4 = creator.createLapTimeWithNoIntermediate(4, true, time);
-    time = time + 124;
+    time = time.plus(Duration.ofMillis(124));
 
     LapTime l5 = creator.createLapTimeWithNoIntermediate(5, true, time);
-    time = time + 155;
+    time = time.plus(Duration.ofMillis(155));
 
     LapTime l6 = creator.createLapTimeWithNoIntermediate(6, true, time);
     // l6 does not end
@@ -139,13 +147,13 @@ public class TestLapTimeOrder {
     List<LapTimeDTO> result = (new LapTimeConverter()).convert(searchResults);
     testMe.orderByDuration(result);
 
-    org.junit.Assert.assertEquals(6, result.size());
-    org.junit.Assert.assertEquals(l1.getId(), result.get(0).getId());
-    org.junit.Assert.assertEquals(l4.getId(), result.get(1).getId());
-    org.junit.Assert.assertEquals(l3.getId(), result.get(2).getId());
-    org.junit.Assert.assertEquals(l5.getId(), result.get(3).getId());
-    org.junit.Assert.assertEquals(l2.getId(), result.get(4).getId());
-    org.junit.Assert.assertEquals(l6.getId(), result.get(5).getId());
+    Assertions.assertEquals(6, result.size());
+    Assertions.assertEquals(l1.id.longValue(), result.get(0).getId());
+    Assertions.assertEquals(l4.id.longValue(), result.get(1).getId());
+    Assertions.assertEquals(l3.id.longValue(), result.get(2).getId());
+    Assertions.assertEquals(l5.id.longValue(), result.get(3).getId());
+    Assertions.assertEquals(l2.id.longValue(), result.get(4).getId());
+    Assertions.assertEquals(l6.id.longValue(), result.get(5).getId());
   }
 
   @Test
@@ -218,12 +226,12 @@ public class TestLapTimeOrder {
     (new LapTimeFiller()).fillLapsNumber(result);
     (new LapTimeFilter()).keepOnlyLast(result);
     testMe.orderForRace(result);
-    org.junit.Assert.assertEquals(5, result.size());
-    org.junit.Assert.assertEquals(3, result.get(0).getId());
-    org.junit.Assert.assertEquals(5, result.get(1).getId());
-    org.junit.Assert.assertEquals(7, result.get(2).getId());
-    org.junit.Assert.assertEquals(9, result.get(3).getId());
-    org.junit.Assert.assertEquals(11, result.get(4).getId());
+    Assertions.assertEquals(5, result.size());
+    Assertions.assertEquals(3, result.get(0).getId());
+    Assertions.assertEquals(5, result.get(1).getId());
+    Assertions.assertEquals(7, result.get(2).getId());
+    Assertions.assertEquals(9, result.get(3).getId());
+    Assertions.assertEquals(11, result.get(4).getId());
   }
 
   @Test
@@ -235,9 +243,10 @@ public class TestLapTimeOrder {
   }
 
   public void checkRaceLapsOrder(List<LapTimeDTO> raceLapsWithIntermediates) {
-    int lastLapIndex = Integer.MAX_VALUE;
+    long lastLapIndex = Long.MAX_VALUE;
     for (LapTimeDTO l : raceLapsWithIntermediates) {
-      Assert.assertTrue("Lap " + l + " has a lap index inferior to previous lap : " + lastLapIndex, l.getLapIndex() <= lastLapIndex);
+      assertThat(l.getLapIndex()).isLessThanOrEqualTo(lastLapIndex)
+          .describedAs("Lap " + l + " has a lap index inferior to previous lap : " + lastLapIndex);
       lastLapIndex = l.getLapIndex();
     }
   }
@@ -251,25 +260,24 @@ public class TestLapTimeOrder {
   public void checkOrderByDurationOrStartDate(List<LapTimeDTO> laps) {
     LapTimeOrder testMe = new LapTimeOrder();
     testMe.orderByDuration(laps);
-    long previousDuration = -1;
-    long previousStart = -1;
+    Duration previousDuration = Duration.ZERO;
+    Instant previousStart = Instant.MIN;
     for (LapTimeDTO l : laps) {
-
-      if (l.getDuration() > 0) {
-        Assert.assertTrue(l.getDuration() >= previousDuration);
+      if (l.getDuration() != null && l.getDuration().compareTo(Duration.ZERO) > 0) {
+        Assertions.assertTrue(l.getDuration().compareTo(previousDuration) >= 0);
         previousDuration = l.getDuration();
       } else {
         // None order by duration anymore
-        previousDuration = Long.MAX_VALUE;
+        previousDuration = Duration.ofMillis(Long.MAX_VALUE);
         if (l.getStartDate() != null) {
           // Is it the first that did not end
-          if (previousStart >= 0) {
-            Assert.assertTrue(l.getStartDate().getTime() >= previousStart);
+          if (previousStart.isAfter(Instant.MIN)) {
+            Assertions.assertTrue(l.getStartDate().compareTo(previousStart) >= 0);
           }
-          previousStart = l.getStartDate().getTime();
+          previousStart = l.getStartDate();
         } else {
           // None order by start date anymore
-          previousStart = Long.MAX_VALUE;
+          previousStart = Instant.MAX;
         }
       }
     }
@@ -286,19 +294,35 @@ public class TestLapTimeOrder {
     LapTimeOrder order = new LapTimeOrder();
     List<LapTimeDTO> laps = dtoCreator.createLaps();
     order.orderByDuration(laps);
-    long previousGap = -1;
+    laps.removeIf(l -> l.getDuration() == null);
+    Duration previousGap = null;
 
     for (LapTimeDTO l : laps) {
-      if (previousGap == -1) {
-        Assert.assertEquals(0, l.getGapWithBest());
-      }
-      if (l.getDuration() > 0) {
-        Assert.assertTrue(l.getGapWithBest() >= previousGap);
-      } else {
-        // No more gaps
-        previousGap = Long.MAX_VALUE;
+      if (previousGap == null) {
+        Assertions.assertEquals(Duration.ZERO, l.getGapWithBest());
+      } else if (l.getDuration() != null && l.getDuration().compareTo(Duration.ZERO) > 0) {
+        Assertions.assertTrue(l.getGapWithBest().compareTo(previousGap) >= 0);
       }
       previousGap = l.getGapWithBest();
+    }
+  }
+
+  @Test
+  public void lapsWithNoDurationAreLargest() {
+    LapTimeOrder order = new LapTimeOrder();
+    List<LapTimeDTO> laps = dtoCreator.createLaps();
+    order.orderByDuration(laps);
+    Collections.reverse(laps);
+    boolean firstWithNonNullDuration = false;
+
+    for (LapTimeDTO l : laps) {
+      if (firstWithNonNullDuration) {
+        Assertions.assertNotNull(l.getDuration());
+      } else {
+        if (l.getDuration() != null) {
+          firstWithNonNullDuration = true;
+        }
+      }
     }
   }
 }

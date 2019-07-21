@@ -9,6 +9,8 @@ import org.trd.app.teknichrono.model.jpa.Ping;
 import org.trd.app.teknichrono.model.jpa.Session;
 
 import javax.persistence.EntityManager;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
@@ -29,45 +31,45 @@ public class PingManager {
   public void addPing(Ping ping) {
     Beacon beacon = ping.getBeacon();
     if (beacon == null) {
-      logger.error("Beacon is not in the DB, cannot updates laptimes for Ping @ " + ping.getDateTime());
+      logger.error("Beacon is not in the DB, cannot updates laptimes for Ping @ " + ping.getInstant());
       return;
     }
 
     Pilot pilot = ping.getBeacon().getPilot();
     if (pilot == null) {
-      logger.error("Pilot is not associated to Beacon " + beacon.getId() + ", cannot updates laptimes");
+      logger.error("Pilot is not associated to Beacon " + beacon.id + ", cannot updates laptimes");
       return;
     }
 
     Chronometer chronometer = ping.getChrono();
     if (chronometer == null) {
-      logger.error("Chrono is not in the DB, cannot updates laptimes for Ping @ " + ping.getDateTime());
+      logger.error("Chrono is not in the DB, cannot updates laptimes for Ping @ " + ping.getInstant());
       return;
     }
 
     Session session = selector.pickMostRelevant(ping);
     if (session == null) {
-      logger.error("No Session associated to Chrono " + chronometer.getId() + ", cannot updates laptimes");
+      logger.error("No Session associated to Chrono " + chronometer.id + ", cannot updates laptimes");
       return;
     }
     addPing(ping, pilot, chronometer, session);
   }
 
   public void addPing(Ping ping, Pilot pilot, Chronometer chronometer, Session session) {
-    int chronoIndex = session.getChronoIndex(chronometer);
+    long chronoIndex = session.getChronoIndex(chronometer);
     if (chronoIndex < 0) {
       logger.error("Ping error since from a chronometer '" + chronometer.getName() +
-          "' that is not part of the Session " + session.getId());
+          "' that is not part of the Session " + session.id);
       return;
     }
 
     long inactivity = session.getInactivity();
     if (inactivity > 0) {
-      long pingTime = ping.getDateTime().getTime();
-      long start = session.getStart().getTime();
-      long inactivityEnd = start + inactivity;
-      if (pingTime > start && pingTime < inactivityEnd) {
-        logger.info("Ping ignored since Session " + session.getId() + " is during its inactivity period.");
+      Instant pingTime = ping.getInstant();
+      Instant start = session.getStart();
+      Instant inactivityEnd = start.plus(Duration.ofMillis(inactivity));
+      if (pingTime.isAfter(start) && pingTime.isBefore(inactivityEnd)) {
+        logger.info("Ping ignored since Session " + session.id + " is during its inactivity period.");
         return;
       }
     }
@@ -82,13 +84,13 @@ public class PingManager {
       Ping pingAfter = null;
       for (LapTime lapTime : previousLaptimes) {
         for (Ping lapTimePing : lapTime.getIntermediates()) {
-          if (lapTimePing.getDateTime().getTime() < ping.getDateTime().getTime()) {
+          if (lapTimePing.getInstant().isBefore(ping.getInstant())) {
             lapTimeOfPingBefore = lapTime;
             pingBefore = lapTimePing;
-          } else if (lapTimePing.getDateTime().getTime() == ping.getDateTime().getTime()) {
-            logger.error("Trying to store a ping that was already in DB " + ping.getDateTime());
-          } else if (lapTimePing.getDateTime().getTime() > ping.getDateTime().getTime()
-              && (pingAfter == null || lapTimePing.getDateTime().getTime() < pingAfter.getDateTime().getTime())) {
+          } else if (lapTimePing.getInstant().equals(ping.getInstant())) {
+            logger.error("Trying to store a ping that was already in DB " + ping.getInstant());
+          } else if (lapTimePing.getInstant().isAfter(ping.getInstant())
+              && (pingAfter == null || lapTimePing.getInstant().isBefore(pingAfter.getInstant()))) {
             lapTimeOfPingAfter = lapTime;
             pingAfter = lapTimePing;
           }
@@ -131,7 +133,7 @@ public class PingManager {
           // We ll insert it in the lap of the ping before
           int insertAtIndex = lapTimeOfPingBefore.getIntermediates().indexOf(pingBefore) + 1;
           // Is this index taken by pingAfter ?
-          if (lapTimeOfPingBefore.getId() == lapTimeOfPingAfter.getId()
+          if (lapTimeOfPingBefore.id.longValue() == lapTimeOfPingAfter.id.longValue()
               && chronoIndex >= session.getChronoIndex(pingAfter.getChrono())) {
             // Split
             List<Ping> toInsertInNewLap = lapTimeOfPingBefore.getIntermediates().subList(insertAtIndex,
@@ -139,7 +141,7 @@ public class PingManager {
             LapTime lap = createLaptime(session, pilot, toInsertInNewLap, chronometer);
             em.persist(lap);
             toInsertInNewLap.clear();
-            lapTimeOfPingBefore.setStartDate();
+            lapTimeOfPingBefore.recomputeDates();
             // since toInsertInNewLap is backed by original list,
             // this removes all sub-list items from the original list
             lapTimeOfPingBefore.addIntermediates(insertAtIndex, ping);

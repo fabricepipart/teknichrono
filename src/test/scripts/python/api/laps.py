@@ -105,19 +105,24 @@ def printLaps(laps, withDates=False):
   for lap in laps:
     #print("Raw Lap : " + str(lap))
     #lapId = str(lap['id'])
-    startDateValue = lap['startDate']
-    if startDateValue:
-      startDate = pretty_hour(startDateValue)
-    else:
-      startDate = ''
-    endDateValue = lap['endDate']
-    if endDateValue:
-      endDate = pretty_hour(endDateValue)
-    else:
-      endDate = ''
+    startDate = ''
+    if 'startDate' in lap:
+      startDateValue = lap['startDate']
+      if startDateValue:
+        startDate = startDateValue
+    
+    endDate = ''
+    if 'endDate' in lap:
+      endDateValue = lap['endDate']
+      if endDateValue:
+        endDate = endDateValue
+
     pilot = str(lap['pilot']['firstName']) + ' ' + str(lap['pilot']['lastName'])
     lapIndex = str(lap['lapIndex']) + '/' + str(lap['lapNumber'])
-    lapTime = pretty_time_delta(lap['duration'])
+    
+    lapTime = '-'
+    if 'duration' in lap:
+      lapTime = pretty_time_delta_iso(lap['duration'])
     lapRow = [str(rowIndex)]
     lapRow.append(str(lap['pilot']['beaconNumber']))
     if withDates:
@@ -137,10 +142,16 @@ def printLaps(laps, withDates=False):
           if intermediate['fromChronoId'] != i:
             lapRow.append('')
           else:
-            lapRow.append(pretty_time_delta(intermediate['duration']))
+            lapRow.append(pretty_time_delta_iso(intermediate['duration']))
             intermediateIndex += 1
-    lapRow.append(pretty_time_delta(lap['gapWithBest']))
-    lapRow.append(pretty_time_delta(lap['gapWithPrevious']))
+    if 'gapWithBest' in lap:
+      lapRow.append(pretty_time_delta_iso(lap['gapWithBest']))
+    else:
+      lapRow.append('-')
+    if 'gapWithPrevious' in lap:
+      lapRow.append(pretty_time_delta_iso(lap['gapWithPrevious']))
+    else:
+      lapRow.append('-')
     table.add_row(lapRow)
     rowIndex += +1
   print(table)

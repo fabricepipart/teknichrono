@@ -1,224 +1,208 @@
 package org.trd.app.teknichrono.model.jpa;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.Version;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
-@XmlRootElement
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class Session implements java.io.Serializable {
+public class Session extends PanacheEntity {
 
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 8436060292277716599L;
+    @Version
+    @Column(name = "version")
+    private int version;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "id", unique = true, nullable = false)
-  private int id;
+    @Column(columnDefinition = "TIMESTAMP(3)", nullable = false)
+    private Instant start;
 
-  @Version
-  @Column(name = "version")
-  private int version;
+    @Column
+    private long inactivity = 0L;
 
-  @Column(columnDefinition="TIMESTAMP(3)", nullable = false)
-  private Timestamp start;
+    @Column(columnDefinition = "TIMESTAMP(3)", nullable = false)
+    private Instant end;
 
-  @Column
-  private long inactivity = 0L;
+    @Column(nullable = false)
+    private String type;
 
-  @Column(columnDefinition="TIMESTAMP(3)", nullable = false)
-  private Timestamp end;
+    @Column
+    private boolean current = false;
 
-  @Column(nullable = false)
-  private String type;
+    /**
+     * <pre>
+     * List of chrono points used for the event. From start to finish line.
+     * </pre>
+     */
+    @ManyToMany(fetch = FetchType.EAGER)
+    @OrderColumn(name = "chronoIndex")
+    private List<Chronometer> chronometers = new ArrayList<>();
 
-  @Column
-  private boolean current = false;
+    @Column(nullable = false)
+    private String name;
 
-  /**
-   * <pre>
-   * List of chrono points used for the event. From start to finish line.
-   * </pre>
-   */
-  @ManyToMany(fetch = FetchType.EAGER)
-  @OrderColumn(name = "chronoIndex")
-  private List<Chronometer> chronometers = new ArrayList<Chronometer>();
+    // Can be null if after event, items are reassociated
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "locationId")
+    private Location location;
 
-  @Column(nullable = false)
-  private String name;
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "eventId")
+    private Event event = null;
 
-  // Can be null if after event, items are reassociated
-  @ManyToOne(optional = true)
-  @JoinColumn(name = "locationId")
-  private Location location;
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Pilot> pilots = new HashSet<>();
 
-  @ManyToOne(optional = true)
-  @JoinColumn(name = "eventId")
-  private Event event = null;
+    public Long getId() {
+        return this.id;
+    }
 
-  @ManyToMany(fetch = FetchType.EAGER)
-  private Set<Pilot> pilots = new HashSet<Pilot>();
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-  public Set<Pilot> getPilots() {
-    return pilots;
-  }
+    public Set<Pilot> getPilots() {
+        return pilots;
+    }
 
-  public void setPilots(Set<Pilot> pilots) {
-    this.pilots = pilots;
-  }
+    public void setPilots(Set<Pilot> pilots) {
+        this.pilots = pilots;
+    }
 
-  public Event getEvent() {
-    return event;
-  }
+    public Event getEvent() {
+        return event;
+    }
 
-  public void setEvent(Event event) {
-    this.event = event;
-  }
+    public void setEvent(Event event) {
+        this.event = event;
+    }
 
-  public Location getLocation() {
-    return location;
-  }
+    public Location getLocation() {
+        return location;
+    }
 
-  public void setLocation(Location location) {
-    this.location = location;
-  }
+    public void setLocation(Location location) {
+        this.location = location;
+    }
 
-  public int getId() {
-    return this.id;
-  }
+    public void setId(long id) {
+        this.id = id;
+    }
 
-  public void setId(int id) {
-    this.id = id;
-  }
+    public int getVersion() {
+        return this.version;
+    }
 
-  public int getVersion() {
-    return this.version;
-  }
+    public void setVersion(final int version) {
+        this.version = version;
+    }
 
-  public void setVersion(final int version) {
-    this.version = version;
-  }
+    public Instant getStart() {
+        return start;
+    }
 
-  public Timestamp getStart() {
-    return start;
-  }
+    public void setStart(Instant beginning) {
+        this.start = beginning;
+    }
 
-  public void setStart(Timestamp beginning) {
-    this.start = beginning;
-  }
+    public Instant getEnd() {
+        return end;
+    }
 
-  public Timestamp getEnd() {
-    return end;
-  }
+    public void setEnd(Instant end) {
+        this.end = end;
+    }
 
-  public void setEnd(Timestamp end) {
-    this.end = end;
-  }
+    public List<Chronometer> getChronometers() {
+        return this.chronometers;
+    }
 
-  public List<Chronometer> getChronometers() {
-    return this.chronometers;
-  }
+    public void setChronometers(final List<Chronometer> chronometers) {
+        this.chronometers = chronometers;
+    }
 
-  public void setChronometers(final List<Chronometer> chronometers) {
-    this.chronometers = chronometers;
-  }
-
-  public int getChronoIndex(Chronometer chronometer) {
-    if (getChronometers() != null) {
-      int index = 0;
-      for (Chronometer c : getChronometers()) {
-        if (c.getId() == chronometer.getId()) {
-          return index;
+    public long getChronoIndex(Chronometer chronometer) {
+        if (getChronometers() != null) {
+            long index = 0;
+            for (Chronometer c : getChronometers()) {
+                if (Objects.equals(c.id, chronometer.id)) {
+                    return index;
+                }
+                index++;
+            }
         }
-        index++;
-      }
+        return -1;
     }
-    return -1;
-  }
 
-  public void addChronometer(Chronometer chronometer, Integer insertAtIndex) {
-    this.chronometers.add(insertAtIndex, chronometer);
-  }
-
-  public void addChronometer(Chronometer chronometer) {
-    this.chronometers.add(chronometer);
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public SessionType getSessionType() {
-    for (SessionType sessionType : SessionType.values()) {
-      if (type != null && type.equals(sessionType.getIdentifier())) {
-        return sessionType;
-      }
+    public void addChronometer(Chronometer chronometer, int insertAtIndex) {
+        this.chronometers.add(insertAtIndex, chronometer);
     }
-    return SessionType.TIME_TRIAL;
-  }
 
-  public void setSessionType(SessionType type) {
-    this.type = type.getIdentifier();
-  }
-
-  public String getType() {
-    return type;
-  }
-
-  public void setType(String type) {
-    this.type = type;
-  }
-
-  public long getInactivity() {
-    return inactivity;
-  }
-
-  public void setInactivity(long inactivity) {
-    this.inactivity = inactivity;
-  }
-
-  public boolean isCurrent() {
-    return current;
-  }
-
-  public void setCurrent(boolean current) {
-    this.current = current;
-  }
-
-  @Override
-  public String toString() {
-    String result = getClass().getSimpleName() + " ";
-    if (name != null && !name.trim().isEmpty()) {
-      result += "name: " + name;
-      result += " from: " + start;
-      result += " to: " + end;
+    public void addChronometer(Chronometer chronometer) {
+        this.chronometers.add(chronometer);
     }
-    return result;
-  }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public SessionType getSessionType() {
+        for (SessionType sessionType : SessionType.values()) {
+            if (type != null && type.equals(sessionType.getIdentifier())) {
+                return sessionType;
+            }
+        }
+        return SessionType.TIME_TRIAL;
+    }
+
+    public void setSessionType(SessionType type) {
+        this.type = type.getIdentifier();
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public long getInactivity() {
+        return inactivity;
+    }
+
+    public void setInactivity(long inactivity) {
+        this.inactivity = inactivity;
+    }
+
+    public boolean isCurrent() {
+        return current;
+    }
+
+    public void setCurrent(boolean current) {
+        this.current = current;
+    }
+
+    @Override
+    public String toString() {
+        return "Session{" +
+                "name='" + name + '\'' +
+                ", start=" + start +
+                ", end=" + end +
+                '}';
+    }
 }

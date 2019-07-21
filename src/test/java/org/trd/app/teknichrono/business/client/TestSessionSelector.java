@@ -1,41 +1,45 @@
 package org.trd.app.teknichrono.business.client;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.trd.app.teknichrono.model.jpa.Beacon;
 import org.trd.app.teknichrono.model.jpa.Chronometer;
+import org.trd.app.teknichrono.model.jpa.LapTimeCreatorForTests;
 import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.model.jpa.Ping;
 import org.trd.app.teknichrono.model.jpa.Session;
-import org.trd.app.teknichrono.model.jpa.TestLapTimeCreator;
 
-import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import static org.assertj.core.api.Assertions.*;
+
 
 public class TestSessionSelector {
 
   private final long HOUR = 60 * 60 * 1000L;
-  private int id = 1;
-  private long now = System.currentTimeMillis();
+  private long id = 1;
+  private Instant now = Instant.now();
 
-  SessionSelector selector = new SessionSelector();
+  private final SessionSelector selector = new SessionSelector();
 
   private Ping ping = new Ping();
   private Chronometer chrono = new Chronometer();
   private Pilot pilot = new Pilot();
   private Beacon beacon = new Beacon();
 
-  @Before
+  @BeforeEach
   public void prepare() {
-    chrono.setId(id++);
+    chrono.id = id++;
     ping.setChrono(chrono);
-    ping.setId(id++);
-    ping.setDateTime(new Timestamp(now));
-    pilot.setId(id++);
+    ping.id = id++;
+    ping.setInstant(now);
+    pilot.id = id++;
     beacon.setPilot(pilot);
-    beacon.setId(id++);
+    beacon.id = id++;
     ping.setBeacon(beacon);
   }
 
@@ -55,21 +59,21 @@ public class TestSessionSelector {
     sessions.add(s1);
     sessions.add(s2);
     Session session = selector.pickMostRelevantCurrent(sessions);
-    Assert.assertEquals(s0.getId(), session.getId());
+    assertThat(session.id).isEqualTo(s0.id);
   }
 
   @Test
   public void picksNullIfNoSession() {
     List<Session> sessions = new ArrayList<>();
     Session session = selector.pickMostRelevantCurrent(sessions);
-    Assert.assertEquals(null, session);
+    assertThat(session).isNull();
   }
 
   private Session createSession(long start, long end) {
     Session s = new Session();
     s.setId(id++);
-    s.setStart(new Timestamp(now + start));
-    s.setEnd(new Timestamp(now + end));
+    s.setStart(now.plus(Duration.ofMillis(start)));
+    s.setEnd(now.plus(Duration.ofMillis(end)));
     return s;
   }
 
@@ -79,7 +83,7 @@ public class TestSessionSelector {
     Session s1 = addSession(2 * HOUR, 4 * HOUR);
     Session s2 = addSession(-4 * HOUR, -2 * HOUR);
     Session session = selector.pickMostRelevant(ping);
-    Assert.assertEquals(s0.getId(), session.getId());
+    assertThat(session.id).isEqualTo(s0.id);
   }
 
   @Test
@@ -89,7 +93,7 @@ public class TestSessionSelector {
     Session s2 = addSession(10 * HOUR, 12 * HOUR);
     Session s3 = addSession(22 * HOUR, 24 * HOUR);
     Session session = selector.pickMostRelevant(ping);
-    Assert.assertEquals(s1.getId(), session.getId());
+    assertThat(session.id).isEqualTo(s1.id);
   }
 
   @Test
@@ -98,7 +102,7 @@ public class TestSessionSelector {
     Session s1 = addSession(2 * HOUR, 4 * HOUR);
     Session s2 = addSession(10 * HOUR, 20 * HOUR);
     Session session = selector.pickMostRelevant(ping);
-    Assert.assertTrue(s0.getId() == session.getId() || s1.getId() == session.getId());
+    assertThat(Objects.equals(s0.id, session.id) || Objects.equals(s1.id, session.id)).isTrue();
   }
 
   @Test
@@ -106,7 +110,7 @@ public class TestSessionSelector {
     Session s0 = addSession(48 * HOUR, 50 * HOUR);
     Session s1 = addSession(72 * HOUR, 74 * HOUR);
     Session session = selector.pickMostRelevant(ping);
-    Assert.assertNull(session);
+    assertThat(session).isNull();
   }
 
   @Test
@@ -118,12 +122,12 @@ public class TestSessionSelector {
     s0.getPilots().add(pilot);
     s3.getPilots().add(pilot);
     Session session = selector.pickMostRelevant(ping);
-    Assert.assertEquals(s3.getId(), session.getId());
+    assertThat(session.id).isEqualTo(s3.id);
   }
 
   @Test
   public void picksClosestIfPilotPartOfNoSession() {
-    List otherPilots = new ArrayList();
+    List<Pilot> otherPilots = new ArrayList<>();
     otherPilots.add(new Pilot());
     otherPilots.add(new Pilot());
     otherPilots.add(new Pilot());
@@ -134,7 +138,7 @@ public class TestSessionSelector {
     s0.getPilots().addAll(otherPilots);
     s1.getPilots().addAll(otherPilots);
     Session session = selector.pickMostRelevant(ping);
-    Assert.assertEquals(s1.getId(), session.getId());
+    assertThat(session.id).isEqualTo(s1.id);
   }
 
   @Test
@@ -153,7 +157,7 @@ public class TestSessionSelector {
     s5.setCurrent(true);
     s6.setCurrent(true);
     Session session = selector.pickMostRelevant(ping);
-    Assert.assertEquals(s6.getId(), session.getId());
+    assertThat(session.id).isEqualTo(s6.id);
   }
 
   @Test
@@ -176,7 +180,7 @@ public class TestSessionSelector {
     s7.setCurrent(true);
 
     Session session = selector.pickMostRelevant(ping);
-    Assert.assertEquals(s5.getId(), session.getId());
+    assertThat(session.id).isIn(s5.id, s6.id, s7.id);
   }
 
   @Test
@@ -198,7 +202,7 @@ public class TestSessionSelector {
     s6.setCurrent(true);
     s7.setCurrent(true);
 
-    TestLapTimeCreator creator = new TestLapTimeCreator();
+    LapTimeCreatorForTests creator = new LapTimeCreatorForTests();
     creator.setPilot(pilot);
     creator.setSession(s5);
     pilot.getLaps().add(creator.createLapTimeWithIntermediates(10000, 20000, 30000, 40000));
@@ -214,7 +218,7 @@ public class TestSessionSelector {
     pilot.getLaps().add(creator.createLapTimeWithIntermediates(410000, 420000, 430000, 440000));
 
     Session session = selector.pickMostRelevant(ping);
-    Assert.assertEquals(s6.getId(), session.getId());
+    assertThat(session.id).isEqualTo(s6.id);
   }
 
 }

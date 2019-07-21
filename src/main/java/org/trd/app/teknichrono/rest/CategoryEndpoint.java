@@ -3,13 +3,11 @@ package org.trd.app.teknichrono.rest;
 import org.trd.app.teknichrono.model.dto.CategoryDTO;
 import org.trd.app.teknichrono.model.jpa.Category;
 import org.trd.app.teknichrono.model.jpa.Pilot;
+import org.trd.app.teknichrono.model.repository.CategoryRepository;
+import org.trd.app.teknichrono.model.repository.PilotRepository;
 
-import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.OptimisticLockException;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
+import javax.inject.Inject;
+import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -19,147 +17,73 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
 import java.util.List;
-import java.util.Set;
 
-/**
- *
- */
-@Stateless
 @Path("/categories")
 public class CategoryEndpoint {
-  @PersistenceContext(unitName = "teknichrono-persistence-unit")
-  private EntityManager em;
+
+  private final EntityEndpoint<Category, CategoryDTO> entityEndpoint;
+  private final PilotRepository pilotRepository;
+
+  @Inject
+  public CategoryEndpoint(CategoryRepository categoryRepository, PilotRepository pilotRepository) {
+    this.pilotRepository = pilotRepository;
+    this.entityEndpoint = new EntityEndpoint<>(categoryRepository);
+  }
 
   @POST
-  @Consumes("application/json")
-  public Response create(Category entity) {
-    em.persist(entity);
-    return Response
-        .created(UriBuilder.fromResource(CategoryEndpoint.class).path(String.valueOf(entity.getId())).build()).build();
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response create(CategoryDTO entity) {
+    return entityEndpoint.create(entity, entity.getName());
   }
 
   @DELETE
   @Path("/{id:[0-9][0-9]*}")
-  public Response deleteById(@PathParam("id") int id) {
-    Category entity = em.find(Category.class, id);
-    if (entity == null) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
-    Set<Pilot> pilots = entity.getPilots();
-    if (pilots != null) {
-      for (Pilot pilot : pilots) {
-        pilot.setCategory(null);
-        em.persist(pilot);
-      }
-    }
-    em.remove(entity);
-    return Response.noContent().build();
+  @Transactional
+  public Response deleteById(@PathParam("id") long id) {
+    return entityEndpoint.deleteById(id);
   }
 
   @GET
   @Path("/{id:[0-9][0-9]*}")
-  @Produces("application/json")
-  public Response findById(@PathParam("id") int id) {
-    TypedQuery<Category> findByIdQuery = em.createQuery(
-        "SELECT DISTINCT e FROM Category e LEFT JOIN FETCH e.pilots WHERE e.id = :entityId ORDER BY e.id",
-        Category.class);
-    findByIdQuery.setParameter("entityId", id);
-    Category entity;
-    try {
-      entity = findByIdQuery.getSingleResult();
-    } catch (NoResultException nre) {
-      entity = null;
-    }
-    if (entity == null) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
-    CategoryDTO dto = new CategoryDTO(entity);
-    return Response.ok(dto).build();
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response findById(@PathParam("id") long id) {
+    return entityEndpoint.findById(id);
   }
 
   @GET
   @Path("/name")
-  @Produces("application/json")
-  public CategoryDTO findCategoryByName(@QueryParam("name") String name) {
-    TypedQuery<Category> findByNameQuery = em.createQuery(
-        "SELECT DISTINCT e FROM Category e LEFT JOIN FETCH e.pilots WHERE e.name = :name ORDER BY e.id",
-        Category.class);
-    findByNameQuery.setParameter("name", name);
-    Category entity;
-    try {
-      entity = findByNameQuery.getSingleResult();
-    } catch (NoResultException nre) {
-      entity = null;
-    }
-    CategoryDTO dto = new CategoryDTO(entity);
-    return dto;
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response findCategoryByName(@QueryParam("name") String name) {
+    return entityEndpoint.findByField("name", name);
   }
 
   @GET
-  @Produces("application/json")
-  public List<CategoryDTO> listAll(@QueryParam("start") Integer startPosition, @QueryParam("max") Integer maxResult) {
-    TypedQuery<Category> findAllQuery = em
-        .createQuery("SELECT DISTINCT e FROM Category e LEFT JOIN FETCH e.pilots ORDER BY e.id", Category.class);
-    if (startPosition != null) {
-      findAllQuery.setFirstResult(startPosition);
-    }
-    if (maxResult != null) {
-      findAllQuery.setMaxResults(maxResult);
-    }
-    final List<Category> results = findAllQuery.getResultList();
-    final List<CategoryDTO> converted = CategoryDTO.convert(results);
-    return converted;
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public List<CategoryDTO> listAll(@QueryParam("page") Integer pageIndex, @QueryParam("pageSize") Integer pageSize) {
+    return entityEndpoint.listAll(pageIndex, pageSize);
   }
 
   @POST
   @Path("{categoryId:[0-9][0-9]*}/addPilot")
-  @Produces("application/json")
-  public Response addPilot(@PathParam("categoryId") int categoryId, @QueryParam("pilotId") Integer pilotId) {
-    Category category = em.find(Category.class, categoryId);
-    if (category == null) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
-    Pilot pilot = em.find(Pilot.class, pilotId);
-    if (pilot == null) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
-    pilot.setCategory(category);
-    category.getPilots().add(pilot);
-    em.persist(category);
-    for (Pilot c : category.getPilots()) {
-      em.persist(c);
-    }
-    CategoryDTO dto = new CategoryDTO(category);
-    return Response.ok(dto).build();
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response addPilot(@PathParam("categoryId") long categoryId, @QueryParam("pilotId") Long pilotId) {
+    return entityEndpoint.addToCollectionField(categoryId, pilotId, pilotRepository,
+        Pilot::setCategory, Category::getPilots);
   }
 
   @PUT
   @Path("/{id:[0-9][0-9]*}")
-  @Consumes("application/json")
-  public Response update(@PathParam("id") int id, CategoryDTO entity) {
-    if (entity == null) {
-      return Response.status(Status.BAD_REQUEST).build();
-    }
-    if (id != entity.getId()) {
-      return Response.status(Status.CONFLICT).entity(entity).build();
-    }
-    Category category = em.find(Category.class, id);
-    if (category == null) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
-    //TODO I dont like this code, merge is done twice (inside fromDTO too)
-    // It is hard to test, a manual update is probably better
-    try {
-      category = entity.fromDTO(category, em);
-      em.merge(category);
-    } catch (OptimisticLockException e) {
-      return Response.status(Response.Status.CONFLICT).entity(e.getEntity()).build();
-    }
-
-    return Response.noContent().build();
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response update(@PathParam("id") long id, CategoryDTO dto) {
+    return entityEndpoint.update(id, dto);
   }
 }

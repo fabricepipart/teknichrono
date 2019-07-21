@@ -1,36 +1,17 @@
 package org.trd.app.teknichrono.model.jpa;
 
-import java.util.ArrayList;
-import java.util.List;
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@XmlRootElement
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class Location implements java.io.Serializable {
-
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 7127979330876487660L;
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "id", unique = true, nullable = false)
-  private int id;
+public class Location extends PanacheEntity {
 
   @Version
   @Column(name = "version")
@@ -47,14 +28,13 @@ public class Location implements java.io.Serializable {
 
   @OneToMany(orphanRemoval = true)
   @JoinColumn(name = "locationId")
-  @JsonBackReference(value = "session-location")
-  private List<Session> sessions = new ArrayList<Session>();
+  private Set<Session> sessions = new HashSet<>();
 
-  public int getId() {
+  public Long getId() {
     return this.id;
   }
 
-  public void setId(int id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
@@ -82,11 +62,11 @@ public class Location implements java.io.Serializable {
     this.loopTrack = loop;
   }
 
-  public List<Session> getSessions() {
+  public Set<Session> getSessions() {
     return this.sessions;
   }
 
-  public void setSessions(final List<Session> sessions) {
+  public void setSessions(final Set<Session> sessions) {
     this.sessions = sessions;
   }
 

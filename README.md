@@ -4,10 +4,6 @@
 
 * [Project home](https://github.com/fabricepipart/teknichrono)
 * [Alternative home](https://bitbucket.org/trdteam/teknichrono/overview)
-* [Staging](http://teknichrono-fabrice-pipart-stage.b542.starter-us-east-2a.openshiftapps.com/)
-* [Prod](http://frontend-fabrice-pipart-run.b542.starter-us-east-2a.openshiftapps.com/)
-* [Jenkins](https://jenkins.openshift.io/job/fabricepipart/job/teknichrono/)
-* [OpenShift](https://console.starter-us-east-2a.openshift.com/console/project/fabrice-pipart/browse/pipelines)
 
 ## Description
 
@@ -20,52 +16,91 @@ This project is the backend part of the Software: the REST API that sits on a se
 
 ### Architecture
 
-The backend part is based on Wildfly that receives API calls implemented with Jax-RS. Persistence is implemented with Hibernate and JPA.
-The testing part of the project is based on JUnits (very few) and Python end to end tests that simulate real activity.
+The backend part is based on Quarkus that receives API calls implemented with Jax-RS. Persistence is implemented with Hibernate and JPA.
+The testing part of the project is based on JUnits (very few), QuarkusTest and Python end to end tests that simulate real activity.
 
-## How to use
+### Requirements
 
-### How to run locally
+* Java 8
+* Maven 3.6
 
-* You may need to adapt ```src/main/resources/project-defaults.yaml```
-* Start the server:
-  * Normally : ```mvn thorntail:run``` 
-  * With MariaDB Datasource : ```java -jar target/teknichrono-thorntail.jar -Smariadb```
-  * Package ```mvn clean package``` and run ```java -jar target/teknichrono-thorntail.jar -Sh2```
-  * In debug mode : ```mvn thorntail:run -Dswarm.debug.port=5555```
-  * With debug logs : ```mvn thorntail:run -Dswarm.logging=DEBUG```
-* Run the E2E tests : ```./src/test/scripts/bash/moto_tests.sh``` (or any bash script in this folder)
+## How to build
 
-### How to run on OpenShift
+### How to build locally
 
-* ```oc login https://api.starter-us-east-2a.openshift.com --token=******```
-* ```mvn clean install -P openshift -Dimage.namespace=teknichrono-staging```
-* ```mvn -B fabric8:apply -P openshift -Dimage.namespace=teknichrono-staging```
+```mvn clean verify```
 
-## CI Build
+### How to build via OpenShift
 
-### Kubernetes build images
+```bash
+oc new-build --binary --name teknichrono-quarkus --to='teknichrono-quarkus:local'
+oc patch bc/teknichrono-quarkus -p "{\"spec\":{\"strategy\":{\"dockerStrategy\":{\"dockerfilePath\":\"src/main/docker/Dockerfile\"}}}}"
+oc start-build teknichrono-quarkus --from-dir=. --follow
+```
+
+### CI Build and Kubernetes build images
+
 The project relies on the Kubernetes plugin to run its CI in Jenkins.
 The podTemplate referenced here has the following settings:
-```
+
+```groovy
   podTemplate(label:label , cloud: 'openshift', serviceAccount:'jenkins', containers: [	
     containerTemplate(name: 'maven', image: 'maven:3.6-jdk-8-alpine',	ttyEnabled: true, command: 'cat'),	
     containerTemplate(name: 'python', image: 'docker.io/python:3.6-slim',	ttyEnabled: true, command: 'cat')]) {
       ...
   }
 ```
+
 I did not provide the configuration inline because, I integrated a Nexus proxy to speed up the builds in my case. It requires providing a custom build image in order to customize the ```settings.xml``` .
 
-### Interact with Raspberry
+## How to run
+
+There are three profiles. See in ```src/main/resources/application.properties```.
+
+### How to run locally with dev profile
+
+```mvn quarkus:dev```
+
+### How to run locally with localmariadb profile
+
+First:
+```oc port-forward mariadb-3-qgvwj 3306:3306```
+then
+```mvn quarkus:dev -Dquarkus-profile=localmariadb```
+or
+```java -jar target/teknichrono-runner.jar -Dquarkus-profile=localmariadb```
+
+### How to run on OpenShift
+
+```bash
+oc new-app --image-stream=teknichrono-quarkus:local
+oc expose service teknichrono-quarkus --name=teknichrono-quarkus-route --port=8080 --hostname=teknichrono-quarkus.h-y.fr
+```
+
+## How to test
+
+### JUnit
+
+```mvn clean test```
+
+### QuarkusTest
+
+```mvn clean verify```
+
+### End to End
+
+Run the E2E tests : ```./src/test/scripts/bash/moto_tests.sh``` (or any bash script in this folder)
+
+## Interact with Raspberry
 
 See [the client documentation](src/main/client/Readme.md)
 
-### How to re-generate scaffhold:
+## How to re-generate scaffhold:
 
 * Delete ```src/main/webapp```
 * In Ecipse run Forge (Command + ' or Ctrl + 4) with default settings and AngularJS
 
-### Services
+## Services
 
 TODO List of the REST API services here
 
@@ -102,9 +137,18 @@ For the time being, you can have a look in: ```src/main/java/org/trd/app/teknich
 * Jenkins
   * https://github.com/jenkinsci/kubernetes-plugin
   * https://github.com/openshift/jenkins/tree/master/agent-maven-3.5
-  * https://github.com/jenkinsci/kubernetes-plugin
+  * https://github.com/openshift/jenkins-client-plugin
 * Database
   * https://webmasters.stackexchange.com/questions/2242/how-to-create-separate-users-in-phpmyadmin-each-one-cant-see-others-databases
 * Python
   * https://stackoverflow.com/questions/9190169/threading-and-information-passing-how-to
   * https://pymotw.com/2/threading/
+
+## Quarkus migration todo list
+ 
+ * Proper health check as per https://quarkus.io/guides/health-guide
+ * Remote dev mode
+ * Create proper Template
+ * Create proper build
+ * Debug mode?
+ * Debug log level?

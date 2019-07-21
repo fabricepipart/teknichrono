@@ -1,57 +1,29 @@
 package org.trd.app.teknichrono.model.jpa;
 
-import java.util.HashSet;
-import java.util.Set;
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@XmlRootElement
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class Category implements java.io.Serializable {
-
-  /**
-   * 
-   */
-  private static final long serialVersionUID = -1694655875930305512L;
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "id", unique = true, nullable = false)
-  private int id;
+public class Category extends PanacheEntity {
 
   @Version
   @Column(name = "version")
   private int version;
 
-  @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(fetch = FetchType.EAGER)
   @JoinColumn(name = "categoryId")
-  @JsonBackReference(value = "pilot-category")
   private Set<Pilot> pilots = new HashSet<>();
 
   @Column(nullable = false)
   private String name;
-
-  public int getId() {
-    return this.id;
-  }
-
-  public void setId(int id) {
-    this.id = id;
-  }
 
   public int getVersion() {
     return this.version;
@@ -59,6 +31,14 @@ public class Category implements java.io.Serializable {
 
   public void setVersion(final int version) {
     this.version = version;
+  }
+
+  public Long getId() {
+    return this.id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
   }
 
   public Set<Pilot> getPilots() {
