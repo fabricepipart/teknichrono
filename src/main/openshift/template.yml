@@ -1,0 +1,126 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: teknichrono-template
+  annotations:
+    description: "Teknichrono"
+    iconClass: "icon-openshift"
+    tags: "teknichrono,quarkus,openshift"
+objects:
+
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: teknichrono
+    name: teknichrono-staging
+  spec:
+    replicas: 1
+    selector:
+      app: teknichrono-staging
+      deploymentconfig: teknichrono-staging
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          app: teknichrono-staging
+          deploymentconfig: teknichrono-staging
+      spec:
+        containers:
+          - image: >-
+              docker-registry.default.svc:5000/ci/teknichrono@sha256:fdc1bbcc9891b21f7611f044dc8a1ceb82fd1af88006974da2a4bf5c2e7a4ea4
+            imagePullPolicy: IfNotPresent
+            name: teknichrono-staging
+            ports:
+              - containerPort: 8080
+                protocol: TCP
+              - containerPort: 8778
+                protocol: TCP
+              - containerPort: 9779
+                protocol: TCP
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: teknichrono-staging
+    name: teknichrono-staging
+  spec:
+    clusterIP: 172.30.145.237
+    ports:
+      - name: 8080-tcp
+        port: 8080
+        protocol: TCP
+        targetPort: 8080
+      - name: 8778-tcp
+        port: 8778
+        protocol: TCP
+        targetPort: 8778
+      - name: 9779-tcp
+        port: 9779
+        protocol: TCP
+        targetPort: 9779
+    selector:
+      app: teknichrono-staging
+      deploymentconfig: teknichrono-staging
+    sessionAffinity: None
+    type: ClusterIP
+
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    labels:
+      app: teknichrono-staging
+    name: teknichrono-staging-route
+  spec:
+    host: teknichrono-teknichrono-staging.router.default.svc.cluster.local
+    port:
+      targetPort: 8080
+    to:
+      kind: Service
+      name: teknichrono-staging
+      weight: 100
+    wildcardPolicy: None
+
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    labels:
+      app: teknichrono-staging
+    name: teknichrono-staging-route-ext
+  spec:
+    host: teknichrono-staging.h-y.fr
+    port:
+      targetPort: 8080
+    to:
+      kind: Service
+      name: teknichrono-staging
+      weight: 100
+    wildcardPolicy: None
+
+
+
+parameters:
+- description: Password used for Redis authentication
+  from: '[A-Z0-9]{8}'
+  generate: expression
+  name: REDIS_PASSWORD
+labels:
+  app: teknichrono

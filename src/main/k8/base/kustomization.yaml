@@ -1,0 +1,5 @@
+commonLabels:
+  app: teknichrono
+resources:
+- deployment.yaml
+- service.yaml
