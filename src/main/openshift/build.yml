@@ -1,0 +1,19 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    build: teknichrono
+  name: teknichrono
+  namespace: ci
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: 'teknichrono:2.0.0-PR-88.1'
+  source:
+    binary: {}
+    type: Binary
+  strategy:
+    dockerStrategy:
+      dockerfilePath: src/main/docker/Dockerfile
+    type: Docker

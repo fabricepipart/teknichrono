@@ -1,0 +1,6 @@
+commonLabels:
+  env: staging
+bases:
+- ../../base
+resources:
+- ingress.yaml
