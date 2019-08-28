@@ -6,7 +6,7 @@ from rest import get
 class Chronometer:
   def __init__(self, name, host):
     self.name = name
-    self.restApiUrl = 'http://' + host + '/rest/chronometers'
+    self.restApiUrl = 'https://' + host + '/rest/chronometers'
     self.id = self.getChronometerByName(name)['id']
 
   def getChronometerByName(self, name):

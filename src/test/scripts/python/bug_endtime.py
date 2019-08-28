@@ -1,6 +1,5 @@
-from api.session import addSession, addChronometerToSession, addPilotToSession, startSession, endSession
-from datetime import date, datetime, timedelta
-from api.location import addSessionToLocation
+from datetime import datetime
+from api.session import addSession
 from api.event import addSessionToEvent, addEvent
 
 event = addEvent('event11')
