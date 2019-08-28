@@ -6,7 +6,10 @@ import logging
 import os
 import socket
 from multiprocessing import Queue
-from bluetooth_scanner import BluetoothScanner
+if os.getenv('DEMO_MODE', 'false') == 'false':
+  from bluetooth_scanner import BluetoothScanner
+else:
+  from demo_scanner import FakeBluetoothScanner
 from select_first import SelectFirstStrategy
 from select_last import SelectLastStrategy
 from select_high import SelectHighStrategy
@@ -14,6 +17,7 @@ from send_none import SendNoneStrategy
 from send_async import SendAsyncStrategy
 from chrono import Chronometer
 
+LOGS_PATH = os.getenv('LOGS_PATH', '/home/pi/scripts/logs')
 DEBUG = (os.getenv('TEKNICHRONO_DEBUG', 'false') == 'true')
 BT_DEBUG = (os.getenv('TEKNICHRONO_BT_DEBUG', 'false') == 'true')
 PING_SELECTION_STRATEGY = os.getenv('PING_SELECTION_STRATEGY', 'FIRST')
@@ -24,12 +28,12 @@ CHRONO_NAME = os.getenv('CHRONO_NAME', 'Raspberry')
 
 
 def setupBackupFile():
-  return open('/home/pi/scripts/logs/all_pings.log', 'a', buffering=1)
+  return open(LOGS_PATH + '/all_pings.log', 'a', buffering=1)
 
 
 def setupLogging():
   # set up logging to file
-  fh = logging.FileHandler('/home/pi/scripts/logs/teknichrono.log')
+  fh = logging.FileHandler(LOGS_PATH + '/teknichrono.log')
   # create console handler with a higher log level
   ch = logging.StreamHandler()
   # Set log levels
@@ -88,7 +92,10 @@ logger.info('TEKNICHRONO_SERVER = ' + TEKNICHRONO_SERVER)
 logger.info('CHRONO_NAME = ' + CHRONO_NAME)
 logger.info('--------------------------------------')
 
-scanner = BluetoothScanner()
+if os.getenv('DEMO_MODE', 'false') == 'false':
+  scanner = BluetoothScanner()
+else:
+  scanner = FakeBluetoothScanner()
 scanner.init()
 
 chrono = Chronometer(CHRONO_NAME, TEKNICHRONO_SERVER)

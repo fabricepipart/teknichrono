@@ -5,7 +5,7 @@ from rest import post, formatDatetime
 
 class Ping:
   def __init__(self, host):
-    self.restApiUrl = 'http://' + host + '/rest/pings'
+    self.restApiUrl = 'https://' + host + '/rest/pings'
 
   def ping(self, instant, pilotBeaconId, power, chronoId):
     "This adds a Ping"

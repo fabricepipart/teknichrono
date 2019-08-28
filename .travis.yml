@@ -63,7 +63,8 @@ jobs:
       script:
         - mvn process-resources
         - kubectl delete all -n teknichrono-prod -l app=teknichrono --wait=true
-        - kubectl kustomize target/classes/overlays/staging | kubectl apply -n teknichrono-prod -f -
+        - kubectl kustomize target/classes/overlays/prod | kubectl apply -n teknichrono-prod -f -
+        - while ! curl -fs https://www.teknichrono.fr > /dev/null; do echo 'Not started yet ...'; sleep 5; done
 
 
 

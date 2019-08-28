@@ -6,7 +6,7 @@ from rest import get
 class Beacon:
   def __init__(self, number, host):
     self.number = number
-    self.restApiUrl = 'http://' + host + '/rest/beacons'
+    self.restApiUrl = 'https://' + host + '/rest/beacons'
     self.id = self.getBeaconByNumber(number)['id']
 
   def getBeaconByNumber(self, number):

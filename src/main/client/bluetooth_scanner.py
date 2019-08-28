@@ -31,7 +31,7 @@ class BluetoothScanner:
     try:
       current = blescan.parse_events(self.sock, 1)
     except Exception as ex:
-      self.logger.debug("Not bluetooth device found : " + type(ex).__name__)
+      self.logger.debug("No bluetooth device found : " + type(ex).__name__)
       current = []
     if len(current) > 0:
       scanned = BeaconScan()
