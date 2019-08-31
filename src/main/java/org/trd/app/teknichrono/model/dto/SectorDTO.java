@@ -14,19 +14,24 @@ public class SectorDTO {
   private Long fromChronoId;
   private Long toChronoId;
 
-  SectorDTO(final Ping from, final Ping to) {
+
+  public static SectorDTO from(final Ping from, final Ping to) {
+    SectorDTO dto = new SectorDTO();
     if (from != null && to != null) {
-      this.start = from.getInstant();
-      this.duration = Duration.between(start, to.getInstant());
-      this.fromChronoId = from.getChrono().id;
-      this.toChronoId = to.getChrono().id;
+      dto.start = from.getInstant();
+      dto.duration = Duration.between(dto.start, to.getInstant());
+      dto.fromChronoId = from.getChrono().id;
+      dto.toChronoId = to.getChrono().id;
     }
+    return dto;
   }
 
-  SectorDTO(final Instant start, final long fromChronoId, final Duration duration) {
-    this.start = start;
-    this.duration = duration;
-    this.fromChronoId = fromChronoId;
-    this.toChronoId = 0L;
+  public static SectorDTO from(Instant previousLastEnd, Instant endDate, long previousLastChronoId) {
+    SectorDTO dto = new SectorDTO();
+    dto.start = previousLastEnd;
+    dto.duration = Duration.between(previousLastEnd, endDate);
+    dto.fromChronoId = previousLastChronoId;
+    dto.toChronoId = 0L;
+    return dto;
   }
 }

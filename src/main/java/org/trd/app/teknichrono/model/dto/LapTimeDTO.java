@@ -3,9 +3,7 @@ package org.trd.app.teknichrono.model.dto;
 import lombok.Data;
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.jpa.LapTime;
-import org.trd.app.teknichrono.model.jpa.Ping;
 
-import javax.persistence.EntityManager;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -35,31 +33,10 @@ public class LapTimeDTO implements EntityDTO {
     return DtoMapper.INSTANCE.asLapTimeDTO(lapTime);
   }
 
-  public LapTime fromDTO(LapTime entity, EntityManager em) {
-    if (entity == null) {
-      entity = new LapTime();
-    }
-    entity.setVersion(this.version);
-    if (this.pilot != null) {
-      entity.setPilot(this.pilot.fromDTO(entity.getPilot(), em));
-    }
-    if (this.session != null) {
-      entity.setSession(this.session.fromDTO(entity.getSession(), em));
-    }
-    if (!this.intermediates.isEmpty()) {
-      LOGGER.error("Sorry I cannot rebuild a LapTime from a LapTimeDTO. Leaving list empty.");
-    }
-    entity = em.merge(entity);
-    return entity;
-  }
 
   public void setStartDate(Instant startDate) {
     this.startDate = startDate;
     this.duration = computeDuration(startDate, this.endDate);
-  }
-
-  public void setStartDate(Ping start) {
-    setStartDate(start.getInstant());
   }
 
   public void setEndDate(Instant endDate) {
@@ -87,7 +64,8 @@ public class LapTimeDTO implements EntityDTO {
       Instant previousLastStart = previousLast.getStart();
       Instant previousLastEnd = previousLastStart.plus(previousLast.getDuration());
       long previousLastChronoId = previousLast.getToChronoId();
-      this.intermediates.add(new SectorDTO(previousLastEnd, previousLastChronoId, Duration.between(previousLastEnd, endDate)));
+      SectorDTO dto = SectorDTO.from(previousLastEnd, endDate, previousLastChronoId);
+      this.intermediates.add(dto);
     }
     setEndDate(endDate);
   }

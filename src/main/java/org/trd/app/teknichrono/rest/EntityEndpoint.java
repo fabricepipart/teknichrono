@@ -1,6 +1,7 @@
 package org.trd.app.teknichrono.rest;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.repository.Repository;
 import org.trd.app.teknichrono.util.DurationLogger;
@@ -24,17 +25,16 @@ public class EntityEndpoint<E extends PanacheEntity, D> {
     this.repository = repository;
   }
 
-
-  public Response create(D entity, String identifier) {
+  public Response create(D dto, String identifier) {
     try (DurationLogger dl = DurationLogger.get(LOGGER).start("Create " + repository.getEntityName() + " " + identifier)) {
       try {
-        repository.create(entity);
+        repository.create(dto);
+        return Response.noContent().build();
       } catch (NotFoundException e) {
         return Response.status(Response.Status.NOT_FOUND).build();
       } catch (ConflictingIdException e) {
         return Response.status(Response.Status.CONFLICT).build();
       }
-      return Response.noContent().build();
     }
   }
 
@@ -67,14 +67,55 @@ public class EntityEndpoint<E extends PanacheEntity, D> {
   }
 
 
-  public <F extends PanacheEntity> Response addToCollectionField(long entityId, long fieldEntityId, Repository<F, ?> elementRepository,
-                                                                 BiConsumer<F, E> fieldEntitySetter,
+  public <F extends PanacheEntity> Response addToOneToManyField(long entityId, long fieldEntityId, PanacheRepository<F> elementRepository,
+                                                                BiConsumer<F, E> fieldEntitySetter,
+                                                                Function<E, ? extends Collection<F>> entityListGetter) {
+    try (DurationLogger dl = DurationLogger.get(LOGGER).start("Add entity id=" + fieldEntityId +
+        " to list field of entity id=" + entityId)) {
+      try {
+        E entity = repository.ensureFindById(entityId);
+        F field = repository.addToOneToManyRelationship(entity, fieldEntityId, entityListGetter, fieldEntitySetter, elementRepository);
+        repository.persist(entity);
+        elementRepository.persist(field);
+        D dto = repository.toDTO(entity);
+        return Response.ok(dto).build();
+      } catch (NotFoundException e) {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+    }
+  }
+
+
+  public <F extends PanacheEntity> Response addToManyToManyField(long entityId, long fieldEntityId,
+                                                                 PanacheRepository<F> elementRepository,
+                                                                 Function<F, ? extends Collection<E>> fieldCollectionGetter,
                                                                  Function<E, ? extends Collection<F>> entityListGetter) {
     try (DurationLogger dl = DurationLogger.get(LOGGER).start("Add entity id=" + fieldEntityId +
         " to list field of entity id=" + entityId)) {
       try {
-        D dto = repository.addToOneToManyRelationship(entityId, fieldEntityId, elementRepository,
-            fieldEntitySetter, entityListGetter);
+        E entity = repository.ensureFindById(entityId);
+        F field = repository.addToManyToManyRelationship(entity, fieldEntityId, entityListGetter, fieldCollectionGetter, elementRepository);
+        repository.persist(entity);
+        elementRepository.persist(field);
+        D dto = repository.toDTO(entity);
+        return Response.ok(dto).build();
+      } catch (NotFoundException e) {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+    }
+  }
+
+  public <F extends PanacheEntity> Response setField(long entityId, long fieldEntityId, PanacheRepository<F> elementRepository,
+                                                     BiConsumer<E, F> entitySetter,
+                                                     BiConsumer<F, E> fieldEntitySetter) {
+    try (DurationLogger dl = DurationLogger.get(LOGGER).start("Add entity id=" + fieldEntityId +
+        " to field of entity id=" + entityId)) {
+      try {
+        E entity = repository.ensureFindById(entityId);
+        F field = repository.setOneToOneRelationship(entity, fieldEntityId, entitySetter, fieldEntitySetter, elementRepository);
+        repository.persist(entity);
+        elementRepository.persist(field);
+        D dto = repository.toDTO(entity);
         return Response.ok(dto).build();
       } catch (NotFoundException e) {
         return Response.status(Response.Status.NOT_FOUND).build();

@@ -51,6 +51,8 @@ public class LapTimeFiller {
   private void addEmptyLap(List<LapTimeDTO> results, NestedPilotDTO pilot) {
     LapTimeDTO dummyLap = new LapTimeDTO();
     dummyLap.setPilot(pilot);
+    dummyLap.setLapIndex(1);
+    dummyLap.setLapNumber(1);
     results.add(dummyLap);
   }
 }

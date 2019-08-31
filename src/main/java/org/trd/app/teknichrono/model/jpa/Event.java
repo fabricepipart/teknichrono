@@ -8,7 +8,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class Event extends PanacheEntity {
@@ -19,7 +21,7 @@ public class Event extends PanacheEntity {
 
   @OneToMany(orphanRemoval = true)
   @JoinColumn(name = "eventId")
-  private List<Session> sessions = new ArrayList<>();
+  private Set<Session> sessions = new HashSet<>();
 
   @Column(nullable = false)
   private String name;
@@ -40,11 +42,11 @@ public class Event extends PanacheEntity {
     this.version = version;
   }
 
-  public List<Session> getSessions() {
+  public Set<Session> getSessions() {
     return this.sessions;
   }
 
-  public void setSessions(final List<Session> sessions) {
+  public void setSessions(final Set<Session> sessions) {
     this.sessions = sessions;
   }
 

@@ -58,7 +58,7 @@ public class TestCategoryEndpoint {
   private CategoryRepository categoryRepository;
 
   @Mock
-  private PilotRepository pilotRepository;
+  private PilotRepository.Panache pilotRepository;
 
   @InjectMocks
   private CategoryEndpoint endpoint;
@@ -76,6 +76,7 @@ public class TestCategoryEndpoint {
     when(responseBuilder.location(uri)).thenReturn(responseBuilder);
     when(responseBuilder.build()).thenReturn(response);
     when(responseBuilder.entity(any())).thenReturn(responseBuilder);
+    when(categoryRepository.getPilotRepository()).thenReturn(pilotRepository);
     //when(em.createQuery(anyString(), eq(Category.class))).thenReturn(query);
   }
 
@@ -165,16 +166,6 @@ public class TestCategoryEndpoint {
   }
 
   @Test
-  public void findCategoryByNameReturnsAnEmptyIfNotFound() {
-    Category entity = newCategory(9, 10, 11);
-    when(categoryRepository.findByName(anyString())).thenReturn(null);
-    Response r = endpoint.findCategoryByName(entity.getName());
-    assertThat(r).isNotNull();
-    verify(responseBuilder, never()).entity(any());
-    verify(responseBuilder).status((Response.StatusType) javax.ws.rs.core.Response.Status.NOT_FOUND);
-  }
-
-  @Test
   public void listAll() {
     List<CategoryDTO> entities = new ArrayList<>();
     Category entity1 = newCategory(9, 10, 11);
@@ -210,14 +201,13 @@ public class TestCategoryEndpoint {
     Pilot pilot = new Pilot();
     pilot.setId(102L);
     Category entity = newCategory(9, 10, 11);
-    when(categoryRepository.findById(entity.getId())).thenReturn(entity);
-    //when(pilotRepository.findById(102L)).thenReturn(pilot);
+    when(categoryRepository.ensureFindById(entity.getId())).thenReturn(entity);
 
     Response r = endpoint.addPilot(entity.getId(), 102L);
     assertThat(r).isNotNull();
 
-    verify(categoryRepository, atLeastOnce()).addToOneToManyRelationship(eq(entity.getId()), eq(102L),
-        eq(pilotRepository), any(), any());
+    verify(categoryRepository, atLeastOnce()).addToOneToManyRelationship(eq(entity), eq(102L), any(), any(),
+        eq(pilotRepository));
   }
 
   @Test

@@ -1,6 +1,7 @@
 package org.trd.app.teknichrono.model.repository;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.dto.SessionDTO;
 import org.trd.app.teknichrono.model.jpa.Chronometer;
 import org.trd.app.teknichrono.model.jpa.Event;
@@ -13,12 +14,12 @@ import org.trd.app.teknichrono.util.exception.NotFoundException;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
-import javax.validation.constraints.NotNull;
-import java.util.List;
-import java.util.Set;
+import java.time.Instant;
 
 @Dependent
 public class SessionRepository extends PanacheRepositoryWrapper<Session, SessionDTO> {
+
+  private Logger LOGGER = Logger.getLogger(SessionRepository.class);
 
   @ApplicationScoped
   public static class Panache implements PanacheRepository<Session> {
@@ -46,6 +47,7 @@ public class SessionRepository extends PanacheRepositoryWrapper<Session, Session
     this.pilotRepository = pilotRepository;
   }
 
+  @Override
   public void deleteById(long id) throws NotFoundException {
     Session entity = ensureFindById(id);
 
@@ -63,9 +65,10 @@ public class SessionRepository extends PanacheRepositoryWrapper<Session, Session
   }
 
   @Override
-  public void create(SessionDTO entity) throws ConflictingIdException, NotFoundException {
+  public Session create(SessionDTO entity) throws ConflictingIdException, NotFoundException {
     Session session = fromDTO(entity);
     panacheRepository.persist(session);
+    return session;
   }
 
   @Override
@@ -112,4 +115,44 @@ public class SessionRepository extends PanacheRepositoryWrapper<Session, Session
 
     panacheRepository.persist(session);
   }
+
+
+  public void endSession(Session session, Instant end) {
+    session.setEnd(end);
+    session.setCurrent(false);
+    panacheRepository.persist(session);
+  }
+
+  public void startSession(Session session, Instant start) {
+    session.setStart(start);
+    session.setCurrent(true);
+    panacheRepository.persist(session);
+
+  }
+
+  public PilotRepository.Panache getPilotRepository() {
+    return pilotRepository;
+  }
+
+  public Session addChronometerAtIndex(Long sessionId, Long chronoId, Integer index) throws NotFoundException {
+    Session session = ensureFindById(sessionId);
+    boolean alreadyPresent = session.getChronometers().stream().anyMatch(chrono -> (chrono.getId().longValue() == chronoId.longValue()));
+    if (alreadyPresent) {
+      LOGGER.warn("Did not add Chrono #" + chronoId + " to Session #" + sessionId + " since it was already present");
+      return session;
+    }
+    Chronometer chronometer = ensureFindFieldById(chronoId, chronometerRepository);
+    chronometer.getSessions().add(session);
+    if (index != null) {
+      session.addChronometer(chronometer, index);
+    } else {
+      session.addChronometer(chronometer);
+    }
+    persist(session);
+    for (Chronometer c : session.getChronometers()) {
+      chronometerRepository.persist(c);
+    }
+    return session;
+  }
+
 }

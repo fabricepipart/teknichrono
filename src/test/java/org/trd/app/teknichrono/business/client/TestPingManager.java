@@ -16,8 +16,8 @@ import org.trd.app.teknichrono.model.jpa.LapTime;
 import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.model.jpa.Ping;
 import org.trd.app.teknichrono.model.jpa.Session;
+import org.trd.app.teknichrono.model.repository.LapTimeRepository;
 
-import javax.persistence.EntityManager;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -53,10 +53,10 @@ public class TestPingManager {
   private SessionSelector selector;
 
   @Mock
-  private EntityManager em;
+  private LapTimeRepository lapTimeRepository;
 
   @InjectMocks
-  private PingManager testMe = new PingManager(em);
+  private PingManager testMe = new PingManager(lapTimeRepository);
   private final Beacon beacon = new Beacon();
 
   @BeforeEach
@@ -107,7 +107,7 @@ public class TestPingManager {
   public void pingMustReferBeacon() {
     Ping p = new Ping();
     testMe.addPing(p);
-    verifyZeroInteractions(em);
+    verifyZeroInteractions(lapTimeRepository);
     verify(logger, atLeastOnce()).error(any());
   }
 
@@ -116,7 +116,7 @@ public class TestPingManager {
     Ping p = new Ping();
     p.setBeacon(new Beacon());
     testMe.addPing(p);
-    verifyZeroInteractions(em);
+    verifyZeroInteractions(lapTimeRepository);
     verify(logger, atLeastOnce()).error(any());
   }
 
@@ -127,7 +127,7 @@ public class TestPingManager {
     b.setPilot(new Pilot());
     p.setBeacon(b);
     testMe.addPing(p);
-    verifyZeroInteractions(em);
+    verifyZeroInteractions(lapTimeRepository);
     verify(logger, atLeastOnce()).error(any());
   }
 
@@ -136,7 +136,7 @@ public class TestPingManager {
     Ping p = createPing(0, c0);
     when(selector.pickMostRelevant(any(Ping.class))).thenReturn(null);
     testMe.addPing(p);
-    verifyZeroInteractions(em);
+    verifyZeroInteractions(lapTimeRepository);
     verify(logger, atLeastOnce()).error(any());
   }
 
@@ -145,7 +145,7 @@ public class TestPingManager {
     Ping p = createPing(0, c0);
     testMe.addPing(p);
     ArgumentCaptor<LapTime> captor = ArgumentCaptor.forClass(LapTime.class);
-    verify(em).persist(captor.capture());
+    verify(lapTimeRepository).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
     assertThat(lap).isNotNull();
@@ -162,7 +162,7 @@ public class TestPingManager {
     c.id = 666L;
     Ping p = createPing(0, c);
     testMe.addPing(p);
-    verifyZeroInteractions(em);
+    verifyZeroInteractions(lapTimeRepository);
     verify(logger, atLeastOnce()).error(any());
   }
 
@@ -171,7 +171,7 @@ public class TestPingManager {
     session.setInactivity(10000);
     Ping p = createPing(5000, c0);
     testMe.addPing(p);
-    verifyZeroInteractions(em);
+    verifyZeroInteractions(lapTimeRepository);
   }
 
   @Test
@@ -181,7 +181,7 @@ public class TestPingManager {
     l.addIntermediates(p);
     pilot.getLaps().add(l);
     testMe.addPing(p);
-    verify(em, never()).persist(any());
+    verify(lapTimeRepository, never()).persist(any());
     verify(logger, atLeastOnce()).error(any());
   }
 
@@ -191,7 +191,7 @@ public class TestPingManager {
     pilotHasLapWith(0, -1, -1, -1);
     testMe.addPing(p1);
     ArgumentCaptor<LapTime> captor = ArgumentCaptor.forClass(LapTime.class);
-    verify(em).persist(captor.capture());
+    verify(lapTimeRepository).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
     assertThat(lap).isNotNull();
@@ -209,7 +209,7 @@ public class TestPingManager {
     pilotHasLapWith(0, 10000, -1, -1);
     testMe.addPing(p2);
     ArgumentCaptor<LapTime> captor = ArgumentCaptor.forClass(LapTime.class);
-    verify(em).persist(captor.capture());
+    verify(lapTimeRepository).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
     assertThat(lap).isNotNull();
@@ -227,7 +227,7 @@ public class TestPingManager {
     Ping p3 = createPing(30000, c3);
     testMe.addPing(p3);
     ArgumentCaptor<LapTime> captor = ArgumentCaptor.forClass(LapTime.class);
-    verify(em).persist(captor.capture());
+    verify(lapTimeRepository).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
     assertThat(lap).isNotNull();
@@ -244,7 +244,7 @@ public class TestPingManager {
     Ping p3 = createPing(30000, c3);
     testMe.addPing(p3);
     ArgumentCaptor<LapTime> captor = ArgumentCaptor.forClass(LapTime.class);
-    verify(em).persist(captor.capture());
+    verify(lapTimeRepository).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
     assertThat(lap).isNotNull();
@@ -262,7 +262,7 @@ public class TestPingManager {
     Ping p2 = createPing(20000, c2);
     testMe.addPing(p2);
     ArgumentCaptor<LapTime> captor = ArgumentCaptor.forClass(LapTime.class);
-    verify(em).persist(captor.capture());
+    verify(lapTimeRepository).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
     assertThat(lap).isNotNull();
@@ -280,7 +280,7 @@ public class TestPingManager {
     Ping p1 = createPing(10000, c1);
     testMe.addPing(p1);
     ArgumentCaptor<LapTime> captor = ArgumentCaptor.forClass(LapTime.class);
-    verify(em).persist(captor.capture());
+    verify(lapTimeRepository).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
     assertThat(lap).isNotNull();
@@ -298,7 +298,7 @@ public class TestPingManager {
     Ping p0 = createPing(0, c0);
     testMe.addPing(p0);
     ArgumentCaptor<LapTime> captor = ArgumentCaptor.forClass(LapTime.class);
-    verify(em).persist(captor.capture());
+    verify(lapTimeRepository).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
     assertThat(lap).isNotNull();
@@ -315,7 +315,7 @@ public class TestPingManager {
     Ping p2 = createPing(20000, c2);
     testMe.addPing(p2);
     ArgumentCaptor<LapTime> captor = ArgumentCaptor.forClass(LapTime.class);
-    verify(em).persist(captor.capture());
+    verify(lapTimeRepository).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
     assertThat(lap).isNotNull();
@@ -333,7 +333,7 @@ public class TestPingManager {
     Ping p0 = createPing(0, c0);
     testMe.addPing(p0);
     ArgumentCaptor<LapTime> captor = ArgumentCaptor.forClass(LapTime.class);
-    verify(em).persist(captor.capture());
+    verify(lapTimeRepository).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
     assertThat(lap).isNotNull();
@@ -351,7 +351,7 @@ public class TestPingManager {
     Ping p3 = createPing(30000, c3);
     testMe.addPing(p3);
     ArgumentCaptor<LapTime> captor = ArgumentCaptor.forClass(LapTime.class);
-    verify(em).persist(captor.capture());
+    verify(lapTimeRepository).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
     assertThat(lap).isNotNull();
@@ -369,7 +369,7 @@ public class TestPingManager {
     Ping p1 = createPing(10000, c1);
     testMe.addPing(p1);
     ArgumentCaptor<LapTime> captor = ArgumentCaptor.forClass(LapTime.class);
-    verify(em).persist(captor.capture());
+    verify(lapTimeRepository).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
     assertThat(lap).isNotNull();
@@ -388,7 +388,7 @@ public class TestPingManager {
     Ping p1 = createPing(50000, c1);
     testMe.addPing(p1);
     ArgumentCaptor<LapTime> captor = ArgumentCaptor.forClass(LapTime.class);
-    verify(em).persist(captor.capture());
+    verify(lapTimeRepository).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
     assertThat(lap).isNotNull();
@@ -407,7 +407,7 @@ public class TestPingManager {
     Ping p1 = createPing(10000, c1);
     testMe.addPing(p1);
     ArgumentCaptor<LapTime> captor = ArgumentCaptor.forClass(LapTime.class);
-    verify(em).persist(captor.capture());
+    verify(lapTimeRepository).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
     assertThat(lap).isNotNull();
@@ -427,7 +427,7 @@ public class TestPingManager {
     Ping p1 = createPing(50000, c1);
     testMe.addPing(p1);
     ArgumentCaptor<LapTime> captor = ArgumentCaptor.forClass(LapTime.class);
-    verify(em).persist(captor.capture());
+    verify(lapTimeRepository).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
     assertThat(lap).isNotNull();
@@ -448,7 +448,7 @@ public class TestPingManager {
     Ping p1 = createPing(50000, c1);
     testMe.addPing(p1);
     ArgumentCaptor<LapTime> captor = ArgumentCaptor.forClass(LapTime.class);
-    verify(em).persist(captor.capture());
+    verify(lapTimeRepository).persist(captor.capture());
     verify(logger, never()).error(any());
     LapTime lap = captor.getValue();
     assertThat(lap).isNotNull();
@@ -467,7 +467,7 @@ public class TestPingManager {
     Ping p1 = createPing(10000, c1);
     testMe.addPing(p1);
     ArgumentCaptor<LapTime> captor = ArgumentCaptor.forClass(LapTime.class);
-    verify(em, times(2)).persist(captor.capture());
+    verify(lapTimeRepository, times(2)).persist(captor.capture());
     verify(logger, never()).error(any());
     List<LapTime> laps = captor.getAllValues();
     boolean foundLapOne = false;
@@ -498,7 +498,7 @@ public class TestPingManager {
     Ping p1 = createPing(50000, c1);
     testMe.addPing(p1);
     ArgumentCaptor<LapTime> captor = ArgumentCaptor.forClass(LapTime.class);
-    verify(em).persist(captor.capture());
+    verify(lapTimeRepository).persist(captor.capture());
     LapTime lap = captor.getValue();
     assertThat(lap).isNotNull();
     assertThat(lap.getPilot()).isEqualTo(pilot);

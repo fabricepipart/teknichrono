@@ -10,10 +10,10 @@ import org.trd.app.teknichrono.util.exception.NotFoundException;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
-import java.util.List;
 
 @Dependent
 public class EventRepository extends PanacheRepositoryWrapper<Event, EventDTO> {
+
 
   @ApplicationScoped
   public static class Panache implements PanacheRepository<Event> {
@@ -30,24 +30,10 @@ public class EventRepository extends PanacheRepositoryWrapper<Event, EventDTO> {
     this.sessionRepository = sessionRepository;
   }
 
-  public Event findByName(String name) {
-    return panacheRepository.find("name", name).firstResult();
-  }
-
-
+  @Override
   public void deleteById(long id) throws NotFoundException {
-    Event entity = panacheRepository.findById(id);
-    if (entity == null) {
-      throw new NotFoundException();
-    }
-
-    List<Session> sessions = entity.getSessions();
-    if (sessions != null) {
-      for (Session session : sessions) {
-        session.setEvent(null);
-        sessionRepository.persist(session);
-      }
-    }
+    Event entity = ensureFindById(id);
+    nullifyOneToManyRelationship(entity.getSessions(), Session::setEvent, sessionRepository);
     panacheRepository.delete(entity);
   }
 
@@ -57,23 +43,38 @@ public class EventRepository extends PanacheRepositoryWrapper<Event, EventDTO> {
   }
 
   @Override
-  public void create(EventDTO entity) throws ConflictingIdException, NotFoundException {
-
+  public Event create(EventDTO entity) throws ConflictingIdException, NotFoundException {
+    Event event = fromDTO(entity);
+    panacheRepository.persist(event);
+    return event;
   }
 
   @Override
   public Event fromDTO(EventDTO dto) throws ConflictingIdException, NotFoundException {
-    return null;
+    checkNoId(dto);
+    Event event = new Event();
+    event.setName(dto.getName());
+    setOneToManyRelationship(event, dto.getSessions(), Event::getSessions, Session::setEvent, sessionRepository);
+    return event;
   }
 
   @Override
-  public EventDTO toDTO(Event dto) {
-    return null;
+  public EventDTO toDTO(Event event) {
+    return EventDTO.fromEvent(event);
   }
 
   @Override
   public void update(long id, EventDTO dto) throws ConflictingIdException, NotFoundException {
+    checkIdsMatch(id, dto);
+    Event event = ensureFindById(id);
+    event.setName(dto.getName());
+    // Update of sessions
+    setOneToManyRelationship(event, dto.getSessions(), Event::getSessions, Session::setEvent, sessionRepository);
+    panacheRepository.persist(event);
+  }
 
+  public PanacheRepository getSessionRepository() {
+    return sessionRepository;
   }
 
 }

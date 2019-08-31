@@ -1,6 +1,7 @@
 package org.trd.app.teknichrono.model.repository;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
@@ -30,18 +31,30 @@ public interface Repository<E extends PanacheEntity, D> {
 
   String getEntityName();
 
-  void create(D entity) throws ConflictingIdException, NotFoundException;
+  E create(D dto) throws ConflictingIdException, NotFoundException;
 
   E fromDTO(D dto) throws ConflictingIdException, NotFoundException;
 
-  D toDTO(E dto);
+  D toDTO(E entity);
 
   void update(long id, D dto) throws ConflictingIdException, NotFoundException;
 
   E findByField(String fieldName, Object fieldValue);
 
-  <F extends PanacheEntity> D addToOneToManyRelationship(long entityId, long fieldId, Repository<F, ?> elementRepository,
-                                                         BiConsumer<F, E> fieldEntitySetter,
-                                                         Function<E, ? extends Collection<F>> entityListGetter)
-      throws NotFoundException;
+  E ensureFindById(long id) throws NotFoundException;
+
+  <F extends PanacheEntity> F addToOneToManyRelationship(E entity, Long fieldDtoId,
+                                                         Function<E, ? extends Collection<F>> entityCollectionGetter,
+                                                         BiConsumer<F, E> setterFieldEntity,
+                                                         PanacheRepository<F> fieldRepository) throws NotFoundException;
+
+  <F extends PanacheEntity> F addToManyToManyRelationship(E entity, Long fieldDtoId,
+                                                          Function<E, ? extends Collection<F>> entityCollectionGetter,
+                                                          Function<F, ? extends Collection<E>> fieldCollectionGetter,
+                                                          PanacheRepository<F> fieldRepository) throws NotFoundException;
+
+  <F extends PanacheEntity> F setOneToOneRelationship(E entity, Long fieldId,
+                                                      BiConsumer<E, F> setterEntity,
+                                                      BiConsumer<F, E> setterFieldEntity,
+                                                      PanacheRepository<F> fieldRepository) throws NotFoundException;
 }

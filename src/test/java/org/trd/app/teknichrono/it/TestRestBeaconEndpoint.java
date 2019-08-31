@@ -1,7 +1,5 @@
 package org.trd.app.teknichrono.it;
 
-import io.restassured.response.Response;
-
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -10,7 +8,6 @@ import org.trd.app.teknichrono.model.dto.BeaconDTO;
 import org.trd.app.teknichrono.model.dto.NestedPilotDTO;
 import org.trd.app.teknichrono.model.dto.PilotDTO;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +21,7 @@ public class TestRestBeaconEndpoint extends TestRestEndpoint<BeaconDTO> {
 
   public TestRestBeaconEndpoint() {
     super("beacons", BeaconDTO.class, new ArrayList<BeaconDTO>() {
+      private static final long serialVersionUID = -4364729905366111867L;
     }.getClass().getGenericSuperclass());
   }
 

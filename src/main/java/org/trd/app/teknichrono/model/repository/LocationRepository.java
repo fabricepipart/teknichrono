@@ -14,6 +14,7 @@ import javax.inject.Inject;
 @Dependent
 public class LocationRepository extends PanacheRepositoryWrapper<Location, LocationDTO> {
 
+
   @ApplicationScoped
   public static class Panache implements PanacheRepository<Location> {
   }
@@ -30,9 +31,10 @@ public class LocationRepository extends PanacheRepositoryWrapper<Location, Locat
   }
 
   @Override
-  public void create(LocationDTO entity) throws ConflictingIdException, NotFoundException {
+  public Location create(LocationDTO entity) throws ConflictingIdException, NotFoundException {
     Location location = fromDTO(entity);
     panacheRepository.persist(location);
+    return location;
   }
 
   @Override
@@ -55,14 +57,6 @@ public class LocationRepository extends PanacheRepositoryWrapper<Location, Locat
     return location;
   }
 
-  public LocationDTO addSession(long locationId, long sessionId) throws NotFoundException {
-    Location location = ensureFindById(locationId);
-    Session session = addToOneToManyRelationship(location, sessionId, Location::getSessions, Session::setLocation, sessionRepository);
-    sessionRepository.persist(session);
-    persist(location);
-    return LocationDTO.fromLocation(location);
-  }
-
   @Override
   public void deleteById(long id) throws NotFoundException {
     Location entity = ensureFindById(id);
@@ -81,4 +75,9 @@ public class LocationRepository extends PanacheRepositoryWrapper<Location, Locat
     setOneToManyRelationship(location, entity.getSessions(), Location::getSessions, Session::setLocation, sessionRepository);
     panacheRepository.persist(location);
   }
+
+  public PanacheRepository getSessionRepository() {
+    return sessionRepository;
+  }
+
 }

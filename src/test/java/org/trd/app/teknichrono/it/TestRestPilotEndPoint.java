@@ -23,18 +23,18 @@ import static org.assertj.core.api.Assertions.*;
 public class TestRestPilotEndPoint extends TestRestEndpoint<PilotDTO> {
 
 
-  private TestRestBeaconEndpoint restBeacon;
-  private TestRestCategoryEndpoint restCategory;
+  private TestRestBeaconEndpoint restBeacon = new TestRestBeaconEndpoint();
+  private TestRestCategoryEndpoint restCategory = new TestRestCategoryEndpoint();
 
   public TestRestPilotEndPoint() {
     super("pilots", PilotDTO.class, new ArrayList<PilotDTO>() {
+      private static final long serialVersionUID = -5888949647537408775L;
     }.getClass().getGenericSuperclass());
   }
 
   @BeforeEach
   public void prepare() {
-    restBeacon = new TestRestBeaconEndpoint();
-    restCategory = new TestRestCategoryEndpoint();
+
   }
 
   /**

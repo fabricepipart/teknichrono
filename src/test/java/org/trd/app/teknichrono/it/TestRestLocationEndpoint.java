@@ -6,7 +6,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.trd.app.teknichrono.model.dto.BeaconDTO;
 import org.trd.app.teknichrono.model.dto.LocationDTO;
 import org.trd.app.teknichrono.model.dto.NestedSessionDTO;
 import org.trd.app.teknichrono.model.dto.SessionDTO;
@@ -25,6 +24,7 @@ public class TestRestLocationEndpoint extends TestRestEndpoint<LocationDTO> {
 
   public TestRestLocationEndpoint() {
     super("locations", LocationDTO.class, new ArrayList<LocationDTO>() {
+      private static final long serialVersionUID = 3043219685887053856L;
     }.getClass().getGenericSuperclass());
   }
 
@@ -242,6 +242,7 @@ public class TestRestLocationEndpoint extends TestRestEndpoint<LocationDTO> {
   public void create(String name) {
     LocationDTO p = new LocationDTO();
     p.setName(name);
+    p.setLoopTrack(true);
     create(p);
   }
 

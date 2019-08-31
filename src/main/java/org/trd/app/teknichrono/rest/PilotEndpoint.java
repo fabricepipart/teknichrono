@@ -3,6 +3,7 @@ package org.trd.app.teknichrono.rest;
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.dto.PilotDTO;
 import org.trd.app.teknichrono.model.jpa.Pilot;
+import org.trd.app.teknichrono.model.repository.BeaconRepository;
 import org.trd.app.teknichrono.model.repository.PilotRepository;
 import org.trd.app.teknichrono.util.DurationLogger;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
@@ -28,11 +29,13 @@ public class PilotEndpoint {
 
   private static final Logger LOGGER = Logger.getLogger(PilotEndpoint.class);
 
+  private final BeaconRepository beaconRepository;
   private final PilotRepository pilotRepository;
   private final EntityEndpoint entityEndpoint;
 
   @Inject
-  public PilotEndpoint(PilotRepository pilotRepository) {
+  public PilotEndpoint(PilotRepository pilotRepository, BeaconRepository beaconRepository) {
+    this.beaconRepository = beaconRepository;
     this.pilotRepository = pilotRepository;
     this.entityEndpoint = new EntityEndpoint(pilotRepository);
   }
@@ -86,14 +89,17 @@ public class PilotEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public Response associateBeacon(@PathParam("pilotId") long pilotId, @QueryParam("beaconId") long beaconId) {
-    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Associate pilot id=" + pilotId + " to beacon id=" + beaconId)) {
+    try (DurationLogger dl = DurationLogger.get(LOGGER).start("Add beacon id=" + beaconId +
+        " to pilot id=" + pilotId)) {
       try {
         PilotDTO dto = pilotRepository.associateBeacon(pilotId, beaconId);
         return Response.ok(dto).build();
       } catch (NotFoundException e) {
-        return Response.status(Status.NOT_FOUND).build();
+        return Response.status(Response.Status.NOT_FOUND).build();
       }
     }
+    /*return entityEndpoint.setField(pilotId, beaconId, beaconRepository,
+        Pilot::setCurrentBeacon, Beacon::setPilot);*/
   }
 
   @PUT
