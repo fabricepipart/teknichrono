@@ -69,7 +69,7 @@ class FridayMorningTest:
     friMorningTestsResults = getResultsForSession(self.morningTest.session['id'])
     # TODO Have chart with startup list
     # TODO Check if it should count points
-    checkResults(friMorningTestsResults, 80, {0: 2}, {0: 2})
+    checkResults(friMorningTestsResults, 80, {}, {1: 4})
 
     beaconsStartOrder = []
     for i in reversed(range(30)):
@@ -101,7 +101,7 @@ class FridayMorningTest:
     checkBestLaps(friMorningChronoBests, 78, {}, {1: 2})
 
     friMorningChronoResults = getResultsForSession(self.morningChrono.session['id'])
-    checkResults(friMorningChronoResults, 80, {0: 2}, {0: 2})
+    checkResults(friMorningChronoResults, 80, {}, {1: 4})
 
     # Some do 1 chrono
     # Some dont chrono

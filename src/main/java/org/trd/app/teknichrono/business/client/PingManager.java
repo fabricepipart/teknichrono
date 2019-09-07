@@ -7,8 +7,8 @@ import org.trd.app.teknichrono.model.jpa.LapTime;
 import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.model.jpa.Ping;
 import org.trd.app.teknichrono.model.jpa.Session;
+import org.trd.app.teknichrono.model.repository.LapTimeRepository;
 
-import javax.persistence.EntityManager;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
@@ -18,11 +18,11 @@ public class PingManager {
 
   private Logger logger = Logger.getLogger(PingManager.class);
 
-  private EntityManager em;
+  private LapTimeRepository lapTimeRepository;
   private SessionSelector selector = new SessionSelector();
 
-  public PingManager(EntityManager em) {
-    this.em = em;
+  public PingManager(LapTimeRepository lapTimeRepository) {
+    this.lapTimeRepository = lapTimeRepository;
   }
 
   /**
@@ -110,10 +110,10 @@ public class PingManager {
           if (chronoIndex < session.getChronoIndex(pingAfter.getChrono())) {
             int insertAtIdex = lapTimeOfPingAfter.getIntermediates().indexOf(pingAfter);
             lapTimeOfPingAfter.addIntermediates(insertAtIdex, ping);
-            em.persist(lapTimeOfPingAfter);
+            lapTimeRepository.persist(lapTimeOfPingAfter);
           } else {
             LapTime lap = createLaptime(session, pilot, ping, chronometer);
-            em.persist(lap);
+            lapTimeRepository.persist(lap);
           }
         }
       } else if (pingAfter == null) {
@@ -121,10 +121,10 @@ public class PingManager {
         if (chronoIndex > session.getChronoIndex(pingBefore.getChrono())) {
           int insertAtIndex = lapTimeOfPingBefore.getIntermediates().indexOf(pingBefore) + 1;
           lapTimeOfPingBefore.addIntermediates(insertAtIndex, ping);
-          em.persist(lapTimeOfPingBefore);
+          lapTimeRepository.persist(lapTimeOfPingBefore);
         } else {
           LapTime lap = createLaptime(session, pilot, ping, chronometer);
-          em.persist(lap);
+          lapTimeRepository.persist(lap);
         }
       } else {
         // One before, one after
@@ -139,33 +139,33 @@ public class PingManager {
             List<Ping> toInsertInNewLap = lapTimeOfPingBefore.getIntermediates().subList(insertAtIndex,
                 lapTimeOfPingBefore.getIntermediates().size());
             LapTime lap = createLaptime(session, pilot, toInsertInNewLap, chronometer);
-            em.persist(lap);
+            lapTimeRepository.persist(lap);
             toInsertInNewLap.clear();
             lapTimeOfPingBefore.recomputeDates();
             // since toInsertInNewLap is backed by original list,
             // this removes all sub-list items from the original list
             lapTimeOfPingBefore.addIntermediates(insertAtIndex, ping);
-            em.persist(lapTimeOfPingBefore);
+            lapTimeRepository.persist(lapTimeOfPingBefore);
           } else {
             // Insert
             lapTimeOfPingBefore.addIntermediates(insertAtIndex, ping);
-            em.persist(lapTimeOfPingBefore);
+            lapTimeRepository.persist(lapTimeOfPingBefore);
           }
         } else {
           // We ll insert it in the lap of the ping after
           if (chronoIndex < session.getChronoIndex(pingAfter.getChrono())) {
             int insertAtIdex = lapTimeOfPingAfter.getIntermediates().indexOf(pingAfter);
             lapTimeOfPingAfter.addIntermediates(insertAtIdex, ping);
-            em.persist(lapTimeOfPingAfter);
+            lapTimeRepository.persist(lapTimeOfPingAfter);
           } else {
             LapTime lap = createLaptime(session, pilot, ping, chronometer);
-            em.persist(lap);
+            lapTimeRepository.persist(lap);
           }
         }
       }
     } else {
       LapTime lap = createLaptime(session, pilot, ping, chronometer);
-      em.persist(lap);
+      lapTimeRepository.persist(lap);
     }
 
     // Missing intermediate of previous existing Laptime

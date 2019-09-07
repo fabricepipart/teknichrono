@@ -47,7 +47,7 @@ interface DtoMapper {
     Ping previous = null;
     for (Ping ping : pings) {
       if (previous != null) {
-        sectors.add(new SectorDTO(previous, ping));
+        sectors.add(SectorDTO.from(previous, ping));
       }
       previous = ping;
     }
@@ -71,6 +71,7 @@ interface DtoMapper {
 
   NestedPingDTO asNestedPingDto(Ping ping);
 
+  @Mapping(target = "chronometer", source = "chrono")
   PingDTO asPingDto(Ping ping);
 
   @Mapping(target = "loopTrack", source = "location.loopTrack")

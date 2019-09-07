@@ -6,7 +6,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.trd.app.teknichrono.model.dto.BeaconDTO;
 import org.trd.app.teknichrono.model.dto.CategoryDTO;
 import org.trd.app.teknichrono.model.dto.NestedPilotDTO;
 import org.trd.app.teknichrono.model.dto.PilotDTO;
@@ -25,6 +24,7 @@ public class TestRestCategoryEndpoint extends TestRestEndpoint<CategoryDTO> {
 
   public TestRestCategoryEndpoint() {
     super("categories", CategoryDTO.class, new ArrayList<CategoryDTO>() {
+      private static final long serialVersionUID = 4376809210010796602L;
     }.getClass().getGenericSuperclass());
   }
 

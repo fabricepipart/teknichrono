@@ -4,7 +4,6 @@ import org.trd.app.teknichrono.model.dto.CategoryDTO;
 import org.trd.app.teknichrono.model.jpa.Category;
 import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.model.repository.CategoryRepository;
-import org.trd.app.teknichrono.model.repository.PilotRepository;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -25,11 +24,11 @@ import java.util.List;
 public class CategoryEndpoint {
 
   private final EntityEndpoint<Category, CategoryDTO> entityEndpoint;
-  private final PilotRepository pilotRepository;
+  private final CategoryRepository categoryRepository;
 
   @Inject
-  public CategoryEndpoint(CategoryRepository categoryRepository, PilotRepository pilotRepository) {
-    this.pilotRepository = pilotRepository;
+  public CategoryEndpoint(CategoryRepository categoryRepository) {
+    this.categoryRepository = categoryRepository;
     this.entityEndpoint = new EntityEndpoint<>(categoryRepository);
   }
 
@@ -75,7 +74,7 @@ public class CategoryEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public Response addPilot(@PathParam("categoryId") long categoryId, @QueryParam("pilotId") Long pilotId) {
-    return entityEndpoint.addToCollectionField(categoryId, pilotId, pilotRepository,
+    return entityEndpoint.addToOneToManyField(categoryId, pilotId, categoryRepository.getPilotRepository(),
         Pilot::setCategory, Category::getPilots);
   }
 

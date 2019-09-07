@@ -35,9 +35,10 @@ public class BeaconRepository extends PanacheRepositoryWrapper<Beacon, BeaconDTO
   }
 
   @Override
-  public void create(BeaconDTO entity) throws NotFoundException, ConflictingIdException {
+  public Beacon create(BeaconDTO entity) throws NotFoundException, ConflictingIdException {
     Beacon beacon = fromDTO(entity);
     panacheRepository.persist(beacon);
+    return beacon;
   }
 
   @Override

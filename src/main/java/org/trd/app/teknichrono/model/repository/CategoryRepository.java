@@ -14,6 +14,7 @@ import javax.inject.Inject;
 @Dependent
 public class CategoryRepository extends PanacheRepositoryWrapper<Category, CategoryDTO> {
 
+
   @ApplicationScoped
   public static class Panache implements PanacheRepository<Category> {
   }
@@ -29,14 +30,11 @@ public class CategoryRepository extends PanacheRepositoryWrapper<Category, Categ
     this.pilotRepository = pilotRepository;
   }
 
-  public Category findByName(String name) {
-    return this.panacheRepository.find("name", name).firstResult();
-  }
-
   @Override
-  public void create(CategoryDTO entity) throws ConflictingIdException, NotFoundException {
+  public Category create(CategoryDTO entity) throws ConflictingIdException, NotFoundException {
     Category category = fromDTO(entity);
     panacheRepository.persist(category);
+    return category;
   }
 
   @Override
@@ -66,14 +64,6 @@ public class CategoryRepository extends PanacheRepositoryWrapper<Category, Categ
     panacheRepository.delete(entity);
   }
 
-  public CategoryDTO addPilot(long categoryId, Long pilotId) throws NotFoundException {
-    Category category = ensureFindById(categoryId);
-    Pilot pilot = addToOneToManyRelationship(category, pilotId, Category::getPilots, Pilot::setCategory, pilotRepository);
-    pilotRepository.persist(pilot);
-    persist(category);
-    return CategoryDTO.fromCategory(category);
-  }
-
   @Override
   public void update(long id, CategoryDTO entity) throws ConflictingIdException, NotFoundException {
     checkIdsMatch(id, entity);
@@ -83,5 +73,9 @@ public class CategoryRepository extends PanacheRepositoryWrapper<Category, Categ
     // Update of pilots
     setOneToManyRelationship(category, entity.getPilots(), Category::getPilots, Pilot::setCategory, pilotRepository);
     panacheRepository.persist(category);
+  }
+
+  public PanacheRepository getPilotRepository() {
+    return pilotRepository;
   }
 }

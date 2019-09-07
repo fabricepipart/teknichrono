@@ -19,7 +19,16 @@ public class SessionSelector {
   private Logger logger = Logger.getLogger(SessionSelector.class);
 
   public Session pickMostRelevantCurrent(List<Session> allSessions) {
-    return pickMostRelevantByDistance(allSessions, Instant.now());
+    List<Session> candidateSessions = new ArrayList<>(allSessions);
+    // Check if one or more are started
+    List<Session> startedSessions = new ArrayList<>(allSessions);
+    startedSessions.removeIf(s -> !s.isCurrent());
+    if (!startedSessions.isEmpty()) {
+      logger.debug("Current sessions " + startedSessions);
+      candidateSessions = startedSessions;
+    }
+
+    return pickMostRelevantByDistance(candidateSessions, Instant.now());
   }
 
   /**

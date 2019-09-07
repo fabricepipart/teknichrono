@@ -188,7 +188,7 @@ class FridayAfternoonTest:
       print("---- Tests Results of " + s.session['name'] + "----")
       checkLaps(getLapsForSession(s.session['id']), 5, {1: 5}, {1: 5})
       checkBestLaps(getBestLapsForSession(s.session['id']), 5, {1: 5}, {1: 5})
-      checkResults(sessionResults, 6, {1: 5}, {1: 5})
+      checkResults(sessionResults, 6, {1: 6}, {1: 6})
 
     # -- 1/2 th - 2 x 6
     print("---- 1 / 2 th ----")
@@ -208,7 +208,7 @@ class FridayAfternoonTest:
       print("---- Tests Results of " + s.session['name'] + "----")
       checkLaps(getLapsForSession(s.session['id']), 5, {1: 5}, {1: 5})
       checkBestLaps(getBestLapsForSession(s.session['id']), 5, {1: 5}, {1: 5})
-      checkResults(sessionResults, 6, {1: 5}, {1: 5})
+      checkResults(sessionResults, 6, {1: 6}, {1: 6})
 
     # -- Finale - 1 x 6
     print("---- Finale ----")

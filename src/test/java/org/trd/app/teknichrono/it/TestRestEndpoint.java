@@ -2,31 +2,31 @@ package org.trd.app.teknichrono.it;
 
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import org.trd.app.teknichrono.model.dto.EntityDTO;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
 
-public abstract class TestRestEndpoint<D> {
+public abstract class TestRestEndpoint<D extends EntityDTO> {
 
   public static final int NO_CONTENT = javax.ws.rs.core.Response.Status.NO_CONTENT.getStatusCode();
   public static final int OK = javax.ws.rs.core.Response.Status.OK.getStatusCode();
   public static final int NOT_FOUND = javax.ws.rs.core.Response.Status.NOT_FOUND.getStatusCode();
+  public static final int BAD_REQUEST = javax.ws.rs.core.Response.Status.BAD_REQUEST.getStatusCode();
 
   private static Jsonb jsonb = JsonbBuilder.create();
 
-  private final String restEntrypointName;
-  private final Class<D> dtoClass;
-  private final Type dtoListClass;
+  protected final String restEntrypointName;
+  protected final Class<D> dtoClass;
+  protected final Type dtoListClass;
 
   public TestRestEndpoint(String restEntrypointName, Class<D> dtoClass, Type dtoListClass) {
     this.restEntrypointName = restEntrypointName;
-    this.dtoClass =  dtoClass;
+    this.dtoClass = dtoClass;
     this.dtoListClass = dtoListClass;
   }
 
@@ -37,7 +37,6 @@ public abstract class TestRestEndpoint<D> {
         .then()
         .statusCode(NO_CONTENT);
   }
-
 
   public List<D> getAll() {
     Response r = given()
@@ -59,40 +58,57 @@ public abstract class TestRestEndpoint<D> {
   }
 
   public void delete(long id) {
+    delete(id, NO_CONTENT);
+  }
+
+  public void delete(long id, int statusCode) {
     given().pathParam("id", id)
         .when().delete("/rest/" + restEntrypointName + "/{id}")
         .then()
-        .statusCode(NO_CONTENT);
+        .statusCode(statusCode);
+  }
+
+
+  public void deleteAll() {
+    List<D> all = getAll();
+    for (D d : all) {
+      delete(d.getId());
+    }
   }
 
   public D getById(long id) {
+    D dto = getById(id, OK);
+    return dto;
+  }
+
+  public D getById(long id, int statusCode) {
     Response r = given().pathParam("id", id)
         .when().get("/rest/" + restEntrypointName + "/{id}")
         .then()
-        .statusCode(OK)
+        .statusCode(statusCode)
         .extract().response();
     return jsonb.fromJson(r.asString(), dtoClass);
   }
 
   public D getBy(String restPath, String fieldName, Object fieldValue) {
-    Response r =  getBy(restPath, fieldName, fieldValue, OK);
+    Response r = getBy(restPath, fieldName, fieldValue, OK);
     return jsonb.fromJson(r.asString(), dtoClass);
   }
 
   public Response getBy(String restPath, String fieldName, Object fieldValue, int expectedStatus) {
     return given().pathParam(fieldName, fieldValue)
-            .when().get("/rest/" + restEntrypointName + "/" + restPath + "/{" + fieldName + "}")
-            .then()
-            .statusCode(expectedStatus)
-            .extract().response();
+        .when().get("/rest/" + restEntrypointName + "/" + restPath + "/{" + fieldName + "}")
+        .then()
+        .statusCode(expectedStatus)
+        .extract().response();
   }
 
   public Response getByQuery(String restPath, String fieldName, Object fieldValue, int expectedStatus) {
     return given().queryParam(fieldName, fieldValue)
-            .when().get("/rest/" + restEntrypointName + "/" + restPath)
-            .then()
-            .statusCode(expectedStatus)
-            .extract().response();
+        .when().get("/rest/" + restEntrypointName + "/" + restPath)
+        .then()
+        .statusCode(expectedStatus)
+        .extract().response();
   }
 
   public D getByQuery(String restPath, String fieldName, Object fieldValue) {
@@ -102,10 +118,10 @@ public abstract class TestRestEndpoint<D> {
 
   public Response getByQuery(String restPath, String field1Name, Object field1Value, String field2Name, Object field2Value, int expectedStatus) {
     return given().queryParam(field1Name, field1Value).queryParam(field2Name, field2Value)
-            .when().get("/rest/" + restEntrypointName + "/" + restPath)
-            .then()
-            .statusCode(expectedStatus)
-            .extract().response();
+        .when().get("/rest/" + restEntrypointName + "/" + restPath)
+        .then()
+        .statusCode(expectedStatus)
+        .extract().response();
   }
 
   public D getByQuery(String restPath, String field1Name, Object field1Value, String field2Name, Object field2Value) {
@@ -114,10 +130,14 @@ public abstract class TestRestEndpoint<D> {
   }
 
   public void create(D dto) {
+    create(dto, NO_CONTENT);
+  }
+
+  public void create(D dto, int statusCode) {
     given()
         .when().contentType(ContentType.JSON).body(jsonb.toJson(dto)).post("/rest/" + restEntrypointName + "/")
         .then()
-        .statusCode(NO_CONTENT);
+        .statusCode(statusCode);
   }
 
   public Response getByName(String name, int expectedStatus) {

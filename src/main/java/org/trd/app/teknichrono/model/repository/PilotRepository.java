@@ -52,9 +52,10 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot, PilotDTO> {
   }
 
   @Override
-  public void create(PilotDTO entity) throws ConflictingIdException, NotFoundException {
+  public Pilot create(PilotDTO entity) throws ConflictingIdException, NotFoundException {
     Pilot pilot = fromDTO(entity);
     panacheRepository.persist(pilot);
+    return pilot;
   }
 
   @Override
@@ -91,15 +92,6 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot, PilotDTO> {
     panacheRepository.delete(entity);
   }
 
-
-  public PilotDTO associateBeacon(long pilotId, long beaconId) throws NotFoundException {
-    Pilot pilot = ensureFindById(pilotId);
-    setOneToOneRelationship(pilot, beaconId, Pilot::setCurrentBeacon, Beacon::setPilot, beaconRepository);
-    persist(pilot);
-    return PilotDTO.fromPilot(pilot);
-  }
-
-
   @Override
   public void update(long id, PilotDTO dto) throws ConflictingIdException, NotFoundException {
     checkIdsMatch(id, dto);
@@ -115,5 +107,19 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot, PilotDTO> {
     updateOneToOneRelationship(pilot, dto.getCurrentBeacon(), Pilot::setCurrentBeacon, Beacon::setPilot, beaconRepository);
 
     panacheRepository.persist(pilot);
+  }
+
+
+  public PilotDTO associateBeacon(long pilotId, long beaconId) throws NotFoundException {
+    Pilot entity = ensureFindById(pilotId);
+    Beacon beacon = setOneToOneRelationship(entity, beaconId, Pilot::setCurrentBeacon, Beacon::setPilot, beaconRepository);
+    persist(entity);
+    beaconRepository.persist(beacon);
+    PilotDTO dto = toDTO(entity);
+    return dto;
+  }
+
+  public PanacheRepository<Beacon> getBeaconRepository() {
+    return beaconRepository;
   }
 }

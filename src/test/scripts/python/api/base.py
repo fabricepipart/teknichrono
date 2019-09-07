@@ -10,7 +10,7 @@ import isodate
 headers = {'Content-type': 'application/json'}
 debug = True
 
-host = 'https://localhost:8080'
+host = 'http://localhost:8080'
 specificTarget = os.environ.get('TEKNICHRONO_HOST')
 if specificTarget:
   host = 'https://' + specificTarget

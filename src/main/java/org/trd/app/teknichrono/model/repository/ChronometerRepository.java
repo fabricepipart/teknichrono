@@ -48,9 +48,10 @@ public class ChronometerRepository extends PanacheRepositoryWrapper<Chronometer,
   }
 
   @Override
-  public void create(ChronometerDTO entity) throws ConflictingIdException, NotFoundException {
-    Chronometer category = fromDTO(entity);
-    panacheRepository.persist(category);
+  public Chronometer create(ChronometerDTO entity) throws ConflictingIdException, NotFoundException {
+    Chronometer chronometer = fromDTO(entity);
+    panacheRepository.persist(chronometer);
+    return chronometer;
   }
 
   @Override

@@ -4,7 +4,6 @@ import org.trd.app.teknichrono.model.dto.LocationDTO;
 import org.trd.app.teknichrono.model.jpa.Location;
 import org.trd.app.teknichrono.model.jpa.Session;
 import org.trd.app.teknichrono.model.repository.LocationRepository;
-import org.trd.app.teknichrono.model.repository.SessionRepository;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -24,12 +23,12 @@ import java.util.List;
 @Path("/locations")
 public class LocationEndpoint {
 
-  private final SessionRepository sessionRepository;
+  private final LocationRepository locationRepository;
   private final EntityEndpoint<Location, LocationDTO> entityEndpoint;
 
   @Inject
-  public LocationEndpoint(LocationRepository locationRepository, SessionRepository sessionRepository) {
-    this.sessionRepository = sessionRepository;
+  public LocationEndpoint(LocationRepository locationRepository) {
+    this.locationRepository = locationRepository;
     this.entityEndpoint = new EntityEndpoint<>(locationRepository);
   }
 
@@ -75,7 +74,7 @@ public class LocationEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public Response addSession(@PathParam("locationId") long locationId, @QueryParam("sessionId") Long sessionId) {
-    return entityEndpoint.addToCollectionField(locationId, sessionId, sessionRepository,
+    return entityEndpoint.addToOneToManyField(locationId, sessionId, locationRepository.getSessionRepository(),
         Session::setLocation, Location::getSessions);
   }
 

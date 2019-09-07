@@ -24,16 +24,11 @@ import java.util.List;
 @Path("/chronometers")
 public class ChronometerEndpoint {
 
-  private static final Logger LOGGER = Logger.getLogger(ChronometerEndpoint.class);
-
   private final EntityEndpoint<Chronometer, ChronometerDTO> entityEndpoint;
 
-  private final PingRepository pingRepository;
-
   @Inject
-  public ChronometerEndpoint(ChronometerRepository chronometerRepository, PingRepository pingRepository) {
+  public ChronometerEndpoint(ChronometerRepository chronometerRepository) {
     this.entityEndpoint = new EntityEndpoint<>(chronometerRepository);
-    this.pingRepository = pingRepository;
   }
 
   @POST
