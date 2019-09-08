@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" 
-    xmlns="http://maven.apache.org/POM/4.0.0" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.trd.app.teknichrono</groupId>
     <artifactId>teknichrono</artifactId>
@@ -21,11 +21,10 @@
 
         <jacoco.version>0.8.4</jacoco.version>
         <surefire-plugin.version>2.22.1</surefire-plugin.version>
-        <quarkus.version>0.18.0</quarkus.version>
+        <quarkus.version>0.21.2</quarkus.version>
         <mapstruct.version>1.3.0.Final</mapstruct.version>
         <lombok.version>1.18.8</lombok.version>
 
-        <version.thorntail>2.2.1.Final</version.thorntail>        <!-- TODO to remove -->
         <version.mysql>5.1.38</version.mysql>
         <version.h2>1.4.187</version.h2>
     </properties>
@@ -322,82 +321,4 @@
             </plugin>
         </plugins>
     </build>
-    <profiles>
-        <profile>
-            <id>openshift</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>io.fabric8</groupId>
-                        <artifactId>fabric8-maven-plugin</artifactId>
-                        <version>3.5.42</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>resource</goal>
-                                    <goal>build</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <generator>
-                                <includes>
-                                    <include>thorntail-v2</include>
-                                </includes>
-                                <excludes>
-                                    <exclude>webapp</exclude>
-                                </excludes>
-                            </generator>
-                            <images>
-                                <image>
-                                    <name>${image.namespace}/${project.artifactId}:${project.version}</name>
-                                    <alias>teknichrono</alias>
-                                    <build>
-                                        <from>fabric8/s2i-java:3.0-java8</from>
-                                        <ports>
-                                            <port>8080</port>
-                                        </ports>
-                                        <assembly>
-                                            <basedir>/deployments</basedir>
-                                            <inline>
-                                                <fileSets>
-                                                    <fileSet>
-                                                        <includes>
-                                                            <include>${project.build.finalName}-thorntail.jar</include>
-                                                        </includes>
-                                                        <directory>${project.build.directory}</directory>
-                                                        <outputDirectory>/</outputDirectory>
-                                                    </fileSet>
-                                                </fileSets>
-                                            </inline>
-                                        </assembly>
-                                        <env>
-                                            <JAVA_OPTIONS>-XX:MaxMetaspaceSize=128m</JAVA_OPTIONS>
-                                        </env>
-                                    </build>
-                                </image>
-                            </images>
-                            <enricher>
-                                <includes>
-                                    <include>fmp-image</include>
-                                </includes>
-                                <config>
-                                    <thorntail-v2-health-check>
-                                        <path>/</path>
-                                    </thorntail-v2-health-check>
-                                </config>
-                            </enricher>
-                            <resources>
-                                <labels>
-                                    <all>
-                                        <space>Teknirace_Days</space>
-                                    </all>
-                                </labels>
-                            </resources>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>
