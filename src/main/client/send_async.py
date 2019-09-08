@@ -1,63 +1,60 @@
 #!python3
 
+from threading import Thread
 import multiprocessing
-import datetime
 import logging
 import time
+import datetime
+from collections import deque
 
-from ping import Ping
-from beacon import Beacon
+from pinger import Pinger
 
 
-class SendAsyncStrategy(multiprocessing.Process):
-  def __init__(self, server, chronoId, workQueue):
+class SendAsyncStrategy(Thread):
+
+  MAX_PINGS_TO_SEND = 100
+  WAIT_BEFORE_RETRY = 10
+
+  def __init__(self, server, chronoId):
     super(SendAsyncStrategy, self).__init__()  # super() will call Thread.__init__ for you
-    self.workQueue = workQueue
-    self.server = server
-    self.chronoId = chronoId
-    self.failures = []
-    self.beacons = {}
     self.logger = logging.getLogger('SendStrategy')
-    self.lastSend = datetime.datetime.now().timestamp()
-    self.waitBeforeRetry = 10
+    self.pinger = Pinger(server, chronoId)
+    self.lastFailure = 0
+    self.q = deque()
+    self.alive = True
+
+  def append(self, toSend):
+    self.q.append(toSend)
+
+  def pop(self):
+    fromQueue = None
+    if len(self.q) > 0:
+      fromQueue = self.q.popleft()
+    return fromQueue
+
+  def stop(self):
+    self.alive = False
 
   def run(self):
-    while True:
+    while self.alive:
       time.sleep(1)
-      if not self.workQueue.empty():
-        toSend = self.workQueue.get()
-        self.send(toSend)
-      else:
-        self.sendFailures()
+      toSend = []
+      if self.lastFailure + self.WAIT_BEFORE_RETRY < datetime.datetime.now().timestamp():
+        while len(toSend) < self.MAX_PINGS_TO_SEND and len(self.q) > 0:
+          fromQueue = self.pop()
+          if fromQueue:
+            toSend.append(fromQueue)
+      if toSend:
+        self.sendAll(toSend)
 
-  def sendFailures(self):
-    if self.failures and (self.lastSend + self.waitBeforeRetry < datetime.datetime.now().timestamp()):
-      # Let's recover
-      finallySent = []
-      for failure in self.failures:
-        try:
-          self.logger.info('[SEND] Trying again to send Ping : ' + str(failure))
-          self.sendone(failure)
-          finallySent.append(failure)
-        except:
-          self.logger.error('Could not send again Ping : ' + str(failure))
-      for failure in finallySent:
-        self.failures.remove(failure)
-
-  def send(self, sendme):
+  def sendAll(self, toSend):
     try:
-      self.sendone(sendme)
-    except:
-      self.failures.append(sendme)
-      self.logger.error('Could not send for the moment Ping : ' + str(sendme))
-
-  def sendone(self, sendme):
-    p = Ping(self.server)
-    self.lastSend = datetime.datetime.now().timestamp()
-    d = datetime.datetime.fromtimestamp(sendme.scanDate)
-    beaconNumber = sendme.major
-    if beaconNumber not in self.beacons:
-      self.beacons[beaconNumber] = Beacon(beaconNumber, self.server)
-    beaconId = self.beacons[beaconNumber].id
-    p.ping(d, beaconId, sendme.tx, self.chronoId)
-    self.logger.info('[SEND] Ping sent : ' + str(sendme))
+      self.pinger.sendAll(toSend)
+    except Exception as e:
+      print(e)
+      self.lastFailure = datetime.datetime.now().timestamp()
+      failureMessage = 'Could not send for the moment Pings :'
+      for oneToSend in toSend:
+        self.append(oneToSend)
+        failureMessage += ('\n\t' + str(oneToSend))
+      self.logger.error(failureMessage)

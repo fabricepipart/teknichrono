@@ -39,7 +39,7 @@ public class LocationRepository extends PanacheRepositoryWrapper<Location, Locat
 
   @Override
   public String getEntityName() {
-    return Location.class.getName();
+    return Location.class.getSimpleName();
   }
 
   @Override

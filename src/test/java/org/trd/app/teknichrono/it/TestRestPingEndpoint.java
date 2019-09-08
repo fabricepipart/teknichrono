@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.trd.app.teknichrono.model.dto.BeaconDTO;
 import org.trd.app.teknichrono.model.dto.ChronometerDTO;
+import org.trd.app.teknichrono.model.dto.NestedBeaconDTO;
+import org.trd.app.teknichrono.model.dto.NestedChronometerDTO;
 import org.trd.app.teknichrono.model.dto.PingDTO;
 
 import javax.json.bind.Jsonb;
@@ -42,6 +44,25 @@ public class TestRestPingEndpoint extends TestRestEndpoint<PingDTO> {
   /**
    * ******************** Tests *********************
    **/
+
+
+  @Test
+  public void cantCreateSamePingsTwice() {
+    restBeacon.create(100);
+    BeaconDTO beacon = restBeacon.getByNumber(100);
+    restChronometer.create("C1");
+    ChronometerDTO chronometer = restChronometer.getByName("C1");
+
+    List<PingDTO> pings = getAll();
+    assertThat(pings.size()).isEqualTo(0);
+    Instant now = Instant.now();
+    createPing(now, beacon.getId(), chronometer.getId());
+    pings = getAll();
+    assertThat(pings.size()).isEqualTo(1);
+    createPing(now, beacon.getId(), chronometer.getId());
+    pings = getAll();
+    assertThat(pings.size()).isEqualTo(1);
+  }
 
   @Test
   public void testLists() {
@@ -110,8 +131,40 @@ public class TestRestPingEndpoint extends TestRestEndpoint<PingDTO> {
   }
 
   @Test
-  public void cantAddPingIfWithinInactivityPeriodOfRace() {
+  public void badRequestIfNoPingPassed() {
+    createPings(null, BAD_REQUEST);
+  }
 
+  @Test
+  public void badRequestIfPingDoesNotContainChronoOrBeacon() {
+    List<PingDTO> pings = new ArrayList<>();
+    pings.add(createDto(Instant.now()));
+    createPings(pings, BAD_REQUEST);
+  }
+
+  @Test
+  public void canCreatePingsInBatch() {
+    List<PingDTO> pings = new ArrayList<>();
+
+    restBeacon.create(100);
+    BeaconDTO beacon = restBeacon.getByNumber(100);
+    long beaconId = beacon.getId();
+    restChronometer.create("C1");
+    ChronometerDTO chronometer = restChronometer.getByName("C1");
+    long chronoId = chronometer.getId();
+
+    Instant now = Instant.now();
+    pings.add(createDto(now.plusSeconds(10), beaconId, chronoId));
+    pings.add(createDto(now.plusSeconds(20), beaconId, chronoId));
+    pings.add(createDto(now.plusSeconds(30), beaconId, chronoId));
+
+    List<PingDTO> allPings = getAll();
+    assertThat(allPings.size()).isEqualTo(0);
+
+    createPings(pings);
+
+    allPings = getAll();
+    assertThat(allPings.size()).isEqualTo(3);
   }
 
   /**
@@ -131,10 +184,33 @@ public class TestRestPingEndpoint extends TestRestEndpoint<PingDTO> {
         .statusCode(statusCode);
   }
 
+  public void createPings(List<PingDTO> dtos) {
+    createPings(dtos, NO_CONTENT);
+  }
+
+  public void createPings(List<PingDTO> dtos, int statusCode) {
+    Jsonb jsonb = JsonbBuilder.create();
+    given()
+        .when().contentType(ContentType.JSON).body(jsonb.toJson(dtos)).post("/rest/pings/create-multi")
+        .then()
+        .statusCode(statusCode);
+  }
+
   private PingDTO createDto(Instant instant) {
     PingDTO dto = new PingDTO();
     dto.setInstant(instant);
     dto.setPower(0);
+    return dto;
+  }
+
+  private PingDTO createDto(Instant instant, long beaconId, long chronometerId) {
+    PingDTO dto = createDto(instant);
+    NestedBeaconDTO beacon = new NestedBeaconDTO();
+    beacon.setId(beaconId);
+    dto.setBeacon(beacon);
+    NestedChronometerDTO chrono = new NestedChronometerDTO();
+    chrono.setId(chronometerId);
+    dto.setChronometer(chrono);
     return dto;
   }
 

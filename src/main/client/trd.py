@@ -5,7 +5,6 @@
 import logging
 import os
 import socket
-from multiprocessing import Queue
 if os.getenv('DEMO_MODE', 'false') == 'false':
   from bluetooth_scanner import BluetoothScanner
 else:
@@ -69,8 +68,8 @@ def getSelectionStrategy(key):
   return switcher.get(key)
 
 
-def getSendStrategy(key, chronoId, workQueue):
-  switcher = {'NONE': SendNoneStrategy(), 'ASYNC': SendAsyncStrategy(TEKNICHRONO_SERVER, chronoId, workQueue)}
+def getSendStrategy(key, chronoId):
+  switcher = {'NONE': SendNoneStrategy(), 'ASYNC': SendAsyncStrategy(TEKNICHRONO_SERVER, chronoId)}
   # Get the function from switcher dictionary
   return switcher.get(key)
 
@@ -101,8 +100,7 @@ scanner.init()
 chrono = Chronometer(CHRONO_NAME, TEKNICHRONO_SERVER)
 logger.info('Using Chronometer ID=' + str(chrono.id))
 selectionStrategy = getSelectionStrategy(PING_SELECTION_STRATEGY)
-work_q = Queue()
-sendStrategy = getSendStrategy(PING_SEND_STRATEGY, chrono.id, work_q)
+sendStrategy = getSendStrategy(PING_SEND_STRATEGY, chrono.id)
 sendStrategy.start()
 
 try:
@@ -111,7 +109,9 @@ try:
     toSend = selectionStrategy.select(current)
     if toSend:
       print(toSend.toJson(), file=backupFile)
-      work_q.put(toSend)
+      sendStrategy.append(toSend)
+      logger.debug('Added to queue: ' + str(toSend))
 finally:
-  sendStrategy.terminate()
+  sendStrategy.stop()
+  sendStrategy.join()
   backupFile.close()

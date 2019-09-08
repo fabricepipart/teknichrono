@@ -61,7 +61,7 @@ public class SessionRepository extends PanacheRepositoryWrapper<Session, Session
 
   @Override
   public String getEntityName() {
-    return Session.class.getName();
+    return Session.class.getSimpleName();
   }
 
   @Override

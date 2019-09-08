@@ -43,7 +43,7 @@ public class BeaconRepository extends PanacheRepositoryWrapper<Beacon, BeaconDTO
 
   @Override
   public String getEntityName() {
-    return Beacon.class.getName();
+    return Beacon.class.getSimpleName();
   }
 
   @Override

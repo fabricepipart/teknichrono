@@ -48,7 +48,7 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot, PilotDTO> {
 
   @Override
   public String getEntityName() {
-    return Pilot.class.getName();
+    return Pilot.class.getSimpleName();
   }
 
   @Override

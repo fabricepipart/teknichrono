@@ -61,6 +61,24 @@ public class PingEndpoint {
     }
   }
 
+  @POST
+  @Path("/create-multi")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response create(List<PingDTO> entities) {
+    if (entities == null) {
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+    for (PingDTO dto : entities) {
+      if (dto.getChronometer() == null || dto.getBeacon() == null) {
+        return Response.status(Response.Status.BAD_REQUEST).build();
+      }
+      entityEndpoint.create(dto, "Chrono #" + dto.getChronometer().getId() +
+          " Beacon #" + dto.getBeacon().getId() + " @ " + dto.getInstant());
+    }
+    return Response.noContent().build();
+  }
+
   @DELETE
   @Path("/{id:[0-9][0-9]*}")
   @Transactional

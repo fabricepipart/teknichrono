@@ -39,7 +39,7 @@ public class EventRepository extends PanacheRepositoryWrapper<Event, EventDTO> {
 
   @Override
   public String getEntityName() {
-    return Event.class.getName();
+    return Event.class.getSimpleName();
   }
 
   @Override

@@ -44,7 +44,7 @@ public class ChronometerRepository extends PanacheRepositoryWrapper<Chronometer,
 
   @Override
   public String getEntityName() {
-    return Chronometer.class.getName();
+    return Chronometer.class.getSimpleName();
   }
 
   @Override

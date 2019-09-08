@@ -34,7 +34,7 @@ public class LapTimeRepository extends PanacheRepositoryWrapper<LapTime, LapTime
 
   @Override
   public String getEntityName() {
-    return LapTime.class.getName();
+    return LapTime.class.getSimpleName();
   }
 
   @Override
