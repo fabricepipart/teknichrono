@@ -39,7 +39,7 @@ public class CategoryRepository extends PanacheRepositoryWrapper<Category, Categ
 
   @Override
   public String getEntityName() {
-    return Category.class.getName();
+    return Category.class.getSimpleName();
   }
 
   @Override

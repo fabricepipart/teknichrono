@@ -1,13 +1,22 @@
 #!python3
 
-import datetime
+from threading import Thread
 import logging
+import time
 
 
-class SendNoneStrategy:
+class SendNoneStrategy(Thread):
   def __init__(self):
     self.logger = logging.getLogger('SendStrategy')
+    self.alive = True
 
-  def send(self, sendme):
-    if sendme is not None:
-      self.logger.info('[NOSEND] Ping : ' + str(sendme))
+  def append(self, toSend):
+    if toSend is not None:
+      self.logger.info('[NOSEND] Ping : ' + str(toSend))
+
+  def stop(self):
+    self.alive = False
+
+  def run(self):
+    while self.alive:
+      time.sleep(1)
