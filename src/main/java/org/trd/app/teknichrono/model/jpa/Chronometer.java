@@ -5,14 +5,30 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 public class Chronometer extends PanacheEntity {
+
+  public enum ChronometerOrder {
+    UPDATE, RESTART, GET_LOGS
+  }
+
+
+  public enum PingSelectionStrategy {
+    FIRST, MID, LAST, HIGH
+  }
+
+  public enum PingSendStrategy {
+    NONE, ASYNC, RESEND, SYNC, STORE
+  }
 
   @Version
   @Column(name = "version")
@@ -20,7 +36,7 @@ public class Chronometer extends PanacheEntity {
 
   /* =============================== Fields =============================== */
 
-  @Column
+  @Column(nullable = false, unique = true)
   private String name;
 
   // Can be null if after event, items are reassociated
@@ -29,6 +45,27 @@ public class Chronometer extends PanacheEntity {
 
   @ManyToMany(mappedBy = "chronometers")
   private Set<Session> sessions = new HashSet<>();
+
+  @Column
+  private boolean bluetoothDebug;
+
+  @Column
+  private boolean debug;
+
+  @Column
+  @Enumerated(EnumType.STRING)
+  private ChronometerOrder orderToExecute;
+
+  @Column(nullable = false)
+  @Enumerated(EnumType.STRING)
+  private PingSelectionStrategy selectionStrategy;
+
+  @Column(nullable = false)
+  @Enumerated(EnumType.STRING)
+  private PingSendStrategy sendStrategy;
+
+  @Column(nullable = false)
+  private Duration inactivityWindow;
 
   /* ===================== Getters and setters ======================== */
   public Long getId() {
@@ -88,6 +125,55 @@ public class Chronometer extends PanacheEntity {
     return lastestPing;
   }
 
+  public boolean isDebug() {
+    return debug;
+  }
+
+  public void setDebug(boolean debug) {
+    this.debug = debug;
+  }
+
+  public boolean isBluetoothDebug() {
+    return bluetoothDebug;
+  }
+
+  public void setBluetoothDebug(boolean bluetoothDebug) {
+    this.bluetoothDebug = bluetoothDebug;
+  }
+
+  public ChronometerOrder getOrderToExecute() {
+    return orderToExecute;
+  }
+
+  public void setOrderToExecute(ChronometerOrder orderToExecute) {
+    this.orderToExecute = orderToExecute;
+  }
+
+  public PingSelectionStrategy getSelectionStrategy() {
+    return selectionStrategy;
+  }
+
+  public void setSelectionStrategy(PingSelectionStrategy selectionStrategy) {
+    this.selectionStrategy = selectionStrategy;
+  }
+
+  public Duration getInactivityWindow() {
+    return inactivityWindow;
+  }
+
+  public void setInactivityWindow(Duration inactivityWindow) {
+    this.inactivityWindow = inactivityWindow;
+  }
+
+  public PingSendStrategy getSendStrategy() {
+    return sendStrategy;
+  }
+
+  public void setSendStrategy(PingSendStrategy sendStrategy) {
+    this.sendStrategy = sendStrategy;
+  }
+
+
   /* ===================== Other ======================== */
   @Override
   public boolean equals(Object obj) {
@@ -107,8 +193,9 @@ public class Chronometer extends PanacheEntity {
   @Override
   public String toString() {
     String result = getClass().getSimpleName() + " ";
-    if (name != null && !name.trim().isEmpty())
+    if (name != null && !name.trim().isEmpty()) {
       result += name;
+    }
     return result;
   }
 }

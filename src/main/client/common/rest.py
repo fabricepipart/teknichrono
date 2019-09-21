@@ -3,6 +3,8 @@
 import json
 import requests
 import logging
+import isodate
+from datetime import timedelta
 
 HEADERS = {'Content-type': 'application/json'}
 LOGGER = logging.getLogger('REST')
@@ -32,3 +34,9 @@ def formatDatetime(d):
   "This formats a datetime in a format that can be understood on JAX RS side"
   string = d.strftime("%Y-%m-%dT%H:%M:%S")
   return "%s.%03dZ" % (string, d.microsecond / 1000.0)
+
+
+def iso_to_seconds(time_iso):
+  timedeltaObject = isodate.parse_duration(time_iso)
+  seconds = (timedeltaObject / timedelta(seconds=1))
+  return seconds

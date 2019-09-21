@@ -1,22 +1,23 @@
 #!python3
 
-from threading import Thread
+from threading import Thread, Event
 import logging
 import time
 
 
 class SendNoneStrategy(Thread):
   def __init__(self):
+    super(SendNoneStrategy, self).__init__()  # super() will call Thread.__init__ for you
     self.logger = logging.getLogger('SendStrategy')
-    self.alive = True
+    self.exit = Event()
 
   def append(self, toSend):
     if toSend is not None:
       self.logger.info('[NOSEND] Ping : ' + str(toSend))
 
   def stop(self):
-    self.alive = False
+    self.exit.set()
 
   def run(self):
-    while self.alive:
-      time.sleep(1)
+    while not self.exit.is_set():
+      self.exit.wait(1)

@@ -1,6 +1,6 @@
 #!python3
 
-from rest import get
+from common.rest import get
 
 
 class Beacon:

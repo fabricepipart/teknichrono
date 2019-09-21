@@ -31,7 +31,6 @@ angular.module('frontend').controller('NewLocationController', function ($scope,
 
     $scope.save = function () {
         var successCallback = function (data, responseHeaders) {
-            var id = locationParser(responseHeaders);
             flash.setMessage({ 'type': 'success', 'text': 'The location was created successfully.' });
             $location.path('/Locations');
         };

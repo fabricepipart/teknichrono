@@ -40,3 +40,4 @@ hs_err_pid*
 
 # data
 data/*
+__pycache__

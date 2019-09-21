@@ -5,9 +5,9 @@ import logging
 
 
 class SelectFirstStrategy:
-  def __init__(self, inactivityWindow):
+  def __init__(self, chronometer):
     self.scans = {}
-    self.inactivityWindow = inactivityWindow
+    self.chronometer = chronometer
     self.logger = logging.getLogger('SelectStrategy')
 
   def select(self, current):
@@ -20,7 +20,7 @@ class SelectFirstStrategy:
       else:
         nowSeconds = datetime.datetime.now().timestamp()
         # The last one we saw was long enough ago. It is a new lap
-        if self.scans[current.major].scanDate + self.inactivityWindow < nowSeconds:
+        if self.scans[current.major].scanDate + self.chronometer.inactivityWindow < nowSeconds:
           toReturn = current
           self.logger.debug('New Ping for ' + str(current.major) + ' previous @ ' + str(datetime.datetime.fromtimestamp(self.scans[current.major].scanDate)))
       self.scans[current.major] = current

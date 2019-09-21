@@ -60,7 +60,6 @@ angular.module('frontend').controller('NewPilotController', function ($scope, $l
 
     $scope.save = function () {
         var successCallback = function (data, responseHeaders) {
-            var id = locationParser(responseHeaders);
             flash.setMessage({ 'type': 'success', 'text': 'The pilot was created successfully.' });
             $location.path('/Pilots');
         };
