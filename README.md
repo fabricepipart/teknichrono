@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/fabricepipart/teknichrono.svg?branch=master)](https://travis-ci.org/fabricepipart/teknichrono)
 [![codecov](https://codecov.io/gh/fabricepipart/teknichrono/branch/master/graph/badge.svg)](https://codecov.io/gh/fabricepipart/teknichrono)
+![](https://github.com/fabricepipart/teknichrono/workflows/.github/workflows/workflow.yml/badge.svg)
+
 
 * [Project home](https://github.com/fabricepipart/teknichrono)
 * [Alternative home](https://bitbucket.org/trdteam/teknichrono/overview)

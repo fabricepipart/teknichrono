@@ -65,9 +65,14 @@ class ChronoSynchronizer(Thread):
     if self.chronometer.orderToExecute != chronometerMap.get('orderToExecute', None):
       chronoChanged = True
       self.chronometer.orderToExecute = chronometerMap.get('orderToExecute', None)
+      self.executeOrder()
     if chronoChanged:
       self.printChronoInfo()
       setupLogging(self.chronometer.debug, self.chronometer.bluetoothDebug)
+
+  def executeOrder(self):
+    if self.chronometer.orderToExecute == 'RESTART':
+      self.restartNeeded = True
 
   def printChronoInfo(self):
     "This prints the chrono configuration"

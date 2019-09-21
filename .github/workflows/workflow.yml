@@ -1,0 +1,62 @@
+name: Test Python client
+
+on: push
+
+jobs:
+  check-client:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    - name: Start server
+      run: |
+        mvn clean verify quarkus:dev &
+        while ! curl -fs http://localhost:8080 > /dev/null; do echo 'Not started yet ...'; sleep 5; done
+        echo "Started"
+    - name: Setup chrono
+      run: sh src/test/scripts/bash/demo_test.sh
+    - name: Run chrono for some time
+      run: |
+        sh ./src/main/client/demo.sh &
+        RUN_PID=$!
+        sleep 60
+        if cat target/teknichrono.log | grep -q Traceback; then false; fi 
+        echo "Change configuration to FIRST / NONE / DEBUG"
+        python3 src/test/scripts/python/test_demo_conf1.py
+        sleep 60
+        if cat target/teknichrono.log | grep -q Traceback; then false; fi 
+        echo "Change configuration to LAST / ASYNC"
+        python3 src/test/scripts/python/test_demo_conf2.py
+        sleep 60
+        python3 src/test/scripts/python/test_demo_restart.py
+        sleep 15
+        if cat target/teknichrono.log | grep -q Traceback; then false; fi 
+    - name: Coverage report
+      run: |
+        coverage report -m > client-coverage-report.txt
+        coverage xml -i
+
+    - uses: codecov/codecov-action@v1.0.2
+      with:
+        token: ${{secrets.CODECOV_TOKEN}}
+        file: ./coverage.xml
+        flags: pythonclient
+        name: codecov-python-client
+    - name: Archive code coverage results
+      uses: actions/upload-artifact@v1
+      with:
+        name: code-coverage-report
+        path: client-coverage-report.txt

@@ -13,4 +13,5 @@ export DEMO_MODE='true'
 export LOGS_PATH='./target'
 export WAIT_BETWEEN_UPDATES='10'
 
-python3 $DIR/trd.py
+coverage run --source src/main/client $DIR/trd.py
+coverage report -m

@@ -3,3 +3,4 @@ requests
 yapf
 pylint
 isodate
+coverage

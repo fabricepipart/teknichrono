@@ -30,6 +30,14 @@ def deleteChronometer(id):
   return
 
 
+def updateChronometer(id, data):
+  "This updates a Chronometer by id"
+  url = ChronometersUrl + '/' + str(id)
+  put(data, url)
+  print("Updated Chronometer id " + str(id))
+  return
+
+
 def getChronometers():
   "This gets all Chronometers"
   ChronometerResponse = get(ChronometersUrl)
