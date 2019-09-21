@@ -26,7 +26,6 @@ angular.module('frontend').controller('NewCategoryController', function ($scope,
 
     $scope.save = function () {
         var successCallback = function (data, responseHeaders) {
-            var id = locationParser(responseHeaders);
             flash.setMessage({ 'type': 'success', 'text': 'The category was created successfully.' });
             $location.path('/Categories');
         };

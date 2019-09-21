@@ -56,7 +56,6 @@ angular.module('frontend').controller('NewlLapTimeController', function ($scope,
 
     $scope.save = function () {
         var successCallback = function (data, responseHeaders) {
-            var id = locationParser(responseHeaders);
             flash.setMessage({ 'type': 'success', 'text': 'The lapTime was created successfully.' });
             $location.path('/lLapTimes');
         };

@@ -1,7 +1,7 @@
 #!python3
 
 import datetime
-from rest import formatDatetime
+from common.rest import formatDatetime
 
 
 class BeaconScan:

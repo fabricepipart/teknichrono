@@ -4,7 +4,7 @@ public enum SessionType {
 
   TIME_TRIAL("tt"), RACE("rc");
 
-  private SessionType(String i) {
+  SessionType(String i) {
     setIdentifier(i);
   }
 

@@ -3,8 +3,7 @@ import os
 # BLE iBeaconScanner based on https://github.com/adamf/BLE/blob/master/ble-scanner.py
 # JCS 06/07/14
 
-DEBUG = (os.getenv('TEKNICHRONO_BT_DEBUG', 'false') == 'true')
-VERBOSE = False
+TRACE = False
 # BLE scanner based on https://github.com/adamf/BLE/blob/master/ble-scanner.py
 # BLE scanner, based on https://code.google.com/p/pybluez/source/browse/trunk/examples/advanced/inquiry-with-rssi.py
 
@@ -160,7 +159,7 @@ def parse_events(sock, loop_count=100):
         report_pkt_offset = 0
         for i in range(0, num_reports):
 
-          if (DEBUG and VERBOSE):
+          if (TRACE):
             print("-------------")
             sys.stdout.write("\tPACKET: ")
             printpacket(pkt)

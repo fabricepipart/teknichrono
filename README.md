@@ -62,6 +62,8 @@ There are three profiles. See in ```src/main/resources/application.properties```
 
 ```mvn quarkus:dev```
 
+Note: you can connect your IDE for debugging on port 5005.
+
 ### How to run locally with localmariadb profile
 
 First:
@@ -149,7 +151,3 @@ For the time being, you can have a look in: ```src/main/java/org/trd/app/teknich
  
  * Proper health check as per https://quarkus.io/guides/health-guide
  * Remote dev mode
- * Create proper Template
- * Create proper build
- * Debug mode?
- * Debug log level?

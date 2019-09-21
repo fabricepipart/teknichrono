@@ -1,11 +1,12 @@
 package org.trd.app.teknichrono.it;
 
 import io.quarkus.test.junit.QuarkusTest;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.trd.app.teknichrono.model.dto.ChronometerDTO;
+import org.trd.app.teknichrono.model.jpa.Chronometer;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,17 +56,40 @@ public class TestRestChronometerEndpoint extends TestRestEndpoint<ChronometerDTO
     create("C1");
     ChronometerDTO b = getByName("C1");
     long id = b.getId();
-    getById(id);
+    ChronometerDTO dto = getById(id);
+    assertThat(dto.getSelectionStrategy()).isEqualTo("HIGH");
+    assertThat(dto.getSendStrategy()).isEqualTo("ASYNC");
+    assertThat(dto.getInactivityWindow()).isEqualTo(Duration.ofSeconds(5));
+    assertThat(dto.isBluetoothDebug()).isEqualTo(false);
+    assertThat(dto.isDebug()).isEqualTo(false);
+    assertThat(dto.getOrderToExecute()).isNull();
 
     ChronometerDTO modifiedChronometer = new ChronometerDTO();
     modifiedChronometer.setName("C2");
     modifiedChronometer.setId(id);
+
+    modifiedChronometer.setSelectionStrategy(Chronometer.PingSelectionStrategy.LAST.toString());
+    modifiedChronometer.setSendStrategy(Chronometer.PingSendStrategy.NONE.toString());
+    modifiedChronometer.setInactivityWindow(Duration.ofSeconds(10));
+    modifiedChronometer.setBluetoothDebug(true);
+    modifiedChronometer.setDebug(true);
+    modifiedChronometer.setOrderToExecute(Chronometer.ChronometerOrder.UPDATE.toString());
+
+
     update(id, modifiedChronometer);
+
     List<ChronometerDTO> chronos = getAll();
-    Assertions.assertThat(chronos.size()).isEqualTo(1);
+    assertThat(chronos.size()).isEqualTo(1);
     getByName("C1", NOT_FOUND);
     ChronometerDTO newReturnedChrono = getByName("C2");
-    Assertions.assertThat(newReturnedChrono.getId()).isEqualTo(id);
+    assertThat(newReturnedChrono.getId()).isEqualTo(id);
+
+    assertThat(newReturnedChrono.getSelectionStrategy()).isEqualTo("LAST");
+    assertThat(newReturnedChrono.getSendStrategy()).isEqualTo("NONE");
+    assertThat(newReturnedChrono.getInactivityWindow()).isEqualTo(Duration.ofSeconds(10));
+    assertThat(newReturnedChrono.isBluetoothDebug()).isEqualTo(true);
+    assertThat(newReturnedChrono.isDebug()).isEqualTo(true);
+    assertThat(newReturnedChrono.getOrderToExecute()).isEqualTo("UPDATE");
 
     delete(id);
     assertTestCleanedEverything();
@@ -82,6 +106,6 @@ public class TestRestChronometerEndpoint extends TestRestEndpoint<ChronometerDTO
   }
 
   public void assertTestCleanedEverything() {
-    Assertions.assertThat(getAll()).isNullOrEmpty();
+    assertThat(getAll()).isNullOrEmpty();
   }
 }

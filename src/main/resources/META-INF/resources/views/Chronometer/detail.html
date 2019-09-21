@@ -11,38 +11,62 @@
             <input id="name" name="name" type="text" class="form-control" ng-model="chronometer.name" placeholder="Enter the Chronometer Name"></input>
         </div>
     </div>
-    <!-- 
-    <div class="form-group" ng-class="{'has-error': ChronometerForm.chronoIndex.$invalid}">
-        <label for="chronoIndex" class="col-sm-2 control-label">Chrono Index</label>
-        <div id="chronoIndexControls" class="col-sm-10">
-            <input id="chronoIndex" name="chronoIndex" type="number" class="form-control" ng-model="chronometer.chronoIndex" placeholder="Enter the Chronometer Chrono Index"></input>
-            <span class="help-block error" ng-show="ChronometerForm.chronoIndex.$error.number">not a number</span>
+
+    <div class="form-group" ng-class="{'has-error': ChronometerForm.debug.$invalid}">
+        <label for="debug" class="col-sm-2 control-label">Debug</label>
+        <div id="debugControls" class="col-sm-10">
+            <input id="debug" name="debug" type="checkbox" class="checkbox" ng-model="chronometer.debug" placeholder="Enter the Chronometer debug"></input>
         </div>
     </div>
 
-    <div class="form-group" ng-class="{'has-error': ChronometerForm.pings.$invalid}">
-        <label for="pings" class="col-sm-2 control-label">Pings</label>
-        <div id="pingsControls" class="col-sm-10">
-            <select id="pings" name="pings" multiple class="form-control" ng-model="pingsSelection" ng-options="p.text for p in pingsSelectionList">
-                <option value="">Choose a Pings</option>
+    <div class="form-group" ng-class="{'has-error': ChronometerForm.bluetoothDebug.$invalid}">
+        <label for="bluetoothDebug" class="col-sm-2 control-label">Bluetooth Debug</label>
+        <div id="bluetoothDebugControls" class="col-sm-10">
+            <input id="bluetoothDebug" name="bluetoothDebug" type="checkbox" class="checkbox" ng-model="chronometer.bluetoothDebug"
+                placeholder="Enter the Chronometer BT debug"></input>
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': ChronometerForm.selectionStrategy.$invalid}">
+        <label for="selectionStrategy" class="col-sm-2 control-label">Selection Strategy</label>
+        <div id="selectionStrategyControls" class="col-sm-10">
+            <select id="selectionStrategy" name="selectionStrategy" class="form-control" ng-model="chronometer.selectionStrategy"
+                ng-options="s.short as s.text for s in selectionStrategyList">
+                <option value="">Choose a Selection Strategy</option>
             </select>
         </div>
     </div>
 
-    <div class="form-group" ng-class="{'has-error': ChronometerForm.sessions.$invalid}">
-        <label for="sessions" class="col-sm-2 control-label">Sessions</label>
-        <div id="sessionsControls" class="col-sm-10">
-            <select id="sessions" name="sessions" multiple class="form-control" ng-model="sessionsSelection" ng-options="s.text for s in sessionsSelectionList">
-                <option value="">Choose a Sessions</option>
+    <div class="form-group" ng-class="{'has-error': ChronometerForm.sendStrategy.$invalid}">
+        <label for="sendStrategy" class="col-sm-2 control-label">Send Strategy</label>
+        <div id="sendStrategyControls" class="col-sm-10">
+            <select id="sendStrategy" name="sendStrategy" class="form-control" ng-model="chronometer.sendStrategy" ng-options="s.short as s.text for s in sendStrategyList">
+                <option value="">Choose a Send Strategy</option>
             </select>
         </div>
-    </div> -->
+    </div>
 
+    <div class="form-group" ng-class="{'has-error': ChronometerForm.orderToExecute.$invalid}">
+        <label for="orderToExecute" class="col-sm-2 control-label">Order</label>
+        <div id="orderToExecuteControls" class="col-sm-10">
+            <select id="orderToExecute" name="orderToExecute" class="form-control" ng-model="chronometer.orderToExecute" ng-options="s.short as s.text for s in orderToExecuteList">
+                <option value="">Choose an Order</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': ChronometerForm.inactivityWindow.$invalid}">
+        <label for="inactivityWindow" class="col-sm-2 control-label">Inactivity Window</label>
+        <div id="inactivityWindowControls" class="col-sm-10">
+            <input id="inactivityWindow" name="inactivityWindow" type="number" class="form-control" ng-model="chronometer.inactivityWindow"
+                placeholder="Enter the Inactivity Window"></input>
+            <span class="help-block error" ng-show="ChronometerForm.inactivityWindow.$error.number">not a number</span>
+        </div>
+    </div>
 
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
-            <button id="saveChronometer" name="saveChronometer" class="btn btn-primary" ng-disabled="isClean() || ChronometerForm.$invalid"
-                ng-click="save()">
+            <button id="saveChronometer" name="saveChronometer" class="btn btn-primary" ng-disabled="isClean() || ChronometerForm.$invalid" ng-click="save()">
                 <span class="glyphicon glyphicon-ok-sign"></span> Save</button>
             <button id="cancel" name="cancel" class="btn btn-default" ng-click="cancel()">
                 <span class="glyphicon glyphicon-remove-sign"></span> Cancel</button>

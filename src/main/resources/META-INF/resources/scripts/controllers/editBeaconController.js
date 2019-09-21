@@ -26,27 +26,6 @@ angular.module('frontend').controller('EditBeaconController', function ($scope, 
                     return labelObject;
                 });
             });
-            PingResource.queryAll(function (items) {
-                $scope.pingsSelectionList = $.map(items, function (item) {
-                    var wrappedObject = {
-                        id: item.id
-                    };
-                    var labelObject = {
-                        value: item.id,
-                        text: item.id
-                    };
-                    if ($scope.beacon.pings) {
-                        $.each($scope.beacon.pings, function (idx, element) {
-                            if (item.id == element.id) {
-                                $scope.pingsSelection.push(labelObject);
-                                $scope.beacon.pings.push(wrappedObject);
-                            }
-                        });
-                        self.original.pings = $scope.beacon.pings;
-                    }
-                    return labelObject;
-                });
-            });
         };
         var errorCallback = function () {
             flash.setMessage({ 'type': 'error', 'text': 'The beacon could not be found.' });

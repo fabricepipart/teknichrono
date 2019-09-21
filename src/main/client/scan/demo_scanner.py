@@ -3,7 +3,7 @@
 import random
 import logging
 import time
-from beacon_scan import BeaconScan
+from scan.beacon_scan import BeaconScan
 
 
 class FakeBluetoothScanner:
@@ -12,6 +12,7 @@ class FakeBluetoothScanner:
 
   def init(self):
     self.logger.info("Loading Scanner ...")
+    self.logger.info("Scanner loaded")
 
   def scan(self):
     time.sleep(0.1)

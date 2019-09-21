@@ -58,10 +58,27 @@ public class ChronometerRepository extends PanacheRepositoryWrapper<Chronometer,
   public Chronometer fromDTO(ChronometerDTO dto) throws ConflictingIdException, NotFoundException {
     checkNoId(dto);
     Chronometer chronometer = new Chronometer();
-    chronometer.setName(dto.getName());
+    setFromDto(dto, chronometer);
+
     // Sessions are not updated (not part of DTO)
     // Pings are not updated (not part of DTO)
     return chronometer;
+  }
+
+  private void setFromDto(ChronometerDTO dto, Chronometer chronometer) {
+    chronometer.setName(dto.getName());
+    if (dto.getSelectionStrategy() != null) {
+      chronometer.setSelectionStrategy(Chronometer.PingSelectionStrategy.valueOf(dto.getSelectionStrategy()));
+    }
+    if (dto.getSendStrategy() != null) {
+      chronometer.setSendStrategy(Chronometer.PingSendStrategy.valueOf(dto.getSendStrategy()));
+    }
+    chronometer.setInactivityWindow(dto.getInactivityWindow());
+    chronometer.setBluetoothDebug(dto.isBluetoothDebug());
+    chronometer.setDebug(dto.isDebug());
+    if (dto.getOrderToExecute() != null) {
+      chronometer.setOrderToExecute(Chronometer.ChronometerOrder.valueOf(dto.getOrderToExecute()));
+    }
   }
 
   @Override
@@ -73,10 +90,9 @@ public class ChronometerRepository extends PanacheRepositoryWrapper<Chronometer,
   public void update(long id, ChronometerDTO dto) throws ConflictingIdException, NotFoundException {
     checkIdsMatch(id, dto);
     Chronometer chronometer = ensureFindById(id);
-    chronometer.setName(dto.getName());
+    setFromDto(dto, chronometer);
     // Sessions are not updated (not part of DTO)
     // Pings are not updated (not part of DTO)
     panacheRepository.persist(chronometer);
-
   }
 }

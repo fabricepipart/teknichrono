@@ -80,7 +80,6 @@ angular.module('frontend').controller('NewSessionController', function ($scope, 
 
     $scope.save = function () {
         var successCallback = function (data, responseHeaders) {
-            var id = locationParser(responseHeaders);
             flash.setMessage({ 'type': 'success', 'text': 'The session was created successfully.' });
             $location.path('/Sessions');
         };

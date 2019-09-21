@@ -1,13 +1,13 @@
 #!python3
 
-from threading import Thread
+from threading import Thread, Event
 import multiprocessing
 import logging
 import time
 import datetime
 from collections import deque
 
-from pinger import Pinger
+from ping_senders.pinger import Pinger
 
 
 class SendAsyncStrategy(Thread):
@@ -21,7 +21,7 @@ class SendAsyncStrategy(Thread):
     self.pinger = Pinger(server, chronoId)
     self.lastFailure = 0
     self.q = deque()
-    self.alive = True
+    self.exit = Event()
 
   def append(self, toSend):
     self.q.append(toSend)
@@ -33,11 +33,11 @@ class SendAsyncStrategy(Thread):
     return fromQueue
 
   def stop(self):
-    self.alive = False
+    self.exit.set()
 
   def run(self):
-    while self.alive:
-      time.sleep(1)
+    while not self.exit.is_set():
+      self.exit.wait(1)
       toSend = []
       if self.lastFailure + self.WAIT_BEFORE_RETRY < datetime.datetime.now().timestamp():
         while len(toSend) < self.MAX_PINGS_TO_SEND and len(self.q) > 0:
