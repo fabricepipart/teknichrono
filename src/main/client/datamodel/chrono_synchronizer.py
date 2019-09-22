@@ -2,7 +2,7 @@ import os
 import logging
 from threading import Thread, Event
 from datamodel.chrono import Chronometer
-from common.rest import get, iso_to_seconds
+from common.rest import get, post, iso_to_seconds
 from logs.init import setupLogging
 
 
@@ -27,6 +27,11 @@ class ChronoSynchronizer(Thread):
     url = self.restApiUrl + '/name?name=' + name
     response = get(url)
     return response
+
+  def ackOrder(self):
+    "This sends ack after executing an order"
+    url = self.restApiUrl + '/' + str(self.chronometer.id) + '/ack'
+    post('{}', url)
 
   def updateChronometer(self):
     chronometerMap = self.getChronometerByName(self.chronometer.name)
@@ -71,7 +76,11 @@ class ChronoSynchronizer(Thread):
       setupLogging(self.chronometer.debug, self.chronometer.bluetoothDebug)
 
   def executeOrder(self):
+    self.logger.info("New order : %s", self.chronometer.orderToExecute)
+    self.ackOrder()
     if self.chronometer.orderToExecute == 'RESTART':
+      self.restartNeeded = True
+    if self.chronometer.orderToExecute == 'UPDATE':
       self.restartNeeded = True
 
   def printChronoInfo(self):
@@ -89,6 +98,7 @@ class ChronoSynchronizer(Thread):
     self.logger.info('--------------------------------------')
 
   def stop(self):
+    self.logger.info('Stopping chrono thread')
     self.exit.set()
 
   def run(self):

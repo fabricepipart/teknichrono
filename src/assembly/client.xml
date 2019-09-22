@@ -1,0 +1,27 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+    <id>client-updater</id>
+    <formats>
+        <format>tar.gz</format>
+    </formats>
+    <fileSets>
+        <fileSet>
+            <directory>${project.basedir}/src/main/client</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>**/*.py</include>
+                <include>**/*.sh</include>
+                <include>requirements.txt</include>
+            </includes>
+            <excludes>
+                <exclude>**/__pycache__/**</exclude>
+                <exclude>**.pyc</exclude>
+                <exclude>systemd/**</exclude>
+                <exclude>old/**</exclude>
+                <exclude>demo.sh</exclude>
+                <exclude>install.sh</exclude>
+            </excludes>
+        </fileSet>
+    </fileSets>
+</assembly>

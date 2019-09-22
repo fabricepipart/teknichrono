@@ -47,6 +47,8 @@ beacon = addBeacon(7)
 beacon = addBeacon(8)
 beacon = addBeacon(9)
 beacon = addBeacon(10)
+beacon = addBeacon(175)
+beacon = addBeacon(248)
 
 start = datetime(2018, 1, 1)
 end = datetime(2019, 12, 31)

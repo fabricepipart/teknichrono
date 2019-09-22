@@ -18,7 +18,7 @@ public abstract class TestRestEndpoint<D extends EntityDTO> {
   public static final int NOT_FOUND = javax.ws.rs.core.Response.Status.NOT_FOUND.getStatusCode();
   public static final int BAD_REQUEST = javax.ws.rs.core.Response.Status.BAD_REQUEST.getStatusCode();
 
-  private static Jsonb jsonb = JsonbBuilder.create();
+  protected static Jsonb jsonb = JsonbBuilder.create();
 
   protected final String restEntrypointName;
   protected final Class<D> dtoClass;

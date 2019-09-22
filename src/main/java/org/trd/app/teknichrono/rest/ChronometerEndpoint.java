@@ -4,7 +4,8 @@ import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.dto.ChronometerDTO;
 import org.trd.app.teknichrono.model.jpa.Chronometer;
 import org.trd.app.teknichrono.model.repository.ChronometerRepository;
-import org.trd.app.teknichrono.model.repository.PingRepository;
+import org.trd.app.teknichrono.util.DurationLogger;
+import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -24,10 +25,14 @@ import java.util.List;
 @Path("/chronometers")
 public class ChronometerEndpoint {
 
+  private Logger LOGGER = Logger.getLogger(SessionEndpoint.class);
+
+  private ChronometerRepository chronometerRepository;
   private final EntityEndpoint<Chronometer, ChronometerDTO> entityEndpoint;
 
   @Inject
   public ChronometerEndpoint(ChronometerRepository chronometerRepository) {
+    this.chronometerRepository = chronometerRepository;
     this.entityEndpoint = new EntityEndpoint<>(chronometerRepository);
   }
 
@@ -57,6 +62,21 @@ public class ChronometerEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   public Response findChronometerByName(@QueryParam("name") String name) {
     return entityEndpoint.findByField("name", name);
+  }
+
+  @POST
+  @Path("/{id:[0-9][0-9]*}/ack")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Transactional
+  public Response ack(@PathParam("id") long id) {
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Ack orders of chronometer " + id)) {
+      try {
+        ChronometerDTO dto = chronometerRepository.ack(id);
+        return Response.ok(dto).build();
+      } catch (NotFoundException e) {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+    }
   }
 
   @GET

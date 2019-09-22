@@ -22,6 +22,7 @@ import org.trd.app.teknichrono.model.jpa.SessionType;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -98,7 +99,7 @@ public class TestRestSessionEndpoint extends TestRestEndpoint<SessionDTO> {
 
     SessionDTO modifiedSession = new SessionDTO();
     modifiedSession.setName("S2");
-    Instant now = Instant.now();
+    Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
     modifiedSession.setStart(now);
     modifiedSession.setEnd(now.plusSeconds(55));
     modifiedSession.setInactivity(10L);
@@ -119,7 +120,8 @@ public class TestRestSessionEndpoint extends TestRestEndpoint<SessionDTO> {
 
     SessionDTO modifiedAgainSession = new SessionDTO();
     modifiedAgainSession.setName("S3");
-    Instant newStart = Instant.now();
+    Instant newStart = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+
     modifiedAgainSession.setStart(newStart);
     modifiedAgainSession.setEnd(newStart.plusSeconds(20));
     modifiedAgainSession.setInactivity(20L);

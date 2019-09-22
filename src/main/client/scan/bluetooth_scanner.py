@@ -3,9 +3,9 @@
 import bluetooth._bluetooth as bluez
 import sys
 import os
-import scan.blescan
 import logging
 from scan.beacon_scan import BeaconScan
+from scan.blescan import hci_le_set_scan_parameters, hci_enable_le_scan, parse_events
 
 
 class BluetoothScanner:
@@ -23,15 +23,16 @@ class BluetoothScanner:
     except:
       self.logger.error("No bluetooth controller found ...")
       sys.exit(1)
-    blescan.hci_le_set_scan_parameters(self.sock)
-    blescan.hci_enable_le_scan(self.sock)
+    hci_le_set_scan_parameters(self.sock)
+    hci_enable_le_scan(self.sock)
     self.logger.info("Scanner loaded")
 
   def scan(self):
     try:
-      current = blescan.parse_events(self.sock, 1)
+      current = parse_events(self.sock, 1)
     except Exception as ex:
       self.logger.debug("No bluetooth device found : " + type(ex).__name__)
+      print(ex)
       current = []
     if len(current) > 0:
       scanned = BeaconScan()

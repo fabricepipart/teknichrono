@@ -16,6 +16,7 @@ class SendNoneStrategy(Thread):
       self.logger.info('[NOSEND] Ping : ' + str(toSend))
 
   def stop(self):
+    self.logger.info('Stopping send thread')
     self.exit.set()
 
   def run(self):

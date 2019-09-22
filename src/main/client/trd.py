@@ -42,6 +42,7 @@ try:
       print(toSend.toJson(), file=BACKUP_FILE)
       sendStrategy.append(toSend)
 finally:
+  print("Ending application")
   if sendStrategy:
     sendStrategy.stop()
     sendStrategy.join()
