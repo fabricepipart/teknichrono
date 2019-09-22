@@ -20,6 +20,8 @@ local-stage
 # Log file
 *.log
 jacoco.exec
+.coverage
+coverage.xml
 
 # BlueJ files
 *.ctxt

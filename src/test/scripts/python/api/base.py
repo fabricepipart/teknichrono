@@ -39,7 +39,7 @@ def post(dataString, url, params=[]):
 def put(dataString, url):
   "This send in a PUT a json to a URL"
   if debug:
-    print('PUT to ' + host + url)
+    print('PUT to ' + host + url + ' --> ' + dataString)
   response = requests.put(host + url, data=dataString, headers=headers)
   if (not response.ok):
     response.raise_for_status()
