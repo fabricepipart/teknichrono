@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/fabricepipart/teknichrono.svg?branch=master)](https://travis-ci.org/fabricepipart/teknichrono)
 [![codecov](https://codecov.io/gh/fabricepipart/teknichrono/branch/master/graph/badge.svg)](https://codecov.io/gh/fabricepipart/teknichrono)
-![](https://github.com/fabricepipart/teknichrono/workflows/.github/workflows/workflow.yml/badge.svg)
+[![GitHub actions workflow](https://github.com/fabricepipart/teknichrono/workflows/Test%20Python%20client/badge.svg)](https://github.com/fabricepipart/teknichrono/blob/master/.github/workflows/workflow.yml)
 
 
 * [Project home](https://github.com/fabricepipart/teknichrono)
