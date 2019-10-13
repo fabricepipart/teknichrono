@@ -34,11 +34,11 @@ jobs:
         if cat target/teknichrono.log | grep -q Traceback; then false; fi 
         echo "Change configuration to FIRST / NONE / DEBUG"
         python3 src/test/scripts/python/test_demo_conf1.py
-        sleep 20
+        sleep 60
         if cat target/teknichrono.log | grep -q Traceback; then false; fi 
         echo "Change configuration to LAST / ASYNC"
         python3 src/test/scripts/python/test_demo_conf2.py
-        sleep 20
+        sleep 60
         python3 src/test/scripts/python/test_demo_restart.py
         sleep 20
         if ps -p $RUN_PID; then echo "Client did not restart" && false; fi
