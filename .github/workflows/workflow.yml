@@ -28,7 +28,7 @@ jobs:
         echo "Started"
     - name: Test chronometer
       run: |
-        sh ./src/main/client/demo.sh &
+        export COVERAGE_FILE=.coverage_1 ; sh ./src/main/client/demo.sh &
         RUN_PID=$!
         sleep 20
         if cat target/teknichrono.log | grep -q Traceback; then false; fi 
@@ -42,7 +42,7 @@ jobs:
         python3 src/test/scripts/python/test_demo_restart.py
         sleep 20
         if ps -p $RUN_PID; then echo "Client did not restart" && false; fi
-        sh ./src/main/client/demo.sh &
+        export COVERAGE_FILE=.coverage_2 ; sh ./src/main/client/demo.sh &
         RUN_PID=$!
         sleep 20
         python3 src/test/scripts/python/test_demo_update.py
@@ -51,6 +51,7 @@ jobs:
         if cat target/teknichrono.log | grep -q Traceback; then false; fi 
     - name: Coverage report
       run: |
+        coverage combine .coverage_1 .coverage_2
         coverage report -m > client-coverage-report.txt --omit=src/main/client/scan/bluetooth_scanner.py,src/main/client/scan/blescan.py
         coverage xml -i
     - uses: codecov/codecov-action@v1.0.2

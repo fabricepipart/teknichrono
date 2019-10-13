@@ -58,12 +58,14 @@ def returnnumberpacket(pkt):
   return myInteger
 
 
+""" 
 def returnstringpacket(pkt):
   myString = ""
   for i in range(len(pkt)):
     c = pkt[i:i + 1]
     myString += "%02x" % struct.unpack("B", c)[0]
   return myString
+ """
 
 
 def printpacket(pkt):
@@ -72,6 +74,7 @@ def printpacket(pkt):
     sys.stdout.write("%02x " % struct.unpack("B", c)[0])
 
 
+""" 
 def get_packed_bdaddr(bdaddr_string):
   packable_addr = []
   addr = bdaddr_string.split(':')
@@ -79,6 +82,7 @@ def get_packed_bdaddr(bdaddr_string):
   for b in addr:
     packable_addr.append(int(b, 16))
   return struct.pack("<BBBBBB", *packable_addr)
+"""
 
 
 def packed_bdaddr_to_string(bdaddr_packed):
@@ -89,8 +93,10 @@ def hci_enable_le_scan(sock):
   hci_toggle_le_scan(sock, 0x01)
 
 
+""" 
 def hci_disable_le_scan(sock):
   hci_toggle_le_scan(sock, 0x00)
+"""
 
 
 def hci_toggle_le_scan(sock, enable):
