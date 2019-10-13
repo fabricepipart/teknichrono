@@ -14,6 +14,7 @@ import org.trd.app.teknichrono.model.dto.PingDTO;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +56,7 @@ public class TestRestPingEndpoint extends TestRestEndpoint<PingDTO> {
 
     List<PingDTO> pings = getAll();
     assertThat(pings.size()).isEqualTo(0);
-    Instant now = Instant.now();
+    Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
     createPing(now, beacon.getId(), chronometer.getId());
     pings = getAll();
     assertThat(pings.size()).isEqualTo(1);
@@ -114,7 +115,7 @@ public class TestRestPingEndpoint extends TestRestEndpoint<PingDTO> {
     getById(id);
 
     PingDTO modifiedPing = new PingDTO();
-    Instant now = Instant.now();
+    Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
     modifiedPing.setInstant(now);
     modifiedPing.setPower(-1);
     modifiedPing.setId(id);
@@ -153,7 +154,7 @@ public class TestRestPingEndpoint extends TestRestEndpoint<PingDTO> {
     ChronometerDTO chronometer = restChronometer.getByName("C1");
     long chronoId = chronometer.getId();
 
-    Instant now = Instant.now();
+    Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
     pings.add(createDto(now.plusSeconds(10), beaconId, chronoId));
     pings.add(createDto(now.plusSeconds(20), beaconId, chronoId));
     pings.add(createDto(now.plusSeconds(30), beaconId, chronoId));

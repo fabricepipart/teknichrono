@@ -1,0 +1,5 @@
+prettytable
+requests
+yapf
+isodate
+pybluez

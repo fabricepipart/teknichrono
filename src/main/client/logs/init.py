@@ -1,7 +1,7 @@
 import os
 import logging
 
-LOGS_PATH = os.getenv('LOGS_PATH', '/home/pi/scripts/logs')
+LOGS_PATH = os.getenv('LOGS_PATH', os.getenv('TEKNICHRONO_HOME', '/home/pi/chrono') + '/teknichrono-data/logs')
 
 
 def setupBackupFile():

@@ -11,5 +11,5 @@ def getScanner():
     scanner = BluetoothScanner()
   else:
     scanner = FakeBluetoothScanner()
-    scanner.init()
+  scanner.init()
   return scanner

@@ -19,6 +19,7 @@ import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -112,7 +113,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
     NestedPilotDTO pilot2 = beacon2.getPilot();
     createSession("Session", "C1");
     long sessionId = sessions.get(0).getId();
-    Instant now = Instant.now();
+    Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
     restPing.createPing(now.plusSeconds(0), beacons.get(0).getId(), chronos.get(0));
     restPing.createPing(now.plusSeconds(0), beacons.get(1).getId(), chronos.get(0));
     restPing.createPing(now.plusSeconds(101), beacons.get(0).getId(), chronos.get(0));
@@ -156,7 +157,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
 
     createSession("Session", "C1");
     long sessionId = sessions.get(0).getId();
-    Instant now = Instant.now();
+    Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
     restPing.createPing(now.plusSeconds(336), beacons.get(1).getId(), chronos.get(0));
     restPing.createPing(now.plusSeconds(0), beacons.get(0).getId(), chronos.get(0));
     restPing.createPing(now.plusSeconds(102), beacons.get(1).getId(), chronos.get(0));
@@ -192,7 +193,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
     NestedPilotDTO pilot2 = beacon2.getPilot();
     createSession("Session", "C1");
 
-    Instant now = Instant.now();
+    Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
     restPing.createPing(now.plusSeconds(214), beacons.get(1).getId(), chronos.get(0));
     restPing.createPing(now.plusSeconds(336), beacons.get(1).getId(), chronos.get(0));
     restPing.createPing(now.plusSeconds(212), beacons.get(0).getId(), chronos.get(0));
@@ -228,7 +229,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
     NestedPilotDTO pilot2 = beacon2.getPilot();
     createSession("Session", "C1");
 
-    Instant now = Instant.now();
+    Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
     restPing.createPing(now.plusSeconds(336), beacons.get(1).getId(), chronos.get(0));
     restPing.createPing(now.plusSeconds(214), beacons.get(1).getId(), chronos.get(0));
     restPing.createPing(now.plusSeconds(0), beacons.get(0).getId(), chronos.get(0));
@@ -663,7 +664,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
   public void createWithAllNeeded() {
     addBeacon(101);
     createSession("Session", "C1");
-    Instant now = Instant.now();
+    Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
     restPing.createPing(now.plusSeconds(0), beacons.get(0).getId(), chronos.get(0));
   }
 
@@ -715,7 +716,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
     location.setLoopTrack(true);
     restLocation.update(locations.get(0), location);
 
-    Instant now = Instant.now();
+    Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
     PingDTO startPing = new PingDTO();
     startPing.setInstant(now);
     startPing.setPower(0);
@@ -782,7 +783,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
     addChronometer("C2", 0);
     addChronometer("C3", 0);
 
-    Instant now = Instant.now();
+    Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
     restPing.createPing(now.plusSeconds(0), beacons.get(0).getId(), chronos.get(0));
     restPing.createPing(now.plusSeconds(30), beacons.get(0).getId(), chronos.get(1));
     restPing.createPing(now.plusSeconds(60), beacons.get(0).getId(), chronos.get(2));

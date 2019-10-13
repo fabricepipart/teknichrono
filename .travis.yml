@@ -19,7 +19,7 @@ stages:
 
 env:
   global:
-    - VERSION_BASE=2.1
+    - VERSION_BASE=2.2
 
 jobs:
   include:

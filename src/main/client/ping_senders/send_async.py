@@ -33,6 +33,7 @@ class SendAsyncStrategy(Thread):
     return fromQueue
 
   def stop(self):
+    self.logger.info('Stopping send thread')
     self.exit.set()
 
   def run(self):

@@ -1,6 +1,7 @@
 package org.trd.app.teknichrono.it;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.trd.app.teknichrono.model.dto.ChronometerDTO;
@@ -10,6 +11,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.*;
 
 @Tag("integration")
@@ -95,6 +97,39 @@ public class TestRestChronometerEndpoint extends TestRestEndpoint<ChronometerDTO
     assertTestCleanedEverything();
   }
 
+  @Test
+  public void ackReturns404ForChronoThatDoesNotExist() {
+    List<ChronometerDTO> chronometers = getAll();
+    assertThat(chronometers.size()).isEqualTo(0);
+    failedAck(123);
+    assertTestCleanedEverything();
+  }
+
+  @Test
+  public void ackClearsOrders() {
+    create("C1");
+    ChronometerDTO b = getByName("C1");
+    long id = b.getId();
+    ChronometerDTO dto = getById(id);
+    assertThat(dto.getOrderToExecute()).isNull();
+
+    dto.setOrderToExecute(Chronometer.ChronometerOrder.UPDATE.toString());
+    update(id, dto);
+
+    dto = getById(id);
+    assertThat(dto.getOrderToExecute()).isEqualTo(Chronometer.ChronometerOrder.UPDATE.toString());
+
+    dto = ack(id);
+    assertThat(dto.getOrderToExecute()).isNull();
+    dto = getById(id);
+    assertThat(dto.getOrderToExecute()).isNull();
+    dto = ack(id);
+    assertThat(dto.getOrderToExecute()).isNull();
+
+    delete(id);
+    assertTestCleanedEverything();
+  }
+
   /**
    * ******************** Utilities *********************
    **/
@@ -103,6 +138,22 @@ public class TestRestChronometerEndpoint extends TestRestEndpoint<ChronometerDTO
     ChronometerDTO c = new ChronometerDTO();
     c.setName(name);
     create(c);
+  }
+
+  private void failedAck(long id) {
+    given().pathParam("id", id)
+        .when().post("/rest/" + restEntrypointName + "/{id}/ack")
+        .then()
+        .statusCode(NOT_FOUND);
+  }
+
+  private ChronometerDTO ack(long id) {
+    Response r = given().pathParam("id", id)
+        .when().post("/rest/" + restEntrypointName + "/{id}/ack")
+        .then()
+        .statusCode(OK)
+        .extract().response();
+    return jsonb.fromJson(r.asString(), dtoClass);
   }
 
   public void assertTestCleanedEverything() {

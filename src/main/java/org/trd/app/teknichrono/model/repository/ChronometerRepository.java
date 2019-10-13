@@ -86,6 +86,14 @@ public class ChronometerRepository extends PanacheRepositoryWrapper<Chronometer,
     return ChronometerDTO.fromChronometer(dto);
   }
 
+
+  public ChronometerDTO ack(long id) throws NotFoundException {
+    Chronometer entity = ensureFindById(id);
+    entity.setOrderToExecute(null);
+    panacheRepository.persist(entity);
+    return ChronometerDTO.fromChronometer(entity);
+  }
+
   @Override
   public void update(long id, ChronometerDTO dto) throws ConflictingIdException, NotFoundException {
     checkIdsMatch(id, dto);

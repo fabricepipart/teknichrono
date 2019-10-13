@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.trd.app.teknichrono</groupId>
     <artifactId>teknichrono</artifactId>
-    <version>2.0-SNAPSHOT</version>
+    <version>2.2-SNAPSHOT</version>
     <name>Teknichrono Mobile Web Application</name>
     <description>This project contains pre-requisites for demonstrating the use of JBoss Forge. The end-user will be
         instructed on how to scaffold a new application based on a pre-existing JPA entity. Refer to the embedded
@@ -156,6 +156,22 @@
             <resource>
                 <filtering>true</filtering>
                 <directory>src/main/k8</directory>
+            </resource>
+            <resource>
+                <filtering>false</filtering>
+                <directory>${project.build.directory}</directory>
+                <targetPath>META-INF/resources/downloads</targetPath>              
+                <includes>
+                    <include>*.tar.gz</include>
+              </includes>
+            </resource>
+            <resource>
+                <filtering>false</filtering>
+                <directory>${project.basedir}/src/main/client</directory>
+                <targetPath>META-INF/resources/downloads</targetPath>              
+                <includes>
+                    <include>install.sh</include>
+              </includes>
             </resource>
         </resources>
         <finalName>${project.artifactId}</finalName>
@@ -319,6 +335,25 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assembly/client.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
+
 </project>
