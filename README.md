@@ -70,10 +70,12 @@ Note: you can connect your IDE for debugging on port 5005.
 
 First:
 ```oc port-forward mariadb-3-qgvwj 3306:3306```
+```kubectl port-forward -n teknichrono $(kubectl get pod -n teknichrono -l app=mysql -o jsonpath='{.items[0].metadata.name}') 3306:3306```
+```kubectl port-forward -n teknichrono service/mysql-service 3306 3306```
 then
 ```mvn quarkus:dev -Dquarkus-profile=localmariadb```
 or
-```java -jar target/teknichrono-runner.jar -Dquarkus-profile=localmariadb```
+```java -Dquarkus-profile=localmariadb -jar target/teknichrono-runner.jar```
 
 ### How to run on OpenShift
 

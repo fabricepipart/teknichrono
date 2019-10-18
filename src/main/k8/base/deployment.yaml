@@ -31,8 +31,6 @@ spec:
             secretKeyRef:
               name: mysql-user
               key: QUARKUS_DATASOURCE_PASSWORD
-        - name: QUARKUS_DATASOURCE_URL
-          value: 
         image: "fabricepipart/teknichrono-backend:${project.version}"
         imagePullPolicy: "IfNotPresent"
         livenessProbe:
