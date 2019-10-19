@@ -13,6 +13,7 @@ import org.trd.app.teknichrono.model.dto.LocationDTO;
 import org.trd.app.teknichrono.model.dto.NestedPilotDTO;
 import org.trd.app.teknichrono.model.dto.PingDTO;
 import org.trd.app.teknichrono.model.dto.SessionDTO;
+import org.trd.app.teknichrono.model.jpa.Chronometer;
 import org.trd.app.teknichrono.model.jpa.SessionType;
 
 import javax.json.bind.Jsonb;
@@ -100,6 +101,22 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
       delete(laptime.getId());
     }
     laptimes = getAllOfSession(sessionId);
+    assertThat(laptimes.size()).isEqualTo(0);
+  }
+
+
+  @Test
+  public void noLapCreatedWhenChronoInProximityMode() {
+    createWithAllNeeded();
+
+    ChronometerDTO dto = restChronometer.getById(chronos.get(0));
+    dto.setSelectionStrategy(Chronometer.PingSelectionStrategy.PROXIMITY.toString());
+    restChronometer.update(chronos.get(0), dto);
+
+    addLap(Instant.now().plusSeconds(11), beacons.get(0).getId(), chronos.get(0));
+
+    long sessionId = sessions.get(0).getId();
+    List<LapTimeDTO> laptimes = getAllOfSession(sessionId);
     assertThat(laptimes.size()).isEqualTo(0);
   }
 

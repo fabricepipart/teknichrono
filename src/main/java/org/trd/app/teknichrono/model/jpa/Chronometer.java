@@ -23,7 +23,7 @@ public class Chronometer extends PanacheEntity {
 
 
   public enum PingSelectionStrategy {
-    FIRST, MID, LAST, HIGH
+    FIRST, MID, LAST, HIGH, PROXIMITY
   }
 
   public enum PingSendStrategy {
@@ -106,23 +106,6 @@ public class Chronometer extends PanacheEntity {
 
   public void setSessions(Set<Session> sessions) {
     this.sessions = sessions;
-  }
-
-  public Ping getLastestPing() {
-    if (pings != null) {
-      return null;
-    }
-    Ping lastestPing = null;
-    for (Ping p : pings) {
-      if (p.getInstant() != null) {
-        boolean moreRecent = lastestPing != null && lastestPing.getInstant().isBefore(p.getInstant());
-        boolean isFirst = lastestPing == null;
-        if (moreRecent || isFirst) {
-          lastestPing = p;
-        }
-      }
-    }
-    return lastestPing;
   }
 
   public boolean isDebug() {

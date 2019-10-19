@@ -32,6 +32,7 @@ deleteLocations()
 event = addEvent('Live tests')
 chrono = addChronometer('Raspberry-2')
 cleo = addPilot('Cleo', 'Pipart')
+fabrice = addPilot('Fabrice', 'Pipart')
 
 newbie = addCategory('Newbie')
 addPilotToCategory(newbie['id'], cleo['id'])

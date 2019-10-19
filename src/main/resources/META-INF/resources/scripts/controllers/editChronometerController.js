@@ -59,7 +59,8 @@ angular.module('frontend').controller('EditChronometerController', function ($sc
     $scope.selectionStrategyList = [
         { key: "FIRST", short: "FIRST", text: "First ping" },
         { key: "HIGH", short: "HIGH", text: "Highest ping" },
-        { key: "LAST", short: "LAST", text: "Last ping" }
+        { key: "LAST", short: "LAST", text: "Last ping" },
+        { key: "PROXIMITY", short: "PROXIMITY", text: "Closest beacon" }
     ];
 
     $scope.sendStrategyList = [
