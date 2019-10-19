@@ -19,6 +19,8 @@
 FROM fabric8/java-centos-openjdk8-jdk
 ENV JAVA_OPTIONS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
 ENV AB_ENABLED=jmx_exporter
+ENV QUARKUS_PROFILE=prod
 COPY target/*-runner.jar /deployments/app.jar
 EXPOSE 8080
-ENTRYPOINT [ "/deployments/run-java.sh" ]
+ENTRYPOINT [ "/deployments/run-java.sh" ] 
+#ENTRYPOINT [ "java", "-Dquarkus-profile=prod", "-Dquarkus.http.host=0.0.0.0", "-jar", "/deployments/app.jar" ]
