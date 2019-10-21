@@ -25,5 +25,4 @@ comment:
   require_changes: no
 
 ignore:
-  - "src/main/client/scan/bluetooth_scanner.py"
-  - "src/main/client/scan/blescan.py"
+  - "src/main/client/scan"
