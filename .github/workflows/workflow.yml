@@ -1,12 +1,10 @@
-name: Test Python client
+name: Test Teknichrono
 
 on: push
 
 jobs:
-  check-client:
-
+  ci-client:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python 3.7
@@ -39,6 +37,8 @@ jobs:
         echo "Change configuration to LAST / ASYNC"
         python3 src/test/scripts/python/test_demo_conf2.py
         sleep 60
+    - name: Test chronometer update
+      run: |
         python3 src/test/scripts/python/test_demo_restart.py
         sleep 20
         if ps -p $RUN_PID; then echo "Client did not restart" && false; fi
@@ -54,7 +54,7 @@ jobs:
         coverage combine .coverage_1 .coverage_2
         coverage report -m > client-coverage-report.txt --omit=src/main/client/scan/bluetooth_scanner.py,src/main/client/scan/blescan.py
         coverage xml -i
-    - uses: codecov/codecov-action@v1.0.2
+    - uses: codecov/codecov-action@v1.0.3
       with:
         token: ${{secrets.CODECOV_TOKEN}}
         file: ./coverage.xml
@@ -65,3 +65,83 @@ jobs:
       with:
         name: code-coverage-report
         path: client-coverage-report.txt
+
+  ci-server:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    - name: Bump version and push tag
+      id: versioning
+      uses: anothrNick/github-tag-action@master
+      if: github.ref == 'refs/heads/master'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REPO_OWNER: fabricepipart
+    - name: Build Maven and Docker
+      env:
+        NEW_TAG: ${{ steps.versioning.outputs.new_tag }}
+        REPO: fabricepipart/teknichrono-backend
+        TESTS_REPO: fabricepipart/teknichrono-backend-tests
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      run: |
+        export version=$(.github/tools/get-version.sh)
+        mvn -B -U clean verify
+        docker build -f src/main/docker/Dockerfile -t $REPO:$version .
+        docker build -f src/main/docker-tests/Dockerfile -t $TESTS_REPO:$version .
+        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        docker push $REPO:$version
+        docker push $TESTS_REPO:$version
+        docker logout
+    - uses: codecov/codecov-action@v1.0.3
+      with:
+        token: ${{secrets.CODECOV_TOKEN}}
+        flags: javaserver
+        name: codecov-java-server
+    - uses: azure/k8s-actions/k8s-set-context@master
+      with:
+        kubeconfig: ${{ secrets.KUBE_CONFIG }}
+    - name: Update Staging environment
+      timeout-minutes: 10
+      run: |
+        kubectl delete all -n teknichrono-staging -l app=teknichrono --wait=true
+        kubectl kustomize target/classes/overlays/staging | kubectl apply -n teknichrono-staging -f -
+        while ! curl -fs https://staging.teknichrono.fr > /dev/null; do echo 'Not started yet ...'; sleep 5; done
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Test Staging environment
+      env:
+        NEW_TAG: ${{ steps.versioning.outputs.new_tag }}
+        TESTS_REPO: fabricepipart/teknichrono-backend-tests
+      run: |
+        export version=$(.github/tools/get-version.sh)
+        kubectl run -i -t teknichrono-e2e-tests -n teknichrono-staging --image=$TESTS_REPO:$version --labels="app=teknichrono" --restart=Never -- sh /app/bash/all_tests.sh staging.teknichrono.fr
+  
+  cd:
+    needs: [ci-client, ci-server]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+    - uses: azure/k8s-actions/k8s-set-context@master
+      with:
+        kubeconfig: ${{ secrets.KUBE_CONFIG }}
+    - name: Update Production environment
+      timeout-minutes: 10
+      run: |
+        kubectl delete all -n teknichrono-prod -l app=teknichrono --wait=true
+        kubectl kustomize target/classes/overlays/prod | kubectl apply -n teknichrono-prod -f -
+        while ! curl -fs https://www.teknichrono.fr > /dev/null; do echo 'Not started yet ...'; sleep 5; done
+
+
+
+  
