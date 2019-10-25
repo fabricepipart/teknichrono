@@ -126,25 +126,8 @@ jobs:
       run: |
         export version=$(.github/tools/get-version.sh)
         kubectl run -i -t teknichrono-e2e-tests -n teknichrono-staging --image=$TESTS_REPO:$version --labels="app=teknichrono" --restart=Never -- sh /app/bash/all_tests.sh staging.teknichrono.fr
-  
-  cd:
-    needs: [ci-client, ci-server]
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
-    steps:
-    - uses: actions/checkout@v1
-    - name: Set up JDK 1.8
-      uses: actions/setup-java@v1
-      with:
-        java-version: 1.8
-    - name: Prepare K8 descriptors
-      run: |
-        export version=$(.github/tools/get-version.sh)
-        mvn -B -U process-resources
-    - uses: azure/k8s-actions/k8s-set-context@master
-      with:
-        kubeconfig: ${{ secrets.KUBE_CONFIG }}
     - name: Update Production environment
+      if: github.ref == 'refs/heads/master'
       timeout-minutes: 10
       run: |
         kubectl delete all -n teknichrono-prod -l app=teknichrono --wait=true
