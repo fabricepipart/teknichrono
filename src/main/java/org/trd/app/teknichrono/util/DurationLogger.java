@@ -8,12 +8,6 @@ public class DurationLogger implements AutoCloseable {
   private long start;
   private String doing;
 
-  public DurationLogger(Logger logger, String doing) {
-    this.endpointLogger = logger;
-    this.doing = doing;
-    this.start = System.nanoTime();
-  }
-
   public DurationLogger(Logger logger) {
     this.endpointLogger = logger;
   }
@@ -22,13 +16,10 @@ public class DurationLogger implements AutoCloseable {
     DurationLogger perfLogger = new DurationLogger(logger);
     return perfLogger;
   }
+
   public DurationLogger start(String doing) {
     this.doing = doing;
     this.start = System.nanoTime();
-    return this;
-  }
-  public DurationLogger end() {
-    this.close();
     return this;
   }
 

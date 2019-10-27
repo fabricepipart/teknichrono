@@ -15,20 +15,27 @@ public class CSVConverter {
 
   private static final Logger LOGGER = Logger.getLogger(CSVConverter.class);
 
+  private StringWriter writer = new StringWriter();
 
-  public static String convertToCsv(List<LapTimeDTO> results) throws IOException {
+  public String convertToCsv(List<LapTimeDTO> results) throws IOException {
     String csvResult;
-    StringWriter writer = new StringWriter();
-    // TODO StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder<LapTimeDTO>(writer).withMappingStrategy(new LapTimeMappingStrategy()).build();
-    StatefulBeanToCsv<LapTimeDTO> beanToCsv = new StatefulBeanToCsvBuilder<LapTimeDTO>(writer).build();
+    StatefulBeanToCsv<LapTimeDTO> beanToCsv = getBeanToCsv();
     try {
       beanToCsv.write(results);
       csvResult = writer.toString();
       writer.close();
-    } catch (IOException | CsvDataTypeMismatchException | CsvRequiredFieldEmptyException e) {
-      LOGGER.error("unable to generate lap times CSV", e);
+    } catch (CsvRequiredFieldEmptyException e) {
+      LOGGER.error("Unable to generate lap times CSV (required field error)", e);
+      throw new IOException(e);
+    } catch (CsvDataTypeMismatchException e) {
+      LOGGER.error("Unable to generate lap times CSV (data type error)", e);
       throw new IOException(e);
     }
     return csvResult;
+  }
+
+  StatefulBeanToCsv<LapTimeDTO> getBeanToCsv() {
+    // TODO StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder<LapTimeDTO>(writer).withMappingStrategy(new LapTimeMappingStrategy()).build();
+    return new StatefulBeanToCsvBuilder<LapTimeDTO>(writer).build();
   }
 }
