@@ -25,4 +25,4 @@ comment:
   require_changes: no
 
 ignore:
-  - "src/main/client/scan"
+  - "src/main/client/scan/bl*.py"

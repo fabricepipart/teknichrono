@@ -3,8 +3,6 @@ package org.trd.app.teknichrono.model.repository;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import org.jboss.logging.Logger;
-import org.trd.app.teknichrono.model.dto.NestedBeaconDTO;
-import org.trd.app.teknichrono.model.dto.NestedChronometerDTO;
 import org.trd.app.teknichrono.model.dto.PingDTO;
 import org.trd.app.teknichrono.model.jpa.Beacon;
 import org.trd.app.teknichrono.model.jpa.Chronometer;
@@ -16,6 +14,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 
 @Dependent
 public class PingRepository extends PanacheRepositoryWrapper<Ping, PingDTO> {
@@ -57,18 +57,6 @@ public class PingRepository extends PanacheRepositoryWrapper<Ping, PingDTO> {
     return ping;
   }
 
-  @Deprecated
-  public Ping create(PingDTO dto, long chronoId, long beaconId) throws ConflictingIdException, NotFoundException {
-    NestedChronometerDTO chrono = new NestedChronometerDTO();
-    chrono.setId(chronoId);
-    dto.setChronometer(chrono);
-    NestedBeaconDTO beacon = new NestedBeaconDTO();
-    beacon.setId(beaconId);
-    dto.setBeacon(beacon);
-    return create(dto);
-  }
-
-
   @Override
   public Ping fromDTO(PingDTO dto) throws ConflictingIdException, NotFoundException {
     checkNoId(dto);
@@ -78,6 +66,16 @@ public class PingRepository extends PanacheRepositoryWrapper<Ping, PingDTO> {
     setManyToOneRelationship(ping, dto.getBeacon(), Ping::setBeacon, Beacon::getPings, beaconRepository);
     setManyToOneRelationship(ping, dto.getChronometer(), Ping::setChrono, Chronometer::getPings, chronometerRepository);
     return ping;
+  }
+
+  public PingDTO latestOfChronometer(long chronometerId) throws NotFoundException {
+    Instant yesterday = Instant.now().minus(1, ChronoUnit.DAYS);
+    PanacheQuery<Ping> pingPanacheQuery = panacheRepository.find("chrono.id = ?1 and instant > ?2",
+        chronometerId, yesterday);
+    if(pingPanacheQuery.count() > 0){
+      return PingDTO.fromPing(pingPanacheQuery.list().stream().max(Comparator.comparing(Ping::getInstant)).get());
+    }
+    throw new NotFoundException("No Ping found for Chronometer " + chronometerId);
   }
 
   @Override

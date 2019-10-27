@@ -2,6 +2,7 @@ package org.trd.app.teknichrono.it;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -97,6 +98,62 @@ public class TestRestPingEndpoint extends TestRestEndpoint<PingDTO> {
     createPing(Instant.now(), 666, 666, NOT_FOUND);
   }
 
+  @Test
+  public void latestFailsWith404IfChronometerDoesNotExist() {
+    latestFails(987, NOT_FOUND);
+  }
+
+  @Test
+  public void latestFailsWith404IfNoPing() {
+    restChronometer.create("C1");
+    ChronometerDTO chronometer = restChronometer.getByName("C1");
+    latestFails(chronometer.getId(), NOT_FOUND);
+  }
+
+  @Test
+  public void latestReturnsPingsOfLessThanOneDay() {
+    restBeacon.create(100);
+    BeaconDTO beacon = restBeacon.getByNumber(100);
+    restChronometer.create("C1");
+    ChronometerDTO chronometer = restChronometer.getByName("C1");
+
+    List<PingDTO> pings = getAll();
+    assertThat(pings.size()).isEqualTo(0);
+    Instant fiveDaysAgo = Instant.now().truncatedTo(ChronoUnit.MILLIS).minus(5, ChronoUnit.DAYS);
+    createPing(fiveDaysAgo, beacon.getId(), chronometer.getId());
+    pings = getAll();
+    assertThat(pings.size()).isEqualTo(1);
+
+    latestFails(chronometer.getId(), NOT_FOUND);
+  }
+
+  @Test
+  public void latestReturnsPingMostRecent() {
+    restBeacon.create(100);
+    BeaconDTO beacon = restBeacon.getByNumber(100);
+    restChronometer.create("C1");
+    ChronometerDTO chronometer = restChronometer.getByName("C1");
+
+    List<PingDTO> pings = getAll();
+    assertThat(pings.size()).isEqualTo(0);
+
+    Instant twoMinutesAgo = Instant.now().truncatedTo(ChronoUnit.MILLIS).minus(2, ChronoUnit.MINUTES);
+    createPing(twoMinutesAgo, beacon.getId(), chronometer.getId());
+
+    Instant oneMinuteAgo = Instant.now().truncatedTo(ChronoUnit.MILLIS).minus(1, ChronoUnit.MINUTES);
+    createPing(oneMinuteAgo, beacon.getId(), chronometer.getId());
+
+    Instant threeMinutesAgo = Instant.now().truncatedTo(ChronoUnit.MILLIS).minus(3, ChronoUnit.MINUTES);
+    createPing(threeMinutesAgo, beacon.getId(), chronometer.getId());
+
+    pings = getAll();
+    assertThat(pings.size()).isEqualTo(3);
+
+    PingDTO latest = latest(chronometer.getId());
+    assertThat(latest).isNotNull();
+    assertThat(latest.getInstant()).isEqualTo(oneMinuteAgo);
+  }
+
 
   @Test
   public void testCreateModifyDelete() {
@@ -183,6 +240,23 @@ public class TestRestPingEndpoint extends TestRestEndpoint<PingDTO> {
         .when().contentType(ContentType.JSON).body(jsonb.toJson(dto)).post("/rest/pings/create")
         .then()
         .statusCode(statusCode);
+  }
+
+  public void latestFails(long chronometerId, int status){
+    given().queryParam("chronoId", chronometerId)
+        .when().get("/rest/pings/latest")
+        .then()
+        .statusCode(status);
+  }
+
+  public PingDTO latest(long chronometerId){
+    Jsonb jsonb = JsonbBuilder.create();
+    Response r = given().queryParam("chronoId", chronometerId)
+        .when().get("/rest/pings/latest")
+        .then()
+        .statusCode(OK)
+        .extract().response();
+    return jsonb.fromJson(r.asString(), PingDTO.class);
   }
 
   public void createPings(List<PingDTO> dtos) {

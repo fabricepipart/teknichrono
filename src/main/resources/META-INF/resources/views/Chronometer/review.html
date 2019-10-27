@@ -1,0 +1,69 @@
+<header>
+    <h3>Review Chronometer</h3>
+</header>
+
+<form id="ChronometerForm" name="ChronometerForm" class="form-horizontal" role="form">
+
+    <h3>Chronometer</h3>
+
+    <div class="form-group">
+        <label for=" name" class="col-sm-2 control-label">Name</label>
+        <div id="nameControls" class="col-sm-10">
+            <span id="name" name="name" type="text" class="form-control">{{chronometer.name}}</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="selectionStrategy" class="col-sm-2 control-label">Selection Strategy</label>
+        <div id="selectionStrategyControls" class="col-sm-10">
+            <span id="selectionStrategy" name="selectionStrategy" type="text" class="form-control">{{chronometer.selectionStrategy}}</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="inactivityWindow" class="col-sm-2 control-label">Inactivity Window</label>
+        <div id="inactivityWindowControls" class="col-sm-10">
+            <span id="inactivityWindow" name="inactivityWindow" type="text" class="form-control">{{chronometer.inactivityWindow}} seconds</span>
+        </div>
+    </div>
+
+    <h3>Beacon</h3>
+
+    <div class="form-group">
+        <label for="beacon" class="col-sm-2 control-label">Beacon</label>
+        <div id="beaconControls" class="col-sm-10">
+            <span id="beacon" name="beacon" type="text" class="form-control">{{latest.beacon.number}}</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="instant" class="col-sm-2 control-label">Last appearance</label>
+        <div id="instantControls" class="col-sm-10">
+            <span id="instant" name="instant" type="text" class="form-control">{{latest.instant}}</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="power" class="col-sm-2 control-label">Power</label>
+        <div id="powerControls" class="col-sm-10">
+            <span id="power" name="power" type="text" class="form-control">{{latest.power}} dB</span>
+        </div>
+    </div>
+
+    <h3>Pilot</h3>
+
+    <div class="form-group">
+        <label for="pilot" class="col-sm-2 control-label">Pilot</label>
+        <div id="pilotControls" class="col-sm-10">
+            <span id="pilot" name="pilot" type="text" class="form-control">{{latestBeacon.pilot.firstName}} {{latestBeacon.pilot.lastName}}</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="category" class="col-sm-2 control-label">Category</label>
+        <div id="categoryControls" class="col-sm-10">
+            <span id="category" name="category" type="text" class="form-control">{{latestBeacon.pilot.categoryName}}</span>
+        </div>
+    </div>
+
+</form>

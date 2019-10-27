@@ -43,13 +43,17 @@ public class PingManager {
 
     Chronometer chronometer = ping.getChrono();
     if (chronometer == null) {
-      logger.error("Chrono is not in the DB, cannot updates laptimes for Ping @ " + ping.getInstant());
+      logger.error("Chronometer is not in the DB, cannot updates laptimes for Ping @ " + ping.getInstant());
+      return;
+    }
+    if(chronometer.getSelectionStrategy() == Chronometer.PingSelectionStrategy.PROXIMITY){
+      logger.info("Chronometer is in proximity mode, we just store the Ping @ " + ping.getInstant());
       return;
     }
 
     Session session = selector.pickMostRelevant(ping);
     if (session == null) {
-      logger.error("No Session associated to Chrono " + chronometer.id + ", cannot updates laptimes");
+      logger.error("No Session associated to Chronometer " + chronometer.id + ", cannot updates laptimes");
       return;
     }
     addPing(ping, pilot, chronometer, session);

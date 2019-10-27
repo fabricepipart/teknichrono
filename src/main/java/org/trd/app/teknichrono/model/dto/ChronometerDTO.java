@@ -11,7 +11,6 @@ public class ChronometerDTO implements EntityDTO {
   private Long id;
   private int version;
   private String name;
-  private NestedPingDTO lastSeen;
   private String selectionStrategy = Chronometer.PingSelectionStrategy.HIGH.toString();
   private String sendStrategy = Chronometer.PingSendStrategy.ASYNC.toString();
   private Duration inactivityWindow = Duration.ofSeconds(5);

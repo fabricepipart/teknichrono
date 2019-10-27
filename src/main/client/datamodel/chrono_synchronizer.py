@@ -103,5 +103,8 @@ class ChronoSynchronizer(Thread):
 
   def run(self):
     while not self.exit.is_set():
-      self.exit.wait(self.WAIT_BETWEEN_UPDATES)
-      self.updateChronometer()
+      try:
+        self.exit.wait(self.WAIT_BETWEEN_UPDATES)
+        self.updateChronometer()
+      except Exception as ex:
+        self.logger.error("Chronometer update failed : " + type(ex).__name__)

@@ -26,7 +26,6 @@ interface DtoMapper {
 
   CategoryDTO asCategoryDto(Category category);
 
-  @Mapping(target = "lastSeen", source = "lastestPing")
   ChronometerDTO asChronometerDto(Chronometer chronometer);
 
   EventDTO asEventDto(Event event);
@@ -67,6 +66,7 @@ interface DtoMapper {
   NestedLocationDTO asNestedLocationDto(Location location);
 
   @Mapping(target = "beaconNumber", source = "currentBeacon.number")
+  @Mapping(target = "categoryName", source = "category.name")
   NestedPilotDTO asNestedPilotDto(Pilot pilot);
 
   NestedPingDTO asNestedPingDto(Ping ping);

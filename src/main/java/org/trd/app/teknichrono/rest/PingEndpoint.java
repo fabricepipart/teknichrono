@@ -2,6 +2,8 @@ package org.trd.app.teknichrono.rest;
 
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.business.client.PingManager;
+import org.trd.app.teknichrono.model.dto.NestedBeaconDTO;
+import org.trd.app.teknichrono.model.dto.NestedChronometerDTO;
 import org.trd.app.teknichrono.model.dto.NestedPingDTO;
 import org.trd.app.teknichrono.model.dto.PingDTO;
 import org.trd.app.teknichrono.model.jpa.Ping;
@@ -49,7 +51,11 @@ public class PingEndpoint {
   public Response create(PingDTO entity, @QueryParam("chronoId") long chronoId, @QueryParam("beaconId") long beaconId) {
     try (DurationLogger dl = DurationLogger.get(LOGGER).start("Create Ping - Chrono id=" + chronoId + " beacon id=" + beaconId + " @ " + entity.getInstant())) {
       try {
-        Ping ping = pingRepository.create(entity, chronoId, beaconId);
+        entity.setChronometer(new NestedChronometerDTO());
+        entity.getChronometer().setId(chronoId);
+        entity.setBeacon(new NestedBeaconDTO());
+        entity.getBeacon().setId(beaconId);
+        Ping ping = pingRepository.create(entity);
         PingManager manager = new PingManager(lapTimeRepository);
         manager.addPing(ping);
         return Response.noContent().build();
@@ -92,6 +98,20 @@ public class PingEndpoint {
   @Transactional
   public Response findById(@PathParam("id") long id) {
     return entityEndpoint.findById(id);
+  }
+
+  @GET
+  @Path("/latest")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response getLatestPing(@QueryParam("chronoId") long chronoId) {
+    try (DurationLogger perf = DurationLogger.get(LOGGER).start("Latest ping of chronometer " + chronoId)) {
+      try {
+        PingDTO dto = pingRepository.latestOfChronometer(chronoId);
+        return Response.ok(dto).build();
+      } catch (NotFoundException e) {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+    }
   }
 
   @GET
