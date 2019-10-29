@@ -66,8 +66,6 @@ public class LapTimeEndpoint {
       CSVConverter csvConverter = new CSVConverter();
       String csvResults = csvConverter.convertToCsv(results);
       return Response.ok().entity(csvResults).build();
-    } catch (IllegalArgumentException e) {
-      return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
     } catch (IOException e) {
       return Response.serverError().build();
     }
@@ -101,8 +99,6 @@ public class LapTimeEndpoint {
       CSVConverter csvConverter = new CSVConverter();
       String csvResults = csvConverter.convertToCsv(results);
       return Response.ok().entity(csvResults).build();
-    } catch (IllegalArgumentException e) {
-      return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
     } catch (IOException e) {
       return Response.serverError().build();
     }
@@ -136,8 +132,6 @@ public class LapTimeEndpoint {
       CSVConverter csvConverter = new CSVConverter();
       String csvResults = csvConverter.convertToCsv(results);
       return Response.ok().entity(csvResults).build();
-    } catch (IllegalArgumentException e) {
-      return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
     } catch (IOException e) {
       return Response.serverError().build();
     }

@@ -22,7 +22,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.*;
@@ -102,6 +105,25 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
     }
     laptimes = getAllOfSession(sessionId);
     assertThat(laptimes.size()).isEqualTo(0);
+  }
+
+  @Test
+  public void testCsv() {
+    createWithAllNeeded();
+    Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+    addLap(now.plusSeconds(11), beacons.get(0).getId(), chronos.get(0));
+    addLap(now.plusSeconds(23), beacons.get(0).getId(), chronos.get(0));
+
+    long sessionId = sessions.get(0).getId();
+    String csvOfSession = getCsvOfSession(sessionId);
+
+    assertThat(csvOfSession).isNotNull();
+    String[] lines = csvOfSession.split("\n");
+    assertThat(lines.length).isEqualTo(3);
+
+    Stream<String> stream = Arrays.stream(lines[0].split(","));
+    List<String> header = stream.map(h -> h.replaceAll("\"", "")).collect(Collectors.toList());
+    assertThat(header).contains("duration","endDate","pilot","session");
   }
 
 
@@ -312,7 +334,6 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
     assertThat(laptimes.get(0).getLapNumber()).isEqualTo(1);
   }
 
-
   @Test
   public void bestLapTimesOfPilotReturnsThemInOrder() {
     createTwoPilotsTimeTrial();
@@ -332,8 +353,25 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
     for (LapTimeDTO laptime : laptimes) {
       assertThat(laptime.getDuration().compareTo(maxFoundUntilNow)).isGreaterThanOrEqualTo(0);
     }
+  }
 
+  @Test
+  public void bestLapTimesToCsv() {
+    createTwoPilotsTimeTrial();
 
+    String csvOfPilot = getCsvOfBestOfPilot(pilots.get(0), sessions.get(0).getId());
+    assertThat(csvOfPilot).isNotNull();
+    String[] lines = csvOfPilot.split("\n");
+    assertThat(lines.length).isEqualTo(1+3);
+
+    Stream<String> stream = Arrays.stream(lines[0].split(","));
+    List<String> header = stream.map(h -> h.replaceAll("\"", "")).collect(Collectors.toList());
+    assertThat(header).contains("duration","endDate","pilot","session");
+
+    csvOfPilot = getCsvOfBestOfPilot(pilots.get(1), sessions.get(0).getId());
+    assertThat(csvOfPilot).isNotNull();
+    lines = csvOfPilot.split("\n");
+    assertThat(lines.length).isEqualTo(1+2);
   }
 
   @Test
@@ -416,6 +454,25 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
       assertThat(laptime.getDuration().compareTo(maxFoundUntilNow)).isGreaterThanOrEqualTo(0);
     }
 
+  }
+
+  @Test
+  public void csvResultsOfPilotReturnsAll() {
+    createTwoPilotsTimeTrial();
+
+    String csvOfPilot = getResultsOfPilotAsCsv(pilots.get(0), sessions.get(0).getId());
+    assertThat(csvOfPilot).isNotNull();
+    String[] lines = csvOfPilot.split("\n");
+    assertThat(lines.length).isEqualTo(1+3);
+
+    Stream<String> stream = Arrays.stream(lines[0].split(","));
+    List<String> header = stream.map(h -> h.replaceAll("\"", "")).collect(Collectors.toList());
+    assertThat(header).contains("duration","endDate","pilot","session");
+
+    csvOfPilot = getResultsOfPilotAsCsv(pilots.get(1), sessions.get(0).getId());
+    assertThat(csvOfPilot).isNotNull();
+    lines = csvOfPilot.split("\n");
+    assertThat(lines.length).isEqualTo(1+2);
   }
 
   @Test
@@ -561,6 +618,26 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
     return jsonb.fromJson(r.asString(), dtoListClass);
   }
 
+  public String getCsvOfSession(long sessionId) {
+    Jsonb jsonb = JsonbBuilder.create();
+    Response r = given().queryParam("sessionId", sessionId)
+        .when().get("/rest/laptimes/csv")
+        .then()
+        .statusCode(OK)
+        .extract().response();
+    return r.asString();
+  }
+
+  public String getCsvOfBestOfPilot(long pilotId, long sessionId) {
+    Jsonb jsonb = JsonbBuilder.create();
+    Response r = given().queryParam("pilotId", pilotId).queryParam("sessionId", sessionId)
+        .when().get("/rest/laptimes/csv/best")
+        .then()
+        .statusCode(OK)
+        .extract().response();
+    return r.asString();
+  }
+
   public List<LapTimeDTO> getBestOfSession(long sessionId) {
     Jsonb jsonb = JsonbBuilder.create();
     Response r = given().queryParam("sessionId", sessionId)
@@ -629,6 +706,16 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
         .statusCode(OK)
         .extract().response();
     return jsonb.fromJson(r.asString(), dtoListClass);
+  }
+
+  public String getResultsOfPilotAsCsv(long pilotId, long sessionId) {
+    Jsonb jsonb = JsonbBuilder.create();
+    Response r = given().queryParam("pilotId", pilotId).queryParam("sessionId", sessionId)
+        .when().get("/rest/laptimes/csv/results")
+        .then()
+        .statusCode(OK)
+        .extract().response();
+    return r.asString();
   }
 
   public List<LapTimeDTO> getAllOfPilotAndLocation(long pilotId, long locationId) {
