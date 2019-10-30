@@ -53,6 +53,9 @@ public class Chronometer extends PanacheEntity {
   private boolean debug;
 
   @Column
+  private long txThreshold = -100;
+
+  @Column
   @Enumerated(EnumType.STRING)
   private ChronometerOrder orderToExecute;
 
@@ -154,6 +157,14 @@ public class Chronometer extends PanacheEntity {
 
   public void setSendStrategy(PingSendStrategy sendStrategy) {
     this.sendStrategy = sendStrategy;
+  }
+
+  public long getTxThreshold() {
+    return txThreshold;
+  }
+
+  public void setTxThreshold(long txThreshold) {
+    this.txThreshold = txThreshold;
   }
 
 

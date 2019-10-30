@@ -21,7 +21,14 @@
     </div>
 
     <div class="form-group">
-        <label for="inactivityWindow" class="col-sm-2 control-label">Inactivity Window</label>
+        <label for="threshold" class="col-sm-2 control-label">Tx Threshold</label>
+        <div id="thresholdControls" class="col-sm-10">
+            <span id="threshold" name="threshold" type="text" class="form-control">{{chronometer.txThreshold}} dB</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="inactivityWindow" class="col-sm-2 control-label">Window</label>
         <div id="inactivityWindowControls" class="col-sm-10">
             <span id="inactivityWindow" name="inactivityWindow" type="text" class="form-control">{{chronometer.inactivityWindow}} seconds</span>
         </div>

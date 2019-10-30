@@ -51,6 +51,11 @@ class ChronoSynchronizer(Thread):
       chronoChanged = True
       self.resetNeeded = True
       self.chronometer.sendStrategy = chronometerMap.get('sendStrategy', 'ASYNC')
+    # txThreshold
+    txThreshold = chronometerMap.get('txThreshold', -100)
+    if self.chronometer.txThreshold != txThreshold:
+      chronoChanged = True
+      self.chronometer.txThreshold = txThreshold
     # inactivityWindow
     inactivityWindow = int(iso_to_seconds(chronometerMap.get('inactivityWindow', 'PT5S')))
     if self.chronometer.inactivityWindow != inactivityWindow:
@@ -92,6 +97,7 @@ class ChronoSynchronizer(Thread):
     self.logger.info('BT_DEBUG = %s', str(self.chronometer.bluetoothDebug))
     self.logger.info('PING_SELECTION_STRATEGY = %s', self.chronometer.selectionStrategy)
     self.logger.info('PING_SEND_STRATEGY = %s', self.chronometer.sendStrategy)
+    self.logger.info('TX_THRESHOLD = %s', int(self.chronometer.txThreshold))
     self.logger.info('INACTIVITY_WINDOW = %s', str(self.chronometer.inactivityWindow))
     self.logger.info('TEKNICHRONO_SERVER = %s', self.server)
     self.logger.info('CHRONO_NAME = %s', self.chronometer.name)

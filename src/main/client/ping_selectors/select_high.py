@@ -13,16 +13,17 @@ class SelectHighStrategy:
   def select(self, current):
     toReturn = self.selectOneOld()
     if current is not None:
-      if current.major in self.scans:
-        # Negative values
-        if int(current.tx) > int(self.scans[current.major].tx):
-          # Update because it is higher
-          self.logger.debug('Higher Ping for ' + str(current.major) + ' @ ' + current.tx + 'dB (before: ' + self.scans[current.major].tx + 'dB)')
+      if int(current.tx) > self.chronometer.txThreshold:
+        if current.major in self.scans:
+          # Negative values
+          if int(current.tx) > int(self.scans[current.major].tx):
+            # Update because it is higher
+            self.logger.debug('Higher Ping for ' + str(current.major) + ' @ ' + current.tx + 'dB (before: ' + self.scans[current.major].tx + 'dB)')
+            self.scans[current.major] = current
+        else:
+          # Update because it is a new lap
+          self.logger.debug('New Ping for ' + str(current.major))
           self.scans[current.major] = current
-      else:
-        # Update because it is a new lap
-        self.logger.debug('New Ping for ' + str(current.major))
-        self.scans[current.major] = current
     return toReturn
 
   def selectOneOld(self):

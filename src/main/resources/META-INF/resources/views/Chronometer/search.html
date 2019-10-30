@@ -46,6 +46,7 @@
                     <th>Name</th>
                     <th>Selection</th>
                     <th>Send</th>
+                    <th>Min Tx</th>
                     <th>Window</th>
                     <th>Order</th>
                     <th>Proximity</th>
@@ -57,17 +58,36 @@
                         <a href="#/Chronometers/edit/{{result.id}}">{{result.name}}</a>
                     </td>
                     <td ng-switch on="result.selectionStrategy">
-                        <a href="#/Chronometers/edit/{{result.id}}" ng-switch-when="FIRST">First ping</a>
-                        <a href="#/Chronometers/edit/{{result.id}}" ng-switch-when="HIGH">Highest ping</a>
-                        <a href="#/Chronometers/edit/{{result.id}}" ng-switch-when="LAST">Last ping</a>
-                        <a href="#/Chronometers/edit/{{result.id}}" ng-switch-when="PROXIMITY">Closest beacon</a>
+                        <a href="#/Chronometers/edit/{{result.id}}" ng-switch-when="FIRST">
+                            <span title="First" class="glyphicon glyphicon-menu-left"></span> First
+                        </a>
+                        <a href="#/Chronometers/edit/{{result.id}}" ng-switch-when="HIGH">
+                            <span title="Highest" class="glyphicon glyphicon-menu-up"></span> Highest
+                        </a>
+                        <a href="#/Chronometers/edit/{{result.id}}" ng-switch-when="LAST">
+                            <span title="Last" class="glyphicon glyphicon-menu-right"></span> Last
+                        </a>
+                        <a href="#/Chronometers/edit/{{result.id}}" ng-switch-when="PROXIMITY">
+                            <span title="Closest" class="glyphicon glyphicon-screenshot"></span> Closest
+                        </a>
                     </td>
                     <td ng-switch on="result.sendStrategy">
-                        <a href="#/Chronometers/edit/{{result.id}}" ng-switch-when="ASYNC">In background</a>
-                        <a href="#/Chronometers/edit/{{result.id}}" ng-switch-when="NONE">Don't send</a>
+                        <a href="#/Chronometers/edit/{{result.id}}" ng-switch-when="ASYNC">
+                            <span title="Async" class="glyphicon glyphicon-export"></span> Async
+                        </a>
+                        <a href="#/Chronometers/edit/{{result.id}}" ng-switch-when="NONE">
+                            <span title="Don't send" class="glyphicon glyphicon-floppy-remove"></span> No
+                        </a>
                     </td>
                     <td>
-                        <a href="#/Chronometers/edit/{{result.id}}">{{result.inactivityWindow}} sec</a>
+                        <a href="#/Chronometers/edit/{{result.id}}">
+                            <span title="Threshold" class="glyphicon glyphicon-signal"></span> {{result.txThreshold}} dB
+                        </a>
+                    </td>
+                    <td>
+                        <a href="#/Chronometers/edit/{{result.id}}">
+                            <span title="Window" class="glyphicon glyphicon-time"></span> {{result.inactivityWindow}} sec
+                        </a>
                     </td>
                     <td ng-switch on="result.orderToExecute">
                         <a href="#/Chronometers/edit/{{result.id}}" ng-switch-when="UPDATE">Update</a>
