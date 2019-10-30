@@ -123,7 +123,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
 
     Stream<String> stream = Arrays.stream(lines[0].split(","));
     List<String> header = stream.map(h -> h.replaceAll("\"", "")).collect(Collectors.toList());
-    assertThat(header).contains("duration","endDate","pilot","session");
+    assertThat(header).contains("DURATION","ENDDATE","PILOT","SESSION");
   }
 
 
@@ -366,7 +366,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
 
     Stream<String> stream = Arrays.stream(lines[0].split(","));
     List<String> header = stream.map(h -> h.replaceAll("\"", "")).collect(Collectors.toList());
-    assertThat(header).contains("duration","endDate","pilot","session");
+    assertThat(header).contains("DURATION","ENDDATE","PILOT","SESSION");
 
     csvOfPilot = getCsvOfBestOfPilot(pilots.get(1), sessions.get(0).getId());
     assertThat(csvOfPilot).isNotNull();
@@ -467,7 +467,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
 
     Stream<String> stream = Arrays.stream(lines[0].split(","));
     List<String> header = stream.map(h -> h.replaceAll("\"", "")).collect(Collectors.toList());
-    assertThat(header).contains("duration","endDate","pilot","session");
+    assertThat(header).contains("DURATION","ENDDATE","PILOT","SESSION");
 
     csvOfPilot = getResultsOfPilotAsCsv(pilots.get(1), sessions.get(0).getId());
     assertThat(csvOfPilot).isNotNull();
