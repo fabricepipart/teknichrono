@@ -73,6 +73,7 @@ public class ChronometerRepository extends PanacheRepositoryWrapper<Chronometer,
     if (dto.getSendStrategy() != null) {
       chronometer.setSendStrategy(Chronometer.PingSendStrategy.valueOf(dto.getSendStrategy()));
     }
+    chronometer.setTxThreshold(dto.getTxThreshold());
     chronometer.setInactivityWindow(dto.getInactivityWindow());
     chronometer.setBluetoothDebug(dto.isBluetoothDebug());
     chronometer.setDebug(dto.isDebug());

@@ -21,7 +21,7 @@ class FakeBluetoothScanner:
     # 5/6 chances to have a signal from same
     if rollDice > 5:
       self.beacon_nb = random.randint(1, 10)
-    tx = str(random.randint(50, 90))
+    tx = str(random.randint(30, 90))
     if random.randint(0, 10) == 0:
       scanned = BeaconScan()
       beacon_nb_str = str(self.beacon_nb)

@@ -13,7 +13,8 @@ class SelectLastStrategy:
   def select(self, current):
     toReturn = self.selectOneOld()
     if current is not None:
-      self.scans[current.major] = current
+      if int(current.tx) > self.chronometer.txThreshold:
+        self.scans[current.major] = current
     return toReturn
 
   def selectOneOld(self):
