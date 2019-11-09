@@ -16,16 +16,15 @@ class FakeBluetoothScanner:
     self.logger.info("Scanner loaded")
 
   def scan(self):
-    time.sleep(0.1)
+    time.sleep(0.5)
     rollDice = random.randint(1, 6)
     # 5/6 chances to have a signal from same
     if rollDice > 5:
       self.beacon_nb = random.randint(1, 10)
     tx = str(random.randint(30, 90))
-    if random.randint(0, 10) == 0:
-      scanned = BeaconScan()
-      beacon_nb_str = str(self.beacon_nb)
-      scanned.init("12:34:56:78:9A:DF,uuid," + beacon_nb_str + ',' + beacon_nb_str + ',rssi,-' + tx)
-      self.logger.debug('Saw : ' + str(scanned))
-      return scanned
+    scanned = BeaconScan()
+    beacon_nb_str = str(self.beacon_nb)
+    scanned.init("12:34:56:78:9A:DF,uuid," + beacon_nb_str + ',' + beacon_nb_str + ',rssi,-' + tx)
+    self.logger.debug('Saw : ' + str(scanned))
+    return scanned
     return None
