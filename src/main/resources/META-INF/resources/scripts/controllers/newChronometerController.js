@@ -2,7 +2,12 @@
 angular.module('frontend').controller('NewChronometerController', function ($scope, $location, locationParser, flash, ChronometerResource, PingResource, SessionResource) {
     $scope.disabled = false;
     $scope.$location = $location;
-    $scope.chronometer = $scope.chronometer || {};
+    $scope.chronometer = $scope.chronometer || {
+        "txThreshold": -100,
+        "inactivityWindow": 5,
+        "selectionStrategy": "PROXIMITY",
+        "sendStrategy": "ASYNC"
+    };
 
 
     $scope.selectionStrategyList = [
