@@ -83,12 +83,12 @@ angular.module('frontend').controller('StartLapTimeController', function ($scope
     };
 
     $scope.startLapTime = function () {
-        var now = $filter('date')(new Date(), 'yyyy-MM-ddTHH:mm:ss.sss', 'UTC')
+        var now = $filter('date')(new Date(), 'yyyy-MM-ddTHH:mm:ss')
         PingResource.create({ chronoId: $scope.chronoSelection.value, beaconId: $scope.pilotSelection.beaconId }, { power: '1', dateTime: now });
     }
 
     $scope.startLapTimeManual = function () {
-        var pingDate = $filter('date')(new Date(), 'yyyy-MM-ddTHH:mm:ss.sss', 'UTC')
+        var pingDate = $filter('date')(new Date(), 'yyyy-MM-ddTHH:mm:ss')
         if ($scope.ping.date) {
             pingDate = $scope.ping.date
         }
@@ -97,9 +97,9 @@ angular.module('frontend').controller('StartLapTimeController', function ($scope
     }
 
 
-    $('#ping').datetimepicker({ format: 'YYYY-MM-DDTHH:mm:ss.SSS' });
+    $('#ping').datetimepicker({ format: 'YYYY-MM-DDTHH:mm:ss.SSSZ' });
     $('#ping').on('dp.change', function (event) {
-        $scope.ping.date = event.date.format('YYYY-MM-DDTHH:mm:ss.SSS');
+        $scope.ping.date = event.date.toISOString();
     })
 
 

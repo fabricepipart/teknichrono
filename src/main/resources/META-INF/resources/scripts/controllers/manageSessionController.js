@@ -151,13 +151,13 @@ angular.module('frontend').controller('ManageSessionsController', function ($sco
     };
 
     $scope.startSession = function () {
-        var now = $filter('date')(new Date(), 'yyyy-MM-ddTHH:mm:ss.sss', 'UTC')
+        var now = $filter('date')(new Date(), 'yyyy-MM-ddTHH:mm:ss')
         SessionResource.start({ id: $scope.session.id, dateTime: now });
         $scope.sessionSelection.current = true;
     }
 
     $scope.endSession = function () {
-        var now = $filter('date')(new Date(), 'yyyy-MM-ddTHH:mm:ss.sss', 'UTC')
+        var now = $filter('date')(new Date(), 'yyyy-MM-ddTHH:mm:ss')
         SessionResource.end({ id: $scope.session.id, dateTime: now });
         $scope.sessionSelection.current = false;
     };
