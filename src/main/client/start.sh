@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 
@@ -10,6 +9,14 @@ if [ x$(basename $DIR) != "xteknichrono" ]; then
     echo "Application must be started from a folder named teknichrono"
     exit 1
 fi
+
+echo "-- Waiting for server to be reachable"
+while ! curl -fs "${TEKNICHRONO_SERVER}"
+do
+    echo "Waiting for server to be reachable"
+    sleep 10
+done
+echo "Connected to ${TEKNICHRONO_SERVER}"
 
 # --------- Update ---------
 echo "-- Checking if new version is available:"

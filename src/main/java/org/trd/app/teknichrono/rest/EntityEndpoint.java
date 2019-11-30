@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class EntityEndpoint<E extends PanacheEntity, D> {
 
@@ -62,7 +63,9 @@ public class EntityEndpoint<E extends PanacheEntity, D> {
 
   public List<D> listAll(Integer pageIndex, Integer pageSize) {
     try (DurationLogger dl = DurationLogger.get(LOGGER).start("Find all " + repository.getEntityName())) {
-      return repository.findAll(pageIndex, pageSize).map(repository::toDTO).collect(Collectors.toList());
+      try (Stream<E> s = repository.findAll(pageIndex, pageSize)) {
+        return s.map(repository::toDTO).collect(Collectors.toList());
+      }
     }
   }
 

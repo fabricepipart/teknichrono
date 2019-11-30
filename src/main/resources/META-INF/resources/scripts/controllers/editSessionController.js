@@ -9,8 +9,8 @@ angular.module('frontend').controller('EditSessionController', function ($scope,
         var successCallback = function (data) {
             self.original = data;
             $scope.session = new SessionResource(self.original);
-            $scope.session.start = $filter('date')(self.original.start, 'yyyy-MM-ddTHH:mm:ss', 'UTC')
-            $scope.session.end = $filter('date')(self.original.end, 'yyyy-MM-ddTHH:mm:ss', 'UTC')
+            $scope.session.start = $filter('date')(self.original.start, 'yyyy-MM-ddTHH:mm:ss')
+            $scope.session.end = $filter('date')(self.original.end, 'yyyy-MM-ddTHH:mm:ss')
             $scope.session.pilots = []
             $scope.session.chronometers = []
 
@@ -124,12 +124,12 @@ angular.module('frontend').controller('EditSessionController', function ($scope,
     };
 
     $scope.startSession = function () {
-        var now = $filter('date')(new Date(), 'yyyy-MM-ddTHH:mm:ss.sss', 'UTC')
+        var now = $filter('date')(new Date(), 'yyyy-MM-ddTHH:mm:ss')
         SessionResource.start({ id: $routeParams.SessionId, dateTime: now });
     };
 
     $scope.endSession = function () {
-        var now = $filter('date')(new Date(), 'yyyy-MM-ddTHH:mm:ss.sss', 'UTC')
+        var now = $filter('date')(new Date(), 'yyyy-MM-ddTHH:mm:ss')
         SessionResource.end({ id: $routeParams.SessionId, dateTime: now });
     };
 
@@ -193,15 +193,15 @@ angular.module('frontend').controller('EditSessionController', function ($scope,
     $scope.get();
 
 
-    $('#sessionStart').datetimepicker({ format: 'YYYY-MM-DDTHH:mm:ss' });
+    $('#sessionStart').datetimepicker({ format: 'YYYY-MM-DDTHH:mm:ss.SSSZ' });
     $('#sessionStart').on('dp.change', function (event) {
-        $scope.session.start = event.date.format('YYYY-MM-DDTHH:mm:ss');
+        $scope.session.start = event.date.toISOString();
     })
 
 
-    $('#sessionEnd').datetimepicker({ format: 'YYYY-MM-DDTHH:mm:ss' });
+    $('#sessionEnd').datetimepicker({ format: 'YYYY-MM-DDTHH:mm:ss.SSSZ' });
     $('#sessionEnd').on('dp.change', function (event) {
-        $scope.session.end = event.date.format('YYYY-MM-DDTHH:mm:ss');
+        $scope.session.end = event.date.toISOString();
     })
 
 });

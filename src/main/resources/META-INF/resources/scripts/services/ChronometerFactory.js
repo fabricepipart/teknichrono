@@ -16,6 +16,12 @@ angular.module('frontend').factory('ChronometerResource', function ($resource) {
                 return chrono
             }
         },
+        'save': {
+            method: 'POST', transformRequest: function (chrono) {
+                chrono['inactivityWindow'] = moment.duration(chrono['inactivityWindow'], 's').toISOString();
+                return angular.toJson(chrono);
+            }
+        },
         'update': {
             method: 'PUT', transformRequest: function (chrono) {
                 chrono['inactivityWindow'] = moment.duration(chrono['inactivityWindow'], 's').toISOString();

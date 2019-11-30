@@ -98,14 +98,14 @@ angular.module('frontend').controller('NewSessionController', function ($scope, 
     };
 
 
-    $('#sessionStart').datetimepicker({ format: 'YYYY-MM-DDTHH:mm:ss' });
+    $('#sessionStart').datetimepicker({ format: 'YYYY-MM-DDTHH:mm:ss.SSSZ' });
     $('#sessionStart').on('dp.change', function (event) {
-        $scope.session.start = event.date.format('YYYY-MM-DDTHH:mm:ss');
+        $scope.session.start = event.date.toISOString();
     })
 
 
-    $('#sessionEnd').datetimepicker({ format: 'YYYY-MM-DDTHH:mm:ss' });
+    $('#sessionEnd').datetimepicker({ format: 'YYYY-MM-DDTHH:mm:ss.SSSZ' });
     $('#sessionEnd').on('dp.change', function (event) {
-        $scope.session.end = event.date.format('YYYY-MM-DDTHH:mm:ss');
+        $scope.session.end = event.date.toISOString();
     })
 });
