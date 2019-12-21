@@ -617,6 +617,22 @@ public class TestRestSessionEndpoint extends TestRestEndpoint<SessionDTO> {
   }
 
   @Test
+  public void canStartSessionWithoutSettingTime() {
+    create("Session");
+    SessionDTO c = getByName("Session");
+    assertThat(c.isCurrent()).isFalse();
+    long id = c.getId();
+
+    PingDTO ping = new PingDTO();
+    start(ping, id);
+
+    SessionDTO newReturnedSession = getByName("Session");
+    assertThat(newReturnedSession.getName()).isEqualTo("Session");
+    assertThat(newReturnedSession.getId()).isEqualTo(id);
+    assertThat(newReturnedSession.isCurrent()).isTrue();
+  }
+
+  @Test
   public void endSessionSetsSessionAsNotCurrent() {
     create("Session");
     SessionDTO c = getByName("Session");

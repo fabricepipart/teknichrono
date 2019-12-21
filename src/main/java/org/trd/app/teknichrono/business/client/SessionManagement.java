@@ -33,9 +33,10 @@ public class SessionManagement {
 
   public void startSession(Session session, Instant timestamp) throws ConflictingIdException, NotFoundException {
     if (!session.isCurrent()) {
-      startOngoingSession(session, timestamp);
+      Instant instant = timestamp != null ? timestamp : Instant.now();
+      startOngoingSession(session, instant);
       if (session.getSessionType() == SessionType.RACE) {
-        startOngoingRace(session, timestamp);
+        startOngoingRace(session, instant);
       }
     }
   }
