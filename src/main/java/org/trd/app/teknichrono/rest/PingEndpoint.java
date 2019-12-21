@@ -79,8 +79,7 @@ public class PingEndpoint {
       if (dto.getChronometer() == null || dto.getBeacon() == null) {
         return Response.status(Response.Status.BAD_REQUEST).build();
       }
-      entityEndpoint.create(dto, "Chrono #" + dto.getChronometer().getId() +
-          " Beacon #" + dto.getBeacon().getId() + " @ " + dto.getInstant());
+      create(dto, dto.getChronometer().getId(), dto.getBeacon().getId());
     }
     return Response.noContent().build();
   }
