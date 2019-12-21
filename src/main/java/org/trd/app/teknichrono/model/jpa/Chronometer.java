@@ -7,20 +7,23 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Version;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
 public class Chronometer extends PanacheEntity {
 
   public enum ChronometerOrder {
-    UPDATE, RESTART, GET_LOGS
+    UPDATE, RESTART
   }
-
 
   public enum PingSelectionStrategy {
     FIRST, MID, LAST, HIGH, PROXIMITY
@@ -46,11 +49,19 @@ public class Chronometer extends PanacheEntity {
   @ManyToMany(mappedBy = "chronometers")
   private Set<Session> sessions = new HashSet<>();
 
+  @OneToMany(cascade = CascadeType.REMOVE)
+  @OrderBy(value = "date")
+  @JoinColumn(name = "chronoId")
+  private List<Log> logs = new ArrayList<>();
+
   @Column
   private boolean bluetoothDebug;
 
   @Column
   private boolean debug;
+
+  @Column
+  private boolean sendLogs;
 
   @Column
   private long txThreshold = -100;
@@ -88,7 +99,7 @@ public class Chronometer extends PanacheEntity {
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public void setName(String name) {
@@ -96,7 +107,7 @@ public class Chronometer extends PanacheEntity {
   }
 
   public Set<Ping> getPings() {
-    return pings;
+    return this.pings;
   }
 
   public void setPings(Set<Ping> pings) {
@@ -104,7 +115,7 @@ public class Chronometer extends PanacheEntity {
   }
 
   public Set<Session> getSessions() {
-    return sessions;
+    return this.sessions;
   }
 
   public void setSessions(Set<Session> sessions) {
@@ -112,7 +123,7 @@ public class Chronometer extends PanacheEntity {
   }
 
   public boolean isDebug() {
-    return debug;
+    return this.debug;
   }
 
   public void setDebug(boolean debug) {
@@ -120,7 +131,7 @@ public class Chronometer extends PanacheEntity {
   }
 
   public boolean isBluetoothDebug() {
-    return bluetoothDebug;
+    return this.bluetoothDebug;
   }
 
   public void setBluetoothDebug(boolean bluetoothDebug) {
@@ -128,7 +139,7 @@ public class Chronometer extends PanacheEntity {
   }
 
   public ChronometerOrder getOrderToExecute() {
-    return orderToExecute;
+    return this.orderToExecute;
   }
 
   public void setOrderToExecute(ChronometerOrder orderToExecute) {
@@ -136,7 +147,7 @@ public class Chronometer extends PanacheEntity {
   }
 
   public PingSelectionStrategy getSelectionStrategy() {
-    return selectionStrategy;
+    return this.selectionStrategy;
   }
 
   public void setSelectionStrategy(PingSelectionStrategy selectionStrategy) {
@@ -144,7 +155,7 @@ public class Chronometer extends PanacheEntity {
   }
 
   public Duration getInactivityWindow() {
-    return inactivityWindow;
+    return this.inactivityWindow;
   }
 
   public void setInactivityWindow(Duration inactivityWindow) {
@@ -152,7 +163,7 @@ public class Chronometer extends PanacheEntity {
   }
 
   public PingSendStrategy getSendStrategy() {
-    return sendStrategy;
+    return this.sendStrategy;
   }
 
   public void setSendStrategy(PingSendStrategy sendStrategy) {
@@ -160,13 +171,28 @@ public class Chronometer extends PanacheEntity {
   }
 
   public long getTxThreshold() {
-    return txThreshold;
+    return this.txThreshold;
   }
 
   public void setTxThreshold(long txThreshold) {
     this.txThreshold = txThreshold;
   }
 
+  public boolean isSendLogs() {
+    return this.sendLogs;
+  }
+
+  public void setSendLogs(boolean sendLogs) {
+    this.sendLogs = sendLogs;
+  }
+
+  public List<Log> getLogs() {
+    return this.logs;
+  }
+
+  public void setLogs(List<Log> logs) {
+    this.logs = logs;
+  }
 
   /* ===================== Other ======================== */
   @Override
@@ -178,7 +204,7 @@ public class Chronometer extends PanacheEntity {
       return false;
     }
     Chronometer other = (Chronometer) obj;
-    if (id != other.id) {
+    if (this.id != other.id) {
       return false;
     }
     return true;
@@ -187,8 +213,8 @@ public class Chronometer extends PanacheEntity {
   @Override
   public String toString() {
     String result = getClass().getSimpleName() + " ";
-    if (name != null && !name.trim().isEmpty()) {
-      result += name;
+    if (this.name != null && !this.name.trim().isEmpty()) {
+      result += this.name;
     }
     return result;
   }

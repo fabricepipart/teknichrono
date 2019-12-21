@@ -61,6 +61,11 @@ class ChronoSynchronizer(Thread):
     if self.chronometer.inactivityWindow != inactivityWindow:
       chronoChanged = True
       self.chronometer.inactivityWindow = inactivityWindow
+    # sendLogs
+    sendLogs = chronometerMap.get('sendLogs', False)
+    if self.chronometer.sendLogs != sendLogs:
+      chronoChanged = True
+      self.chronometer.sendLogs = sendLogs
     # bluetoothDebug
     bluetoothDebug = chronometerMap.get('bluetoothDebug', False)
     if self.chronometer.bluetoothDebug != bluetoothDebug:
@@ -78,7 +83,7 @@ class ChronoSynchronizer(Thread):
       self.executeOrder()
     if chronoChanged:
       self.printChronoInfo()
-      setupLogging(self.chronometer.debug, self.chronometer.bluetoothDebug)
+      setupLogging(self.chronometer, self.server)
 
   def executeOrder(self):
     self.logger.info("New order : %s", self.chronometer.orderToExecute)
@@ -101,6 +106,7 @@ class ChronoSynchronizer(Thread):
     self.logger.info('INACTIVITY_WINDOW = %s', str(self.chronometer.inactivityWindow))
     self.logger.info('TEKNICHRONO_SERVER = %s', self.server)
     self.logger.info('CHRONO_NAME = %s', self.chronometer.name)
+    self.logger.info('SEND_LOGS = %s', self.chronometer.sendLogs)
     self.logger.info('--------------------------------------')
 
   def stop(self):

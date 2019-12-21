@@ -91,8 +91,7 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
-            <!-- FIXME should be provided but then Intellij IDEA complains about the imports -->
-            <!--            <scope>provided</scope>-->
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
@@ -157,18 +156,18 @@
             <resource>
                 <filtering>false</filtering>
                 <directory>${project.build.directory}</directory>
-                <targetPath>META-INF/resources/downloads</targetPath>              
+                <targetPath>META-INF/resources/downloads</targetPath>
                 <includes>
                     <include>*.tar.gz</include>
-              </includes>
+                </includes>
             </resource>
             <resource>
                 <filtering>false</filtering>
                 <directory>${project.basedir}/src/main/client</directory>
-                <targetPath>META-INF/resources/downloads</targetPath>              
+                <targetPath>META-INF/resources/downloads</targetPath>
                 <includes>
                     <include>install.sh</include>
-              </includes>
+                </includes>
             </resource>
         </resources>
         <finalName>${project.artifactId}</finalName>

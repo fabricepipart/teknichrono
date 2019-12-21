@@ -3,23 +3,15 @@ package org.trd.app.teknichrono.business.view;
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.dto.LapTimeDTO;
 import org.trd.app.teknichrono.model.dto.NestedPilotDTO;
-import org.trd.app.teknichrono.model.jpa.Category;
-import org.trd.app.teknichrono.model.jpa.Event;
 import org.trd.app.teknichrono.model.jpa.LapTime;
-import org.trd.app.teknichrono.model.jpa.Location;
-import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.model.jpa.Session;
 import org.trd.app.teknichrono.model.jpa.SessionType;
 import org.trd.app.teknichrono.model.repository.CategoryRepository;
 import org.trd.app.teknichrono.model.repository.EventRepository;
+import org.trd.app.teknichrono.model.repository.LapTimeRepository;
 import org.trd.app.teknichrono.model.repository.LocationRepository;
 import org.trd.app.teknichrono.model.repository.SessionRepository;
-import org.trd.app.teknichrono.util.sql.OrderByClauseBuilder;
-import org.trd.app.teknichrono.util.sql.WhereClauseBuilder;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,16 +23,16 @@ public class LapTimeManager {
   private final CategoryRepository categoryRepository;
   private final EventRepository eventRepository;
   private final LocationRepository locationRepository;
-  private final EntityManager em; //TODO Get rid of it
+  private final LapTimeRepository laptimeRepository;
 
   private final LapTimeFilter filter = new LapTimeFilter();
   private final LapTimeFiller filler = new LapTimeFiller();
   private final LapTimeOrder order = new LapTimeOrder();
   private final LapTimeConverter lapTimeConverter = new LapTimeConverter();
 
-  public LapTimeManager(EntityManager em, SessionRepository sessionRepository, CategoryRepository categoryRepository,
+  public LapTimeManager(LapTimeRepository laptimeRepository, SessionRepository sessionRepository, CategoryRepository categoryRepository,
                         EventRepository eventRepository, LocationRepository locationRepository) {
-    this.em = em;
+    this.laptimeRepository = laptimeRepository;
     this.sessionRepository = sessionRepository;
     this.categoryRepository = categoryRepository;
     this.eventRepository = eventRepository;
@@ -89,7 +81,7 @@ public class LapTimeManager {
       LOGGER.error("Please define a sessiondId to get race laps.");
       throw new IllegalArgumentException("Please define a sessiondId to get race laps.");
     }
-    Session session = sessionRepository.findById(sessionId);
+    Session session = this.sessionRepository.findById(sessionId);
 
     List<LapTimeDTO> results = getAllLapsDTOOrderedByStartDate(pilotId, sessionId, locationId, eventId, categoryId);
 
@@ -134,102 +126,47 @@ public class LapTimeManager {
   }
 
   private void arrangeDisplay(List<LapTimeDTO> results, Set<NestedPilotDTO> pilots, LapTimeDisplay... displays) {
-    filter.filterExtreme(results);
-    filler.fillLapsNumber(results);
+    this.filter.filterExtreme(results);
+    this.filler.fillLapsNumber(results);
     for (LapTimeDisplay display : displays) {
       switch (display) {
         case KEEP_COMPLETE:
-          filter.filterNoDuration(results);
+          this.filter.filterNoDuration(results);
           // Adjust
-          filler.fillLapsNumber(results);
+          this.filler.fillLapsNumber(results);
           break;
         case KEEP_LAST:
           // TODO Should probably be merged with Best (best and last info present
           // in DTO) and then its just a matter of order
-          filter.keepOnlyLast(results);
+          this.filter.keepOnlyLast(results);
           break;
         case ORDER_FOR_RACE:
-          order.orderForRace(results);
+          this.order.orderForRace(results);
           break;
         case KEEP_BEST:
-          filter.keepOnlyBest(results);
+          this.filter.keepOnlyBest(results);
           break;
         case ORDER_BY_DURATION:
-          order.orderByDuration(results);
+          this.order.orderByDuration(results);
           break;
         case ORDER_BY_LAST_SEEN:
-          order.orderbyLastSeen(results);
+          this.order.orderbyLastSeen(results);
         default:
           break;
       }
     }
-    filler.ensureAllPilotsPresent(results, pilots);
+    this.filler.ensureAllPilotsPresent(results, pilots);
   }
 
   private List<LapTimeDTO> getAllLapsDTOOrderedByStartDate(Long pilotId, Long sessionId, Long locationId, Long eventId,
                                                            Long categoryId) {
     List<LapTime> searchResults = getAllLapsOrderedByStartDate(pilotId, sessionId, locationId, eventId, categoryId);
-    return lapTimeConverter.convert(searchResults);
+    return this.lapTimeConverter.convert(searchResults);
   }
 
   private List<LapTime> getAllLapsOrderedByStartDate(Long pilotId, Long sessionId, Long locationId, Long eventId,
                                                      Long categoryId) {
-    WhereClauseBuilder whereClauseBuilder = buildWhereClause(pilotId, sessionId, locationId, eventId, categoryId);
-    OrderByClauseBuilder orderByClauseBuilder = new OrderByClauseBuilder();
-    // Necessary to have the lapTimeManager.manage working
-    orderByClauseBuilder.add("l.startDate");
-
-    TypedQuery<LapTime> findAllQuery = em.createQuery("SELECT DISTINCT l FROM LapTime l"
-        + " LEFT JOIN FETCH l.pilot LEFT JOIN FETCH l.session LEFT JOIN FETCH l.intermediates"
-        + whereClauseBuilder.build() + orderByClauseBuilder.build(), LapTime.class);
-
-    whereClauseBuilder.applyClauses(findAllQuery);
-    return findAllQuery.getResultList();
-  }
-
-
-  private WhereClauseBuilder buildWhereClause(Long pilotId, Long sessionId, Long locationId, Long eventId,
-                                              Long categoryId) {
-    WhereClauseBuilder whereClauseBuilder = new WhereClauseBuilder();
-    if (pilotId != null) {
-      whereClauseBuilder.addEqualsClause("l.pilot.id", "pilotId", pilotId);
-    } else {
-      if (categoryId != null) {
-        Category category = categoryRepository.findById(categoryId);
-        if (category != null) {
-          List<Long> categoryPilotsIds = new ArrayList<>();
-          for (Pilot p : category.getPilots()) {
-            categoryPilotsIds.add(p.id);
-          }
-          whereClauseBuilder.addInClause("l.pilot.id", "categoryPilotsIds", categoryPilotsIds);
-        }
-      }
-    }
-    if (sessionId != null) {
-      whereClauseBuilder.addEqualsClause("l.session.id", "sessionId", sessionId);
-    } else {
-      if (eventId != null) {
-        Event event = eventRepository.findById(eventId);
-        if (event != null) {
-          List<Long> eventSessionIds = new ArrayList<>();
-          for (Session s : event.getSessions()) {
-            eventSessionIds.add(s.id);
-          }
-          whereClauseBuilder.addInClause("l.session.id", "eventSessionIds", eventSessionIds);
-        }
-      }
-      if (locationId != null) {
-        Location location = locationRepository.findById(locationId);
-        if (location != null) {
-          List<Long> locationSessionIds = new ArrayList<>();
-          for (Session s : location.getSessions()) {
-            locationSessionIds.add(s.id);
-          }
-          whereClauseBuilder.addInClause("l.session.id", "locationSessionIds", locationSessionIds);
-        }
-      }
-    }
-    return whereClauseBuilder;
+    return this.laptimeRepository.getAllLapsOrderedByStartDate(pilotId, sessionId, locationId, eventId, categoryId);
   }
 
 }

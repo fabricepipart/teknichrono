@@ -11,7 +11,6 @@ import org.trd.app.teknichrono.model.repository.SessionRepository;
 import org.trd.app.teknichrono.util.csv.CSVConverter;
 
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -32,18 +31,18 @@ public class LapTimeEndpoint {
   private final EntityEndpoint<LapTime, LapTimeDTO> entityEndpoint;
 
   @Inject
-  public LapTimeEndpoint(EntityManager em, LapTimeRepository lapTimeRepository, SessionRepository sessionRepository,
+  public LapTimeEndpoint(LapTimeRepository lapTimeRepository, SessionRepository sessionRepository,
                          CategoryRepository categoryRepository, EventRepository eventRepository,
                          LocationRepository locationRepository) {
     this.entityEndpoint = new EntityEndpoint<>(lapTimeRepository);
-    this.lapTimeManager = new LapTimeManager(em, sessionRepository, categoryRepository, eventRepository, locationRepository);
+    this.lapTimeManager = new LapTimeManager(lapTimeRepository, sessionRepository, categoryRepository, eventRepository, locationRepository);
   }
 
   @DELETE
   @Path("/{id:[0-9][0-9]*}")
   @Transactional
   public Response deleteById(@PathParam("id") long id) {
-    return entityEndpoint.deleteById(id);
+    return this.entityEndpoint.deleteById(id);
   }
 
   @GET
@@ -51,7 +50,7 @@ public class LapTimeEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
   public Response findById(@PathParam("id") long id) {
-    return entityEndpoint.findById(id);
+    return this.entityEndpoint.findById(id);
   }
 
   @GET
@@ -62,7 +61,7 @@ public class LapTimeEndpoint {
                             @QueryParam("locationId") Long locationId, @QueryParam("eventId") Long eventId,
                             @QueryParam("categoryId") Long categoryId) {
     try {
-      List<LapTimeDTO> results = lapTimeManager.bestLapTimes(pilotId, sessionId, locationId, eventId, categoryId, null, null);
+      List<LapTimeDTO> results = this.lapTimeManager.bestLapTimes(pilotId, sessionId, locationId, eventId, categoryId, null, null);
       CSVConverter csvConverter = new CSVConverter();
       String csvResults = csvConverter.convertToCsv(results);
       return Response.ok().entity(csvResults).build();
@@ -80,7 +79,7 @@ public class LapTimeEndpoint {
                        @QueryParam("categoryId") Long categoryId, @QueryParam("page") Integer pageIndex,
                        @QueryParam("pageSize") Integer pageSize) {
     try {
-      List<LapTimeDTO> lapTimes = lapTimeManager.bestLapTimes(pilotId, sessionId, locationId, eventId, categoryId, pageIndex, pageSize);
+      List<LapTimeDTO> lapTimes = this.lapTimeManager.bestLapTimes(pilotId, sessionId, locationId, eventId, categoryId, pageIndex, pageSize);
       return Response.ok().entity(lapTimes).build();
     } catch (IllegalArgumentException e) {
       return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
@@ -95,7 +94,7 @@ public class LapTimeEndpoint {
                                @QueryParam("locationId") Long locationId, @QueryParam("eventId") Long eventId,
                                @QueryParam("categoryId") Long categoryId) {
     try {
-      List<LapTimeDTO> results = lapTimeManager.resultsList(pilotId, sessionId, locationId, eventId, categoryId, null, null);
+      List<LapTimeDTO> results = this.lapTimeManager.resultsList(pilotId, sessionId, locationId, eventId, categoryId, null, null);
       CSVConverter csvConverter = new CSVConverter();
       String csvResults = csvConverter.convertToCsv(results);
       return Response.ok().entity(csvResults).build();
@@ -113,7 +112,7 @@ public class LapTimeEndpoint {
                           @QueryParam("categoryId") Long categoryId, @QueryParam("page") Integer pageIndex,
                           @QueryParam("pageSize") Integer pageSize) {
     try {
-      List<LapTimeDTO> lapTimes = lapTimeManager.resultsList(pilotId, sessionId, locationId, eventId, categoryId, pageIndex, pageSize);
+      List<LapTimeDTO> lapTimes = this.lapTimeManager.resultsList(pilotId, sessionId, locationId, eventId, categoryId, pageIndex, pageSize);
       return Response.ok().entity(lapTimes).build();
     } catch (IllegalArgumentException e) {
       return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
@@ -128,7 +127,7 @@ public class LapTimeEndpoint {
                                @QueryParam("locationId") Long locationId, @QueryParam("eventId") Long eventId,
                                @QueryParam("categoryId") Long categoryId) {
     try {
-      List<LapTimeDTO> results = lapTimeManager.all(pilotId, sessionId, locationId, eventId, categoryId, null, null);
+      List<LapTimeDTO> results = this.lapTimeManager.all(pilotId, sessionId, locationId, eventId, categoryId, null, null);
       CSVConverter csvConverter = new CSVConverter();
       String csvResults = csvConverter.convertToCsv(results);
       return Response.ok().entity(csvResults).build();
@@ -145,7 +144,7 @@ public class LapTimeEndpoint {
                           @QueryParam("categoryId") Long categoryId, @QueryParam("page") Integer pageIndex,
                           @QueryParam("pageSize") Integer pageSize) {
     try {
-      List<LapTimeDTO> lapTimes = lapTimeManager.all(pilotId, sessionId, locationId, eventId, categoryId, pageIndex, pageSize);
+      List<LapTimeDTO> lapTimes = this.lapTimeManager.all(pilotId, sessionId, locationId, eventId, categoryId, pageIndex, pageSize);
       return Response.ok().entity(lapTimes).build();
     } catch (IllegalArgumentException e) {
       return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();

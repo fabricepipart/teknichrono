@@ -194,7 +194,6 @@ abstract class PanacheRepositoryWrapper<E extends PanacheEntity, D> implements R
     }
   }
 
-
   protected void checkNoId(EntityDTO entity) throws ConflictingIdException {
     if (entity.getId() != null && entity.getId() > 0) {
       throw new ConflictingIdException("Can't create " + getEntityName() + " with already an ID");

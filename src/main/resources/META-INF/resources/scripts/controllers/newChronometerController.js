@@ -24,8 +24,7 @@ angular.module('frontend').controller('NewChronometerController', function ($sco
 
     $scope.orderToExecuteList = [
         { key: "UPDATE", short: "UPDATE", text: "Update" },
-        { key: "RESTART", short: "RESTART", text: "Restart" },
-        { key: "GET_LOGS", short: "GET_LOGS", text: "Retrieve last logs" }
+        { key: "RESTART", short: "RESTART", text: "Restart" }
     ];
 
     $scope.save = function () {

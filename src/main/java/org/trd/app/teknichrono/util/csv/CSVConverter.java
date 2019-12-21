@@ -22,8 +22,8 @@ public class CSVConverter {
     StatefulBeanToCsv<LapTimeDTO> beanToCsv = getBeanToCsv();
     try {
       beanToCsv.write(results);
-      csvResult = writer.toString();
-      writer.close();
+      csvResult = this.writer.toString();
+      this.writer.close();
     } catch (CsvRequiredFieldEmptyException e) {
       LOGGER.error("Unable to generate lap times CSV (required field error)", e);
       throw new IOException(e);
@@ -35,7 +35,7 @@ public class CSVConverter {
   }
 
   StatefulBeanToCsv<LapTimeDTO> getBeanToCsv() {
-    // TODO StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder<LapTimeDTO>(writer).withMappingStrategy(new LapTimeMappingStrategy()).build();
-    return new StatefulBeanToCsvBuilder<LapTimeDTO>(writer).build();
+    // StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder<LapTimeDTO>(writer).withMappingStrategy(new LapTimeMappingStrategy()).build();
+    return new StatefulBeanToCsvBuilder<LapTimeDTO>(this.writer).build();
   }
 }

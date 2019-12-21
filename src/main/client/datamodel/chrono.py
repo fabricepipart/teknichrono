@@ -12,3 +12,4 @@ class Chronometer:
     self.bluetoothDebug = False
     self.debug = False
     self.orderToExecute = None
+    self.sendLogs = False

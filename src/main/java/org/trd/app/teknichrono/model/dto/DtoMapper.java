@@ -10,6 +10,7 @@ import org.trd.app.teknichrono.model.jpa.Chronometer;
 import org.trd.app.teknichrono.model.jpa.Event;
 import org.trd.app.teknichrono.model.jpa.LapTime;
 import org.trd.app.teknichrono.model.jpa.Location;
+import org.trd.app.teknichrono.model.jpa.Log;
 import org.trd.app.teknichrono.model.jpa.Pilot;
 import org.trd.app.teknichrono.model.jpa.Ping;
 import org.trd.app.teknichrono.model.jpa.Session;
@@ -40,6 +41,13 @@ interface DtoMapper {
   @Mapping(target = "lastSeenDate", source = "lastChronoInstant")
   @Mapping(target = "intermediates", source = "intermediates")
   LapTimeDTO asLapTimeDTO(LapTime lapTime);
+
+  @Mapping(target = "details", ignore = true)
+  @Mapping(target = "pid", ignore = true)
+  @Mapping(target = "tid", ignore = true)
+  @Mapping(target = "log", source = "loggerName")
+  @Mapping(target = "meta.created", expression = "java(log.getDate().toEpochMilli() / 1000.0)")
+  LogDTO asLogDto(Log log);
 
   default List<SectorDTO> asSectorsDTO(List<Ping> pings) {
     List<SectorDTO> sectors = new ArrayList<>();
