@@ -51,13 +51,9 @@ angular.module('frontend').controller('LiveController', function ($scope, $inter
         if ($scope.session.id) {
             $scope.sessionId = $scope.session.id
         }
-        flash.setMessage({}, true);
         if ($scope.searchTypeSelection && $scope.searchTypeSelection.text) {
-            valid = false
             if ($scope.sessionId) {
-                valid = true
-            }
-            if (valid) {
+                flash.setMessage({}, true);
                 $scope.searchResults = LapTimeResource.queryAll({ SearchType: $scope.searchTypeSelection.key, sessionId: $scope.sessionId, eventId: $scope.eventId, locationId: $scope.locationId, pilotId: $scope.pilotId, categoryId: $scope.categoryId }, function () {
                     $scope.filteredResults = $filter('searchFilter')($scope.searchResults, $scope);
                     if ($scope.searchTypeSelection.key == "") {
@@ -66,8 +62,7 @@ angular.module('frontend').controller('LiveController', function ($scope, $inter
                     $scope.currentPage = 0;
                 });
             } else {
-                flash.setMessage({ 'type': 'success', 'text': 'Sorry there is no currently ongoing session' }, true);
-                $scope.session.invalid = true
+                flash.setMessage({ 'type': 'success', 'text': 'Retrieving latest lap times. Please wait...' }, true);
             }
         }
     };
