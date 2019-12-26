@@ -13,11 +13,7 @@ from api.category import deleteCategories
 from api.session import deleteSessions
 from api.location import deleteLocations
 
-# Cleanup
-deleteBeacons()
-deletePilots()
-deleteChronometers()
-deleteSessions()
-deleteEvents()
-deleteCategories()
-deleteLocations()
+# ----------------------------------------------------------------------
+# Add Beacons
+for i in range(0, 100):
+  addBeacon(i)

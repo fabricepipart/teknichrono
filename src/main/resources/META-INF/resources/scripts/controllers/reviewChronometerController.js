@@ -18,6 +18,7 @@ angular.module('frontend').controller('ReviewChronometerController', function ($
     };
 
     $scope.update = function () {
+        flash.setMessage({}, true);
         var successCallbackPing = function (data) {
             self.originalPing = data;
             $scope.latest = new PingResource(self.originalPing);
@@ -36,7 +37,7 @@ angular.module('frontend').controller('ReviewChronometerController', function ($
         };
         var errorCallbackPing = function () {
             flash.setMessage({ 'type': 'error', 'text': 'The latest Ping could not be found.' });
-            $location.path("/Chronometers");
+            //$location.path("/Chronometers");
         };
         PingResource.latest({ chronoId: $routeParams.ChronometerId }, successCallbackPing, errorCallbackPing);
 
