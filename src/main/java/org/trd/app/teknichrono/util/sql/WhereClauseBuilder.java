@@ -5,14 +5,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.persistence.TypedQuery;
-
 public class WhereClauseBuilder {
 
-  Map<String, String> whereEqualMap = new HashMap<String, String>();
-  Map<String, String> whereInMap = new HashMap<String, String>();
-  Map<String, Object> parameters = new HashMap<String, Object>();
-  Map<String, List> parametersList = new HashMap<String, List>();
+  Map<String, String> whereEqualMap = new HashMap<>();
+  Map<String, String> whereInMap = new HashMap<>();
+  Map<String, Object> parameters = new HashMap<>();
+  Map<String, List> parametersList = new HashMap<>();
 
   public String getSqlDescription() {
     return "";
@@ -20,31 +18,33 @@ public class WhereClauseBuilder {
 
   public void addEqualsClause(String toMatch, String parameterName, Object parameterValue) {
     if (parameterValue != null) {
-      whereEqualMap.put(parameterName, toMatch);
-      parameters.put(parameterName, parameterValue);
+      this.whereEqualMap.put(parameterName, toMatch);
+      this.parameters.put(parameterName, parameterValue);
     }
   }
 
   public void addInClause(String toMatch, String parameterName, List<Long> parameterValue) {
     if (parameterValue != null && !parameterValue.isEmpty()) {
-      whereInMap.put(parameterName, toMatch);
-      parametersList.put(parameterName, parameterValue);
+      this.whereInMap.put(parameterName, toMatch);
+      this.parametersList.put(parameterName, parameterValue);
     }
   }
 
-  public void applyClauses(TypedQuery query) {
-    for (Entry<String, Object> entry : parameters.entrySet()) {
-      query.setParameter(entry.getKey(), entry.getValue());
+  public Map<String, Object> getParametersMap() {
+    Map<String, Object> toReturn = new HashMap<>();
+    for (Entry<String, Object> entry : this.parameters.entrySet()) {
+      toReturn.put(entry.getKey(), entry.getValue());
     }
-    for (Entry<String, List> entry : parametersList.entrySet()) {
-      query.setParameter(entry.getKey(), entry.getValue());
+    for (Entry<String, List> entry : this.parametersList.entrySet()) {
+      toReturn.put(entry.getKey(), entry.getValue());
     }
+    return toReturn;
   }
 
   public String build() {
     StringBuilder builder = new StringBuilder();
     boolean startedBuilding = false;
-    for (Entry<String, String> entry : whereEqualMap.entrySet()) {
+    for (Entry<String, String> entry : this.whereEqualMap.entrySet()) {
       if (!startedBuilding) {
         builder.append(" WHERE ");
         startedBuilding = true;
@@ -53,7 +53,7 @@ public class WhereClauseBuilder {
       }
       builder.append(entry.getValue()).append(" = :").append(entry.getKey());
     }
-    for (Entry<String, String> entry : whereInMap.entrySet()) {
+    for (Entry<String, String> entry : this.whereInMap.entrySet()) {
       if (!startedBuilding) {
         builder.append(" WHERE ");
         startedBuilding = true;

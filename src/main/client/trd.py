@@ -14,7 +14,7 @@ from logs.init import setupBackupFile, setupLogging
 TEKNICHRONO_SERVER = os.getenv('TEKNICHRONO_SERVER', 'http://localhost:8080')
 CHRONO_NAME = os.getenv('CHRONO_NAME', 'Raspberry')
 
-setupLogging(False, False)
+setupLogging(None, TEKNICHRONO_SERVER)
 BACKUP_FILE = setupBackupFile()
 
 socket.setdefaulttimeout(2.0)

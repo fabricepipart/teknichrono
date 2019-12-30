@@ -1,5 +1,6 @@
 import os
 import logging
+from restapi_logging_handler import RestApiHandler
 
 LOGS_PATH = os.getenv('LOGS_PATH', os.getenv('TEKNICHRONO_HOME', '/home/pi/chrono') + '/teknichrono-data/logs')
 
@@ -8,7 +9,15 @@ def setupBackupFile():
   return open(LOGS_PATH + '/all_pings.log', 'a', buffering=1)
 
 
-def setupLogging(debug, btDebug):
+def setupLogging(chronometer, server):
+  debug = False
+  btDebug = False
+  sendLogs = False
+  if chronometer:
+    debug = chronometer.debug
+    btDebug = chronometer.bluetoothDebug
+    sendLogs = chronometer.sendLogs
+  logger = logging.getLogger('')
   # set up logging to file
   fh = logging.FileHandler(LOGS_PATH + '/teknichrono.log')
   # create console handler with a higher log level
@@ -17,11 +26,11 @@ def setupLogging(debug, btDebug):
   if debug:
     fh.setLevel(logging.DEBUG)
     ch.setLevel(logging.DEBUG)
-    logging.getLogger('').setLevel(logging.DEBUG)
+    logger.setLevel(logging.DEBUG)
   else:
     fh.setLevel(logging.INFO)
     ch.setLevel(logging.INFO)
-    logging.getLogger('').setLevel(logging.INFO)
+    logger.setLevel(logging.INFO)
   if btDebug:
     logging.getLogger('BT').setLevel(logging.DEBUG)
   else:
@@ -32,6 +41,11 @@ def setupLogging(debug, btDebug):
   ch.setFormatter(formatter)
   fh.setFormatter(formatter)
   # add the handlers to logger
-  logging.getLogger('').handlers = []
-  logging.getLogger('').addHandler(ch)
-  logging.getLogger('').addHandler(fh)
+  logger.handlers = []
+  logger.addHandler(ch)
+  logger.addHandler(fh)
+  if sendLogs:
+    restApiUrl = server + f'/rest/logs/create?chronoId={chronometer.id}'
+    #restapiHandler = RestApiHandler(restApiUrl, 'text')
+    restapiHandler = RestApiHandler(restApiUrl)
+    logger.addHandler(restapiHandler)

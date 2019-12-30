@@ -25,21 +25,25 @@ public class ChronometerRepository extends PanacheRepositoryWrapper<Chronometer,
 
   private final PingRepository.Panache pingRepository;
 
+  private final LogRepository.Panache logRepository;
+
   @Inject
   public ChronometerRepository(Panache panacheRepository, SessionRepository.Panache sessionRepository,
-                               PingRepository.Panache pingRepository) {
+                               PingRepository.Panache pingRepository, LogRepository.Panache logRepository) {
     super(panacheRepository);
     this.panacheRepository = panacheRepository;
     this.sessionRepository = sessionRepository;
     this.pingRepository = pingRepository;
+    this.logRepository = logRepository;
   }
 
   @Override
   public void deleteById(long id) throws NotFoundException {
     Chronometer entity = ensureFindById(id);
-    nullifyOneToManyRelationship(entity.getPings(), Ping::setChrono, pingRepository);
-    removeFromManyToManyRelationship(id, entity.getSessions(), Session::getChronometers, sessionRepository);
-    panacheRepository.delete(entity);
+    nullifyOneToManyRelationship(entity.getPings(), Ping::setChrono, this.pingRepository);
+    removeFromManyToManyRelationship(id, entity.getSessions(), Session::getChronometers, this.sessionRepository);
+    // Logs deleted via cascade
+    this.panacheRepository.delete(entity);
   }
 
   @Override
@@ -50,7 +54,7 @@ public class ChronometerRepository extends PanacheRepositoryWrapper<Chronometer,
   @Override
   public Chronometer create(ChronometerDTO entity) throws ConflictingIdException, NotFoundException {
     Chronometer chronometer = fromDTO(entity);
-    panacheRepository.persist(chronometer);
+    this.panacheRepository.persist(chronometer);
     return chronometer;
   }
 
@@ -62,6 +66,7 @@ public class ChronometerRepository extends PanacheRepositoryWrapper<Chronometer,
 
     // Sessions are not updated (not part of DTO)
     // Pings are not updated (not part of DTO)
+    // Logs are not updated (not part of DTO)
     return chronometer;
   }
 
@@ -77,21 +82,22 @@ public class ChronometerRepository extends PanacheRepositoryWrapper<Chronometer,
     chronometer.setInactivityWindow(dto.getInactivityWindow());
     chronometer.setBluetoothDebug(dto.isBluetoothDebug());
     chronometer.setDebug(dto.isDebug());
+    chronometer.setSendLogs(dto.isSendLogs());
     if (dto.getOrderToExecute() != null) {
       chronometer.setOrderToExecute(Chronometer.ChronometerOrder.valueOf(dto.getOrderToExecute()));
     }
   }
 
   @Override
-  public ChronometerDTO toDTO(Chronometer dto) {
-    return ChronometerDTO.fromChronometer(dto);
+  public ChronometerDTO toDTO(Chronometer chronometer) {
+    return ChronometerDTO.fromChronometer(chronometer);
   }
 
 
   public ChronometerDTO ack(long id) throws NotFoundException {
     Chronometer entity = ensureFindById(id);
     entity.setOrderToExecute(null);
-    panacheRepository.persist(entity);
+    this.panacheRepository.persist(entity);
     return ChronometerDTO.fromChronometer(entity);
   }
 
@@ -102,6 +108,7 @@ public class ChronometerRepository extends PanacheRepositoryWrapper<Chronometer,
     setFromDto(dto, chronometer);
     // Sessions are not updated (not part of DTO)
     // Pings are not updated (not part of DTO)
-    panacheRepository.persist(chronometer);
+    // Logs are not updated (not part of DTO)
+    this.panacheRepository.persist(chronometer);
   }
 }

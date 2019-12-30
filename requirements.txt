@@ -4,3 +4,4 @@ yapf
 pylint
 isodate
 coverage
+restapi_logging_handler

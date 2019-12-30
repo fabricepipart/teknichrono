@@ -34,7 +34,6 @@ import static org.assertj.core.api.Assertions.*;
 @QuarkusTest
 public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
 
-
   private TestRestBeaconEndpoint restBeacon = new TestRestBeaconEndpoint();
   private TestRestChronometerEndpoint restChronometer = new TestRestChronometerEndpoint();
   private TestRestPilotEndPoint restPilot = new TestRestPilotEndPoint();
@@ -123,7 +122,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
 
     Stream<String> stream = Arrays.stream(lines[0].split(","));
     List<String> header = stream.map(h -> h.replaceAll("\"", "")).collect(Collectors.toList());
-    assertThat(header).contains("DURATION","ENDDATE","PILOT","SESSION");
+    assertThat(header).contains("DURATION", "ENDDATE", "PILOT", "SESSION");
   }
 
 
@@ -362,16 +361,16 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
     String csvOfPilot = getCsvOfBestOfPilot(pilots.get(0), sessions.get(0).getId());
     assertThat(csvOfPilot).isNotNull();
     String[] lines = csvOfPilot.split("\n");
-    assertThat(lines.length).isEqualTo(1+3);
+    assertThat(lines.length).isEqualTo(1 + 3);
 
     Stream<String> stream = Arrays.stream(lines[0].split(","));
     List<String> header = stream.map(h -> h.replaceAll("\"", "")).collect(Collectors.toList());
-    assertThat(header).contains("DURATION","ENDDATE","PILOT","SESSION");
+    assertThat(header).contains("DURATION", "ENDDATE", "PILOT", "SESSION");
 
     csvOfPilot = getCsvOfBestOfPilot(pilots.get(1), sessions.get(0).getId());
     assertThat(csvOfPilot).isNotNull();
     lines = csvOfPilot.split("\n");
-    assertThat(lines.length).isEqualTo(1+2);
+    assertThat(lines.length).isEqualTo(1 + 2);
   }
 
   @Test
@@ -463,16 +462,16 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
     String csvOfPilot = getResultsOfPilotAsCsv(pilots.get(0), sessions.get(0).getId());
     assertThat(csvOfPilot).isNotNull();
     String[] lines = csvOfPilot.split("\n");
-    assertThat(lines.length).isEqualTo(1+3);
+    assertThat(lines.length).isEqualTo(1 + 3);
 
     Stream<String> stream = Arrays.stream(lines[0].split(","));
     List<String> header = stream.map(h -> h.replaceAll("\"", "")).collect(Collectors.toList());
-    assertThat(header).contains("DURATION","ENDDATE","PILOT","SESSION");
+    assertThat(header).contains("DURATION", "ENDDATE", "PILOT", "SESSION");
 
     csvOfPilot = getResultsOfPilotAsCsv(pilots.get(1), sessions.get(0).getId());
     assertThat(csvOfPilot).isNotNull();
     lines = csvOfPilot.split("\n");
-    assertThat(lines.length).isEqualTo(1+2);
+    assertThat(lines.length).isEqualTo(1 + 2);
   }
 
   @Test

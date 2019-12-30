@@ -17,7 +17,8 @@ public class ChronometerDTO implements EntityDTO {
   private boolean bluetoothDebug = false;
   private boolean debug = false;
   private String orderToExecute;
-  private long txThreshold;
+  private long txThreshold = -100L;
+  private boolean sendLogs = true;
 
   public static ChronometerDTO fromChronometer(Chronometer chronometer) {
     return DtoMapper.INSTANCE.asChronometerDto(chronometer);

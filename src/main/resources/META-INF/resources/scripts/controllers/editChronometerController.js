@@ -70,8 +70,7 @@ angular.module('frontend').controller('EditChronometerController', function ($sc
 
     $scope.orderToExecuteList = [
         { key: "UPDATE", short: "UPDATE", text: "Update" },
-        { key: "RESTART", short: "RESTART", text: "Restart" },
-        { key: "GET_LOGS", short: "GET_LOGS", text: "Retrieve last logs" }
+        { key: "RESTART", short: "RESTART", text: "Restart" }
     ];
 
     $scope.get();

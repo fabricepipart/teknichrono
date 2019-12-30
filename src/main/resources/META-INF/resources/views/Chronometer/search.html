@@ -50,6 +50,7 @@
                     <th>Window</th>
                     <th>Order</th>
                     <th>Proximity</th>
+                    <th>Logs</th>
                 </tr>
             </thead>
             <tbody id="search-results-body">
@@ -92,11 +93,15 @@
                     <td ng-switch on="result.orderToExecute">
                         <a href="#/Chronometers/edit/{{result.id}}" ng-switch-when="UPDATE">Update</a>
                         <a href="#/Chronometers/edit/{{result.id}}" ng-switch-when="RESTART">Restart</a>
-                        <a href="#/Chronometers/edit/{{result.id}}" ng-switch-when="GET_LOGS">Retrieve last logs</a>
                     </td>
                     <td>
                         <a href="#/Chronometers/review/{{result.id}}">
                             <span class="glyphicon glyphicon-screenshot"></span>
+                        </a>
+                    </td>
+                    <td>
+                        <a href="#/Chronometers/logs/{{result.id}}">
+                            <span class="glyphicon glyphicon-list-alt"></span>
                         </a>
                     </td>
                 </tr>

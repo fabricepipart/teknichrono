@@ -3,3 +3,4 @@ requests
 yapf
 isodate
 pybluez
+restapi-logging-handler
