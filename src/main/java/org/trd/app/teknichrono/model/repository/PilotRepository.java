@@ -21,29 +21,23 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot, PilotDTO> {
   }
 
   private final Panache panacheRepository;
-
   private final BeaconRepository.Panache beaconRepository;
-
   private final CategoryRepository.Panache categoryRepository;
-
-  private final LapTimeRepository.Panache laptimeRepository;
-
   private final SessionRepository.Panache sessionRepository;
 
   @Inject
   public PilotRepository(Panache panacheRepository, BeaconRepository.Panache beaconRepository,
-                         CategoryRepository.Panache categoryRepository, LapTimeRepository.Panache laptimeRepository,
+                         CategoryRepository.Panache categoryRepository,
                          SessionRepository.Panache sessionRepository) {
     super(panacheRepository);
     this.panacheRepository = panacheRepository;
     this.beaconRepository = beaconRepository;
     this.categoryRepository = categoryRepository;
-    this.laptimeRepository = laptimeRepository;
     this.sessionRepository = sessionRepository;
   }
 
   public Pilot findByName(String firstname, String lastname) {
-    return panacheRepository.find("firstName = ?1 AND lastName = ?2", firstname, lastname).firstResult();
+    return this.panacheRepository.find("firstName = ?1 AND lastName = ?2", firstname, lastname).firstResult();
   }
 
   @Override
@@ -54,7 +48,7 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot, PilotDTO> {
   @Override
   public Pilot create(PilotDTO entity) throws ConflictingIdException, NotFoundException {
     Pilot pilot = fromDTO(entity);
-    panacheRepository.persist(pilot);
+    this.panacheRepository.persist(pilot);
     return pilot;
   }
 
@@ -65,9 +59,10 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot, PilotDTO> {
     Pilot pilot = new Pilot();
     pilot.setFirstName(entity.getFirstName());
     pilot.setLastName(entity.getLastName());
+    pilot.setNickname(entity.getNickname());
 
-    setOneToOneRelationship(pilot, entity.getCurrentBeacon(), Pilot::setCurrentBeacon, Beacon::setPilot, beaconRepository);
-    setManyToOneRelationship(pilot, entity.getCategory(), Pilot::setCategory, Category::getPilots, categoryRepository);
+    setOneToOneRelationship(pilot, entity.getCurrentBeacon(), Pilot::setCurrentBeacon, Beacon::setPilot, this.beaconRepository);
+    setManyToOneRelationship(pilot, entity.getCategory(), Pilot::setCategory, Category::getPilots, this.categoryRepository);
     // Don't create with Laps
     // Don't create with Sessions
 
@@ -84,12 +79,12 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot, PilotDTO> {
   public void deleteById(long id) throws NotFoundException {
     Pilot entity = ensureFindById(id);
 
-    removeFromManyToOneRelationship(id, entity.getCategory(), Category::getPilots, categoryRepository);
-    nullifyOneToOneRelationship(entity.getCurrentBeacon(), Beacon::setPilot, beaconRepository);
+    removeFromManyToOneRelationship(id, entity.getCategory(), Category::getPilots, this.categoryRepository);
+    nullifyOneToOneRelationship(entity.getCurrentBeacon(), Beacon::setPilot, this.beaconRepository);
     // Cascading should do its job for Laps or we should create a deleteFromOneToManyRelationship
-    removeFromManyToManyRelationship(id, entity.getSessions(), Session::getPilots, sessionRepository);
+    removeFromManyToManyRelationship(id, entity.getSessions(), Session::getPilots, this.sessionRepository);
 
-    panacheRepository.delete(entity);
+    this.panacheRepository.delete(entity);
   }
 
   @Override
@@ -99,27 +94,24 @@ public class PilotRepository extends PanacheRepositoryWrapper<Pilot, PilotDTO> {
 
     pilot.setFirstName(dto.getFirstName());
     pilot.setLastName(dto.getLastName());
+    pilot.setNickname(dto.getNickname());
     // Don't update Laps
     // Don't update Sessions
 
     // Update of category
-    setManyToOneRelationship(pilot, dto.getCategory(), Pilot::setCategory, Category::getPilots, categoryRepository);
-    updateOneToOneRelationship(pilot, dto.getCurrentBeacon(), Pilot::setCurrentBeacon, Beacon::setPilot, beaconRepository);
+    setManyToOneRelationship(pilot, dto.getCategory(), Pilot::setCategory, Category::getPilots, this.categoryRepository);
+    updateOneToOneRelationship(pilot, dto.getCurrentBeacon(), Pilot::setCurrentBeacon, Beacon::setPilot, this.beaconRepository);
 
-    panacheRepository.persist(pilot);
+    this.panacheRepository.persist(pilot);
   }
 
 
   public PilotDTO associateBeacon(long pilotId, long beaconId) throws NotFoundException {
     Pilot entity = ensureFindById(pilotId);
-    Beacon beacon = setOneToOneRelationship(entity, beaconId, Pilot::setCurrentBeacon, Beacon::setPilot, beaconRepository);
+    Beacon beacon = setOneToOneRelationship(entity, beaconId, Pilot::setCurrentBeacon, Beacon::setPilot, this.beaconRepository);
     persist(entity);
-    beaconRepository.persist(beacon);
+    this.beaconRepository.persist(beacon);
     PilotDTO dto = toDTO(entity);
     return dto;
-  }
-
-  public PanacheRepository<Beacon> getBeaconRepository() {
-    return beaconRepository;
   }
 }

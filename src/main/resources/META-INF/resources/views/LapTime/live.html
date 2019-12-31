@@ -32,7 +32,7 @@
                     <td ng-switch-when="true">{{result.startDate | date : 'HH:mm:ss.sss' }}</td>
                     <td ng-switch-when="true">{{result.endDate | date : 'HH:mm:ss.sss' }}</td>
                     <td>{{result.pilot.beaconNumber}}</td>
-                    <td>{{result.pilot.firstName}} {{result.pilot.lastName}}</td>
+                    <td>{{result.pilot.fullname}}</td>
                     <td>{{result.lapIndex}} / {{result.lapNumber}}</td>
                     <td>{{result.duration | date : 'm:ss.sss' : 'UTC'}}</td>
                     <td ng-switch-when="false">{{result.gapWithBest | date : 'm:ss.sss' : 'UTC'}}</td>

@@ -74,6 +74,7 @@ public class TestRestPilotEndPoint extends TestRestEndpoint<PilotDTO> {
     PilotDTO modifiedPilot = new PilotDTO();
     modifiedPilot.setFirstName("Pilot");
     modifiedPilot.setLastName("B");
+    modifiedPilot.setNickname("51");
     modifiedPilot.setId(id);
     update(id, modifiedPilot);
     List<PilotDTO> pilots = getAll();
@@ -81,6 +82,7 @@ public class TestRestPilotEndPoint extends TestRestEndpoint<PilotDTO> {
     getByName("Pilot", "A", NOT_FOUND);
     PilotDTO newReturnedPilot = getByName("Pilot", "B");
     assertThat(newReturnedPilot.getId()).isEqualTo(id);
+    assertThat(newReturnedPilot.getNickname()).isEqualTo("51");
 
     delete(id);
     assertTestCleanedEverything();
@@ -133,8 +135,8 @@ public class TestRestPilotEndPoint extends TestRestEndpoint<PilotDTO> {
     modifiedPilot.setLastName("Expert");
     modifiedPilot.setId(id);
 
-    restBeacon.create(210);
-    BeaconDTO beacon = restBeacon.getByNumber(210);
+    this.restBeacon.create(210);
+    BeaconDTO beacon = this.restBeacon.getByNumber(210);
     long beaconId = beacon.getId();
     NestedBeaconDTO nestedBeacon = new NestedBeaconDTO();
     nestedBeacon.setId(beaconId);
@@ -170,8 +172,8 @@ public class TestRestPilotEndPoint extends TestRestEndpoint<PilotDTO> {
     modifiedPilot.setLastName("Expert");
     modifiedPilot.setId(id);
 
-    restCategory.create("Expert");
-    CategoryDTO category = restCategory.getByName("Expert");
+    this.restCategory.create("Expert");
+    CategoryDTO category = this.restCategory.getByName("Expert");
     long categoryId = category.getId();
     NestedCategoryDTO nestedCategory = new NestedCategoryDTO();
     nestedCategory.setId(categoryId);
@@ -201,8 +203,8 @@ public class TestRestPilotEndPoint extends TestRestEndpoint<PilotDTO> {
     assertThat(pilot.getCurrentBeacon()).isNull();
 
     long id = pilot.getId();
-    restBeacon.create(220);
-    BeaconDTO beacon = restBeacon.getByNumber(220);
+    this.restBeacon.create(220);
+    BeaconDTO beacon = this.restBeacon.getByNumber(220);
     long beaconId = beacon.getId();
 
     associateBeacon(id, beaconId);
@@ -300,12 +302,12 @@ public class TestRestPilotEndPoint extends TestRestEndpoint<PilotDTO> {
   }
 
   public void deleteWithBeacon(long id, long beaconId) {
-    restBeacon.delete(beaconId);
+    this.restBeacon.delete(beaconId);
     delete(id);
   }
 
   public void deleteWithCategory(long id, long catId) {
-    restCategory.delete(catId);
+    this.restCategory.delete(catId);
     delete(id);
   }
 
@@ -318,8 +320,8 @@ public class TestRestPilotEndPoint extends TestRestEndpoint<PilotDTO> {
   }
 
   public void createWithBeacon(String first, String last, int beaconNumber) {
-    restBeacon.create(beaconNumber);
-    BeaconDTO beacon = restBeacon.getByNumber(beaconNumber);
+    this.restBeacon.create(beaconNumber);
+    BeaconDTO beacon = this.restBeacon.getByNumber(beaconNumber);
     NestedBeaconDTO nestedBeacon = new NestedBeaconDTO();
     nestedBeacon.setNumber(beaconNumber);
     nestedBeacon.setId(beacon.getId());
@@ -333,8 +335,8 @@ public class TestRestPilotEndPoint extends TestRestEndpoint<PilotDTO> {
   }
 
   public void createWithCategory(String first, String last, String categoryName) {
-    restCategory.create(categoryName);
-    CategoryDTO category = restCategory.getByName(categoryName);
+    this.restCategory.create(categoryName);
+    CategoryDTO category = this.restCategory.getByName(categoryName);
     NestedCategoryDTO nestedCategory = new NestedCategoryDTO();
     nestedCategory.setName(categoryName);
     nestedCategory.setId(category.getId());
@@ -349,7 +351,7 @@ public class TestRestPilotEndPoint extends TestRestEndpoint<PilotDTO> {
 
   public void assertTestCleanedEverything() {
     assertThat(getAll()).isNullOrEmpty();
-    assertThat(restBeacon.getAll()).isNullOrEmpty();
-    assertThat(restCategory.getAll()).isNullOrEmpty();
+    assertThat(this.restBeacon.getAll()).isNullOrEmpty();
+    assertThat(this.restCategory.getAll()).isNullOrEmpty();
   }
 }

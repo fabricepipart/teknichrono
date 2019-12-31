@@ -16,7 +16,7 @@ angular.module('frontend').controller('EditCategoryController', function ($scope
                     };
                     var labelObject = {
                         value: item.id,
-                        text: item.firstName + ' ' + item.lastName
+                        text: item.fullname
                     };
                     if ($scope.category.pilots) {
                         $.each($scope.category.pilots, function (idx, element) {

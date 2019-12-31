@@ -10,6 +10,8 @@ public class PilotDTO implements EntityDTO {
   private int version;
   private String firstName;
   private String lastName;
+  private String nickname;
+  private String fullname;
   private NestedBeaconDTO currentBeacon;
   private NestedCategoryDTO category;
 

@@ -7,7 +7,7 @@
         </div>
     </div>
 </div>
-<hr/>
+<hr />
 <div>
     <h3>Search for Beacons</h3>
     <form id="BeaconSearch" class="form-horizontal">
@@ -22,7 +22,7 @@
         <div class="form-group">
             <label for="pilot" class="col-sm-2 control-label">Pilot</label>
             <div class="col-sm-10">
-                <select id="pilot" name="pilot" class="form-control" ng-model="search.pilot" ng-options="p as p.firstName + ' ' + p.lastName for p in pilotList">
+                <select id="pilot" name="pilot" class="form-control" ng-model="search.pilot" ng-options="p as p.fullname for p in pilotList">
                     <option value="">Choose a Pilot</option>
                 </select>
             </div>
@@ -51,7 +51,7 @@
                         <a href="#/Beacons/edit/{{result.id}}">{{result.number}}</a>
                     </td>
                     <td>
-                        <a href="#/Beacons/edit/{{result.id}}">{{result.pilot.firstName}} {{result.pilot.lastName}}</a>
+                        <a href="#/Beacons/edit/{{result.id}}">{{result.pilot.fullname}}</a>
                     </td>
                 </tr>
             </tbody>

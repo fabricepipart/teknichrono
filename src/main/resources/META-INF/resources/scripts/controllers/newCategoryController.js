@@ -8,7 +8,7 @@ angular.module('frontend').controller('NewCategoryController', function ($scope,
         $scope.pilotsSelectionList = $.map(items, function (item) {
             return ({
                 value: item.id,
-                text: item.firstName + ' ' + item.lastName
+                text: item.fullname
             });
         });
     });

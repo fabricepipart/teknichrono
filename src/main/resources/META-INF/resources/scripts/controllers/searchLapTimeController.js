@@ -32,7 +32,7 @@ angular.module('frontend').controller('LapTimeController', function ($scope, $lo
         $scope.pilotSelectionList = $.map(items, function (item) {
             return ({
                 value: item.id,
-                text: item.firstName + ' ' + item.lastName
+                text: item.fullname
             });
         });
     });
