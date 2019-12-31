@@ -21,7 +21,7 @@ angular.module('frontend').controller('EditSessionController', function ($scope,
                     };
                     var labelObject = {
                         value: item.id,
-                        text: item.firstName + ' ' + item.lastName
+                        text: item.fullname
                     };
                     if (self.original.pilots) {
                         $.each(self.original.pilots, function (idx, element) {

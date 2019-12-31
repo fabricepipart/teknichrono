@@ -39,7 +39,7 @@ angular.module('frontend').controller('StartLapTimeController', function ($scope
         $scope.pilotSelectionListComplete = $.map(items, function (item) {
             return ({
                 value: item.id,
-                text: (item.currentBeacon ? item.currentBeacon.number + ' - ' : '') + item.firstName + ' ' + item.lastName,
+                text: (item.currentBeacon ? item.currentBeacon.number + ' - ' : '') + item.fullname,
                 categoryId: (item.category ? item.category.id : ''),
                 beaconId: (item.currentBeacon ? item.currentBeacon.id : '')
             });

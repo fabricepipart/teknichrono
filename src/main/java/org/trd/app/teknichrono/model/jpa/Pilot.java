@@ -2,7 +2,17 @@ package org.trd.app.teknichrono.model.jpa;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
+import javax.persistence.Version;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -21,6 +31,9 @@ public class Pilot extends PanacheEntity {
 
   @Column(nullable = false)
   private String lastName;
+
+  @Column
+  private String nickname;
 
   @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
   @JoinColumn(name = "currentBeaconId")
@@ -48,7 +61,7 @@ public class Pilot extends PanacheEntity {
   }
 
   public Set<Session> getSessions() {
-    return sessions;
+    return this.sessions;
   }
 
   public void setSessions(Set<Session> sessions) {
@@ -56,7 +69,7 @@ public class Pilot extends PanacheEntity {
   }
 
   public Category getCategory() {
-    return category;
+    return this.category;
   }
 
   public void setCategory(Category category) {
@@ -72,7 +85,7 @@ public class Pilot extends PanacheEntity {
   }
 
   public String getFirstName() {
-    return firstName;
+    return this.firstName;
   }
 
   public void setFirstName(String firstName) {
@@ -80,15 +93,23 @@ public class Pilot extends PanacheEntity {
   }
 
   public String getLastName() {
-    return lastName;
+    return this.lastName;
   }
 
   public void setLastName(String lastName) {
     this.lastName = lastName;
   }
 
+  public String getNickname() {
+    return this.nickname;
+  }
+
+  public void setNickname(String nickname) {
+    this.nickname = nickname;
+  }
+
   public Beacon getCurrentBeacon() {
-    return currentBeacon;
+    return this.currentBeacon;
   }
 
   public void setCurrentBeacon(Beacon currentBeacon) {
@@ -110,7 +131,7 @@ public class Pilot extends PanacheEntity {
   }
 
   public List<LapTime> getLaps() {
-    return laps;
+    return this.laps;
   }
 
   public void setLaps(List<LapTime> laps) {
@@ -118,16 +139,35 @@ public class Pilot extends PanacheEntity {
   }
 
   private boolean sameAsFormer(Beacon newBeacon) {
-    return currentBeacon == null ? newBeacon == null : currentBeacon.equals(newBeacon);
+    return this.currentBeacon == null ? newBeacon == null : this.currentBeacon.equals(newBeacon);
+  }
+
+  public String getFullname() {
+    List<String> elements = new ArrayList<>();
+    if (this.nickname != null) {
+      elements.add("(" + this.nickname + ")");
+    }
+    if (this.firstName != null) {
+      elements.add(this.firstName);
+    }
+    if (this.lastName != null) {
+      elements.add(this.lastName);
+    }
+    return String.join(" ", elements);
   }
 
   @Override
   public String toString() {
-    String result = getClass().getSimpleName() + "[#" + id;
-    if (firstName != null && !firstName.trim().isEmpty())
-      result += ", firstName: " + firstName;
-    if (lastName != null && !lastName.trim().isEmpty())
-      result += ", lastName: " + lastName;
+    String result = getClass().getSimpleName() + "[#" + this.id;
+    if (this.nickname != null && !this.nickname.trim().isEmpty()) {
+      result += ", nickname: " + this.nickname;
+    }
+    if (this.firstName != null && !this.firstName.trim().isEmpty()) {
+      result += ", firstName: " + this.firstName;
+    }
+    if (this.lastName != null && !this.lastName.trim().isEmpty()) {
+      result += ", lastName: " + this.lastName;
+    }
     result += "]";
     return result;
   }

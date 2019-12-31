@@ -1,0 +1,53 @@
+<header>
+    <h3>Logs of Chronometer</h3>
+</header>
+
+<div id="search-results">
+    <div class="table-responsive">
+        <table class="table table-responsive table-bordered table-striped clearfix table-condensed table-sm">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Level</th>
+                    <!-- <th>Logger</th> -->
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody id="search-results-body">
+                <tr ng-repeat="result in filteredResults | startFrom:currentPage*pageSize | limitTo:pageSize">
+                    <td>
+                        <small>
+                            <samp class="text-nowrap small">{{ result.meta.created * 1000 | date : 'yyyy-MM-dd HH:mm:ss.sss' }}</samp class="text-nowrap small">
+                        </small>
+                    </td>
+                    <td>
+                        <small>
+                            <samp class="text-nowrap small">{{result.level}}</samp>
+                        </small>
+                    </td>
+                    <!-- <td>
+                        <p class="text-nowrap"><code>{{result.log}}</code></p>
+                    </td> -->
+                    <td>
+                        <small>
+                            <samp class="text-nowrap small">{{result.message}}</samp>
+                        </small>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <ul class="pagination pagination-centered">
+        <li ng-class="{disabled:currentPage == 0}">
+            <a id="prev" href ng-click="previous()">«</a>
+        </li>
+        <li ng-repeat="n in pageRange" ng-class="{active:currentPage == n}" ng-click="setPage(n)">
+            <a href ng-bind="n + 1">1</a>
+        </li>
+        <li ng-class="{disabled: currentPage == (numberOfPages() - 1)}">
+            <a id="next" href ng-click="next()">»</a>
+        </li>
+    </ul>
+
+</div>

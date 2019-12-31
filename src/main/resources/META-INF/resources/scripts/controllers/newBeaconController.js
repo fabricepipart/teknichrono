@@ -8,7 +8,7 @@ angular.module('frontend').controller('NewBeaconController', function ($scope, $
         $scope.pilotSelectionList = $.map(items, function (item) {
             return ({
                 value: item.id,
-                text: item.firstName + ' ' + item.lastName
+                text: item.fullname
             });
         });
     });

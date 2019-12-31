@@ -16,7 +16,7 @@ angular.module('frontend').controller('EditBeaconController', function ($scope, 
                     };
                     var labelObject = {
                         value: item.id,
-                        text: item.firstName + ' ' + item.lastName
+                        text: item.fullname
                     };
                     if ($scope.beacon.pilot && item.id == $scope.beacon.pilot.id) {
                         $scope.pilotSelection = labelObject;

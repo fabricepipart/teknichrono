@@ -9,6 +9,8 @@ public class NestedPilotDTO implements EntityDTO {
   private Long id;
   private String firstName;
   private String lastName;
+  private String nickname;
+  private String fullname;
   private long beaconNumber;
   private String categoryName;
 
