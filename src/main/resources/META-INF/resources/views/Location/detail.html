@@ -8,7 +8,8 @@
     <div class="form-group" ng-class="{'has-error': LocationForm.name.$invalid}">
         <label for="name" class="col-sm-2 control-label">Name</label>
         <div id="nameControls" class="col-sm-10">
-            <input id="name" name="name" type="text" required class="form-control" ng-model="location.name" placeholder="Enter the Location Name"></input>
+            <input id="name" name="name" type="text" required class="form-control" ng-model="location.name"
+                   placeholder="Enter the Location Name"></input>
             <span class="help-block error" ng-show="LocationForm.name.$error.required">required</span>
         </div>
     </div>
@@ -16,7 +17,8 @@
     <div class="form-group" ng-class="{'has-error': LocationForm.sessions.$invalid}">
         <label for="sessions" class="col-sm-2 control-label">Sessions</label>
         <div id="sessionsControls" class="col-sm-10">
-            <select id="sessions" name="sessions" multiple class="form-control" ng-model="sessionsSelection" ng-options="s.text for s in sessionsSelectionList">
+            <select id="sessions" name="sessions" multiple class="form-control" ng-model="sessionsSelection"
+                    ng-options="s.text for s in sessionsSelectionList">
                 <option value="">Choose a Sessions</option>
             </select>
         </div>
@@ -25,19 +27,43 @@
     <div class="form-group" ng-class="{'has-error': LocationForm.loopTrack.$invalid}">
         <label for="loopTrack" class="col-sm-2 control-label">Loop Track</label>
         <div id="loopTrackControls" class="col-sm-10">
-            <input id="loopTrack" name="loopTrack" type="checkbox" class="checkbox" ng-model="location.loopTrack" placeholder="Enter the Location Loop Track"></input>
+            <input id="loopTrack" name="loopTrack" type="checkbox" class="checkbox" ng-model="location.loopTrack"
+                   placeholder="Enter the Location Loop Track"></input>
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': LocationForm.minimum.$invalid}">
+        <label for="minimum" class="col-sm-2 control-label">Minimum</label>
+        <div id="minimumControls" class="col-sm-10">
+            <input id="minimum" name="minimum" type="number" class="form-control" ng-model="location.minimum"
+                   placeholder="Enter the Location minimum laptime in sec"></input>
+            <span class="help-block error" ng-show="LocationForm.minimum.$error.number">not a number</span>
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error': LocationForm.maximum.$invalid}">
+        <label for="maximum" class="col-sm-2 control-label">Inactivity</label>
+        <div id="maximumControls" class="col-sm-10">
+            <input id="maximum" name="maximum" type="number" class="form-control" ng-model="location.maximum"
+                   placeholder="Enter the Location maximum laptime in sec"></input>
+            <span class="help-block error" ng-show="LocationForm.maximum.$error.number">not a number</span>
         </div>
     </div>
 
 
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
-            <button id="saveLocation" name="saveLocation" class="btn btn-primary" ng-disabled="isClean() || LocationForm.$invalid" ng-click="save()">
-                <span class="glyphicon glyphicon-ok-sign"></span> Save</button>
+            <button id="saveLocation" name="saveLocation" class="btn btn-primary"
+                    ng-disabled="isClean() || LocationForm.$invalid" ng-click="save()">
+                <span class="glyphicon glyphicon-ok-sign"></span> Save
+            </button>
             <button id="cancel" name="cancel" class="btn btn-default" ng-click="cancel()">
-                <span class="glyphicon glyphicon-remove-sign"></span> Cancel</button>
-            <button id="deleteLocation" name="deleteLocation" class="btn btn-danger" ng-show="location.id" ng-click="remove()">
-                <span class="glyphicon glyphicon-trash"></span> Delete</button>
+                <span class="glyphicon glyphicon-remove-sign"></span> Cancel
+            </button>
+            <button id="deleteLocation" name="deleteLocation" class="btn btn-danger" ng-show="location.id"
+                    ng-click="remove()">
+                <span class="glyphicon glyphicon-trash"></span> Delete
+            </button>
         </div>
     </div>
 </form>

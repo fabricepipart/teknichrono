@@ -45,7 +45,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
 
   private List<BeaconDTO> beacons = new ArrayList<>();
   private List<Long> chronos = new ArrayList<>();
-  private List<Long> locations = new ArrayList<>();
+  private List<LocationDTO> locations = new ArrayList<>();
   private List<Long> events = new ArrayList<>();
   private List<SessionDTO> sessions = new ArrayList<>();
   private List<Long> pilots = new ArrayList<>();
@@ -58,19 +58,19 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
 
   @AfterEach
   public void cleanup() {
-    if (sessions != null) {
-      for (SessionDTO session : sessions) {
+    if (this.sessions != null) {
+      for (SessionDTO session : this.sessions) {
         deleteAllOfSession(session.getId());
       }
     }
-    restPilot.deleteAll();
-    restSession.deleteAll();
-    restLocation.deleteAll();
-    restBeacon.deleteAll();
-    restChronometer.deleteAll();
-    restPing.deleteAll();
-    restCategory.deleteAll();
-    restEvent.deleteAll();
+    this.restPilot.deleteAll();
+    this.restSession.deleteAll();
+    this.restLocation.deleteAll();
+    this.restBeacon.deleteAll();
+    this.restChronometer.deleteAll();
+    this.restPing.deleteAll();
+    this.restCategory.deleteAll();
+    this.restEvent.deleteAll();
   }
 
 
@@ -85,13 +85,13 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
   @Test
   public void testLists() {
     createWithAllNeeded();
-    addLap(Instant.now().plusSeconds(11), beacons.get(0).getId(), chronos.get(0));
+    addLap(Instant.now().plusSeconds(11), this.beacons.get(0).getId(), this.chronos.get(0));
 
-    long sessionId = sessions.get(0).getId();
+    long sessionId = this.sessions.get(0).getId();
     List<LapTimeDTO> laptimes = getAllOfSession(sessionId);
     assertThat(laptimes.size()).isEqualTo(1);
 
-    addLap(Instant.now().plusSeconds(23), beacons.get(0).getId(), chronos.get(0));
+    addLap(Instant.now().plusSeconds(23), this.beacons.get(0).getId(), this.chronos.get(0));
     laptimes = getAllOfSession(sessionId);
     assertThat(laptimes.size()).isEqualTo(2);
 
@@ -110,10 +110,10 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
   public void testCsv() {
     createWithAllNeeded();
     Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
-    addLap(now.plusSeconds(11), beacons.get(0).getId(), chronos.get(0));
-    addLap(now.plusSeconds(23), beacons.get(0).getId(), chronos.get(0));
+    addLap(now.plusSeconds(11), this.beacons.get(0).getId(), this.chronos.get(0));
+    addLap(now.plusSeconds(23), this.beacons.get(0).getId(), this.chronos.get(0));
 
-    long sessionId = sessions.get(0).getId();
+    long sessionId = this.sessions.get(0).getId();
     String csvOfSession = getCsvOfSession(sessionId);
 
     assertThat(csvOfSession).isNotNull();
@@ -130,13 +130,13 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
   public void noLapCreatedWhenChronoInProximityMode() {
     createWithAllNeeded();
 
-    ChronometerDTO dto = restChronometer.getById(chronos.get(0));
+    ChronometerDTO dto = this.restChronometer.getById(this.chronos.get(0));
     dto.setSelectionStrategy(Chronometer.PingSelectionStrategy.PROXIMITY.toString());
-    restChronometer.update(chronos.get(0), dto);
+    this.restChronometer.update(this.chronos.get(0), dto);
 
-    addLap(Instant.now().plusSeconds(11), beacons.get(0).getId(), chronos.get(0));
+    addLap(Instant.now().plusSeconds(11), this.beacons.get(0).getId(), this.chronos.get(0));
 
-    long sessionId = sessions.get(0).getId();
+    long sessionId = this.sessions.get(0).getId();
     List<LapTimeDTO> laptimes = getAllOfSession(sessionId);
     assertThat(laptimes.size()).isEqualTo(0);
   }
@@ -144,21 +144,21 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
   @Test
   public void allLaptimesOfPilotInOrderOfOccurence() {
     addBeacon(101);
-    BeaconDTO beacon1 = restBeacon.getByNumber(101);
+    BeaconDTO beacon1 = this.restBeacon.getByNumber(101);
     NestedPilotDTO pilot1 = beacon1.getPilot();
     addBeacon(102);
-    BeaconDTO beacon2 = restBeacon.getByNumber(102);
+    BeaconDTO beacon2 = this.restBeacon.getByNumber(102);
     NestedPilotDTO pilot2 = beacon2.getPilot();
     createSession("Session", "C1");
-    long sessionId = sessions.get(0).getId();
+    long sessionId = this.sessions.get(0).getId();
     Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
-    restPing.createPing(now.plusSeconds(0), beacons.get(0).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(0), beacons.get(1).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(101), beacons.get(0).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(102), beacons.get(1).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(212), beacons.get(0).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(214), beacons.get(1).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(336), beacons.get(1).getId(), chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(0), this.beacons.get(0).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(0), this.beacons.get(1).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(101), this.beacons.get(0).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(102), this.beacons.get(1).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(212), this.beacons.get(0).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(214), this.beacons.get(1).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(336), this.beacons.get(1).getId(), this.chronos.get(0));
 
     List<LapTimeDTO> laptimes = getAllOfSession(sessionId);
     assertThat(laptimes.size()).isEqualTo(5);
@@ -180,29 +180,29 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
   @Test
   public void allLaptimesOfCategoryInOrderOfOccurence() {
     addBeacon(101);
-    BeaconDTO beacon1 = restBeacon.getByNumber(101);
+    BeaconDTO beacon1 = this.restBeacon.getByNumber(101);
     NestedPilotDTO pilot1 = beacon1.getPilot();
-    restCategory.create("One");
-    CategoryDTO one = restCategory.getByName("One");
-    restCategory.addPilot(one.getId(), pilot1.getId());
+    this.restCategory.create("One");
+    CategoryDTO one = this.restCategory.getByName("One");
+    this.restCategory.addPilot(one.getId(), pilot1.getId());
 
     addBeacon(102);
-    BeaconDTO beacon2 = restBeacon.getByNumber(102);
+    BeaconDTO beacon2 = this.restBeacon.getByNumber(102);
     NestedPilotDTO pilot2 = beacon2.getPilot();
-    restCategory.create("Two");
-    CategoryDTO two = restCategory.getByName("Two");
-    restCategory.addPilot(two.getId(), pilot2.getId());
+    this.restCategory.create("Two");
+    CategoryDTO two = this.restCategory.getByName("Two");
+    this.restCategory.addPilot(two.getId(), pilot2.getId());
 
     createSession("Session", "C1");
-    long sessionId = sessions.get(0).getId();
+    long sessionId = this.sessions.get(0).getId();
     Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
-    restPing.createPing(now.plusSeconds(336), beacons.get(1).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(0), beacons.get(0).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(102), beacons.get(1).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(212), beacons.get(0).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(214), beacons.get(1).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(0), beacons.get(1).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(101), beacons.get(0).getId(), chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(336), this.beacons.get(1).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(0), this.beacons.get(0).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(102), this.beacons.get(1).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(212), this.beacons.get(0).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(214), this.beacons.get(1).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(0), this.beacons.get(1).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(101), this.beacons.get(0).getId(), this.chronos.get(0));
 
     List<LapTimeDTO> laptimes = getAllOfSession(sessionId);
     assertThat(laptimes.size()).isEqualTo(5);
@@ -222,34 +222,57 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
   }
 
   @Test
+  public void laptimesFilteredComparedToLocationMinAndMax() {
+    addBeacon(101);
+    BeaconDTO beacon1 = this.restBeacon.getByNumber(101);
+    NestedPilotDTO pilot1 = beacon1.getPilot();
+    createSession("Session", "C1");
+
+    LocationDTO location = this.restLocation.getById(this.locations.get(0).getId());
+    location.setMinimum(Duration.ofSeconds(80));
+    location.setMaximum(Duration.ofSeconds(120));
+    this.restLocation.update(this.locations.get(0).getId(), location);
+
+    Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+    this.restPing.createPing(now.plusSeconds(600), this.beacons.get(0).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(500), this.beacons.get(0).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(200), this.beacons.get(0).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(100), this.beacons.get(0).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(0), this.beacons.get(0).getId(), this.chronos.get(0));
+
+    List<LapTimeDTO> laptimes = getAllOfLocation(this.locations.get(0).getId());
+    assertThat(laptimes.size()).isEqualTo(3);
+  }
+
+  @Test
   public void allLaptimesOfPilotAndLocationInOrderOfOccurence() {
     addBeacon(101);
-    BeaconDTO beacon1 = restBeacon.getByNumber(101);
+    BeaconDTO beacon1 = this.restBeacon.getByNumber(101);
     NestedPilotDTO pilot1 = beacon1.getPilot();
     addBeacon(102);
-    BeaconDTO beacon2 = restBeacon.getByNumber(102);
+    BeaconDTO beacon2 = this.restBeacon.getByNumber(102);
     NestedPilotDTO pilot2 = beacon2.getPilot();
     createSession("Session", "C1");
 
     Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
-    restPing.createPing(now.plusSeconds(214), beacons.get(1).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(336), beacons.get(1).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(212), beacons.get(0).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(101), beacons.get(0).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(102), beacons.get(1).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(0), beacons.get(0).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(0), beacons.get(1).getId(), chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(214), this.beacons.get(1).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(336), this.beacons.get(1).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(212), this.beacons.get(0).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(101), this.beacons.get(0).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(102), this.beacons.get(1).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(0), this.beacons.get(0).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(0), this.beacons.get(1).getId(), this.chronos.get(0));
 
-    List<LapTimeDTO> laptimes = getAllOfLocation(locations.get(0));
+    List<LapTimeDTO> laptimes = getAllOfLocation(this.locations.get(0).getId());
     assertThat(laptimes.size()).isEqualTo(5);
 
-    laptimes = getAllOfPilotAndLocation(pilot1.getId(), locations.get(0));
+    laptimes = getAllOfPilotAndLocation(pilot1.getId(), this.locations.get(0).getId());
     assertThat(laptimes.size()).isEqualTo(2);
     assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(pilot1.getId()))).isTrue();
     assertThat(laptimes.get(0).getDuration()).isEqualTo(Duration.ofSeconds(101));
     assertThat(laptimes.get(1).getDuration()).isEqualTo(Duration.ofSeconds(111));
 
-    laptimes = getAllOfPilotAndLocation(pilot2.getId(), locations.get(0));
+    laptimes = getAllOfPilotAndLocation(pilot2.getId(), this.locations.get(0).getId());
     assertThat(laptimes.size()).isEqualTo(3);
     assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(pilot2.getId()))).isTrue();
     assertThat(laptimes.get(0).getDuration()).isEqualTo(Duration.ofSeconds(102));
@@ -260,32 +283,32 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
   @Test
   public void allLaptimesOfPilotAndEventInOrderOfOccurence() {
     addBeacon(101);
-    BeaconDTO beacon1 = restBeacon.getByNumber(101);
+    BeaconDTO beacon1 = this.restBeacon.getByNumber(101);
     NestedPilotDTO pilot1 = beacon1.getPilot();
     addBeacon(102);
-    BeaconDTO beacon2 = restBeacon.getByNumber(102);
+    BeaconDTO beacon2 = this.restBeacon.getByNumber(102);
     NestedPilotDTO pilot2 = beacon2.getPilot();
     createSession("Session", "C1");
 
     Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
-    restPing.createPing(now.plusSeconds(336), beacons.get(1).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(214), beacons.get(1).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(0), beacons.get(0).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(212), beacons.get(0).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(101), beacons.get(0).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(0), beacons.get(1).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(102), beacons.get(1).getId(), chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(336), this.beacons.get(1).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(214), this.beacons.get(1).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(0), this.beacons.get(0).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(212), this.beacons.get(0).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(101), this.beacons.get(0).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(0), this.beacons.get(1).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(102), this.beacons.get(1).getId(), this.chronos.get(0));
 
-    List<LapTimeDTO> laptimes = getAllOfEvent(events.get(0));
+    List<LapTimeDTO> laptimes = getAllOfEvent(this.events.get(0));
     assertThat(laptimes.size()).isEqualTo(5);
 
-    laptimes = getAllOfPilotAndEvent(pilot1.getId(), events.get(0));
+    laptimes = getAllOfPilotAndEvent(pilot1.getId(), this.events.get(0));
     assertThat(laptimes.size()).isEqualTo(2);
     assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(pilot1.getId()))).isTrue();
     assertThat(laptimes.get(0).getDuration()).isEqualTo(Duration.ofSeconds(101));
     assertThat(laptimes.get(1).getDuration()).isEqualTo(Duration.ofSeconds(111));
 
-    laptimes = getAllOfPilotAndEvent(pilot2.getId(), events.get(0));
+    laptimes = getAllOfPilotAndEvent(pilot2.getId(), this.events.get(0));
     assertThat(laptimes.size()).isEqualTo(3);
     assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(pilot2.getId()))).isTrue();
     assertThat(laptimes.get(0).getDuration()).isEqualTo(Duration.ofSeconds(102));
@@ -300,13 +323,13 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
     List<LapTimeDTO> laptimes = getAllOfSession(sessionId);
     assertThat(laptimes.size()).isEqualTo(5);
 
-    laptimes = getAllOfPilot(pilots.get(0), sessionId);
+    laptimes = getAllOfPilot(this.pilots.get(0), sessionId);
     assertThat(laptimes.size()).isEqualTo(3);
-    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(pilots.get(0)))).isTrue();
+    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(this.pilots.get(0)))).isTrue();
 
-    laptimes = getAllOfPilot(pilots.get(1), sessionId);
+    laptimes = getAllOfPilot(this.pilots.get(1), sessionId);
     assertThat(laptimes.size()).isEqualTo(2);
-    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(pilots.get(1)))).isTrue();
+    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(this.pilots.get(1)))).isTrue();
   }
 
 
@@ -317,17 +340,17 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
     List<LapTimeDTO> laptimes = getAllOfSession(sessionId);
     assertThat(laptimes.size()).isEqualTo(7);
 
-    laptimes = getAllOfPilot(pilots.get(0), sessionId);
+    laptimes = getAllOfPilot(this.pilots.get(0), sessionId);
     assertThat(laptimes.size()).isEqualTo(3);
-    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(pilots.get(0)))).isTrue();
+    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(this.pilots.get(0)))).isTrue();
 
-    laptimes = getAllOfPilot(pilots.get(1), sessionId);
+    laptimes = getAllOfPilot(this.pilots.get(1), sessionId);
     assertThat(laptimes.size()).isEqualTo(3);
-    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(pilots.get(1)))).isTrue();
+    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(this.pilots.get(1)))).isTrue();
 
-    laptimes = getAllOfPilot(pilots.get(2), sessionId);
+    laptimes = getAllOfPilot(this.pilots.get(2), sessionId);
     assertThat(laptimes.size()).isEqualTo(1);
-    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(pilots.get(2)))).isTrue();
+    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(this.pilots.get(2)))).isTrue();
     assertThat(laptimes.get(0).getDuration()).isEqualTo(Duration.ofSeconds(102));
     assertThat(laptimes.get(0).getLapIndex()).isEqualTo(1);
     assertThat(laptimes.get(0).getLapNumber()).isEqualTo(1);
@@ -337,17 +360,17 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
   public void bestLapTimesOfPilotReturnsThemInOrder() {
     createTwoPilotsTimeTrial();
 
-    List<LapTimeDTO> laptimes = getBestOfPilot(pilots.get(0), sessions.get(0).getId());
+    List<LapTimeDTO> laptimes = getBestOfPilot(this.pilots.get(0), this.sessions.get(0).getId());
     assertThat(laptimes.size()).isEqualTo(3);
-    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(pilots.get(0)))).isTrue();
+    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(this.pilots.get(0)))).isTrue();
     Duration maxFoundUntilNow = Duration.ZERO;
     for (LapTimeDTO laptime : laptimes) {
       assertThat(laptime.getDuration().compareTo(maxFoundUntilNow)).isGreaterThanOrEqualTo(0);
     }
 
-    laptimes = getBestOfPilot(pilots.get(1), sessions.get(0).getId());
+    laptimes = getBestOfPilot(this.pilots.get(1), this.sessions.get(0).getId());
     assertThat(laptimes.size()).isEqualTo(2);
-    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(pilots.get(1)))).isTrue();
+    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(this.pilots.get(1)))).isTrue();
     maxFoundUntilNow = Duration.ZERO;
     for (LapTimeDTO laptime : laptimes) {
       assertThat(laptime.getDuration().compareTo(maxFoundUntilNow)).isGreaterThanOrEqualTo(0);
@@ -358,7 +381,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
   public void bestLapTimesToCsv() {
     createTwoPilotsTimeTrial();
 
-    String csvOfPilot = getCsvOfBestOfPilot(pilots.get(0), sessions.get(0).getId());
+    String csvOfPilot = getCsvOfBestOfPilot(this.pilots.get(0), this.sessions.get(0).getId());
     assertThat(csvOfPilot).isNotNull();
     String[] lines = csvOfPilot.split("\n");
     assertThat(lines.length).isEqualTo(1 + 3);
@@ -367,7 +390,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
     List<String> header = stream.map(h -> h.replaceAll("\"", "")).collect(Collectors.toList());
     assertThat(header).contains("DURATION", "ENDDATE", "PILOT", "SESSION");
 
-    csvOfPilot = getCsvOfBestOfPilot(pilots.get(1), sessions.get(0).getId());
+    csvOfPilot = getCsvOfBestOfPilot(this.pilots.get(1), this.sessions.get(0).getId());
     assertThat(csvOfPilot).isNotNull();
     lines = csvOfPilot.split("\n");
     assertThat(lines.length).isEqualTo(1 + 2);
@@ -377,25 +400,25 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
   public void bestRaceLapTimesOfPilotReturnsThemInOrder() {
     createThreePilotsRace();
 
-    List<LapTimeDTO> laptimes = getBestOfPilot(pilots.get(0), sessions.get(0).getId());
+    List<LapTimeDTO> laptimes = getBestOfPilot(this.pilots.get(0), this.sessions.get(0).getId());
     assertThat(laptimes.size()).isEqualTo(3);
-    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(pilots.get(0)))).isTrue();
+    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(this.pilots.get(0)))).isTrue();
     Duration maxFoundUntilNow = Duration.ZERO;
     for (LapTimeDTO laptime : laptimes) {
       assertThat(laptime.getDuration().compareTo(maxFoundUntilNow)).isGreaterThanOrEqualTo(0);
     }
 
-    laptimes = getBestOfPilot(pilots.get(1), sessions.get(0).getId());
+    laptimes = getBestOfPilot(this.pilots.get(1), this.sessions.get(0).getId());
     assertThat(laptimes.size()).isEqualTo(3);
-    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(pilots.get(1)))).isTrue();
+    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(this.pilots.get(1)))).isTrue();
     maxFoundUntilNow = Duration.ZERO;
     for (LapTimeDTO laptime : laptimes) {
       assertThat(laptime.getDuration().compareTo(maxFoundUntilNow)).isGreaterThanOrEqualTo(0);
     }
 
-    laptimes = getBestOfPilot(pilots.get(2), sessions.get(0).getId());
+    laptimes = getBestOfPilot(this.pilots.get(2), this.sessions.get(0).getId());
     assertThat(laptimes.size()).isEqualTo(1);
-    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(pilots.get(2)))).isTrue();
+    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(this.pilots.get(2)))).isTrue();
     maxFoundUntilNow = Duration.ZERO;
     for (LapTimeDTO laptime : laptimes) {
       assertThat(laptime.getDuration().compareTo(maxFoundUntilNow)).isGreaterThanOrEqualTo(0);
@@ -407,7 +430,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
   public void bestLapTimesReturnsBestPerPilotInOrder() {
     createTwoPilotsTimeTrial();
 
-    List<LapTimeDTO> laptimes = getBestOfSession(sessions.get(0).getId());
+    List<LapTimeDTO> laptimes = getBestOfSession(this.sessions.get(0).getId());
     assertThat(laptimes.size()).isEqualTo(2);
     Duration maxFoundUntilNow = Duration.ZERO;
     for (LapTimeDTO laptime : laptimes) {
@@ -419,7 +442,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
   public void bestRaceLapTimesReturnsBestPerPilotInOrder() {
     createThreePilotsRace();
 
-    List<LapTimeDTO> laptimes = getBestOfSession(sessions.get(0).getId());
+    List<LapTimeDTO> laptimes = getBestOfSession(this.sessions.get(0).getId());
     assertThat(laptimes.size()).isEqualTo(3);
     Duration maxFoundUntilNow = Duration.ZERO;
     for (LapTimeDTO laptime : laptimes) {
@@ -437,17 +460,17 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
   public void resultsOfPilotReturnsAll() {
     createTwoPilotsTimeTrial();
 
-    List<LapTimeDTO> laptimes = getResultsOfPilot(pilots.get(0), sessions.get(0).getId());
+    List<LapTimeDTO> laptimes = getResultsOfPilot(this.pilots.get(0), this.sessions.get(0).getId());
     assertThat(laptimes.size()).isEqualTo(3);
-    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(pilots.get(0)))).isTrue();
+    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(this.pilots.get(0)))).isTrue();
     Duration maxFoundUntilNow = Duration.ZERO;
     for (LapTimeDTO laptime : laptimes) {
       assertThat(laptime.getDuration().compareTo(maxFoundUntilNow)).isGreaterThanOrEqualTo(0);
     }
 
-    laptimes = getResultsOfPilot(pilots.get(1), sessions.get(0).getId());
+    laptimes = getResultsOfPilot(this.pilots.get(1), this.sessions.get(0).getId());
     assertThat(laptimes.size()).isEqualTo(2);
-    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(pilots.get(1)))).isTrue();
+    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(this.pilots.get(1)))).isTrue();
     maxFoundUntilNow = Duration.ZERO;
     for (LapTimeDTO laptime : laptimes) {
       assertThat(laptime.getDuration().compareTo(maxFoundUntilNow)).isGreaterThanOrEqualTo(0);
@@ -459,7 +482,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
   public void csvResultsOfPilotReturnsAll() {
     createTwoPilotsTimeTrial();
 
-    String csvOfPilot = getResultsOfPilotAsCsv(pilots.get(0), sessions.get(0).getId());
+    String csvOfPilot = getResultsOfPilotAsCsv(this.pilots.get(0), this.sessions.get(0).getId());
     assertThat(csvOfPilot).isNotNull();
     String[] lines = csvOfPilot.split("\n");
     assertThat(lines.length).isEqualTo(1 + 3);
@@ -468,7 +491,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
     List<String> header = stream.map(h -> h.replaceAll("\"", "")).collect(Collectors.toList());
     assertThat(header).contains("DURATION", "ENDDATE", "PILOT", "SESSION");
 
-    csvOfPilot = getResultsOfPilotAsCsv(pilots.get(1), sessions.get(0).getId());
+    csvOfPilot = getResultsOfPilotAsCsv(this.pilots.get(1), this.sessions.get(0).getId());
     assertThat(csvOfPilot).isNotNull();
     lines = csvOfPilot.split("\n");
     assertThat(lines.length).isEqualTo(1 + 2);
@@ -478,25 +501,25 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
   public void raceResultsOfPilotReturnsSomething() {
     createThreePilotsRace();
 
-    List<LapTimeDTO> laptimes = getResultsOfPilot(pilots.get(0), sessions.get(0).getId());
+    List<LapTimeDTO> laptimes = getResultsOfPilot(this.pilots.get(0), this.sessions.get(0).getId());
     assertThat(laptimes.size()).isEqualTo(3);
-    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(pilots.get(0)))).isTrue();
+    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(this.pilots.get(0)))).isTrue();
     Duration maxFoundUntilNow = Duration.ZERO;
     for (LapTimeDTO laptime : laptimes) {
       assertThat(laptime.getDuration().compareTo(maxFoundUntilNow)).isGreaterThanOrEqualTo(0);
     }
 
-    laptimes = getResultsOfPilot(pilots.get(1), sessions.get(0).getId());
+    laptimes = getResultsOfPilot(this.pilots.get(1), this.sessions.get(0).getId());
     assertThat(laptimes.size()).isEqualTo(3);
-    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(pilots.get(1)))).isTrue();
+    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(this.pilots.get(1)))).isTrue();
     maxFoundUntilNow = Duration.ZERO;
     for (LapTimeDTO laptime : laptimes) {
       assertThat(laptime.getDuration().compareTo(maxFoundUntilNow)).isGreaterThanOrEqualTo(0);
     }
 
-    laptimes = getResultsOfPilot(pilots.get(2), sessions.get(0).getId());
+    laptimes = getResultsOfPilot(this.pilots.get(2), this.sessions.get(0).getId());
     assertThat(laptimes.size()).isEqualTo(1);
-    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(pilots.get(2)))).isTrue();
+    assertThat(laptimes.stream().allMatch(lap -> lap.getPilot().getId().equals(this.pilots.get(2)))).isTrue();
     maxFoundUntilNow = Duration.ZERO;
     for (LapTimeDTO laptime : laptimes) {
       assertThat(laptime.getDuration().compareTo(maxFoundUntilNow)).isGreaterThanOrEqualTo(0);
@@ -507,7 +530,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
   public void resultsReturnsBestPerPilotInOrder() {
     createTwoPilotsTimeTrial();
 
-    List<LapTimeDTO> laptimes = getResultsOfSession(sessions.get(0).getId());
+    List<LapTimeDTO> laptimes = getResultsOfSession(this.sessions.get(0).getId());
     assertThat(laptimes.size()).isEqualTo(2);
     Duration maxFoundUntilNow = Duration.ZERO;
     for (LapTimeDTO laptime : laptimes) {
@@ -520,24 +543,24 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
   public void raceResults() {
     createThreePilotsRace();
 
-    List<LapTimeDTO> laptimes = getResultsOfSession(sessions.get(0).getId());
+    List<LapTimeDTO> laptimes = getResultsOfSession(this.sessions.get(0).getId());
     assertThat(laptimes.size()).isEqualTo(3);
 
-    assertThat(laptimes.get(0).getPilot().getId()).isEqualTo(pilots.get(0));
+    assertThat(laptimes.get(0).getPilot().getId()).isEqualTo(this.pilots.get(0));
     assertThat(laptimes.get(0).getLapIndex()).isEqualTo(3);
     assertThat(laptimes.get(0).getLapNumber()).isEqualTo(3);
     assertThat(laptimes.get(0).getGapWithBest()).isEqualTo(Duration.ZERO);
     assertThat(laptimes.get(0).getGapWithPrevious()).isEqualTo(Duration.ZERO);
 
 
-    assertThat(laptimes.get(1).getPilot().getId()).isEqualTo(pilots.get(1));
+    assertThat(laptimes.get(1).getPilot().getId()).isEqualTo(this.pilots.get(1));
     assertThat(laptimes.get(1).getLapIndex()).isEqualTo(3);
     assertThat(laptimes.get(1).getLapNumber()).isEqualTo(3);
     assertThat(laptimes.get(1).getGapWithBest()).isGreaterThan(Duration.ZERO);
     assertThat(laptimes.get(1).getGapWithPrevious()).isGreaterThan(Duration.ZERO);
 
 
-    assertThat(laptimes.get(2).getPilot().getId()).isEqualTo(pilots.get(2));
+    assertThat(laptimes.get(2).getPilot().getId()).isEqualTo(this.pilots.get(2));
     assertThat(laptimes.get(2).getLapIndex()).isEqualTo(1);
     assertThat(laptimes.get(2).getLapNumber()).isEqualTo(1);
 
@@ -548,22 +571,22 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
     // Makes it considered 4th lap of an unfinished race
     createThreePilotsRace(false);
 
-    List<LapTimeDTO> laptimes = getResultsOfSession(sessions.get(0).getId());
+    List<LapTimeDTO> laptimes = getResultsOfSession(this.sessions.get(0).getId());
     assertThat(laptimes.size()).isEqualTo(3);
 
-    assertThat(laptimes.get(0).getPilot().getId()).isEqualTo(pilots.get(0));
+    assertThat(laptimes.get(0).getPilot().getId()).isEqualTo(this.pilots.get(0));
     assertThat(laptimes.get(0).getLapIndex()).isEqualTo(4);
     assertThat(laptimes.get(0).getLapNumber()).isEqualTo(4);
     assertThat(laptimes.get(0).getGapWithBest()).isEqualTo(Duration.ZERO);
     assertThat(laptimes.get(0).getGapWithPrevious()).isEqualTo(Duration.ZERO);
 
-    assertThat(laptimes.get(1).getPilot().getId()).isEqualTo(pilots.get(1));
+    assertThat(laptimes.get(1).getPilot().getId()).isEqualTo(this.pilots.get(1));
     assertThat(laptimes.get(1).getLapIndex()).isEqualTo(4);
     assertThat(laptimes.get(1).getLapNumber()).isEqualTo(4);
     assertThat(laptimes.get(1).getGapWithBest()).isGreaterThan(Duration.ZERO);
     assertThat(laptimes.get(1).getGapWithPrevious()).isGreaterThan(Duration.ZERO);
 
-    assertThat(laptimes.get(2).getPilot().getId()).isEqualTo(pilots.get(2));
+    assertThat(laptimes.get(2).getPilot().getId()).isEqualTo(this.pilots.get(2));
     assertThat(laptimes.get(2).getLapIndex()).isEqualTo(2);
     assertThat(laptimes.get(2).getLapNumber()).isEqualTo(2);
   }
@@ -601,10 +624,10 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
   }
 
   private void addChronometer(String name, int sessionIndex) {
-    restChronometer.create(name);
-    ChronometerDTO chronometer = restChronometer.getByName(name);
-    chronos.add(chronometer.getId());
-    restSession.addChronometer(sessions.get(sessionIndex).getId(), chronometer.getId());
+    this.restChronometer.create(name);
+    ChronometerDTO chronometer = this.restChronometer.getByName(name);
+    this.chronos.add(chronometer.getId());
+    this.restSession.addChronometer(this.sessions.get(sessionIndex).getId(), chronometer.getId());
   }
 
   public List<LapTimeDTO> getAllOfSession(long sessionId) {
@@ -614,7 +637,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
         .then()
         .statusCode(OK)
         .extract().response();
-    return jsonb.fromJson(r.asString(), dtoListClass);
+    return jsonb.fromJson(r.asString(), this.dtoListClass);
   }
 
   public String getCsvOfSession(long sessionId) {
@@ -644,7 +667,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
         .then()
         .statusCode(OK)
         .extract().response();
-    return jsonb.fromJson(r.asString(), dtoListClass);
+    return jsonb.fromJson(r.asString(), this.dtoListClass);
   }
 
   public List<LapTimeDTO> getResultsOfSession(long sessionId) {
@@ -654,7 +677,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
         .then()
         .statusCode(OK)
         .extract().response();
-    return jsonb.fromJson(r.asString(), dtoListClass);
+    return jsonb.fromJson(r.asString(), this.dtoListClass);
   }
 
   public List<LapTimeDTO> getAllOfLocation(long locationId) {
@@ -664,7 +687,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
         .then()
         .statusCode(OK)
         .extract().response();
-    return jsonb.fromJson(r.asString(), dtoListClass);
+    return jsonb.fromJson(r.asString(), this.dtoListClass);
   }
 
   public List<LapTimeDTO> getAllOfEvent(long eventId) {
@@ -674,7 +697,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
         .then()
         .statusCode(OK)
         .extract().response();
-    return jsonb.fromJson(r.asString(), dtoListClass);
+    return jsonb.fromJson(r.asString(), this.dtoListClass);
   }
 
   public List<LapTimeDTO> getAllOfPilot(long pilotId, long sessionId) {
@@ -684,7 +707,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
         .then()
         .statusCode(OK)
         .extract().response();
-    return jsonb.fromJson(r.asString(), dtoListClass);
+    return jsonb.fromJson(r.asString(), this.dtoListClass);
   }
 
   public List<LapTimeDTO> getBestOfPilot(long pilotId, long sessionId) {
@@ -694,7 +717,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
         .then()
         .statusCode(OK)
         .extract().response();
-    return jsonb.fromJson(r.asString(), dtoListClass);
+    return jsonb.fromJson(r.asString(), this.dtoListClass);
   }
 
   public List<LapTimeDTO> getResultsOfPilot(long pilotId, long sessionId) {
@@ -704,7 +727,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
         .then()
         .statusCode(OK)
         .extract().response();
-    return jsonb.fromJson(r.asString(), dtoListClass);
+    return jsonb.fromJson(r.asString(), this.dtoListClass);
   }
 
   public String getResultsOfPilotAsCsv(long pilotId, long sessionId) {
@@ -724,7 +747,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
         .then()
         .statusCode(OK)
         .extract().response();
-    return jsonb.fromJson(r.asString(), dtoListClass);
+    return jsonb.fromJson(r.asString(), this.dtoListClass);
   }
 
   public List<LapTimeDTO> getAllOfPilotAndEvent(long pilotId, long eventId) {
@@ -734,7 +757,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
         .then()
         .statusCode(OK)
         .extract().response();
-    return jsonb.fromJson(r.asString(), dtoListClass);
+    return jsonb.fromJson(r.asString(), this.dtoListClass);
   }
 
   public List<LapTimeDTO> getAllOfCategory(long categoryId, long sessionId) {
@@ -744,17 +767,17 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
         .then()
         .statusCode(OK)
         .extract().response();
-    return jsonb.fromJson(r.asString(), dtoListClass);
+    return jsonb.fromJson(r.asString(), this.dtoListClass);
   }
 
   public List<LapTimeDTO> getAllOfSessionInWindow(long sessionId, int page, int pageSize) {
     Jsonb jsonb = JsonbBuilder.create();
     Response r = given().queryParam("sessionId", sessionId).queryParam("page", page).queryParam("pageSize", pageSize)
-        .when().get("/rest/" + restEntrypointName)
+        .when().get("/rest/" + this.restEntrypointName)
         .then()
         .statusCode(OK)
         .extract().response();
-    return jsonb.fromJson(r.asString(), dtoListClass);
+    return jsonb.fromJson(r.asString(), this.dtoListClass);
   }
 
   public void deleteAllOfSession(long sessionId) {
@@ -768,24 +791,24 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
     addBeacon(101);
     createSession("Session", "C1");
     Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
-    restPing.createPing(now.plusSeconds(0), beacons.get(0).getId(), chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(0), this.beacons.get(0).getId(), this.chronos.get(0));
   }
 
   public void addLap(Instant instant, long beaconId, long chronoId) {
-    restPing.createPing(instant, beaconId, chronoId);
+    this.restPing.createPing(instant, beaconId, chronoId);
   }
 
   private void createSession(String sessionName, String chronoName) {
-    restSession.createWith(sessionName, null, null, chronoName, "L1", "E1");
-    chronos.add(restChronometer.getByName("C1").getId());
-    events.add(restEvent.getByName("E1").getId());
-    locations.add(restLocation.getByName("L1").getId());
-    sessions.add(restSession.getByName(sessionName));
+    this.restSession.createWith(sessionName, null, null, chronoName, "L1", "E1");
+    this.chronos.add(this.restChronometer.getByName("C1").getId());
+    this.events.add(this.restEvent.getByName("E1").getId());
+    this.locations.add(this.restLocation.getByName("L1"));
+    this.sessions.add(this.restSession.getByName(sessionName));
   }
 
   private void addBeacon(int beaconNumber) {
-    restPilot.createWithBeacon("Pilot", "" + beaconNumber, beaconNumber);
-    beacons.add(restBeacon.getByNumber(beaconNumber));
+    this.restPilot.createWithBeacon("Pilot", "" + beaconNumber, beaconNumber);
+    this.beacons.add(this.restBeacon.getByNumber(beaconNumber));
   }
 
   private long createThreePilotsRace() {
@@ -794,123 +817,123 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
 
   private long createThreePilotsRace(boolean endIt) {
     addBeacon(101);
-    BeaconDTO beacon1 = restBeacon.getByNumber(101);
+    BeaconDTO beacon1 = this.restBeacon.getByNumber(101);
     NestedPilotDTO pilot1 = beacon1.getPilot();
-    pilots.add(pilot1.getId());
+    this.pilots.add(pilot1.getId());
 
     addBeacon(102);
-    BeaconDTO beacon2 = restBeacon.getByNumber(102);
+    BeaconDTO beacon2 = this.restBeacon.getByNumber(102);
     NestedPilotDTO pilot2 = beacon2.getPilot();
-    pilots.add(pilot2.getId());
+    this.pilots.add(pilot2.getId());
 
     addBeacon(103);
-    BeaconDTO beacon3 = restBeacon.getByNumber(103);
+    BeaconDTO beacon3 = this.restBeacon.getByNumber(103);
     NestedPilotDTO pilot3 = beacon3.getPilot();
-    pilots.add(pilot3.getId());
+    this.pilots.add(pilot3.getId());
 
     createSession("Session", "C1");
-    long sessionId = sessions.get(0).getId();
-    sessions.get(0).setInactivity(40000L);
-    sessions.get(0).setType(SessionType.RACE.getIdentifier());
+    long sessionId = this.sessions.get(0).getId();
+    this.sessions.get(0).setInactivity(40000L);
+    this.sessions.get(0).setType(SessionType.RACE.getIdentifier());
     addChronometer("C2", 0);
     addChronometer("C3", 0);
-    restSession.update(sessionId, sessions.get(0));
-    LocationDTO location = restLocation.getById(locations.get(0));
+    this.restSession.update(sessionId, this.sessions.get(0));
+    LocationDTO location = this.restLocation.getById(this.locations.get(0).getId());
     location.setLoopTrack(true);
-    restLocation.update(locations.get(0), location);
+    this.restLocation.update(this.locations.get(0).getId(), location);
 
     Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
     PingDTO startPing = new PingDTO();
     startPing.setInstant(now);
     startPing.setPower(0);
-    restSession.addPilot(sessionId, pilot1.getId());
-    restSession.addPilot(sessionId, pilot2.getId());
-    restSession.addPilot(sessionId, pilot3.getId());
-    restSession.start(startPing, sessionId);
+    this.restSession.addPilot(sessionId, pilot1.getId());
+    this.restSession.addPilot(sessionId, pilot2.getId());
+    this.restSession.addPilot(sessionId, pilot3.getId());
+    this.restSession.start(startPing, sessionId);
 
     // Lap 1 starts
     // Ignored because of inactivity
-    restPing.createPing(now.plusSeconds(3), beacons.get(1).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(4), beacons.get(2).getId(), chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(3), this.beacons.get(1).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(4), this.beacons.get(2).getId(), this.chronos.get(0));
     // First intermediate in order
-    restPing.createPing(now.plusSeconds(30), beacons.get(0).getId(), chronos.get(1));
-    restPing.createPing(now.plusSeconds(31), beacons.get(1).getId(), chronos.get(1));
-    restPing.createPing(now.plusSeconds(32), beacons.get(2).getId(), chronos.get(1));
+    this.restPing.createPing(now.plusSeconds(30), this.beacons.get(0).getId(), this.chronos.get(1));
+    this.restPing.createPing(now.plusSeconds(31), this.beacons.get(1).getId(), this.chronos.get(1));
+    this.restPing.createPing(now.plusSeconds(32), this.beacons.get(2).getId(), this.chronos.get(1));
     // Second intermediate in other order
-    restPing.createPing(now.plusSeconds(62), beacons.get(0).getId(), chronos.get(2));
-    restPing.createPing(now.plusSeconds(61), beacons.get(1).getId(), chronos.get(2));
-    restPing.createPing(now.plusSeconds(60), beacons.get(2).getId(), chronos.get(2));
+    this.restPing.createPing(now.plusSeconds(62), this.beacons.get(0).getId(), this.chronos.get(2));
+    this.restPing.createPing(now.plusSeconds(61), this.beacons.get(1).getId(), this.chronos.get(2));
+    this.restPing.createPing(now.plusSeconds(60), this.beacons.get(2).getId(), this.chronos.get(2));
     // Lap 2 starts
     // Received in wrong order
-    restPing.createPing(now.plusSeconds(102), beacons.get(2).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(101), beacons.get(1).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(100), beacons.get(0).getId(), chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(102), this.beacons.get(2).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(101), this.beacons.get(1).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(100), this.beacons.get(0).getId(), this.chronos.get(0));
     // Third does not finish - falls during lap
-    restPing.createPing(now.plusSeconds(130), beacons.get(0).getId(), chronos.get(1));
-    restPing.createPing(now.plusSeconds(131), beacons.get(1).getId(), chronos.get(1));
+    this.restPing.createPing(now.plusSeconds(130), this.beacons.get(0).getId(), this.chronos.get(1));
+    this.restPing.createPing(now.plusSeconds(131), this.beacons.get(1).getId(), this.chronos.get(1));
     // Last intermediate of lap 2 received late
     // Last lap
-    restPing.createPing(now.plusSeconds(200), beacons.get(0).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(201), beacons.get(1).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(230), beacons.get(1).getId(), chronos.get(1));
-    restPing.createPing(now.plusSeconds(231), beacons.get(0).getId(), chronos.get(1));
-    restPing.createPing(now.plusSeconds(260), beacons.get(0).getId(), chronos.get(2));
-    restPing.createPing(now.plusSeconds(261), beacons.get(1).getId(), chronos.get(2));
+    this.restPing.createPing(now.plusSeconds(200), this.beacons.get(0).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(201), this.beacons.get(1).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(230), this.beacons.get(1).getId(), this.chronos.get(1));
+    this.restPing.createPing(now.plusSeconds(231), this.beacons.get(0).getId(), this.chronos.get(1));
+    this.restPing.createPing(now.plusSeconds(260), this.beacons.get(0).getId(), this.chronos.get(2));
+    this.restPing.createPing(now.plusSeconds(261), this.beacons.get(1).getId(), this.chronos.get(2));
     // Last intermediate of lap 2 received late
-    restPing.createPing(now.plusSeconds(160), beacons.get(0).getId(), chronos.get(2));
-    restPing.createPing(now.plusSeconds(161), beacons.get(1).getId(), chronos.get(2));
+    this.restPing.createPing(now.plusSeconds(160), this.beacons.get(0).getId(), this.chronos.get(2));
+    this.restPing.createPing(now.plusSeconds(161), this.beacons.get(1).getId(), this.chronos.get(2));
     // Arrival
-    restPing.createPing(now.plusSeconds(300), beacons.get(0).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(301), beacons.get(1).getId(), chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(300), this.beacons.get(0).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(301), this.beacons.get(1).getId(), this.chronos.get(0));
 
     if (endIt) {
       PingDTO endPing = new PingDTO();
       endPing.setInstant(now.plusSeconds(305));
       endPing.setPower(0);
-      restSession.end(endPing, sessionId);
+      this.restSession.end(endPing, sessionId);
     }
     return sessionId;
   }
 
   private long createTwoPilotsTimeTrial() {
     addBeacon(101);
-    BeaconDTO beacon1 = restBeacon.getByNumber(101);
+    BeaconDTO beacon1 = this.restBeacon.getByNumber(101);
     NestedPilotDTO pilot1 = beacon1.getPilot();
-    pilots.add(pilot1.getId());
+    this.pilots.add(pilot1.getId());
     addBeacon(102);
-    BeaconDTO beacon2 = restBeacon.getByNumber(102);
+    BeaconDTO beacon2 = this.restBeacon.getByNumber(102);
     NestedPilotDTO pilot2 = beacon2.getPilot();
-    pilots.add(pilot2.getId());
+    this.pilots.add(pilot2.getId());
     createSession("Session", "C1");
-    long sessionId = sessions.get(0).getId();
+    long sessionId = this.sessions.get(0).getId();
     addChronometer("C2", 0);
     addChronometer("C3", 0);
 
     Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
-    restPing.createPing(now.plusSeconds(0), beacons.get(0).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(30), beacons.get(0).getId(), chronos.get(1));
-    restPing.createPing(now.plusSeconds(60), beacons.get(0).getId(), chronos.get(2));
+    this.restPing.createPing(now.plusSeconds(0), this.beacons.get(0).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(30), this.beacons.get(0).getId(), this.chronos.get(1));
+    this.restPing.createPing(now.plusSeconds(60), this.beacons.get(0).getId(), this.chronos.get(2));
 
-    restPing.createPing(now.plusSeconds(62), beacons.get(1).getId(), chronos.get(2));
-    restPing.createPing(now.plusSeconds(31), beacons.get(1).getId(), chronos.get(1));
-    restPing.createPing(now.plusSeconds(0), beacons.get(1).getId(), chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(62), this.beacons.get(1).getId(), this.chronos.get(2));
+    this.restPing.createPing(now.plusSeconds(31), this.beacons.get(1).getId(), this.chronos.get(1));
+    this.restPing.createPing(now.plusSeconds(0), this.beacons.get(1).getId(), this.chronos.get(0));
 
-    restPing.createPing(now.plusSeconds(100), beacons.get(0).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(130), beacons.get(0).getId(), chronos.get(1));
-    restPing.createPing(now.plusSeconds(160), beacons.get(0).getId(), chronos.get(2));
+    this.restPing.createPing(now.plusSeconds(100), this.beacons.get(0).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(130), this.beacons.get(0).getId(), this.chronos.get(1));
+    this.restPing.createPing(now.plusSeconds(160), this.beacons.get(0).getId(), this.chronos.get(2));
 
-    restPing.createPing(now.plusSeconds(200), beacons.get(0).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(230), beacons.get(0).getId(), chronos.get(1));
-    restPing.createPing(now.plusSeconds(260), beacons.get(0).getId(), chronos.get(2));
+    this.restPing.createPing(now.plusSeconds(200), this.beacons.get(0).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(230), this.beacons.get(0).getId(), this.chronos.get(1));
+    this.restPing.createPing(now.plusSeconds(260), this.beacons.get(0).getId(), this.chronos.get(2));
 
-    restPing.createPing(now.plusSeconds(202), beacons.get(1).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(231), beacons.get(1).getId(), chronos.get(1));
+    this.restPing.createPing(now.plusSeconds(202), this.beacons.get(1).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(231), this.beacons.get(1).getId(), this.chronos.get(1));
 
-    restPing.createPing(now.plusSeconds(300), beacons.get(0).getId(), chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(300), this.beacons.get(0).getId(), this.chronos.get(0));
 
-    restPing.createPing(now.plusSeconds(102), beacons.get(1).getId(), chronos.get(0));
-    restPing.createPing(now.plusSeconds(132), beacons.get(1).getId(), chronos.get(1));
-    restPing.createPing(now.plusSeconds(162), beacons.get(1).getId(), chronos.get(2));
+    this.restPing.createPing(now.plusSeconds(102), this.beacons.get(1).getId(), this.chronos.get(0));
+    this.restPing.createPing(now.plusSeconds(132), this.beacons.get(1).getId(), this.chronos.get(1));
+    this.restPing.createPing(now.plusSeconds(162), this.beacons.get(1).getId(), this.chronos.get(2));
     return sessionId;
   }
 

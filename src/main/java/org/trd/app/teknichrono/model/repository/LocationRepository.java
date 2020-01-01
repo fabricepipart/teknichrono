@@ -33,7 +33,7 @@ public class LocationRepository extends PanacheRepositoryWrapper<Location, Locat
   @Override
   public Location create(LocationDTO entity) throws ConflictingIdException, NotFoundException {
     Location location = fromDTO(entity);
-    panacheRepository.persist(location);
+    this.panacheRepository.persist(location);
     return location;
   }
 
@@ -53,15 +53,17 @@ public class LocationRepository extends PanacheRepositoryWrapper<Location, Locat
     Location location = new Location();
     location.setLoopTrack(entity.isLoopTrack());
     location.setName(entity.getName());
-    setOneToManyRelationship(location, entity.getSessions(), Location::getSessions, Session::setLocation, sessionRepository);
+    location.setMinimum(entity.getMinimum());
+    location.setMaximum(entity.getMaximum());
+    setOneToManyRelationship(location, entity.getSessions(), Location::getSessions, Session::setLocation, this.sessionRepository);
     return location;
   }
 
   @Override
   public void deleteById(long id) throws NotFoundException {
     Location entity = ensureFindById(id);
-    nullifyOneToManyRelationship(entity.getSessions(), Session::setLocation, sessionRepository);
-    panacheRepository.delete(entity);
+    nullifyOneToManyRelationship(entity.getSessions(), Session::setLocation, this.sessionRepository);
+    this.panacheRepository.delete(entity);
   }
 
   @Override
@@ -70,14 +72,16 @@ public class LocationRepository extends PanacheRepositoryWrapper<Location, Locat
     Location location = ensureFindById(id);
     location.setName(entity.getName());
     location.setLoopTrack(entity.isLoopTrack());
+    location.setMinimum(entity.getMinimum());
+    location.setMaximum(entity.getMaximum());
 
     // Update of pilots
-    setOneToManyRelationship(location, entity.getSessions(), Location::getSessions, Session::setLocation, sessionRepository);
-    panacheRepository.persist(location);
+    setOneToManyRelationship(location, entity.getSessions(), Location::getSessions, Session::setLocation, this.sessionRepository);
+    this.panacheRepository.persist(location);
   }
 
   public PanacheRepository getSessionRepository() {
-    return sessionRepository;
+    return this.sessionRepository;
   }
 
 }

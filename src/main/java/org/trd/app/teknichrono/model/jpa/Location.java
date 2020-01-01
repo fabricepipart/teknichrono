@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,6 +20,12 @@ public class Location extends PanacheEntity {
 
   @Column(nullable = false)
   private String name;
+
+  @Column
+  private Duration minimum;
+
+  @Column
+  private Duration maximum;
 
   /**
    * True for a racetrack, false for a rally stage
@@ -47,7 +54,7 @@ public class Location extends PanacheEntity {
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public void setName(String name) {
@@ -55,7 +62,7 @@ public class Location extends PanacheEntity {
   }
 
   public boolean isLoopTrack() {
-    return loopTrack;
+    return this.loopTrack;
   }
 
   public void setLoopTrack(boolean loop) {
@@ -70,13 +77,29 @@ public class Location extends PanacheEntity {
     this.sessions = sessions;
   }
 
+  public Duration getMaximum() {
+    return this.maximum;
+  }
+
+  public void setMaximum(Duration maximum) {
+    this.maximum = maximum;
+  }
+
+  public Duration getMinimum() {
+    return this.minimum;
+  }
+
+  public void setMinimum(Duration minimum) {
+    this.minimum = minimum;
+  }
+
   @Override
   public String toString() {
     String result = getClass().getSimpleName() + " ";
-    if (name != null && !name.trim().isEmpty())
-      result += "name: " + name;
-    result += ", loop: " + loopTrack;
+    if (this.name != null && !this.name.trim().isEmpty()) {
+      result += "name: " + this.name;
+    }
+    result += ", loop: " + this.loopTrack;
     return result;
   }
-
 }
