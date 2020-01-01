@@ -5,26 +5,17 @@ import logging
 import time
 from scan.beacon_scan import BeaconScan
 
+LAST_BEACON = 1
 
-class FakeBluetoothScanner:
-  def __init__(self):
-    self.logger = logging.getLogger('BluetoothScanner')
-    self.beacon_nb = 1
 
-  def init(self):
-    self.logger.info("Loading Scanner ...")
-    self.logger.info("Scanner loaded")
-
-  def scan(self):
-    time.sleep(0.5)
-    rollDice = random.randint(1, 6)
-    # 5/6 chances to have a signal from same
-    if rollDice > 5:
-      self.beacon_nb = random.randint(1, 10)
-    tx = str(random.randint(30, 90))
-    scanned = BeaconScan()
-    beacon_nb_str = str(self.beacon_nb)
-    scanned.init("12:34:56:78:9A:DF,uuid," + beacon_nb_str + ',' + beacon_nb_str + ',rssi,-' + tx)
-    self.logger.debug('Saw : ' + str(scanned))
-    return scanned
-    return None
+def fake_scan():
+  global LAST_BEACON
+  time.sleep(0.5)
+  rollDice = random.randint(1, 6)
+  # 5/6 chances to have a signal from same
+  if rollDice > 5:
+    LAST_BEACON = random.randint(1, 10)
+  tx = str(random.randint(30, 90))
+  beacon_nb_str = str(LAST_BEACON)
+  scan = "12:34:56:78:9A:DF,uuid," + beacon_nb_str + ',' + beacon_nb_str + ',rssi,-' + tx
+  return [scan]
