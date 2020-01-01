@@ -7,7 +7,7 @@ import socket
 
 from ping_selectors.factory import getSelectionStrategy
 from ping_senders.factory import getSendStrategy
-from scan.factory import getScanner
+from scan.bluetooth_scanner import BluetoothScanner
 from datamodel.chrono_synchronizer import ChronoSynchronizer
 from logs.init import setupBackupFile, setupLogging
 
@@ -22,7 +22,9 @@ socket.setdefaulttimeout(2.0)
 chronoSynchronizer = ChronoSynchronizer(CHRONO_NAME, TEKNICHRONO_SERVER)
 chronoSynchronizer.start()
 
-scanner = getScanner()
+scanner = BluetoothScanner()
+scanner.init()
+
 sendStrategy = None
 selectionStrategy = None
 

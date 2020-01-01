@@ -20,7 +20,8 @@ TRACE = False
 import os
 import sys
 import struct
-import bluetooth._bluetooth as bluez
+if os.getenv('DEMO_MODE', 'false') == 'false':
+  import bluetooth._bluetooth as bluez
 
 LE_META_EVENT = 0x3e
 LE_PUBLIC_ADDRESS = 0x00
@@ -58,31 +59,10 @@ def returnnumberpacket(pkt):
   return myInteger
 
 
-""" 
-def returnstringpacket(pkt):
-  myString = ""
-  for i in range(len(pkt)):
-    c = pkt[i:i + 1]
-    myString += "%02x" % struct.unpack("B", c)[0]
-  return myString
- """
-
-
 def printpacket(pkt):
   for i in range(len(pkt)):
     c = pkt[i:i + 1]
     sys.stdout.write("%02x " % struct.unpack("B", c)[0])
-
-
-""" 
-def get_packed_bdaddr(bdaddr_string):
-  packable_addr = []
-  addr = bdaddr_string.split(':')
-  addr.reverse()
-  for b in addr:
-    packable_addr.append(int(b, 16))
-  return struct.pack("<BBBBBB", *packable_addr)
-"""
 
 
 def packed_bdaddr_to_string(bdaddr_packed):
@@ -93,10 +73,11 @@ def hci_enable_le_scan(sock):
   hci_toggle_le_scan(sock, 0x01)
 
 
-""" 
-def hci_disable_le_scan(sock):
-  hci_toggle_le_scan(sock, 0x00)
-"""
+def connect(dev_id):
+  sock = bluez.hci_open_dev(dev_id)
+  hci_le_set_scan_parameters(sock)
+  hci_enable_le_scan(sock)
+  return sock
 
 
 def hci_toggle_le_scan(sock, enable):

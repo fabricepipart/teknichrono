@@ -57,7 +57,7 @@ jobs:
       - name: Coverage report
         run: |
           coverage combine .coverage_1 .coverage_2
-          coverage report -m > client-coverage-report.txt --omit=src/main/client/scan/bluetooth_scanner.py,src/main/client/scan/blescan.py
+          coverage report -m > client-coverage-report.txt --omit=src/main/client/scan/blescan.py
           coverage xml -i
       - uses: codecov/codecov-action@v1.0.3
         with:
