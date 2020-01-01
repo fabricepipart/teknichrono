@@ -16,22 +16,35 @@ public class LapTimeDTOCreatorForTests {
   private long pilotId = 0;
   private long now = System.currentTimeMillis();
 
+  private final NestedSessionDTO session;
+
+  public LapTimeDTOCreatorForTests() {
+    this.session = new NestedSessionDTO();
+    NestedLocationDTO location = new NestedLocationDTO();
+    location.setId(1234595L);
+    this.session.setLocation(location);
+  }
+
+  public NestedSessionDTO getSession() {
+    return this.session;
+  }
+
   public void nextPilot() {
-    pilotId++;
+    this.pilotId++;
   }
 
 
-  public LapTimeDTO createDTOLapTimeWithSession(long startDate, long endDate, long lapNb, NestedSessionDTO session) {
+  public LapTimeDTO createDTOLapTimeWithSession(long startDate, long endDate, long lapNb) {
     LapTimeDTO lap = createDTOLapTime(startDate, endDate, lapNb);
-    lap.setSession(session);
+    lap.setSession(this.session);
     return lap;
   }
 
   public LapTimeDTO createDTOLapTime(long startDate, long endDate, long lapNb) {
     LapTimeDTO laptime = new LapTimeDTO();
-    laptime.setId(++lapId);
+    laptime.setId(++this.lapId);
     NestedPilotDTO p = new NestedPilotDTO();
-    p.setId(pilotId);
+    p.setId(this.pilotId);
     laptime.setPilot(p);
     laptime.setStartDate(Instant.ofEpochMilli(startDate));
     if (endDate > 0) {
@@ -54,63 +67,63 @@ public class LapTimeDTOCreatorForTests {
 
     // Several laps , in order , contiguous , finished
     nextPilot();
-    laps.add(createDTOLapTime(now, now + 1000, 0));
-    laps.add(createDTOLapTime(now + 1000, now + 2101, 0));
-    laps.add(createDTOLapTime(now + 2100, now + 3301, 0));
+    laps.add(createDTOLapTime(this.now, this.now + 1000, 0));
+    laps.add(createDTOLapTime(this.now + 1000, this.now + 2101, 0));
+    laps.add(createDTOLapTime(this.now + 2100, this.now + 3301, 0));
 
     // Several laps , in order , contiguous , not finished
     nextPilot();
-    laps.add(createDTOLapTime(now, now + 1000, 0));
-    laps.add(createDTOLapTime(now + 1000, now + 2102, 0));
-    laps.add(createDTOLapTime(now + 2100, now + 3302, 0));
-    laps.add(createDTOLapTime(now + 3300, 0, 0));
-    laps.add(createDTOLapTime(now + 4400, now + 5502, 0));
-    laps.add(createDTOLapTime(now + 5800, 0, 0));
+    laps.add(createDTOLapTime(this.now, this.now + 1000, 0));
+    laps.add(createDTOLapTime(this.now + 1000, this.now + 2102, 0));
+    laps.add(createDTOLapTime(this.now + 2100, this.now + 3302, 0));
+    laps.add(createDTOLapTime(this.now + 3300, 0, 0));
+    laps.add(createDTOLapTime(this.now + 4400, this.now + 5502, 0));
+    laps.add(createDTOLapTime(this.now + 5800, 0, 0));
 
     // Several laps , in order , not contiguous , finished
     nextPilot();
-    laps.add(createDTOLapTime(now, now + 1000, 0));
-    laps.add(createDTOLapTime(now + 10000, now + 11203, 0));
-    laps.add(createDTOLapTime(now + 20000, now + 21503, 0));
+    laps.add(createDTOLapTime(this.now, this.now + 1000, 0));
+    laps.add(createDTOLapTime(this.now + 10000, this.now + 11203, 0));
+    laps.add(createDTOLapTime(this.now + 20000, this.now + 21503, 0));
 
     // Several laps , in order , not contiguous , not finished
     nextPilot();
-    laps.add(createDTOLapTime(now, now + 1000, 0));
-    laps.add(createDTOLapTime(now + 10000, 0, 0));
+    laps.add(createDTOLapTime(this.now, this.now + 1000, 0));
+    laps.add(createDTOLapTime(this.now + 10000, 0, 0));
 
     // Several laps , not in order , contiguous , finished
     nextPilot();
-    laps.add(createDTOLapTime(now, now + 1000, 0));
-    laps.add(createDTOLapTime(now + 2100, now + 3305, 0));
-    laps.add(createDTOLapTime(now + 1000, now + 2105, 0));
+    laps.add(createDTOLapTime(this.now, this.now + 1000, 0));
+    laps.add(createDTOLapTime(this.now + 2100, this.now + 3305, 0));
+    laps.add(createDTOLapTime(this.now + 1000, this.now + 2105, 0));
 
     // Several laps , not in order , contiguous , not finished
     nextPilot();
-    laps.add(createDTOLapTime(now + 3300, 0, 0));
-    laps.add(createDTOLapTime(now, now + 1006, 0));
-    laps.add(createDTOLapTime(now + 4400, now + 5506, 0));
-    laps.add(createDTOLapTime(now + 1000, now + 2106, 0));
-    laps.add(createDTOLapTime(now + 5800, 0, 0));
-    laps.add(createDTOLapTime(now + 2100, now + 3306, 0));
+    laps.add(createDTOLapTime(this.now + 3300, 0, 0));
+    laps.add(createDTOLapTime(this.now, this.now + 1006, 0));
+    laps.add(createDTOLapTime(this.now + 4400, this.now + 5506, 0));
+    laps.add(createDTOLapTime(this.now + 1000, this.now + 2106, 0));
+    laps.add(createDTOLapTime(this.now + 5800, 0, 0));
+    laps.add(createDTOLapTime(this.now + 2100, this.now + 3306, 0));
 
     // Several laps , not in order , not contiguous , finished
     nextPilot();
-    laps.add(createDTOLapTime(now + 20000, now + 21507, 0));
-    laps.add(createDTOLapTime(now, now + 1007, 0));
-    laps.add(createDTOLapTime(now + 10000, now + 11207, 0));
+    laps.add(createDTOLapTime(this.now + 20000, this.now + 21507, 0));
+    laps.add(createDTOLapTime(this.now, this.now + 1007, 0));
+    laps.add(createDTOLapTime(this.now + 10000, this.now + 11207, 0));
 
     // Several laps , not in order , not contiguous , not finished
     nextPilot();
-    laps.add(createDTOLapTime(now + 10000, 0, 0));
-    laps.add(createDTOLapTime(now, 0, 0));
+    laps.add(createDTOLapTime(this.now + 10000, 0, 0));
+    laps.add(createDTOLapTime(this.now, 0, 0));
 
     // One lap , finished
     nextPilot();
-    laps.add(createDTOLapTime(now + 22222, now + 23333, 0));
+    laps.add(createDTOLapTime(this.now + 22222, this.now + 23333, 0));
 
     // One lap , not finished
     nextPilot();
-    laps.add(createDTOLapTime(now, 0, 0));
+    laps.add(createDTOLapTime(this.now, 0, 0));
 
     return laps;
   }

@@ -10,6 +10,7 @@ import org.trd.app.teknichrono.model.dto.LocationDTO;
 import org.trd.app.teknichrono.model.dto.NestedSessionDTO;
 import org.trd.app.teknichrono.model.dto.SessionDTO;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class TestRestLocationEndpoint extends TestRestEndpoint<LocationDTO> {
 
   @BeforeEach
   public void prepare() {
-    restSession = new TestRestSessionEndpoint();
+    this.restSession = new TestRestSessionEndpoint();
   }
 
   /**
@@ -71,12 +72,16 @@ public class TestRestLocationEndpoint extends TestRestEndpoint<LocationDTO> {
     LocationDTO modifiedLocation = new LocationDTO();
     modifiedLocation.setName("Elsewhere");
     modifiedLocation.setId(id);
+    modifiedLocation.setMinimum(Duration.ofSeconds(60));
+    modifiedLocation.setMaximum(Duration.ofSeconds(120));
     update(id, modifiedLocation);
     List<LocationDTO> locations = getAll();
     Assertions.assertThat(locations.size()).isEqualTo(1);
     getByName("Somewhere", NOT_FOUND);
     LocationDTO newLocation = getByName("Elsewhere");
     Assertions.assertThat(newLocation.getId()).isEqualTo(id);
+    Assertions.assertThat(newLocation.getMinimum()).isEqualTo(Duration.ofSeconds(60));
+    Assertions.assertThat(newLocation.getMaximum()).isEqualTo(Duration.ofSeconds(120));
 
     delete(id);
     assertTestCleanedEverything();
@@ -116,8 +121,8 @@ public class TestRestLocationEndpoint extends TestRestEndpoint<LocationDTO> {
     modifiedLocation.setLoopTrack(true);
     modifiedLocation.setId(id);
 
-    restSession.create("Session Name");
-    SessionDTO sessionDto1 = restSession.getByName("Session Name");
+    this.restSession.create("Session Name");
+    SessionDTO sessionDto1 = this.restSession.getByName("Session Name");
     long session1Id = sessionDto1.getId();
     NestedSessionDTO nestedSession1dto = new NestedSessionDTO();
     nestedSession1dto.setId(session1Id);
@@ -142,8 +147,8 @@ public class TestRestLocationEndpoint extends TestRestEndpoint<LocationDTO> {
     modifiedLocation.setId(id);
     modifiedLocation.setLoopTrack(false);
 
-    restSession.create("Other Session Name");
-    SessionDTO sessionDto2 = restSession.getByName("Other Session Name");
+    this.restSession.create("Other Session Name");
+    SessionDTO sessionDto2 = this.restSession.getByName("Other Session Name");
     long session2Id = sessionDto2.getId();
     NestedSessionDTO nestedSession2dto = new NestedSessionDTO();
     nestedSession2dto.setId(session2Id);
@@ -168,8 +173,8 @@ public class TestRestLocationEndpoint extends TestRestEndpoint<LocationDTO> {
     LocationDTO b = getByName("Heaven");
     long id = b.getId();
 
-    restSession.create("Session Name");
-    SessionDTO sessionDto1 = restSession.getByName("Session Name");
+    this.restSession.create("Session Name");
+    SessionDTO sessionDto1 = this.restSession.getByName("Session Name");
     long session1Id = sessionDto1.getId();
 
     addSession(id, session1Id);
@@ -184,8 +189,8 @@ public class TestRestLocationEndpoint extends TestRestEndpoint<LocationDTO> {
     assertThat(sessionDtoFound.getId()).isEqualTo(session1Id);
     assertThat(sessionDtoFound.getName()).isEqualTo("Session Name");
 
-    restSession.create("Other Session Name");
-    SessionDTO sessionDto2 = restSession.getByName("Other Session Name");
+    this.restSession.create("Other Session Name");
+    SessionDTO sessionDto2 = this.restSession.getByName("Other Session Name");
     long session2Id = sessionDto2.getId();
 
     addSession(id, session2Id);
@@ -234,7 +239,7 @@ public class TestRestLocationEndpoint extends TestRestEndpoint<LocationDTO> {
 
   public void deleteWithSessions(long id, long... sessionIds) {
     for (Long sessionId : sessionIds) {
-      restSession.delete(sessionId);
+      this.restSession.delete(sessionId);
     }
     delete(id);
   }
@@ -247,8 +252,8 @@ public class TestRestLocationEndpoint extends TestRestEndpoint<LocationDTO> {
   }
 
   public void createWithSession(String name, String sessionName) {
-    restSession.create(sessionName);
-    SessionDTO session = restSession.getByName(sessionName);
+    this.restSession.create(sessionName);
+    SessionDTO session = this.restSession.getByName(sessionName);
     NestedSessionDTO nestedSessionDTO = new NestedSessionDTO();
     nestedSessionDTO.setId(session.getId());
     nestedSessionDTO.setName(session.getName());
@@ -262,6 +267,6 @@ public class TestRestLocationEndpoint extends TestRestEndpoint<LocationDTO> {
 
   public void assertTestCleanedEverything() {
     assertThat(getAll()).isNullOrEmpty();
-    assertThat(restSession.getAll()).isNullOrEmpty();
+    assertThat(this.restSession.getAll()).isNullOrEmpty();
   }
 }

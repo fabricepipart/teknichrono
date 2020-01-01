@@ -6,7 +6,6 @@ import org.trd.app.teknichrono.model.dto.NestedLocationDTO;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,9 +23,57 @@ public class LapTimeFilter {
   public void filterExtreme(List<LapTimeDTO> results) {
     // Needs to be done here since we did not have all info before
     Map<Long, List<LapTimeDTO>> lapsPerLocation = new HashMap<>();
+    Map<Long, Duration> minPerLocation = new HashMap<>();
+    Map<Long, Duration> maxPerLocation = new HashMap<>();
+    fillLapsInformation(results, lapsPerLocation, minPerLocation, maxPerLocation);
+    fillMinAndMaxInformation(lapsPerLocation, minPerLocation, maxPerLocation);
+
+    List<LapTimeDTO> toRemove = new ArrayList<>();
+    for (LapTimeDTO lapTimeDTO : results) {
+      NestedLocationDTO location = lapTimeDTO.getSession().getLocation();
+      Duration locationMinDuration = minPerLocation.get(location.getId());
+      Duration locationMaxDuration = maxPerLocation.get(location.getId());
+      if (lapTimeDTO.getDuration() != null && lapTimeDTO.getDuration().compareTo(Duration.ZERO) > 0) {
+        if (lapTimeDTO.getDuration().compareTo(locationMaxDuration) > 0) {
+          this.logger.info("Discarding lap ID " + lapTimeDTO.getId()
+              + " since it is too long (" + lapTimeDTO.getDuration() +
+              ") compared to the max authorized for this location : " + locationMaxDuration);
+          toRemove.add(lapTimeDTO);
+        } else if (lapTimeDTO.getDuration().compareTo(locationMinDuration) < 0) {
+          this.logger.info("Discarding lap ID " + lapTimeDTO.getId()
+              + " since it is too short (" + lapTimeDTO.getDuration() +
+              ") compared to the min authorized for this location : " + locationMinDuration);
+          toRemove.add(lapTimeDTO);
+        }
+      }
+    }
+    results.removeAll(toRemove);
+
+  }
+
+  private void fillMinAndMaxInformation(Map<Long, List<LapTimeDTO>> lapsPerLocation, Map<Long, Duration> minPerLocation, Map<Long, Duration> maxPerLocation) {
+    for (Map.Entry<Long, List<LapTimeDTO>> entry : lapsPerLocation.entrySet()) {
+      Long locationId = entry.getKey();
+      if (!minPerLocation.containsKey(locationId) || !maxPerLocation.containsKey(locationId)) {
+        List<LapTimeDTO> laps = entry.getValue();
+        new LapTimeOrder().orderByDuration(laps);
+        Duration medianDuration = laps.get(laps.size() / 2).getDuration();
+        minPerLocation.put(locationId, medianDuration.dividedBy(ACCEPTANCE_FACTOR));
+        maxPerLocation.put(locationId, medianDuration.multipliedBy(ACCEPTANCE_FACTOR));
+      }
+    }
+  }
+
+  private void fillLapsInformation(List<LapTimeDTO> results, Map<Long, List<LapTimeDTO>> lapsPerLocation, Map<Long, Duration> minPerLocation, Map<Long, Duration> maxPerLocation) {
     for (LapTimeDTO dto : results) {
       if (dto.getDuration() != null && dto.getDuration().compareTo(Duration.ZERO) > 0) {
         NestedLocationDTO location = dto.getSession().getLocation();
+        if (location.getMinimum() != null && !location.getMinimum().isZero()) {
+          minPerLocation.put(location.getId(), location.getMinimum());
+        }
+        if (location.getMaximum() != null && !location.getMaximum().isZero()) {
+          maxPerLocation.put(location.getId(), location.getMaximum());
+        }
         if (lapsPerLocation.containsKey(location.getId())) {
           lapsPerLocation.get(location.getId()).add(dto);
         } else {
@@ -36,35 +83,6 @@ public class LapTimeFilter {
         }
       }
     }
-    Map<Long, Duration> medianPerLocation = new HashMap<>();
-    for (Map.Entry<Long, List<LapTimeDTO>> entry : lapsPerLocation.entrySet()) {
-      Long locationId = entry.getKey();
-      List<LapTimeDTO> laps = entry.getValue();
-      new LapTimeOrder().orderByDuration(laps);
-      Duration medianDuration = laps.get(laps.size() / 2).getDuration();
-      medianPerLocation.put(locationId, medianDuration);
-    }
-
-    List<LapTimeDTO> toRemove = new ArrayList<>();
-    for (LapTimeDTO lapTimeDTO : results) {
-      NestedLocationDTO location = lapTimeDTO.getSession().getLocation();
-      Duration averageOfLocation = medianPerLocation.get(location.getId());
-      if (averageOfLocation != null && lapTimeDTO.getDuration() != null && lapTimeDTO.getDuration().compareTo(Duration.ZERO) > 0) {
-        if (lapTimeDTO.getDuration().compareTo(averageOfLocation.multipliedBy(ACCEPTANCE_FACTOR)) > 0) {
-          logger.info("Discarding lap ID " + lapTimeDTO.getId()
-              + " since it is too long (" + lapTimeDTO.getDuration() +
-              ") compared to the average for this location : " + averageOfLocation);
-          toRemove.add(lapTimeDTO);
-        } else if (lapTimeDTO.getDuration().compareTo(averageOfLocation.dividedBy(ACCEPTANCE_FACTOR)) < 0) {
-          logger.info("Discarding lap ID " + lapTimeDTO.getId()
-              + " since it is too short (" + lapTimeDTO.getDuration() +
-              ") compared to the average for this location : " + averageOfLocation);
-          toRemove.add(lapTimeDTO);
-        }
-      }
-    }
-    results.removeAll(toRemove);
-
   }
 
   public void keepOnlyBest(List<LapTimeDTO> results) {
