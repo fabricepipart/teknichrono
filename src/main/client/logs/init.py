@@ -19,7 +19,7 @@ def setupLogging(chronometer, server):
     sendLogs = chronometer.sendLogs
   logger = logging.getLogger('')
   # set up logging to file
-  fh = logging.FileHandler(LOGS_PATH + '/teknichrono.log')
+  fh = logging.FileHandler('{}/teknichrono.log'.format(LOGS_PATH))
   # create console handler with a higher log level
   ch = logging.StreamHandler()
   # Set log levels
@@ -45,7 +45,7 @@ def setupLogging(chronometer, server):
   logger.addHandler(ch)
   logger.addHandler(fh)
   if sendLogs:
-    restApiUrl = server + f'/rest/logs/create?chronoId={chronometer.id}'
+    restApiUrl = '{server}/rest/logs/create?chronoId={cid}'.format(server=server, cid=chronometer.id)
     #restapiHandler = RestApiHandler(restApiUrl, 'text')
     restapiHandler = RestApiHandler(restApiUrl)
     logger.addHandler(restapiHandler)
