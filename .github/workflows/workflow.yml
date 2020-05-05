@@ -140,6 +140,7 @@ jobs:
 
   ci-server-cleanup:
     needs: ci-server
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
