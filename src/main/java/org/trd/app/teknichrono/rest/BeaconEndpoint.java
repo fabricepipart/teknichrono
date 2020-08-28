@@ -19,6 +19,16 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+
+
 @Path("/beacons")
 public class BeaconEndpoint {
 
@@ -28,6 +38,7 @@ public class BeaconEndpoint {
   public BeaconEndpoint(BeaconRepository beaconRepository) {
     this.entityEndpoint = new EntityEndpoint(beaconRepository);
   }
+
 
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
@@ -55,7 +66,26 @@ public class BeaconEndpoint {
   @Path("/number/{number:[0-9][0-9]*}")
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
-  public Response findBeaconNumber(@PathParam("number") long number) {
+  @APIResponses(
+        value = {
+            @APIResponse(
+                responseCode = "404",
+                description = "Unknown ID specified",
+                content = @Content(mediaType = "text/plain")),
+            @APIResponse(
+                responseCode = "200",
+                description = "Details of Beacon for given ID",
+                content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = Beacon.class))) })
+    @Operation(
+        summary = "Get the description of a beacon",
+        description = "Get the description of a beacon, explained longer")
+  public Response findBeaconNumber(
+    @Parameter(
+            description = "The ID of the beacon you want to get",
+            required = true,
+            example = "1234")
+    @PathParam("number") long number) {
     return entityEndpoint.findByField("number", number);
   }
 
