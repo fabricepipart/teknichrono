@@ -47,6 +47,16 @@ public class BeaconEndpoint {
     return entityEndpoint.create(entity, String.valueOf(entity.getNumber()));
   }
 
+  @APIResponses(
+        value = {
+            @APIResponse(
+                responseCode = "404",
+                description = "Unknown Beacon ID specified",
+                content = @Content(mediaType = "text/plain")),
+            @APIResponse(
+                responseCode = "200",
+                description = "Details of Beacon for given Beacon ID, including associated Pilot if any",
+                content = @Content()) })
   @DELETE
   @Path("/{id:[0-9][0-9]*}")
   @Transactional
@@ -58,7 +68,26 @@ public class BeaconEndpoint {
   @Path("/{id:[0-9][0-9]*}")
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
-  public Response findById(@PathParam("id") long id) {
+  @APIResponses(
+        value = {
+            @APIResponse(
+                responseCode = "404",
+                description = "Unknown Beacon ID specified",
+                content = @Content(mediaType = "text/plain")),
+            @APIResponse(
+                responseCode = "200",
+                description = "Details of Beacon for given Beacon ID, including associated Pilot if any",
+                content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = BeaconDTO.class))) })
+    @Operation(
+        summary = "Get the details of a beacon by ID",
+        description = "Get the details of Beacon for given Beacon ID, including associated Pilot if any")
+  public Response findById(
+    @Parameter(
+            description = "The ID of the beacon",
+            required = true,
+            example = "978")
+    @PathParam("id") long id) {
     return entityEndpoint.findById(id);
   }
 
@@ -70,21 +99,21 @@ public class BeaconEndpoint {
         value = {
             @APIResponse(
                 responseCode = "404",
-                description = "Unknown ID specified",
+                description = "Unknown Beacon number specified",
                 content = @Content(mediaType = "text/plain")),
             @APIResponse(
                 responseCode = "200",
-                description = "Details of Beacon for given ID",
+                description = "Details of Beacon for given Beacon number, including associated Pilot if any",
                 content = @Content(mediaType = "application/json",
-                schema = @Schema(implementation = Beacon.class))) })
+                schema = @Schema(implementation = BeaconDTO.class))) })
     @Operation(
-        summary = "Get the description of a beacon",
-        description = "Get the description of a beacon, explained longer")
+        summary = "Get the details of a beacon by number",
+        description = "Get the details of Beacon for given Beacon number, including associated Pilot if any")
   public Response findBeaconNumber(
     @Parameter(
-            description = "The ID of the beacon you want to get",
+            description = "The number of the beacon",
             required = true,
-            example = "1234")
+            example = "96")
     @PathParam("number") long number) {
     return entityEndpoint.findByField("number", number);
   }
@@ -92,7 +121,22 @@ public class BeaconEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
-  public List<BeaconDTO> listAll(@QueryParam("page") Integer pageIndex, @QueryParam("pageSize") Integer pageSize) {
+  @APIResponses(
+    value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "List of all Beacons in the system",
+            content = @Content(mediaType = "application/json",
+            schema = @Schema(implementation = BeaconDTO.class, type = SchemaType.ARRAY))
+        )
+      }
+  )
+  public List<BeaconDTO> listAll(
+    @QueryParam("page") 
+    Integer pageIndex, 
+    
+    @QueryParam("pageSize") 
+    Integer pageSize) {
     return entityEndpoint.listAll(pageIndex, pageSize);
   }
 
