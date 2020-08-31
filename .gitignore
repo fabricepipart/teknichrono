@@ -43,3 +43,5 @@ hs_err_pid*
 # data
 data/*
 __pycache__
+ObjectStore/ShadowNoFileLockStore/defaultStore/Recovery/TransactionStatusManager/0_ffffac13965c_f9cf_5f4d1d3e_0
+ObjectStore/ShadowNoFileLockStore/defaultStore/Recovery/TransactionStatusManager/0_ffffac13965c_fa5e_5f4d1e7b_0
