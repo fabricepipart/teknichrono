@@ -19,6 +19,16 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+
+
 @Path("/beacons")
 public class BeaconEndpoint {
 
@@ -29,6 +39,7 @@ public class BeaconEndpoint {
     this.entityEndpoint = new EntityEndpoint(beaconRepository);
   }
 
+
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Transactional
@@ -36,6 +47,16 @@ public class BeaconEndpoint {
     return entityEndpoint.create(entity, String.valueOf(entity.getNumber()));
   }
 
+  @APIResponses(
+        value = {
+            @APIResponse(
+                responseCode = "404",
+                description = "Unknown Beacon ID specified",
+                content = @Content(mediaType = "text/plain")),
+            @APIResponse(
+                responseCode = "200",
+                description = "Details of Beacon for given Beacon ID, including associated Pilot if any",
+                content = @Content()) })
   @DELETE
   @Path("/{id:[0-9][0-9]*}")
   @Transactional
@@ -47,7 +68,26 @@ public class BeaconEndpoint {
   @Path("/{id:[0-9][0-9]*}")
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
-  public Response findById(@PathParam("id") long id) {
+  @APIResponses(
+        value = {
+            @APIResponse(
+                responseCode = "404",
+                description = "Unknown Beacon ID specified",
+                content = @Content(mediaType = "text/plain")),
+            @APIResponse(
+                responseCode = "200",
+                description = "Details of Beacon for given Beacon ID, including associated Pilot if any",
+                content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = BeaconDTO.class))) })
+    @Operation(
+        summary = "Get the details of a beacon by ID",
+        description = "Get the details of Beacon for given Beacon ID, including associated Pilot if any")
+  public Response findById(
+    @Parameter(
+            description = "The ID of the beacon",
+            required = true,
+            example = "978")
+    @PathParam("id") long id) {
     return entityEndpoint.findById(id);
   }
 
@@ -55,14 +95,48 @@ public class BeaconEndpoint {
   @Path("/number/{number:[0-9][0-9]*}")
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
-  public Response findBeaconNumber(@PathParam("number") long number) {
+  @APIResponses(
+        value = {
+            @APIResponse(
+                responseCode = "404",
+                description = "Unknown Beacon number specified",
+                content = @Content(mediaType = "text/plain")),
+            @APIResponse(
+                responseCode = "200",
+                description = "Details of Beacon for given Beacon number, including associated Pilot if any",
+                content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = BeaconDTO.class))) })
+    @Operation(
+        summary = "Get the details of a beacon by number",
+        description = "Get the details of Beacon for given Beacon number, including associated Pilot if any")
+  public Response findBeaconNumber(
+    @Parameter(
+            description = "The number of the beacon",
+            required = true,
+            example = "96")
+    @PathParam("number") long number) {
     return entityEndpoint.findByField("number", number);
   }
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Transactional
-  public List<BeaconDTO> listAll(@QueryParam("page") Integer pageIndex, @QueryParam("pageSize") Integer pageSize) {
+  @APIResponses(
+    value = {
+        @APIResponse(
+            responseCode = "200",
+            description = "List of all Beacons in the system",
+            content = @Content(mediaType = "application/json",
+            schema = @Schema(implementation = BeaconDTO.class, type = SchemaType.ARRAY))
+        )
+      }
+  )
+  public List<BeaconDTO> listAll(
+    @QueryParam("page") 
+    Integer pageIndex, 
+    
+    @QueryParam("pageSize") 
+    Integer pageSize) {
     return entityEndpoint.listAll(pageIndex, pageSize);
   }
 
