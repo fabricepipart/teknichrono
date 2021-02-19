@@ -16,6 +16,15 @@ from api.ping import *
 from api.laps import *
 
 # ----------------------------------------------------------------------
+# Add Beacons
+addBeacon(2046)
+addBeacon(2093)
+addBeacon(2026)
+addBeacon(2099)
+addBeacon(2005)
+addBeacon(2035)
+
+# ----------------------------------------------------------------------
 # Add Pilots
 valentino = addPilot('Valentino', 'Rossi')
 marc = addPilot('Marc', 'Marquez')
@@ -68,19 +77,19 @@ addSessionToEvent(timeTrial['id'], session['id'])
 chrono0 = getChronometerByName('Raspberry-loop-tt-0')['id']
 addChronometerToSession(session['id'], chrono0)
 
-associatePilotBeacon(valentino['id'], getBeacon(46)['id'])
-associatePilotBeacon(marc['id'], getBeacon(93)['id'])
-associatePilotBeacon(dani['id'], getBeacon(26)['id'])
-associatePilotBeacon(jorge['id'], getBeacon(99)['id'])
-associatePilotBeacon(johann['id'], getBeacon(5)['id'])
-associatePilotBeacon(cal['id'], getBeacon(35)['id'])
+associatePilotBeacon(valentino['id'], getBeacon(2046)['id'])
+associatePilotBeacon(marc['id'], getBeacon(2093)['id'])
+associatePilotBeacon(dani['id'], getBeacon(2026)['id'])
+associatePilotBeacon(jorge['id'], getBeacon(2099)['id'])
+associatePilotBeacon(johann['id'], getBeacon(2005)['id'])
+associatePilotBeacon(cal['id'], getBeacon(2035)['id'])
 
-valentinoBeaconId = getBeacon(46)['id']
-jorgeBeaconId = getBeacon(99)['id']
-marcBeaconId = getBeacon(93)['id']
-daniBeaconId = getBeacon(26)['id']
-johannBeaconId = getBeacon(5)['id']
-calBeaconId = getBeacon(35)['id']
+valentinoBeaconId = getBeacon(2046)['id']
+jorgeBeaconId = getBeacon(2099)['id']
+marcBeaconId = getBeacon(2093)['id']
+daniBeaconId = getBeacon(2026)['id']
+johannBeaconId = getBeacon(2005)['id']
+calBeaconId = getBeacon(2035)['id']
 
 for i in range(0, 6):
   ping(datetime(2018, 1, 1, 10, i, random.randint(10, 30), random.randint(0, 100000)), jorgeBeaconId, -99, chrono1)
@@ -179,3 +188,7 @@ print("---- Laps summary ----")
 # Session summary
 printLaps(getLapsForSession(session['id']), True)
 printLaps(getBestLapsForSession(session['id']), True)
+
+print("--------------------------------------------------------------")
+print("|     End of Test for Motorbikes on racetrack (1 chrono)     |")
+print("--------------------------------------------------------------")

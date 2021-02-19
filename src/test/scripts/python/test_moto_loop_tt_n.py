@@ -15,14 +15,24 @@ from api.location import *
 from api.ping import *
 from api.laps import *
 
+
+# ----------------------------------------------------------------------
+# Add Beacons
+addBeacon(3012)
+addBeacon(3002)
+addBeacon(3003)
+addBeacon(3004)
+addBeacon(3008)
+
+
 # ----------------------------------------------------------------------
 # Add Pilots
 
-jerome = addPilot('Jerome', 'Rousseau')
-fabrice = addPilot('Fabrice', 'Pipart')
-jeremy = addPilot('Jeremy', 'Ponchel')
-valentino = addPilot('Valentino', 'TRD')
-jorge = addPilot('Jorge', 'TRD')
+jeromeTtId = addPilot('Jerome', 'Rousseau')['id']
+fabriceTtId = addPilot('Fabrice', 'Pipart')['id']
+jeremyTtId = addPilot('Jeremy', 'Ponchel')['id']
+valentinoTtId = addPilot('Valentino', 'TRD')['id']
+jorgeTtId = addPilot('Jorge', 'TRD')['id']
 
 # ----------------------------------------------------------------------
 # Add Categories
@@ -30,24 +40,24 @@ cat1 = addCategory('Cat1')
 cat2 = addCategory('Cat2')
 cat3 = addCategory('Cat3')
 
-addPilotToCategory(cat3['id'], fabrice['id'])
-addPilotToCategory(cat2['id'], jeremy['id'])
-addPilotToCategory(cat1['id'], valentino['id'])
-addPilotToCategory(cat1['id'], jorge['id'])
+addPilotToCategory(cat3['id'], fabriceTtId)
+addPilotToCategory(cat2['id'], jeremyTtId)
+addPilotToCategory(cat1['id'], valentinoTtId)
+addPilotToCategory(cat1['id'], jorgeTtId)
 
 # ----------------------------------------------------------------------
 # Play with associations
 
-associatePilotBeacon(jerome['id'], getBeacon(12)['id'])
+associatePilotBeacon(jeromeTtId, getBeacon(3012)['id'])
 
-associatePilotBeacon(fabrice['id'], getBeacon(2)['id'])
-associatePilotBeacon(jeremy['id'], getBeacon(12)['id'])
+associatePilotBeacon(fabriceTtId, getBeacon(3002)['id'])
+associatePilotBeacon(jeremyTtId, getBeacon(3012)['id'])
 
-associatePilotBeacon(valentino['id'], getBeacon(4)['id'])
-associatePilotBeacon(jorge['id'], getBeacon(8)['id'])
+associatePilotBeacon(valentinoTtId, getBeacon(3004)['id'])
+associatePilotBeacon(jorgeTtId, getBeacon(3008)['id'])
 
-deleteBeacon(getBeacon(2)['id'])
-associatePilotBeacon(fabrice['id'], getBeacon(3)['id'])
+deleteBeacon(getBeacon(3002)['id'])
+associatePilotBeacon(fabriceTtId, getBeacon(3003)['id'])
 
 # ----------------------------------------------------------------------
 # Add Chronometers
@@ -64,9 +74,9 @@ trd1 = addEvent('TRD Le Luc 2016-08-22')
 
 # ----------------------------------------------------------------------
 # Add Sessions
-session = addSession('Morning TRD Le Luc 2016-08-22', datetime(2016, 8, 22), datetime(2016, 8, 22), 'tt')
-addSessionToLocation(leLuc['id'], session['id'])
-addSessionToEvent(trd1['id'], session['id'])
+sessionTtId = addSession('Morning TRD Le Luc 2016-08-22', datetime(2016, 8, 22), datetime(2016, 8, 22), 'tt')['id']
+addSessionToLocation(leLuc['id'], sessionTtId)
+addSessionToEvent(trd1['id'], sessionTtId)
 
 addSession('Morning TRD Ledenon 2016-09-12+13', datetime(2016, 9, 12), datetime(2016, 9, 13), 'tt')
 addSession('Morning TRD Aragon 2016-10-22+23', datetime(2016, 10, 22), datetime(2016, 10, 23), 'tt')
@@ -75,17 +85,17 @@ addSession('Session of Rally 1', datetime(2017, 3, 1), datetime(2017, 3, 1), 'tt
 
 # ----------------------------------------------------------------------
 # Associate chronometers to session in right order
-addChronometerToSession(session['id'], getChronometerByName('Raspberry-0')['id'])
-addChronometerToSession(session['id'], getChronometerByName('Raspberry-2')['id'])
-addChronometerToSession(session['id'], getChronometerByName('Raspberry-1')['id'], 1)
-addChronometerToSession(session['id'], getChronometerByName('Raspberry-3')['id'])
+addChronometerToSession(sessionTtId, getChronometerByName('Raspberry-0')['id'])
+addChronometerToSession(sessionTtId, getChronometerByName('Raspberry-2')['id'])
+addChronometerToSession(sessionTtId, getChronometerByName('Raspberry-1')['id'], 1)
+addChronometerToSession(sessionTtId, getChronometerByName('Raspberry-3')['id'])
 
 # ----------------------------------------------------------------------
 # Send pings
-fabriceBeaconId = getBeacon(3)['id']
-jeremyBeaconId = getBeacon(12)['id']
-valentinoBeaconId = getBeacon(4)['id']
-jorgeBeaconId = getBeacon(8)['id']
+fabriceBeaconId = getBeacon(3003)['id']
+jeremyBeaconId = getBeacon(3012)['id']
+valentinoBeaconId = getBeacon(3004)['id']
+jorgeBeaconId = getBeacon(3008)['id']
 
 chrono0 = getChronometerByName('Raspberry-0')['id']
 chrono1 = getChronometerByName('Raspberry-1')['id']
@@ -221,10 +231,10 @@ ping(datetime(2016, 8, 22, 11, 10, 59, random.randint(0, 100000)), jorgeBeaconId
 #
 # We should have per pilot all laps (12) in order with 4 intermediates in each (for 4 chronos)
 
-lapsFabrice = getLapsOfPilot(fabrice['id'], sessionId=session['id'])
-lapsJeremy = getLapsOfPilot(jeremy['id'], eventId=trd1['id'])
-lapsValentino = getLapsOfPilot(valentino['id'], locationId=leLuc['id'])
-lapsJorge = getLapsOfPilot(jorge['id'], sessionId=session['id'])
+lapsFabrice = getLapsOfPilot(fabriceTtId, sessionId=sessionTtId)
+lapsJeremy = getLapsOfPilot(jeremyTtId, eventId=trd1['id'])
+lapsValentino = getLapsOfPilot(valentinoTtId, locationId=leLuc['id'])
+lapsJorge = getLapsOfPilot(jorgeTtId, sessionId=sessionTtId)
 
 print("---- Laps Fabrice ----")
 printLaps(lapsFabrice)
@@ -248,14 +258,18 @@ assert len(lapsJorge) == 9
 # Shuffle the pings in a crazy order and check they are still reordered correctly
 
 # Session summary
-laps = getLapsForSession(session['id'])
+laps = getLapsForSession(sessionTtId)
 printLaps(laps, True)
 
 # Laps by category
-printLaps(getLapsForSession(session['id'], cat1['id']), True)
+printLaps(getLapsForSession(sessionTtId, cat1['id']), True)
 
 # Laps of location and category
 printLaps(getLaps(locationId=leLuc['id'], categoryId=cat1['id']), True)
 
 # Laps of Event and category
 printLaps(getLaps(eventId=trd1['id'], categoryId=cat1['id']), True)
+
+print("--------------------------------------------------------------")
+print("|     End of Test for Motorbikes on racetrack (n chronos)    |")
+print("--------------------------------------------------------------")
