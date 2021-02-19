@@ -20,7 +20,7 @@
         <surefire-plugin.version>2.22.2</surefire-plugin.version>
         <quarkus.version>1.7.2.Final</quarkus.version>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
-        <lombok.version>1.18.12</lombok.version>
+        <lombok.version>1.18.18</lombok.version>
 
         <version.mysql>5.1.38</version.mysql>
         <version.h2>1.4.187</version.h2>
