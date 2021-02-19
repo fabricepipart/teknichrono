@@ -2,6 +2,7 @@ package org.trd.app.teknichrono.business.client;
 
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.dto.PingDTO;
+import org.trd.app.teknichrono.model.jpa.Beacon;
 import org.trd.app.teknichrono.model.jpa.Chronometer;
 import org.trd.app.teknichrono.model.jpa.Event;
 import org.trd.app.teknichrono.model.jpa.Pilot;
@@ -51,7 +52,7 @@ public class SessionManagement {
         }
       }
     }
-    sessionRepository.startSession(session, timestamp);
+    this.sessionRepository.startSession(session, timestamp);
   }
 
   private void startOngoingRace(Session session, Instant timestamp) throws ConflictingIdException, NotFoundException {
@@ -60,18 +61,21 @@ public class SessionManagement {
     }
     Chronometer chronometer = session.getChronometers().get(0);
     Set<Pilot> pilots = session.getPilots();
-    PingManager cm = new PingManager(lapTimeRepository);
+    PingManager cm = new PingManager(this.lapTimeRepository);
     for (Pilot pilot : pilots) {
-      PingDTO dto = PingDTO.create(pilot.getCurrentBeacon().getId(), chronometer.getId(), timestamp, 0);
-      Ping p = pingRepository.create(dto);
-      cm.addPing(p, pilot, chronometer, session);
+      Beacon currentBeacon = pilot.getCurrentBeacon();
+      if (currentBeacon != null) {
+        PingDTO dto = PingDTO.create(currentBeacon.getId(), chronometer.getId(), timestamp, 0);
+        Ping p = this.pingRepository.create(dto);
+        cm.addPing(p, pilot, chronometer, session);
+      }
     }
   }
 
   public void endSession(Session session, Instant end) {
     if (session.getEnd().isBefore(end)) {
-      LOGGER.warn("Session ID=" + session.id + " has been stopped after expected end");
+      this.LOGGER.warn("Session ID=" + session.id + " has been stopped after expected end");
     }
-    sessionRepository.endSession(session, end);
+    this.sessionRepository.endSession(session, end);
   }
 }

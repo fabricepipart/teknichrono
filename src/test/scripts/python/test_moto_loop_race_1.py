@@ -17,6 +17,15 @@ from api.ping import *
 from api.laps import *
 
 # ----------------------------------------------------------------------
+# Add Beacons
+addBeacon(1046)
+addBeacon(1093)
+addBeacon(1026)
+addBeacon(1099)
+addBeacon(1005)
+addBeacon(1035)
+
+# ----------------------------------------------------------------------
 # Add Pilots
 valentino = addPilot('Valentino', 'Race1')
 marc = addPilot('Marc', 'Race1')
@@ -53,21 +62,22 @@ raceEvent = addEvent('Event in Aragon')
 
 race = addSession('Race in Aragon session', datetime(2018, 1, 2, 14, 0, 0, 0), datetime(2018, 1, 2, 15, 0, 0, 0), 'rc')
 addSessionToLocation(aragon['id'], race['id'])
+addSessionToEvent(raceEvent['id'], race['id'])
 addChronometerToSession(race['id'], chrono['id'])
 
-associatePilotBeacon(valentino['id'], getBeacon(46)['id'])
-associatePilotBeacon(marc['id'], getBeacon(93)['id'])
-associatePilotBeacon(dani['id'], getBeacon(26)['id'])
-associatePilotBeacon(jorge['id'], getBeacon(99)['id'])
-associatePilotBeacon(johann['id'], getBeacon(5)['id'])
-associatePilotBeacon(cal['id'], getBeacon(35)['id'])
+associatePilotBeacon(valentino['id'], getBeacon(1046)['id'])
+associatePilotBeacon(marc['id'], getBeacon(1093)['id'])
+associatePilotBeacon(dani['id'], getBeacon(1026)['id'])
+associatePilotBeacon(jorge['id'], getBeacon(1099)['id'])
+associatePilotBeacon(johann['id'], getBeacon(1005)['id'])
+associatePilotBeacon(cal['id'], getBeacon(1035)['id'])
 
-valeBeaconId = getBeacon(46)['id']
-jorgeBeaconId = getBeacon(99)['id']
-marcBeaconId = getBeacon(93)['id']
-daniBeaconId = getBeacon(26)['id']
-johannBeaconId = getBeacon(5)['id']
-calBeaconId = getBeacon(35)['id']
+valeBeaconId = getBeacon(1046)['id']
+jorgeBeaconId = getBeacon(1099)['id']
+marcBeaconId = getBeacon(1093)['id']
+daniBeaconId = getBeacon(1026)['id']
+johannBeaconId = getBeacon(1005)['id']
+calBeaconId = getBeacon(1035)['id']
 
 addPilotToSession(race['id'], valentino['id'])
 addPilotToSession(race['id'], marc['id'])
@@ -141,7 +151,7 @@ printLaps(laps, True)
 # Laps of Event
 print("---- Laps Event ----")
 laps = getLaps(eventId=raceEvent['id'])
-printLaps(laps, True)
+#printLaps(laps, True)
 
 # Session summary
 print("---- Session summary ----")
@@ -150,3 +160,8 @@ printLaps(getBestLapsForSession(race['id']), True)
 printLaps(getResultsForSession(race['id']), True)
 
 #TODO Best laps shown, thats not what we want : order by time of last lap end
+
+
+print("--------------------------------------------------------------")
+print("| End of Test for Motorbikes on racetrack (1 chrono - Race)  |")
+print("--------------------------------------------------------------")
