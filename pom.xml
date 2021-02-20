@@ -10,7 +10,7 @@
     <description>Teknichrono</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
 
         <image.namespace>ci</image.namespace>
         <fabric8.openshift.imageChangeTrigger>false</fabric8.openshift.imageChangeTrigger>
@@ -18,12 +18,10 @@
 
         <jacoco.version>0.8.6</jacoco.version>
         <surefire-plugin.version>2.22.2</surefire-plugin.version>
-        <quarkus.version>1.7.2.Final</quarkus.version>
+        <quarkus.version>1.12.0.Final</quarkus.version>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <lombok.version>1.18.12</lombok.version>
 
-        <version.mysql>5.1.38</version.mysql>
-        <version.h2>1.4.187</version.h2>
     </properties>
     <dependencyManagement>
         <dependencies>
