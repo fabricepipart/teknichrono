@@ -24,7 +24,7 @@ The testing part of the project is based on JUnits (very few), QuarkusTest and P
 
 ### Requirements
 
-* Java 8
+* Java 11
 * Maven 3.6
 
 ## How to build
