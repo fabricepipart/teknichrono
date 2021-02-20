@@ -15,10 +15,20 @@ from api.session import *
 from api.location import *
 
 # ----------------------------------------------------------------------
+# Add Beacons
+addBeacon(4012)
+addBeacon(4002)
+addBeacon(4003)
+addBeacon(4004)
+addBeacon(4005)
+addBeacon(4008)
+
+
+# ----------------------------------------------------------------------
 # Add Pilots
 
-addPilot('Fabrice', 'Pipart')
-addPilot('Bruce', 'Rulfo')
+addPilot('Fabrice', 'Snowscoot')
+addPilot('Bruce', 'Snowscoot')
 addPilot('Rider', 'One')
 addPilot('Rider', 'Two')
 addPilot('Rider', 'Three')
@@ -26,21 +36,21 @@ addPilot('Rider', 'Three')
 # ----------------------------------------------------------------------
 # Play with associations
 
-associatePilotBeacon(getPilot('Bruce', 'Rulfo')['id'], getBeacon(5)['id'])
+associatePilotBeacon(getPilot('Bruce', 'Snowscoot')['id'], getBeacon(4005)['id'])
 
-associatePilotBeacon(getPilot('Fabrice', 'Pipart')['id'], getBeacon(2)['id'])
-associatePilotBeacon(getPilot('Rider', 'One')['id'], getBeacon(12)['id'])
+associatePilotBeacon(getPilot('Fabrice', 'Snowscoot')['id'], getBeacon(4002)['id'])
+associatePilotBeacon(getPilot('Rider', 'One')['id'], getBeacon(4012)['id'])
 
-associatePilotBeacon(getPilot('Rider', 'Two')['id'], getBeacon(4)['id'])
-associatePilotBeacon(getPilot('Rider', 'Three')['id'], getBeacon(8)['id'])
+associatePilotBeacon(getPilot('Rider', 'Two')['id'], getBeacon(4004)['id'])
+associatePilotBeacon(getPilot('Rider', 'Three')['id'], getBeacon(4008)['id'])
 
 deleteBeacon(getBeacon(2)['id'])
-associatePilotBeacon(getPilot('Fabrice', 'Pipart')['id'], getBeacon(3)['id'])
+associatePilotBeacon(getPilot('Fabrice', 'Snowscoot')['id'], getBeacon(4003)['id'])
 
 # ----------------------------------------------------------------------
 # Add Chronometers
 for i in range(0, 3):
-  addChronometer('Raspberry-' + str(i))
+  addChronometer('Snowscoot-Raspberry-' + str(i))
 
 # ----------------------------------------------------------------------
 # Add Events
@@ -60,21 +70,21 @@ addSessionToEvent(event['id'], session['id'])
 # ----------------------------------------------------------------------
 # Associate chronometers to event in right order
 
-addChronometerToSession(session['id'], getChronometerByName('Raspberry-0')['id'])
-addChronometerToSession(session['id'], getChronometerByName('Raspberry-2')['id'])
-addChronometerToSession(session['id'], getChronometerByName('Raspberry-1')['id'], 1)
+addChronometerToSession(session['id'], getChronometerByName('Snowscoot-Raspberry-0')['id'])
+addChronometerToSession(session['id'], getChronometerByName('Snowscoot-Raspberry-2')['id'])
+addChronometerToSession(session['id'], getChronometerByName('Snowscoot-Raspberry-1')['id'], 1)
 
 # ----------------------------------------------------------------------
 # Send pings
-fabriceBeaconId = getBeacon(3)['id']
-bruceBeaconId = getBeacon(5)['id']
-oneBeaconId = getBeacon(12)['id']
-twoBeaconId = getBeacon(4)['id']
-threeBeaconId = getBeacon(8)['id']
+fabriceBeaconId = getBeacon(4003)['id']
+bruceBeaconId = getBeacon(4005)['id']
+oneBeaconId = getBeacon(4012)['id']
+twoBeaconId = getBeacon(4004)['id']
+threeBeaconId = getBeacon(4008)['id']
 
-chrono0 = getChronometerByName('Raspberry-0')['id']
-chrono1 = getChronometerByName('Raspberry-1')['id']
-chrono2 = getChronometerByName('Raspberry-2')['id']
+chrono0 = getChronometerByName('Snowscoot-Raspberry-0')['id']
+chrono1 = getChronometerByName('Snowscoot-Raspberry-1')['id']
+chrono2 = getChronometerByName('Snowscoot-Raspberry-2')['id']
 
 # import random
 # random.shuffle(array)
@@ -142,8 +152,8 @@ ping(datetime(2017, 1, 27, 15, 2, 55, 1 * 1000), threeBeaconId, -83, chrono2)
 #
 # We should have per pilot all laps (12) in order with 4 intermediates in each (for 4 chronos)
 
-runsFabrice = getLapsOfPilot(getPilot('Fabrice', 'Pipart')['id'], sessionId=session['id'])
-runsBruce = getLapsOfPilot(getPilot('Bruce', 'Rulfo')['id'], sessionId=session['id'])
+runsFabrice = getLapsOfPilot(getPilot('Fabrice', 'Snowscoot')['id'], sessionId=session['id'])
+runsBruce = getLapsOfPilot(getPilot('Bruce', 'Snowscoot')['id'], sessionId=session['id'])
 runsOne = getLapsOfPilot(getPilot('Rider', 'One')['id'], sessionId=session['id'])
 runsTwo = getLapsOfPilot(getPilot('Rider', 'Two')['id'], sessionId=session['id'])
 runsThree = getLapsOfPilot(getPilot('Rider', 'Three')['id'], sessionId=session['id'])
