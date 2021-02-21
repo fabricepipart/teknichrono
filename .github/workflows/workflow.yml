@@ -22,36 +22,37 @@ jobs:
       - name: Start server
         timeout-minutes: 5
         run: |
-          mvn -B clean verify quarkus:dev &
+          mvn -B compile quarkus:dev &
           while ! curl -fs http://localhost:8080 > /dev/null; do echo 'Not started yet ...'; sleep 5; done
           echo "Started"
       - name: Test chronometer
         run: |
           export COVERAGE_FILE=.coverage_1 ; sh ./src/main/client/demo.sh &
           RUN_PID=$!
-          sleep 60
+          sleep 30
           if cat target/teknichrono.log | grep -q Traceback; then false; fi
           echo "Change configuration to FIRST / NONE / DEBUG"
           python3 src/test/scripts/python/test_demo_conf1.py
-          sleep 60
+          sleep 30
           if cat target/teknichrono.log | grep -q Traceback; then false; fi
           echo "Change configuration to LAST / ASYNC"
           python3 src/test/scripts/python/test_demo_conf2.py
-          sleep 60
+          sleep 30
           if cat target/teknichrono.log | grep -q Traceback; then false; fi
           echo "Change configuration to PROXIMITY / ASYNC"
           python3 src/test/scripts/python/test_demo_conf3.py
-          sleep 60
+          sleep 30
+          echo "RUN_PID=$RUN_PID" >> $GITHUB_ENV
       - name: Test chronometer update
         run: |
           python3 src/test/scripts/python/test_demo_restart.py
-          sleep 20
+          sleep 15
           if ps -p $RUN_PID; then echo "Client did not restart" && false; fi
           export COVERAGE_FILE=.coverage_2 ; sh ./src/main/client/demo.sh &
           RUN_PID=$!
-          sleep 20
+          sleep 15
           python3 src/test/scripts/python/test_demo_update.py
-          sleep 20
+          sleep 15
           if ps -p $RUN_PID; then echo "Client did not update" && false; fi
           if cat target/teknichrono.log | grep -q Traceback; then false; fi
       - name: Coverage report
@@ -130,9 +131,7 @@ jobs:
           TESTS_REPO: fabricepipart/teknichrono-backend-tests
         run: |
           mvn -B -U versions:set -DnewVersion=${VERSION} &> /dev/null
-          kubectl run teknichrono-e2e-tests -n teknichrono-staging --image=$TESTS_REPO:$VERSION --labels="app=teknichrono" --restart=Never -- sh /app/bash/all_tests.sh staging.teknichrono.fr
-          kubectl wait --for=condition=Ready pod/teknichrono-e2e-tests -n teknichrono-staging
-          kubectl logs --follow teknichrono-e2e-tests -n teknichrono-staging
+          kubectl run teknichrono-e2e-tests -n teknichrono-staging --image=$TESTS_REPO:$VERSION --labels="app=teknichrono"  --attach=true --restart=Never -- sh /app/bash/perf_tests.sh staging.teknichrono.fr
       - name: Update Production environment
         if: github.ref == 'refs/heads/master'
         timeout-minutes: 10

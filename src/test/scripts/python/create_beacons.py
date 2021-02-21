@@ -3,5 +3,5 @@ from api.beacons import addBeacon
 
 # ----------------------------------------------------------------------
 # Add Beacons
-for i in range(0, 100):
+for i in range(0, 400):
   addBeacon(i)

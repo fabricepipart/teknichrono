@@ -49,3 +49,7 @@ def setupLogging(chronometer, server):
     #restapiHandler = RestApiHandler(restApiUrl, 'text')
     restapiHandler = RestApiHandler(restApiUrl)
     logger.addHandler(restapiHandler)
+
+
+def stopLogging():
+  logging.shutdown()

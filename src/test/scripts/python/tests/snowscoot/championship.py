@@ -1,5 +1,6 @@
 #!python3
 
+import uuid
 from api.beacons import getBeacon
 from api.category import addCategory, addPilotToCategory
 from api.chronometer import addChronometer
@@ -15,7 +16,7 @@ from tests.snowscoot.sunday_morning import SundayMorningTest
 
 
 class ChampionshipTest:
-  def __init__(self, name):
+  def __init__(self, name, startBeaconNumber=10):
     self.name = name
     self.event = None
     self.beacons = {}
@@ -37,7 +38,8 @@ class ChampionshipTest:
     self.valette = None
     self.redRiver = None
     self.roubines = None
-    self.startBeaconNumber = 10
+    self.startBeaconNumber = startBeaconNumber
+    self.uuid = uuid.uuid4().hex[-6:]
 
   def testThursdayEvening(self):
     thursdayEveningTest = ThursdayEveningTest(self)
@@ -70,50 +72,50 @@ class ChampionshipTest:
 
   def createEvent(self):
     # Add Events
-    self.event = addEvent(self.name)
+    self.event = addEvent(self.name + self.uuid)
 
   def createCategories(self):
     # Add Categories
     # ELITE (30) OPEN HOMME (20) F2MININES (20) JUNIOR (10)
-    self.eliteCategory = addCategory('Elite ' + self.name)
-    self.openCategory = addCategory('Open ' + self.name)
-    self.womanCategory = addCategory('Woman ' + self.name)
-    self.juniorCategory = addCategory('Junior ' + self.name)
+    self.eliteCategory = addCategory('Elite ' + self.uuid)
+    self.openCategory = addCategory('Open ' + self.uuid)
+    self.womanCategory = addCategory('Woman ' + self.uuid)
+    self.juniorCategory = addCategory('Junior ' + self.uuid)
 
   def createPilots(self):
     # Add Pilots
     for i in range(10, 40):
-      pilot = addPilot('Rider ' + str(i), 'Elite ' + self.name)
+      pilot = addPilot('Rider ' + str(i), 'Elite ' + self.uuid)
       self.elitePilots.append(pilot)
       addPilotToCategory(self.eliteCategory['id'], pilot['id'])
     for i in range(40, 60):
-      pilot = addPilot('Rider ' + str(i), 'Open ' + self.name)
+      pilot = addPilot('Rider ' + str(i), 'Open ' + self.uuid)
       self.openPilots.append(pilot)
       addPilotToCategory(self.openCategory['id'], pilot['id'])
     for i in range(60, 80):
-      pilot = addPilot('Rider ' + str(i), 'Woman ' + self.name)
+      pilot = addPilot('Rider ' + str(i), 'Woman ' + self.uuid)
       self.womanPilots.append(pilot)
       addPilotToCategory(self.womanCategory['id'], pilot['id'])
     for i in range(80, 90):
-      pilot = addPilot('Rider ' + str(i), 'Junior ' + self.name)
+      pilot = addPilot('Rider ' + str(i), 'Junior ' + self.uuid)
       self.juniorPilots.append(pilot)
       addPilotToCategory(self.juniorCategory['id'], pilot['id'])
     self.allPilots = self.elitePilots + self.openPilots + self.womanPilots + self.juniorPilots
 
   def createChronos(self):
     # Add Chronometers
-    self.chrono = addChronometer('Raspberry ' + self.name)
-    self.fake1 = addChronometer('Fake1 ' + self.name)
-    self.fake2 = addChronometer('Fake2 ' + self.name)
+    self.chrono = addChronometer('Raspberry ' + self.uuid)
+    self.fake1 = addChronometer('Fake1 ' + self.uuid)
+    self.fake2 = addChronometer('Fake2 ' + self.uuid)
 
   def createLocations(self):
     # Add Locations
-    self.boarderCross = addLocation('Isola - Boarder cross ' + self.name, False)
-    self.mercantour = addLocation('Isola - Mercantour ' + self.name, False)
-    self.dual = addLocation('Isola - Dual ' + self.name, False)
-    self.valette = addLocation('Isola - Valette ' + self.name, False)
-    self.redRiver = addLocation('Isola - Red river ' + self.name, False)
-    self.roubines = addLocation('Isola - Roubines ' + self.name, False)
+    self.boarderCross = addLocation('Isola - Boarder cross ' + self.uuid, False)
+    self.mercantour = addLocation('Isola - Mercantour ' + self.uuid, False)
+    self.dual = addLocation('Isola - Dual ' + self.uuid, False)
+    self.valette = addLocation('Isola - Valette ' + self.uuid, False)
+    self.redRiver = addLocation('Isola - Red river ' + self.uuid, False)
+    self.roubines = addLocation('Isola - Roubines ' + self.uuid, False)
 
   def assignBeasons(self):
     # jeudi soir	accueil concurrents et distribution transpondeurs

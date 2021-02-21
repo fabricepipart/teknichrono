@@ -9,7 +9,7 @@ from ping_selectors.factory import getSelectionStrategy
 from ping_senders.factory import getSendStrategy
 from scan.bluetooth_scanner import BluetoothScanner
 from datamodel.chrono_synchronizer import ChronoSynchronizer
-from logs.init import setupBackupFile, setupLogging
+from logs.setup import setupBackupFile, setupLogging, stopLogging
 
 TEKNICHRONO_SERVER = os.getenv('TEKNICHRONO_SERVER', 'http://localhost:8080')
 CHRONO_NAME = os.getenv('CHRONO_NAME', 'Raspberry')
@@ -45,6 +45,7 @@ try:
       sendStrategy.append(toSend)
 finally:
   print("Ending application")
+  stopLogging()
   if sendStrategy:
     sendStrategy.stop()
     sendStrategy.join()
