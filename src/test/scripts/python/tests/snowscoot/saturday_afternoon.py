@@ -113,19 +113,19 @@ class SaturdayAfternoonTest:
 
     print("---- Tests Results (Elite) ----")
     bestLapsElite = getBestLapsForSession(self.qualification.session['id'], self.eliteCategory['id'])
-    checkBestLaps(bestLapsElite, len(self.elitePilots), {}, {}, 'Elite', 120000, 140000)
+    checkBestLaps(bestLapsElite, len(self.elitePilots), {}, {}, self.championship.eliteCategory['name'], 120000, 140000)
 
     print("---- Tests Results (Open) ----")
     bestLapsOpen = getBestLapsForSession(self.qualification.session['id'], self.openCategory['id'])
-    checkBestLaps(bestLapsOpen, len(self.openPilots), {}, {}, 'Open', 120000, 140000)
+    checkBestLaps(bestLapsOpen, len(self.openPilots), {}, {}, self.championship.openCategory['name'], 120000, 140000)
 
     print("---- Tests Results (Women) ----")
     bestLapsWomen = getBestLapsForSession(self.qualification.session['id'], self.womanCategory['id'])
-    checkBestLaps(bestLapsWomen, len(self.womanPilots), {}, {}, 'Woman', 120000, 140000)
+    checkBestLaps(bestLapsWomen, len(self.womanPilots), {}, {}, self.championship.womanCategory['name'], 120000, 140000)
 
     print("---- Tests Results (Junior) ----")
     bestLapsJunior = getBestLapsForSession(self.qualification.session['id'], self.juniorCategory['id'])
-    checkBestLaps(bestLapsJunior, len(self.juniorPilots), {}, {}, 'Junior', 120000, 140000)
+    checkBestLaps(bestLapsJunior, len(self.juniorPilots), {}, {}, self.championship.juniorCategory['name'], 120000, 140000)
 
     # Find the 64 participants
     qualified = bestLapsElite[0:24] + bestLapsOpen[0:16] + bestLapsWomen[0:16] + bestLapsJunior[0:8]

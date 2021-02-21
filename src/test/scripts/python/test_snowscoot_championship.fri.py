@@ -5,7 +5,7 @@ from tests.snowscoot.championship import ChampionshipTest
 print("-------------------------------------")
 print("Pre-event")
 print("-------------------------------------")
-championship = ChampionshipTest('Snowscoot championship - Fri')
+championship = ChampionshipTest('Snowscoot championship - Fri', 100)
 championship.prepare()
 
 print("-------------------------------------")

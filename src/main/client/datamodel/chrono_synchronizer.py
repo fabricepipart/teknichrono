@@ -3,7 +3,7 @@ import logging
 from threading import Thread, Event
 from datamodel.chrono import Chronometer
 from common.rest import get, post, iso_to_seconds
-from logs.init import setupLogging
+from logs.setup import setupLogging
 
 
 class ChronoSynchronizer(Thread):

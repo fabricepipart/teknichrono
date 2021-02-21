@@ -59,7 +59,7 @@ class FridayMorningTest:
     checkLaps(friMorningTestsLaps, 160 - 6, {1: 78, 2: 76}, {1: 2})
 
     friMorningTestsLapsElite = getLapsForSession(self.morningTest.session['id'], self.championship.eliteCategory['id'])
-    checkLaps(friMorningTestsLapsElite, 60 - 6, {1: 28, 2: 26}, {1: 2}, "Elite")
+    checkLaps(friMorningTestsLapsElite, 60 - 6, {1: 28, 2: 26}, {1: 2}, self.championship.eliteCategory['name'])
 
     friMorningTestsBests = getBestLapsForSession(self.morningTest.session['id'])
     printLaps(friMorningTestsBests, True)
