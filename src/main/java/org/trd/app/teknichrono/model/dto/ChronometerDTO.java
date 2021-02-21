@@ -18,7 +18,7 @@ public class ChronometerDTO implements EntityDTO {
   private boolean debug = false;
   private String orderToExecute;
   private long txThreshold = -100L;
-  private boolean sendLogs = true;
+  private boolean sendLogs = false;
 
   public static ChronometerDTO fromChronometer(Chronometer chronometer) {
     return DtoMapper.INSTANCE.asChronometerDto(chronometer);
