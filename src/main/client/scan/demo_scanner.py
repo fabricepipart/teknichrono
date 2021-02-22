@@ -10,10 +10,10 @@ LAST_BEACON = 1
 
 def fake_scan():
   global LAST_BEACON
-  time.sleep(0.5)
+  time.sleep(0.1)
   rollDice = random.randint(1, 6)
-  # 5/6 chances to have a signal from same
-  if rollDice > 5:
+  # 4/6 chances to have a signal from same
+  if rollDice > 4:
     LAST_BEACON = random.randint(1, 10)
   tx = str(random.randint(30, 90))
   beacon_nb_str = str(LAST_BEACON)
