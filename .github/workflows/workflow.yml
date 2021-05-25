@@ -60,7 +60,7 @@ jobs:
           coverage combine .coverage_1 .coverage_2
           coverage report -m > client-coverage-report.txt --omit=src/main/client/scan/blescan.py
           coverage xml -i
-      - uses: codecov/codecov-action@v1.0.3
+      - uses: codecov/codecov-action@v1.5.0
         with:
           token: ${{secrets.CODECOV_TOKEN}}
           file: ./coverage.xml
@@ -106,7 +106,7 @@ jobs:
           docker build -f src/main/docker-tests/Dockerfile -t $TESTS_REPO:$VERSION .
           docker push $REPO:$VERSION
           docker push $TESTS_REPO:$VERSION
-      - uses: codecov/codecov-action@v1.0.3
+      - uses: codecov/codecov-action@v1.5.0
         with:
           token: ${{secrets.CODECOV_TOKEN}}
           flags: javaserver
