@@ -17,7 +17,7 @@ jobs:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             await github.issues.addLabels({
-              issue_number: github.event.issue.number,
+              issue_number: github.event.pull_request.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               labels: ['safe-dependabot']
@@ -25,6 +25,6 @@ jobs:
             await github.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: github.event.issue.number,
+              issue_number: github.event.pull_request.number,
               body: 'Everything is OK. Thank you for the PR!'
             });
