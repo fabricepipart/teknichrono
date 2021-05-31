@@ -1,8 +1,10 @@
 name: Test Teknichrono
 
 on:
-  pull_request_target:
-    types: [labeled]
+  workflow_run:
+    workflows: ["Dependabot PRs check"]
+    types:
+      - completed
   pull_request:
     branches:
       - 'master'
@@ -16,7 +18,7 @@ jobs:
     if: |
       (github.event_name == 'push' && github.actor != 'dependabot[bot]') ||
       (github.event_name == 'pull_request' && github.actor != 'dependabot[bot]') ||
-      (github.event_name == 'pull_request_target' && github.actor != 'dependabot[bot]' && contains(github.event.pull_request.labels.*.name, 'safe-dependabot'))
+      (github.event.workflow_run.event == 'pull_request' && github.actor == 'dependabot[bot]' && github.event.workflow_run.conclusion == 'success'))
     runs-on: ubuntu-latest
     steps:
       - run: echo "Safe to test"
