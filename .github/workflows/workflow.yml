@@ -18,7 +18,7 @@ jobs:
     if: |
       (github.event_name == 'push' && github.actor != 'dependabot[bot]') ||
       (github.event_name == 'pull_request' && github.actor != 'dependabot[bot]') ||
-      (github.event.workflow_run.event == 'pull_request' && github.actor == 'dependabot[bot]' && github.event.workflow_run.conclusion == 'success')
+      (github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-latest
     steps:
       - run: echo "Safe to test"
