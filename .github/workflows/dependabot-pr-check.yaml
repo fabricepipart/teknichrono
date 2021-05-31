@@ -5,9 +5,9 @@ on:
 
 jobs:
   build:
-    name: Label PR
+    name: PR check
     if: |
-      (github.event_name == 'pull_request_target' && github.actor == 'dependabot[bot]')
+      (github.event_name == 'pull_request' && github.actor == 'dependabot[bot]')
     runs-on: ubuntu-latest
     steps:
       - run: echo "Not perfectly safe because there could be a malicious dependency that takes the occasion of stealing secrets during the build"
