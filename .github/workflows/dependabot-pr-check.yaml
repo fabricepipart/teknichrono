@@ -1,0 +1,30 @@
+name: Label dependabot PRs
+
+on:
+  pull_request_target
+
+jobs:
+  build:
+    name: Label PR
+    if: |
+      (github.event_name == 'push' && github.actor != 'dependabot[bot]') ||
+      (github.event_name == 'pull_request_target' && github.actor == 'dependabot[bot]')
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Not perfectly safe because there could be a malicious dependency that takes the occasion of stealing secrets during the build"
+      - uses: actions/github-script@v4
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            await github.issues.addLabels({
+              issue_number: github.event.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['safe-dependabot']
+            })
+            await github.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: github.event.number,
+              body: 'Everything is OK. Thank you for the PR!'
+            });

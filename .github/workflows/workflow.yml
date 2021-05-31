@@ -1,13 +1,28 @@
 name: Test Teknichrono
 
 on:
+  pull_request_target:
+    types: [labeled]
   pull_request:
-  push:    
+    branches:
+      - 'master'
+  push:
     branches:
       - 'master'
 
 jobs:
+
+  check-security:
+    if: |
+      (github.event_name == 'push' && github.actor != 'dependabot[bot]') ||
+      (github.event_name == 'pull_request' && github.actor != 'dependabot[bot]') ||
+      (github.event_name == 'pull_request_target' && github.actor != 'dependabot[bot]' && contains(github.event.pull_request.labels.*.name, 'safe-dependabot'))
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Safe to test"
+
   ci-client:
+    needs: check-security
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -77,6 +92,7 @@ jobs:
           path: client-coverage-report.txt
 
   ci-server:
+    needs: check-security
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
