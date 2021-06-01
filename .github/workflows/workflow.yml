@@ -28,6 +28,7 @@ jobs:
         uses: actions/setup-java@v2.1.0
         with:
           java-version: 11
+          distribution: 'adopt'
       - name: Start server
         timeout-minutes: 5
         run: |
@@ -100,6 +101,7 @@ jobs:
         uses: actions/setup-java@v2.1.0
         with:
           java-version: 11
+          distribution: 'adopt'
       - name: Bump version and push tag
         id: versioning
         uses: anothrNick/github-tag-action@1.35.0
