@@ -159,7 +159,7 @@ jobs:
           mvn -B -U versions:set -DnewVersion=${VERSION} &> /dev/null
           kubectl run teknichrono-e2e-tests -n teknichrono-staging --image=$TESTS_REPO:$VERSION --labels="app=teknichrono"  --attach=true --restart=Never -- sh /app/bash/perf_tests.sh staging.teknichrono.fr
       - name: Update Production environment
-        if: github.ref == 'refs/heads/master' && ${{env.secrets-available}}
+        if: ${{ github.ref == 'refs/heads/master' && env.secrets-available != '' }}
         timeout-minutes: 10
         run: |
           kubectl delete all -n teknichrono-prod -l app=teknichrono --wait=true
