@@ -1,27 +1,18 @@
 name: Test Teknichrono
 
 on:
-  workflow_run:
-    workflows: ["Dependabot PRs check"]
-    types:
-      - completed
+  pull_request:
+    branches:
+      - 'master'
   push:
     branches:
       - 'master'
 
 jobs:
 
-  check-security:
-    if: |
-      (github.event_name == 'push' && github.actor != 'dependabot[bot]') ||
-      (github.event_name == 'pull_request' && github.actor != 'dependabot[bot]') ||
-      (github.event.workflow_run.conclusion == 'success')
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "Safe to test"
-
   ci-client:
-    needs: check-security
+    env:
+      secrets-available: ${{secrets.CODECOV_TOKEN}}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -74,11 +65,13 @@ jobs:
           if ps -p $RUN_PID; then echo "Client did not update" && false; fi
           if cat target/teknichrono.log | grep -q Traceback; then false; fi
       - name: Coverage report
+        if: ${{env.secrets-available}}
         run: |
           coverage combine .coverage_1 .coverage_2
           coverage report -m > client-coverage-report.txt --omit=src/main/client/scan/blescan.py
           coverage xml -i
       - uses: codecov/codecov-action@v1.5.0
+        if: ${{env.secrets-available}}
         with:
           token: ${{secrets.CODECOV_TOKEN}}
           file: ./coverage.xml
@@ -86,17 +79,20 @@ jobs:
           name: codecov-python-client
       - name: Archive code coverage results
         uses: actions/upload-artifact@v2.2.3
+        if: ${{env.secrets-available}}
         with:
           name: code-coverage-report
           path: client-coverage-report.txt
 
   ci-server:
-    needs: check-security
+    env:
+      secrets-available: ${{secrets.KUBE_CONFIG}}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - name: Login to DockerHub
         uses: docker/login-action@v1
+        if: ${{env.secrets-available}}
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
@@ -107,6 +103,7 @@ jobs:
       - name: Bump version and push tag
         id: versioning
         uses: anothrNick/github-tag-action@1.26.0
+        if: ${{env.secrets-available}}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO_OWNER: fabricepipart
@@ -116,35 +113,45 @@ jobs:
           VERSION: ${{ steps.versioning.outputs.new_tag }}
           REPO: fabricepipart/teknichrono-backend
           TESTS_REPO: fabricepipart/teknichrono-backend-tests
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
           mvn -B -U versions:set -DnewVersion=${VERSION} &> /dev/null
           mvn -B -U clean verify
           docker build -f src/main/docker/Dockerfile -t $REPO:$VERSION .
           docker build -f src/main/docker-tests/Dockerfile -t $TESTS_REPO:$VERSION .
+      - name: Push Docker
+        if: ${{env.secrets-available}}
+        env:
+          VERSION: ${{ steps.versioning.outputs.new_tag }}
+          REPO: fabricepipart/teknichrono-backend
+          TESTS_REPO: fabricepipart/teknichrono-backend-tests
+        run: |
           docker push $REPO:$VERSION
           docker push $TESTS_REPO:$VERSION
       - uses: codecov/codecov-action@v1.5.0
+        if: ${{env.secrets-available}}
         with:
           token: ${{secrets.CODECOV_TOKEN}}
           flags: javaserver
           name: codecov-java-server
       - uses: azure/k8s-set-context@v1
+        if: ${{env.secrets-available}}
         with:
           kubeconfig: ${{ secrets.KUBE_CONFIG }}
       - name: Lock Staging environment
+        if: ${{env.secrets-available}}
         timeout-minutes: 80
         run: |
           while kubectl get ns -l lock=true | grep teknichrono-staging > /dev/null; do echo 'Namespaces already used by another test ...'; sleep 5; done
           kubectl label ns teknichrono-staging lock=true
       - name: Update Staging environment
+        if: ${{env.secrets-available}}
         timeout-minutes: 10
         run: |
           kubectl delete all -n teknichrono-staging -l app=teknichrono --wait=true
           kubectl kustomize target/classes/overlays/staging | kubectl apply -n teknichrono-staging -f -
           while ! curl -fs https://staging.teknichrono.fr > /dev/null; do echo 'Not started yet ...'; sleep 5; done
       - name: Test Staging environment
+        if: ${{env.secrets-available}}
         env:
           VERSION: ${{ steps.versioning.outputs.new_tag }}
           TESTS_REPO: fabricepipart/teknichrono-backend-tests
@@ -152,7 +159,7 @@ jobs:
           mvn -B -U versions:set -DnewVersion=${VERSION} &> /dev/null
           kubectl run teknichrono-e2e-tests -n teknichrono-staging --image=$TESTS_REPO:$VERSION --labels="app=teknichrono"  --attach=true --restart=Never -- sh /app/bash/perf_tests.sh staging.teknichrono.fr
       - name: Update Production environment
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/master' && ${{env.secrets-available}}
         timeout-minutes: 10
         run: |
           kubectl delete all -n teknichrono-prod -l app=teknichrono --wait=true
@@ -161,14 +168,18 @@ jobs:
 
   ci-server-cleanup:
     needs: ci-server
+    env:
+      secrets-available: ${{secrets.KUBE_CONFIG}}
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - uses: azure/k8s-set-context@v1
+        if: ${{env.secrets-available}}
         with:
           kubeconfig: ${{ secrets.KUBE_CONFIG }}
       - name: Release Staging environment
+        if: ${{env.secrets-available}}
         timeout-minutes: 20
         run: |
           kubectl label ns teknichrono-staging lock-
