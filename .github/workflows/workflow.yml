@@ -102,7 +102,7 @@ jobs:
           java-version: 11
       - name: Bump version and push tag
         id: versioning
-        uses: anothrNick/github-tag-action@1.26.0
+        uses: anothrNick/github-tag-action@1.35.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO_OWNER: fabricepipart
