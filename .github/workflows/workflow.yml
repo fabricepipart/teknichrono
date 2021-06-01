@@ -103,11 +103,11 @@ jobs:
       - name: Bump version and push tag
         id: versioning
         uses: anothrNick/github-tag-action@1.26.0
-        if: ${{env.secrets-available}}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO_OWNER: fabricepipart
           RELEASE_BRANCHES: master
+          DRY_RUN: ${{ env.secrets-available == '' }}
       - name: Build Maven and Docker
         env:
           VERSION: ${{ steps.versioning.outputs.new_tag }}
