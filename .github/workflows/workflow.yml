@@ -71,7 +71,7 @@ jobs:
           coverage combine .coverage_1 .coverage_2
           coverage report -m > client-coverage-report.txt --omit=src/main/client/scan/blescan.py
           coverage xml -i
-      - uses: codecov/codecov-action@v2.0.3
+      - uses: codecov/codecov-action@v2.1.0
         if: ${{env.secrets-available}}
         with:
           token: ${{secrets.CODECOV_TOKEN}}
@@ -129,7 +129,7 @@ jobs:
         run: |
           docker push $REPO:$VERSION
           docker push $TESTS_REPO:$VERSION
-      - uses: codecov/codecov-action@v2.0.3
+      - uses: codecov/codecov-action@v2.1.0
         if: ${{env.secrets-available}}
         with:
           token: ${{secrets.CODECOV_TOKEN}}
