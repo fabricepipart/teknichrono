@@ -78,7 +78,7 @@ jobs:
           flags: pythonclient
           name: codecov-python-client
       - name: Archive code coverage results
-        uses: actions/upload-artifact@v2.3.1
+        uses: actions/upload-artifact@v3
         if: ${{env.secrets-available}}
         with:
           name: code-coverage-report
