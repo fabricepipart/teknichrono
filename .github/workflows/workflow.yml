@@ -108,7 +108,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO_OWNER: fabricepipart
           RELEASE_BRANCHES: master
-          DRY_RUN: ${{ env.secrets-available == '' }}
+          DRY_RUN: ${{ github.event_name == 'pull_request' }}
+
       - name: Build Maven and Docker
         env:
           VERSION: ${{ steps.versioning.outputs.new_tag }}
