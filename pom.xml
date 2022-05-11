@@ -65,7 +65,7 @@
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-jdbc-mariadb</artifactId>
+            <artifactId>quarkus-jdbc-mysql</artifactId>
         </dependency>
         <!-- Transaction Manager extension -->
         <dependency>
