@@ -17,7 +17,7 @@ public class Ping extends PanacheEntity {
   private int version;
 
   /* =============================== Fields =============================== */
-  @Column(columnDefinition = "TIMESTAMP(3)", nullable = false)
+  @Column(nullable = false)
   private Instant instant;
 
   // Can be null if after event, items are reassociated
