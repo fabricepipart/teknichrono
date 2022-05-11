@@ -30,7 +30,7 @@ public class LapTime extends PanacheEntity {
   private Pilot pilot;
 
   // Used to order the laps for the pilot relationship
-  @Column(columnDefinition = "TIMESTAMP(3)")
+  @Column
   private Instant startDate;
 
   @Transient

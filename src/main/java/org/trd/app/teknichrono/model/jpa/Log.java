@@ -17,7 +17,7 @@ public class Log extends PanacheEntity {
   private int version;
 
   /* =============================== Fields =============================== */
-  @Column(columnDefinition = "TIMESTAMP(3)", nullable = false)
+  @Column(nullable = false)
   private Instant date;
 
   @Column

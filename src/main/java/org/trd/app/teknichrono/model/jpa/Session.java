@@ -24,13 +24,13 @@ public class Session extends PanacheEntity {
   @Column(name = "version")
   private int version;
 
-  @Column(columnDefinition = "TIMESTAMP(3)", nullable = false)
+  @Column(nullable = false)
   private Instant start;
 
   @Column
   private long inactivity = 0L;
 
-  @Column(columnDefinition = "TIMESTAMP(3)", nullable = false)
+  @Column(nullable = false)
   private Instant end;
 
   @Column(nullable = false)
