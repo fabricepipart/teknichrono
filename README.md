@@ -69,9 +69,9 @@ First:
 ```kubectl port-forward -n teknichrono $(kubectl get pod -n teknichrono -l app=mysql -o jsonpath='{.items[0].metadata.name}') 3306:3306```
 ```kubectl port-forward -n teknichrono service/mysql-service 3306:3306```
 then
-```mvn quarkus:dev -Dquarkus-profile=localmariadb```
+```mvn -Dquarkus.datasource.password=xxx quarkus:dev -Dquarkus-profile=localmariadb```
 or
-```java -Dquarkus-profile=localmariadb -jar target/teknichrono-runner.jar```
+```java -Dquarkus.datasource.password=xxx -Dquarkus-profile=localmariadb -jar target/teknichrono-runner.jar```
 
 ## How to test
 
