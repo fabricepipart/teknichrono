@@ -109,7 +109,7 @@ jobs:
           REPO_OWNER: fabricepipart
           RELEASE_BRANCHES: master
           DRY_RUN: ${{ github.event_name == 'pull_request' }}
-
+          DEFAULT_BRANCH: master
       - name: Build Maven and Docker
         env:
           VERSION: ${{ steps.versioning.outputs.new_tag }}
