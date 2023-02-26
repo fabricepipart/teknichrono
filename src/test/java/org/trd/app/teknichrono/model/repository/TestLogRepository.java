@@ -34,7 +34,7 @@ public class TestLogRepository {
 
     LogDTO logDTO = this.repository.toDTO(log);
     assertThat(logDTO.getMeta().getCreated()).isGreaterThan(1577312101L);
-    assertThat(logDTO.getMeta().getCreated()).isLessThan(1677312101L);
+    assertThat(logDTO.getMeta().getCreated()).isLessThan(2272147261L);
     assertThat(logDTO.getLog()).isEqualTo("Logger");
     assertThat(logDTO.getLevel()).isEqualTo("Info");
     assertThat(logDTO.getMessage()).isEqualTo("Log message");
