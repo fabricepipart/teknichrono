@@ -4,8 +4,8 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.trd.app.teknichrono.model.dto.EntityDTO;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
 import java.lang.reflect.Type;
 import java.util.List;
 
@@ -13,10 +13,10 @@ import static io.restassured.RestAssured.given;
 
 public abstract class TestRestEndpoint<D extends EntityDTO> {
 
-  public static final int NO_CONTENT = javax.ws.rs.core.Response.Status.NO_CONTENT.getStatusCode();
-  public static final int OK = javax.ws.rs.core.Response.Status.OK.getStatusCode();
-  public static final int NOT_FOUND = javax.ws.rs.core.Response.Status.NOT_FOUND.getStatusCode();
-  public static final int BAD_REQUEST = javax.ws.rs.core.Response.Status.BAD_REQUEST.getStatusCode();
+  public static final int NO_CONTENT = jakarta.ws.rs.core.Response.Status.NO_CONTENT.getStatusCode();
+  public static final int OK = jakarta.ws.rs.core.Response.Status.OK.getStatusCode();
+  public static final int NOT_FOUND = jakarta.ws.rs.core.Response.Status.NOT_FOUND.getStatusCode();
+  public static final int BAD_REQUEST = jakarta.ws.rs.core.Response.Status.BAD_REQUEST.getStatusCode();
 
   protected static Jsonb jsonb = JsonbBuilder.create();
 

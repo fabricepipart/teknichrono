@@ -13,9 +13,9 @@ import org.trd.app.teknichrono.util.exception.NotFoundException;
 import org.trd.app.teknichrono.util.sql.OrderByClauseBuilder;
 import org.trd.app.teknichrono.util.sql.WhereClauseBuilder;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.Dependent;
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

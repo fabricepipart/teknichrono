@@ -2,19 +2,18 @@ package org.trd.app.teknichrono.rest;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.repository.Repository;
 import org.trd.app.teknichrono.util.DurationLogger;
 import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
-import javax.persistence.OptimisticLockException;
-import javax.ws.rs.core.Response;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class EntityEndpoint<E extends PanacheEntity, D> {
@@ -64,7 +63,7 @@ public class EntityEndpoint<E extends PanacheEntity, D> {
   public List<D> listAll(Integer pageIndex, Integer pageSize) {
     try (DurationLogger dl = DurationLogger.get(LOGGER).start("Find all " + repository.getEntityName())) {
       try (Stream<E> s = repository.findAll(pageIndex, pageSize)) {
-        return s.map(repository::toDTO).collect(Collectors.toList());
+        return s.map(repository::toDTO).toList();
       }
     }
   }

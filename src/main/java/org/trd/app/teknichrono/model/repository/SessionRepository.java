@@ -11,9 +11,9 @@ import org.trd.app.teknichrono.model.jpa.Session;
 import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.Dependent;
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
 import java.time.Instant;
 
 @Dependent

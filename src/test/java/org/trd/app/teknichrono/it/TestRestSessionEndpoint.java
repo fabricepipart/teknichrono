@@ -19,8 +19,8 @@ import org.trd.app.teknichrono.model.dto.PingDTO;
 import org.trd.app.teknichrono.model.dto.SessionDTO;
 import org.trd.app.teknichrono.model.jpa.SessionType;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;

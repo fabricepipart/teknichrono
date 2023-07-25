@@ -1,7 +1,9 @@
 package org.trd.app.teknichrono.model.repository;
 
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
 import org.jboss.logging.Logger;
 import org.trd.app.teknichrono.model.dto.PingDTO;
 import org.trd.app.teknichrono.model.jpa.Beacon;
@@ -10,12 +12,11 @@ import org.trd.app.teknichrono.model.jpa.Ping;
 import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.Dependent;
-import javax.inject.Inject;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 
 @Dependent
 public class PingRepository extends PanacheRepositoryWrapper<Ping, PingDTO> {
@@ -47,10 +48,10 @@ public class PingRepository extends PanacheRepositoryWrapper<Ping, PingDTO> {
 
   @Override
   public Ping create(PingDTO dto) throws ConflictingIdException, NotFoundException {
-    Ping alreadyExistingPing = find(dto.getInstant(), dto.getChronometer().getId(), dto.getBeacon().getId());
-    if (alreadyExistingPing != null) {
+    Optional<Ping> alreadyExistingPing = find(dto.getInstant(), dto.getChronometer().getId(), dto.getBeacon().getId());
+    if (alreadyExistingPing.isPresent()) {
       LOGGER.warn("Tried to create an existing ping. Returning the existing one and ignoring request.");
-      return alreadyExistingPing;
+      return alreadyExistingPing.get();
     }
     Ping ping = fromDTO(dto);
     panacheRepository.persist(ping);
@@ -70,10 +71,10 @@ public class PingRepository extends PanacheRepositoryWrapper<Ping, PingDTO> {
 
   public PingDTO latestOfChronometer(long chronometerId) throws NotFoundException {
     Instant yesterday = Instant.now().minus(1, ChronoUnit.DAYS);
-    PanacheQuery<Ping> pingPanacheQuery = panacheRepository.find("chrono.id = ?1 and instant > ?2",
-        chronometerId, yesterday);
-    if(pingPanacheQuery.count() > 0){
-      return PingDTO.fromPing(pingPanacheQuery.list().stream().max(Comparator.comparing(Ping::getInstant)).get());
+    List<Ping> pings = panacheRepository.find("chrono.id = ?1", chronometerId)
+        .stream().filter(p -> p.getInstant().toEpochMilli() > yesterday.toEpochMilli()).toList();
+    if (pings.size() > 0) {
+      return PingDTO.fromPing(pings.stream().max(Comparator.comparing(Ping::getInstant)).get());
     }
     throw new NotFoundException("No Ping found for Chronometer " + chronometerId);
   }
@@ -94,10 +95,10 @@ public class PingRepository extends PanacheRepositoryWrapper<Ping, PingDTO> {
     panacheRepository.persist(ping);
   }
 
-  public Ping find(Instant instant, long chronoId, long beaconId) {
-    PanacheQuery<Ping> search = panacheRepository.find("instant = ?1 and beacon.id = ?2 and chrono.id = ?3",
-        instant, beaconId, chronoId);
-    return search.firstResult();
+  public Optional<Ping> find(Instant instant, long chronoId, long beaconId) {
+    // You cannot use instant in find it returns random things
+    return panacheRepository.find("beacon.id = ?1 and chrono.id = ?2", beaconId, chronoId).stream()
+        .filter(p -> p.getInstant().toEpochMilli() == instant.toEpochMilli()).findFirst();
   }
 
 }

@@ -2,6 +2,8 @@ package org.trd.app.teknichrono.it;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.response.Response;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -16,15 +18,12 @@ import org.trd.app.teknichrono.model.dto.SessionDTO;
 import org.trd.app.teknichrono.model.jpa.Chronometer;
 import org.trd.app.teknichrono.model.jpa.SessionType;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.given;
@@ -121,7 +120,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
     assertThat(lines.length).isEqualTo(3);
 
     Stream<String> stream = Arrays.stream(lines[0].split(","));
-    List<String> header = stream.map(h -> h.replaceAll("\"", "")).collect(Collectors.toList());
+    List<String> header = stream.map(h -> h.replaceAll("\"", "")).toList();
     assertThat(header).contains("DURATION", "ENDDATE", "PILOT", "SESSION");
   }
 
@@ -387,7 +386,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
     assertThat(lines.length).isEqualTo(1 + 3);
 
     Stream<String> stream = Arrays.stream(lines[0].split(","));
-    List<String> header = stream.map(h -> h.replaceAll("\"", "")).collect(Collectors.toList());
+    List<String> header = stream.map(h -> h.replaceAll("\"", "")).toList();
     assertThat(header).contains("DURATION", "ENDDATE", "PILOT", "SESSION");
 
     csvOfPilot = getCsvOfBestOfPilot(this.pilots.get(1), this.sessions.get(0).getId());
@@ -488,7 +487,7 @@ public class TestRestLapTimeEndpoint extends TestRestEndpoint<LapTimeDTO> {
     assertThat(lines.length).isEqualTo(1 + 3);
 
     Stream<String> stream = Arrays.stream(lines[0].split(","));
-    List<String> header = stream.map(h -> h.replaceAll("\"", "")).collect(Collectors.toList());
+    List<String> header = stream.map(h -> h.replaceAll("\"", "")).toList();
     assertThat(header).contains("DURATION", "ENDDATE", "PILOT", "SESSION");
 
     csvOfPilot = getResultsOfPilotAsCsv(this.pilots.get(1), this.sessions.get(0).getId());

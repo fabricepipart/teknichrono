@@ -1,8 +1,8 @@
 package org.trd.app.teknichrono.rest;
 
-import javax.transaction.Transactional;
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
+import jakarta.transaction.Transactional;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Application;
 
 @ApplicationPath("/rest")
 @Transactional
