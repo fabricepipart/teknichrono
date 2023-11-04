@@ -106,6 +106,12 @@
         </dependency>
 
         <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-openapi</artifactId>
+            <version>${quarkus.version}</version>
+          </dependency>
+
+        <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
         </dependency>
@@ -141,6 +147,18 @@
             <classifier>runtime</classifier>
             <scope>test</scope>
             <version>${jacoco.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.parser.v3</groupId>
+            <artifactId>swagger-parser</artifactId>
+            <scope>test</scope>
+            <version>2.0.21</version>
+          </dependency>
+          <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <scope>test</scope>
+            <version>1.13.1</version>
         </dependency>
     </dependencies>
     <build>
@@ -347,6 +365,19 @@
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>smallrye-open-api-maven-plugin</artifactId>
+                <groupId>io.smallrye</groupId>
+                <version>2.0.8</version>
+                <executions>
+                    <execution>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>generate-schema</goal>
                         </goals>
                     </execution>
                 </executions>
