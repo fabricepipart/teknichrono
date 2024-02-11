@@ -14,7 +14,9 @@ jobs:
       secrets-available: ${{secrets.CODECOV_TOKEN}}
     runs-on: ubuntu-latest
     steps:
+
       - uses: actions/checkout@v4
+
       - name: Set up Python 3.x
         uses: actions/setup-python@v5
         with:
@@ -23,17 +25,27 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Set up JDK 11
+
+      - name: Set up JDK 21
         uses: actions/setup-java@v4.0.0
         with:
-          java-version: 11
-          distribution: "adopt"
+          java-version: 21
+          distribution: "temurin"
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
       - name: Start server
         timeout-minutes: 5
         run: |
           mvn -B compile quarkus:dev &
           while ! curl -fs http://localhost:8080 > /dev/null; do echo 'Not started yet ...'; sleep 5; done
           echo "Started"
+
       - name: Test chronometer
         run: |
           export COVERAGE_FILE=.coverage_1 ; sh ./src/main/client/demo.sh &
@@ -52,6 +64,7 @@ jobs:
           python3 src/test/scripts/python/test_demo_conf3.py
           sleep 20
           echo "RUN_PID=$RUN_PID" >> $GITHUB_ENV
+
       - name: Test chronometer update
         run: |
           python3 src/test/scripts/python/test_demo_restart.py
@@ -64,12 +77,14 @@ jobs:
           sleep 15
           if ps -p $RUN_PID; then echo "Client did not update" && false; fi
           if cat target/teknichrono.log | grep -q Traceback; then false; fi
+
       - name: Coverage report
         if: ${{env.secrets-available}}
         run: |
           coverage combine .coverage_1 .coverage_2
           coverage report -m > client-coverage-report.txt --omit=src/main/client/scan/blescan.py
           coverage xml -i
+
       - uses: codecov/codecov-action@v4
         if: ${{env.secrets-available}}
         with:
@@ -77,6 +92,7 @@ jobs:
           file: ./coverage.xml
           flags: pythonclient
           name: codecov-python-client
+
       - name: Archive code coverage results
         uses: actions/upload-artifact@v4
         if: ${{env.secrets-available}}
@@ -90,17 +106,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+          
       - name: Login to DockerHub
         uses: docker/login-action@v3
         if: ${{env.secrets-available}}
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Set up JDK 11
+
+      - name: Set up JDK 21
         uses: actions/setup-java@v4.0.0
         with:
-          java-version: 11
-          distribution: "adopt"
+          java-version: 21
+          distribution: "temurin"
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
       - name: Bump version and push tag
         id: versioning
         uses: anothrNick/github-tag-action@1.67.0
@@ -108,43 +134,48 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO_OWNER: fabricepipart
           RELEASE_BRANCHES: master
+          PRERELEASE: ${{ github.event_name == 'pull_request' }}
           DRY_RUN: ${{ github.event_name == 'pull_request' }}
           DEFAULT_BRANCH: master
+
       - name: Build Maven and Docker
         env:
           VERSION: ${{ steps.versioning.outputs.new_tag }}
-          REPO: fabricepipart/teknichrono-backend
-          TESTS_REPO: fabricepipart/teknichrono-backend-tests
+          QUARKUS_CONTAINER_IMAGE_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          QUARKUS_CONTAINER_IMAGE_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          QUARKUS_CONTAINER_IMAGE_PUSH: ${{ env.secrets-available != '' }}
         run: |
           mvn -B -U versions:set -DnewVersion=${VERSION} &> /dev/null
-          mvn -B -U clean verify
-          docker build -f src/main/docker/Dockerfile -t $REPO:$VERSION .
-          docker build -f src/main/docker-tests/Dockerfile -t $TESTS_REPO:$VERSION .
-      - name: Push Docker
+          mvn -B -U clean verify -Dquarkus.profile=prod
+
+      - name: Build and push tests
         if: ${{env.secrets-available}}
         env:
           VERSION: ${{ steps.versioning.outputs.new_tag }}
-          REPO: fabricepipart/teknichrono-backend
           TESTS_REPO: fabricepipart/teknichrono-backend-tests
         run: |
-          docker push $REPO:$VERSION
+          docker build -f src/main/docker-tests/Dockerfile -t $TESTS_REPO:$VERSION .
           docker push $TESTS_REPO:$VERSION
+
       - uses: codecov/codecov-action@v4
         if: ${{env.secrets-available}}
         with:
           token: ${{secrets.CODECOV_TOKEN}}
           flags: javaserver
           name: codecov-java-server
+
       - uses: azure/k8s-set-context@v3
         if: ${{env.secrets-available}}
         with:
           kubeconfig: ${{ secrets.KUBE_CONFIG }}
+
       - name: Lock Staging environment
         if: ${{env.secrets-available}}
         timeout-minutes: 80
         run: |
           while kubectl get ns -l lock=true | grep teknichrono-staging > /dev/null; do echo 'Namespaces already used by another test ...'; sleep 5; done
           kubectl label ns teknichrono-staging lock=true
+
       - name: Update Staging environment
         if: ${{env.secrets-available}}
         timeout-minutes: 10
@@ -152,14 +183,15 @@ jobs:
           kubectl delete all -n teknichrono-staging -l app=teknichrono --wait=true
           kubectl kustomize target/classes/overlays/staging | kubectl apply -n teknichrono-staging -f -
           while ! curl -fs https://staging.teknichrono.fr > /dev/null; do echo 'Not started yet ...'; sleep 5; done
+
       - name: Test Staging environment
         if: ${{env.secrets-available}}
         env:
           VERSION: ${{ steps.versioning.outputs.new_tag }}
           TESTS_REPO: fabricepipart/teknichrono-backend-tests
         run: |
-          mvn -B -U versions:set -DnewVersion=${VERSION} &> /dev/null
           kubectl run teknichrono-e2e-tests -n teknichrono-staging --image=$TESTS_REPO:$VERSION --labels="app=teknichrono"  --attach=true --restart=Never -- sh /app/bash/perf_tests.sh staging.teknichrono.fr
+
       - name: Update Production environment
         if: ${{ github.ref == 'refs/heads/master' && env.secrets-available != '' }}
         timeout-minutes: 10

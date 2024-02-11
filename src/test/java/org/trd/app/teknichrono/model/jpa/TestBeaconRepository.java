@@ -16,7 +16,6 @@ import org.trd.app.teknichrono.util.exception.NotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -134,7 +133,7 @@ class TestBeaconRepository {
     when(query.page(any())).thenReturn(query);
     when(query.stream()).thenReturn(entities.stream());
 
-    List<Beacon> beacons = this.beaconRepository.findAll(null, null).collect(Collectors.toList());
+    List<Beacon> beacons = this.beaconRepository.findAll(null, null).toList();
     assertThat(beacons).isNotNull();
     assertThat(beacons).hasSize(3);
 
@@ -156,7 +155,7 @@ class TestBeaconRepository {
     when(query.page(any())).thenReturn(query);
     when(query.stream()).thenReturn(entities.stream());
 
-    List<Beacon> beacons = this.beaconRepository.findAll(1, 1).collect(Collectors.toList());
+    List<Beacon> beacons = this.beaconRepository.findAll(1, 1).toList();
     assertThat(beacons).isNotNull();
     assertThat(beacons).hasSize(1);
   }

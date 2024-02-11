@@ -18,10 +18,10 @@ import org.trd.app.teknichrono.model.repository.BeaconRepository;
 import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
-import javax.persistence.OptimisticLockException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.ext.RuntimeDelegate;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.ext.RuntimeDelegate;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -138,7 +138,7 @@ public class TestBeaconEndpoint {
     Response r = endpoint.findById(entity.getId());
     assertThat(r).isNotNull();
     verify(responseBuilder, never()).entity(any());
-    verify(responseBuilder).status((Response.StatusType) javax.ws.rs.core.Response.Status.NOT_FOUND);
+    verify(responseBuilder).status((Response.StatusType) jakarta.ws.rs.core.Response.Status.NOT_FOUND);
   }
 
   @Test
@@ -155,7 +155,7 @@ public class TestBeaconEndpoint {
     Response r = endpoint.findBeaconNumber(999);
     assertThat(r).isNotNull();
     verify(responseBuilder, never()).entity(any());
-    verify(responseBuilder).status((Response.StatusType) javax.ws.rs.core.Response.Status.NOT_FOUND);
+    verify(responseBuilder).status((Response.StatusType) jakarta.ws.rs.core.Response.Status.NOT_FOUND);
   }
 
   @Test
@@ -232,7 +232,7 @@ public class TestBeaconEndpoint {
     doThrow(new NotFoundException()).when(beaconService).update(anyLong(), any(BeaconDTO.class));
     Response r = endpoint.update(before.getId(), BeaconDTO.fromBeacon(after));
     assertThat(r).isNotNull();
-    verify(responseBuilder).status((Response.StatusType) javax.ws.rs.core.Response.Status.NOT_FOUND);
+    verify(responseBuilder).status((Response.StatusType) jakarta.ws.rs.core.Response.Status.NOT_FOUND);
   }
 
   @Test

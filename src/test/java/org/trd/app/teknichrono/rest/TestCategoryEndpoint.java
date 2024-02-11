@@ -18,10 +18,10 @@ import org.trd.app.teknichrono.model.repository.PilotRepository;
 import org.trd.app.teknichrono.util.exception.ConflictingIdException;
 import org.trd.app.teknichrono.util.exception.NotFoundException;
 
-import javax.persistence.OptimisticLockException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.ext.RuntimeDelegate;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.ext.RuntimeDelegate;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -151,7 +151,7 @@ public class TestCategoryEndpoint {
     Response r = endpoint.findById(999);
     assertThat(r).isNotNull();
     verify(responseBuilder, never()).entity(any());
-    verify(responseBuilder).status((Response.StatusType) javax.ws.rs.core.Response.Status.NOT_FOUND);
+    verify(responseBuilder).status((Response.StatusType) jakarta.ws.rs.core.Response.Status.NOT_FOUND);
   }
 
   @Test
@@ -262,7 +262,7 @@ public class TestCategoryEndpoint {
     when(categoryRepository.findById(before.getId())).thenReturn(null);
     Response r = endpoint.update(before.getId(), dto);
     assertThat(r).isNotNull();
-    verify(responseBuilder).status((Response.StatusType) javax.ws.rs.core.Response.Status.NOT_FOUND);
+    verify(responseBuilder).status((Response.StatusType) jakarta.ws.rs.core.Response.Status.NOT_FOUND);
   }
 
   @Test
