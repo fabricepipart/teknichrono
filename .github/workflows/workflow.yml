@@ -165,7 +165,7 @@ jobs:
           flags: javaserver
           name: codecov-java-server
 
-      - uses: azure/k8s-set-context@v3
+      - uses: azure/k8s-set-context@v4
         if: ${{env.secrets-available}}
         with:
           kubeconfig: ${{ secrets.KUBE_CONFIG }}
@@ -209,7 +209,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: azure/k8s-set-context@v3
+      - uses: azure/k8s-set-context@v4
         if: ${{env.secrets-available}}
         with:
           kubeconfig: ${{ secrets.KUBE_CONFIG }}
